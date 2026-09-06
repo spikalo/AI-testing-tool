@@ -1,0 +1,2187 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Basic Brain Test — lokaal model lab</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#14161a; --panel:#1b1e24; --panel-alt:#20242b; --border:#2a2f37;
+    --text:#e9e7e1; --text-dim:#9199a3; --text-faint:#5c636d;
+    --pos:#4fd1c5; --neg:#ff6b57; --warn:#ffb454; --grid:#22262d;
+    --c-in:#4fd1c5; --c-out:#ffb454; --c-sens:#59c2ff; --c-work:#8b7cf0;
+    --c-refl:#ff6b57; --c-mem:#f78fb3;
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    background:var(--bg); color:var(--text); font-family:'Inter',sans-serif; line-height:1.5;
+    background-image:linear-gradient(var(--grid) 1px, transparent 1px),linear-gradient(90deg, var(--grid) 1px, transparent 1px);
+    background-size:28px 28px; background-attachment:fixed;
+  }
+  h1,h2,h3{font-family:'Space Grotesk',sans-serif;margin:0;letter-spacing:.2px;}
+  .mono{font-family:'IBM Plex Mono',monospace;}
+  .wrap{max-width:1560px;margin:0 auto;padding:22px 24px 60px;}
+  a{color:var(--pos);}
+
+  .breadcrumb{font-size:12.5px;color:var(--text-dim);margin-bottom:12px;}
+  .breadcrumb a{color:var(--text-dim);text-decoration:none;border-bottom:1px dotted var(--text-faint);}
+  .breadcrumb a:hover{color:var(--pos);border-color:var(--pos);}
+
+  header{display:flex;justify-content:space-between;align-items:flex-end;flex-wrap:wrap;gap:16px;
+    padding-bottom:18px;margin-bottom:20px;border-bottom:1px solid var(--border);}
+  header h1{font-size:24px;font-weight:600;}
+  header .sub{color:var(--text-dim);font-size:13.5px;max-width:620px;margin-top:6px;}
+  .gametabs{display:flex;gap:8px;flex-wrap:wrap;}
+  .gametabs button{background:var(--panel);border:1px solid var(--border);color:var(--text-dim);
+    padding:8px 13px;border-radius:3px;font-family:'IBM Plex Mono',monospace;font-size:11.5px;cursor:pointer;transition:.15s;}
+  .gametabs button.active{color:var(--bg);background:var(--pos);border-color:var(--pos);font-weight:600;}
+  .gametabs button:disabled{opacity:.4;cursor:not-allowed;border-style:dashed;}
+  .gametabs button:hover:not(.active):not(:disabled){border-color:var(--text-dim);color:var(--text);}
+
+  .grid{display:grid;grid-template-columns:326px 1fr 348px;gap:18px;align-items:start;}
+  .grid > *{min-width:0;}
+  .lowerrow > *{min-width:0;}
+  @media (max-width:1400px){ .grid{grid-template-columns:300px 1fr;} .grid .col3{grid-column:1 / -1;} }
+  @media (max-width:1000px){ .grid{grid-template-columns:1fr;} }
+
+  .panel{background:var(--panel);border:1px solid var(--border);border-radius:4px;padding:18px;}
+  .panel + .panel{margin-top:18px;}
+  .panel h2{font-size:13px;color:var(--text-dim);font-weight:600;letter-spacing:.3px;
+    margin-bottom:12px;padding-bottom:10px;border-bottom:1px solid var(--border);
+    display:flex;justify-content:space-between;align-items:center;gap:8px;}
+  .panel h2 .hd{color:var(--text-faint);font-family:'IBM Plex Mono',monospace;font-size:10.5px;font-weight:400;}
+
+  .hint{font-size:11.5px;color:var(--text-faint);line-height:1.5;margin-top:4px;}
+  .hint b{color:var(--warn);}
+  .note{font-size:12px;color:var(--text-faint);margin-top:12px;line-height:1.55;}
+  .note b{color:var(--text-dim);}
+
+  .field{margin-bottom:14px;}
+  .field:last-child{margin-bottom:0;}
+  .field label{display:flex;justify-content:space-between;gap:8px;font-size:12.5px;color:var(--text-dim);margin-bottom:6px;}
+  .field label span.val{color:var(--warn);font-family:'IBM Plex Mono',monospace;}
+  input[type=range]{width:100%;accent-color:var(--pos);}
+  input[type=number]{background:var(--panel-alt);color:var(--text);border:1px solid var(--border);
+    padding:5px 6px;border-radius:3px;font-family:'IBM Plex Mono',monospace;font-size:12px;width:100%;}
+  input[type=text]{background:var(--panel-alt);color:var(--text);border:1px solid var(--border);
+    padding:7px 8px;border-radius:3px;font-family:'IBM Plex Mono',monospace;font-size:12.5px;width:100%;}
+  select{width:100%;background:var(--panel-alt);color:var(--text);border:1px solid var(--border);
+    padding:7px 8px;border-radius:3px;font-family:'IBM Plex Mono',monospace;font-size:12.5px;}
+  .checkline{display:flex;align-items:center;gap:7px;font-size:12px;color:var(--text-dim);margin-top:8px;}
+  .checkline input{accent-color:var(--pos);flex-shrink:0;}
+  .actionbtn{background:var(--panel-alt);color:var(--text);border:1px solid var(--border);
+    padding:8px;border-radius:3px;font-family:'IBM Plex Mono',monospace;font-size:12px;cursor:pointer;}
+  .actionbtn:hover:not(:disabled){border-color:var(--text-dim);}
+  .actionbtn.primary{background:var(--pos);color:#0d1210;border-color:var(--pos);font-weight:600;}
+  .actionbtn.primary:hover:not(:disabled){filter:brightness(1.08);}
+  .actionbtn.stop{background:var(--neg);color:#1a0d0a;border-color:var(--neg);font-weight:600;}
+  .actionbtn:disabled{opacity:.4;cursor:not-allowed;}
+  .row2{display:flex;gap:8px;} .row2 > *{flex:1;}
+  .row3{display:flex;gap:8px;} .row3 > *{flex:1;}
+
+  /* neuron type blocks */
+  .typeblock{background:var(--panel-alt);border:1px solid var(--border);border-left-width:3px;border-radius:3px;padding:10px 11px;margin-bottom:9px;}
+  .typeblock.off{opacity:.5;}
+  .typeblock .th{display:flex;align-items:center;gap:7px;font-size:12.5px;color:var(--text);}
+  .typeblock .th input{accent-color:var(--pos);}
+  .typeblock .th .cnt{margin-left:auto;font-family:'IBM Plex Mono',monospace;font-size:11px;color:var(--warn);}
+  .typeblock .rules{font-size:10.8px;color:var(--text-faint);margin:5px 0 7px;line-height:1.45;font-family:'IBM Plex Mono',monospace;}
+  .minmax{display:flex;gap:8px;align-items:center;font-size:11px;color:var(--text-faint);}
+  .minmax label{display:flex;gap:5px;align-items:center;flex:1;}
+  .tb-sens{border-left-color:var(--c-sens);} .tb-work{border-left-color:var(--c-work);}
+  .tb-refl{border-left-color:var(--c-refl);} .tb-mem{border-left-color:var(--c-mem);}
+
+  .validate{font-size:11.5px;padding:8px 10px;border-radius:3px;border:1px solid;margin-top:6px;line-height:1.45;}
+  .validate.ok{border-color:var(--pos);background:rgba(79,209,197,.07);color:var(--pos);}
+  .validate.bad{border-color:var(--neg);background:rgba(255,107,87,.07);color:var(--neg);}
+
+  /* world + net */
+  .stage{background:var(--panel);border:1px solid var(--border);border-radius:4px;padding:14px;}
+  .stage + .stage{margin-top:18px;}
+  .capt{display:flex;justify-content:space-between;align-items:center;margin-bottom:9px;flex-wrap:wrap;gap:10px;}
+  .capt h2{font-size:13px;color:var(--text-dim);font-weight:600;}
+  .capt .legend{display:flex;gap:12px;font-size:10.5px;color:var(--text-faint);flex-wrap:wrap;align-items:center;}
+  .dot{display:inline-block;width:8px;height:8px;border-radius:50%;margin-right:5px;vertical-align:middle;}
+  .swatch{display:inline-block;width:11px;height:2px;margin-right:5px;vertical-align:middle;}
+  canvas{display:block;width:100%;}
+  #worldcvs{background:#0f1114;border:1px solid var(--border);border-radius:3px;height:auto;aspect-ratio:100/70;}
+  #netcvs{background:#0f1114;border:1px solid var(--border);border-radius:3px;height:500px;cursor:crosshair;}
+  .statusbar{display:flex;gap:16px;flex-wrap:wrap;margin-top:9px;font-family:'IBM Plex Mono',monospace;font-size:11.5px;color:var(--text-faint);}
+  .statusbar b{color:var(--text);font-weight:500;}
+  .progresswrap{background:var(--panel-alt);border:1px solid var(--border);border-radius:3px;height:8px;overflow:hidden;margin-top:9px;}
+  .progressbar{height:100%;background:var(--pos);width:0%;transition:width .15s;}
+
+  .sensorgrid{display:grid;grid-template-columns:repeat(8,1fr);gap:4px;margin-top:9px;}
+  .sensorcell{background:var(--panel-alt);border:1px solid var(--border);border-radius:2px;padding:3px 2px;text-align:center;
+    font-family:'IBM Plex Mono',monospace;font-size:9px;color:var(--text-faint);position:relative;overflow:hidden;}
+  .sensorcell .bar{position:absolute;left:0;bottom:0;width:100%;background:var(--pos);opacity:.28;}
+  .sensorcell .v{position:relative;}
+  .btnrow{display:flex;gap:6px;margin-top:8px;}
+  .btnpill{flex:1;text-align:center;border:1px solid var(--border);background:var(--panel-alt);border-radius:3px;
+    padding:4px;font-family:'IBM Plex Mono',monospace;font-size:10.5px;color:var(--text-faint);}
+  .btnpill.on{background:rgba(255,180,84,.2);border-color:var(--warn);color:var(--warn);}
+
+  .metric{display:flex;justify-content:space-between;gap:10px;padding:6px 0;border-bottom:1px solid var(--border);font-size:12.5px;}
+  .metric:last-child{border-bottom:none;}
+  .metric .k{color:var(--text-dim);}
+  .metric .v{font-family:'IBM Plex Mono',monospace;font-weight:500;text-align:right;}
+
+  .verdict{margin-top:8px;padding:12px 14px;border-radius:3px;font-size:12.5px;border:1px solid;line-height:1.5;}
+  .verdict.good{background:rgba(79,209,197,.08);border-color:var(--pos);color:var(--pos);}
+  .verdict.mid{background:rgba(255,180,84,.08);border-color:var(--warn);color:var(--warn);}
+  .verdict.bad{background:rgba(255,107,87,.08);border-color:var(--neg);color:var(--neg);}
+  .verdict b{display:block;font-family:'Space Grotesk',sans-serif;font-size:13.5px;margin-bottom:3px;}
+
+  table{width:100%;border-collapse:collapse;font-size:11.5px;}
+  th,td{text-align:left;padding:6px 7px;border-bottom:1px solid var(--border);white-space:nowrap;}
+  th{color:var(--text-faint);font-weight:500;font-family:'IBM Plex Mono',monospace;font-size:10px;}
+  td{font-family:'IBM Plex Mono',monospace;color:var(--text);}
+  .scrollx{overflow-x:auto;}
+  .scrollx::-webkit-scrollbar{height:7px;} .scrollx::-webkit-scrollbar-thumb{background:var(--border);border-radius:4px;}
+  .badge{padding:1px 6px;border-radius:2px;font-size:10px;}
+  .badge.ok{background:rgba(79,209,197,.15);color:var(--pos);}
+  .badge.no{background:rgba(255,107,87,.15);color:var(--neg);}
+  .badge.mid{background:rgba(255,180,84,.15);color:var(--warn);}
+
+  .barrow{display:flex;align-items:center;gap:9px;margin-top:7px;font-family:'IBM Plex Mono',monospace;font-size:11px;}
+  .barrow .bl{min-width:118px;color:var(--text-dim);flex-shrink:0;overflow:hidden;text-overflow:ellipsis;}
+  .bar-track{flex:1;height:8px;background:var(--panel-alt);border:1px solid var(--border);border-radius:4px;overflow:hidden;}
+  .bar-fill{height:100%;border-radius:4px;background:var(--pos);}
+  .barrow .bv{min-width:52px;text-align:right;color:var(--text-faint);}
+
+  .savebar{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-top:10px;}
+  .savestatus{font-size:11px;color:var(--text-faint);font-family:'IBM Plex Mono',monospace;line-height:1.5;}
+
+  .lowerrow{display:grid;grid-template-columns:1fr 1fr;gap:18px;margin-top:18px;}
+  @media (max-width:1100px){ .lowerrow{grid-template-columns:1fr;} }
+
+  details.info{background:var(--panel);border:1px solid var(--border);border-radius:4px;padding:0;margin-top:18px;}
+  details.info summary{cursor:pointer;padding:14px 18px;font-family:'Space Grotesk',sans-serif;font-size:14px;color:var(--text);}
+  details.info summary::marker{color:var(--pos);}
+  details.info .body{padding:0 18px 18px;font-size:12.5px;color:var(--text-dim);line-height:1.65;}
+  details.info .body h3{font-size:13px;color:var(--text);margin:14px 0 5px;}
+  details.info .body code{font-family:'IBM Plex Mono',monospace;font-size:11.5px;color:var(--warn);}
+  details.info .body ul{margin:5px 0;padding-left:20px;}
+
+  #tooltip{position:fixed;pointer-events:none;background:#0c0e11;border:1px solid var(--border);border-radius:3px;
+    padding:7px 9px;font-family:'IBM Plex Mono',monospace;font-size:11px;color:var(--text);z-index:50;display:none;max-width:260px;line-height:1.5;}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <div class="breadcrumb"><a href="index.html">← Hoofdmenu</a></div>
+
+  <header>
+    <div>
+      <h1>Basic Brain Test — lokaal model lab</h1>
+      <div class="sub">Bouw een brein als <b>wolk van neuronen</b> in plaats van als stapel lagen, laat het een klein spel spelen, en kijk welke structuur het uit zichzelf vormt. Verbindingen groeien, versterken en vervagen tijdens het spelen — er is geen backpropagation.</div>
+    </div>
+    <div class="gametabs">
+      <button id="game-reach" class="active">Spel A — doel bereiken</button>
+      <button disabled>Spel B — volgt</button>
+    </div>
+  </header>
+
+  <div class="grid">
+
+    <!-- ============ LINKS: besturing ============ -->
+    <div class="col1">
+
+      <div class="panel">
+        <h2>Brein — neuronen <span class="hd" id="hd-neurons">16 in · 4 uit</span></h2>
+        <div class="field">
+          <label>Beschikbare neuronen <span class="val" id="nneuronsval">60</span></label>
+          <input type="range" id="nneurons" min="6" max="400" step="1" value="60">
+          <div class="hint">Het aantal neuronen waarmee de wolk <b>begint</b> tussen de 16 invoer-nodes en de 4 uitvoer-nodes. Tijdens het trainen kunnen er neuronen bijkomen (zie "Leren &amp; plasticiteit"). <b>Meer is niet automatisch beter</b>: een grote wolk heeft veel meer verbindingen nodig voordat er iets zinnigs doorheen loopt.</div>
+        </div>
+
+        <div class="typeblock tb-sens" id="tb-sens">
+          <div class="th"><input type="checkbox" id="en-sens" checked> Invoer-neuronen <span class="cnt" id="cnt-sens">–</span></div>
+          <div class="rules">in: alleen invoer-nodes · uit: vrij</div>
+          <div class="minmax">
+            <label>min <input type="number" id="min-sens" value="4" min="0" max="400"></label>
+            <label>max <input type="number" id="max-sens" value="14" min="0" max="400"></label>
+          </div>
+        </div>
+
+        <div class="typeblock tb-work" id="tb-work">
+          <div class="th"><input type="checkbox" id="en-work" checked disabled> Worker-neuronen <span class="cnt" id="cnt-work">–</span></div>
+          <div class="rules">in: vrij · uit: vrij — moet de meerderheid zijn</div>
+          <div class="minmax">
+            <label>min <input type="number" id="min-work" value="12" min="1" max="400"></label>
+            <label>max <input type="number" id="max-work" value="400" min="1" max="400"></label>
+          </div>
+        </div>
+
+        <div class="typeblock tb-refl" id="tb-refl">
+          <div class="th"><input type="checkbox" id="en-refl" checked> Reflex-/instinct-neuronen <span class="cnt" id="cnt-refl">–</span></div>
+          <div class="rules">in: uitsluitend invoer-neuronen · uit: uitsluitend uitvoer-nodes</div>
+          <div class="minmax">
+            <label>min <input type="number" id="min-refl" value="2" min="0" max="400"></label>
+            <label>max <input type="number" id="max-refl" value="10" min="0" max="400"></label>
+          </div>
+        </div>
+
+        <div class="typeblock tb-mem" id="tb-mem">
+          <div class="th"><input type="checkbox" id="en-mem" checked> Geheugen-neuronen <span class="cnt" id="cnt-mem">–</span></div>
+          <div class="rules">in: vrij · uit: eerst zichzelf, daarna vrij</div>
+          <div class="minmax">
+            <label>min <input type="number" id="min-mem" value="2" min="0" max="400"></label>
+            <label>max <input type="number" id="max-mem" value="10" min="0" max="400"></label>
+          </div>
+        </div>
+
+        <div class="validate ok" id="typevalidate">…</div>
+
+        <div class="field" style="margin-top:12px;">
+          <label>Startdichtheid verbindingen <span class="val" id="densval">25.0</span></label>
+          <input type="range" id="density" min="5" max="400" step="1" value="250">
+          <div class="hint">Gemiddeld aantal uitgaande verbindingen per neuron bij de start. <b>Dit is veruit de belangrijkste knop</b>: uitgemeten haalt een dun bedrade wolk (3–8) het doel nauwelijks vaker dan toeval, terwijl dezelfde wolk bij 25 boven de 70% uitkomt. Meer paden van zintuig naar knop betekent meer waar de beloning iets aan kan toeschrijven. Alle 16 invoer-nodes en alle 4 uitvoer-nodes worden hoe dan ook aangesloten — dat is de enige harde eis.</div>
+        </div>
+
+        <div class="field">
+          <label>Naam van dit brein</label>
+          <input type="text" id="brainname" value="brein-01">
+        </div>
+        <div class="row2">
+          <button class="actionbtn primary" id="genbrain">⟳ nieuw brein</button>
+          <button class="actionbtn" id="preset">standaardwaarden</button>
+        </div>
+      </div>
+
+      
+      <div class="panel">
+        <h2>Leren &amp; plasticiteit</h2>
+        <div class="field">
+          <label>Leersnelheid η <span class="val" id="lrval">0.008</span></label>
+          <input type="range" id="lr" min="1" max="600" step="1" value="8">
+          <div class="hint">Hoe sterk beloning de verbindingen bijstelt. Te hoog = het brein gooit alles om na één toevalstreffer.</div>
+        </div>
+        <div class="field">
+          <label>Sporen-vervaging λ <span class="val" id="elamval">0.60</span></label>
+          <input type="range" id="elam" min="5" max="99" step="1" value="60">
+          <div class="hint">Hoe lang een verbinding "onthoudt" dat hij net actief was. Hoog = beloning wordt ver terug uitgesmeerd, maar ook over stappen die er niets mee te maken hadden.</div>
+        </div>
+        <div class="field">
+          <label>Vervaging per poging <span class="val" id="decval">0.0005</span></label>
+          <input type="range" id="dec" min="0" max="100" step="1" value="5">
+          <div class="hint">Na elke poging zakt elk gewicht een klein beetje naar nul. Wat niets bijdraagt, <b>vervaagt vanzelf</b> en wordt uiteindelijk gesnoeid.</div>
+        </div>
+        <div class="field">
+          <label>Maximaal gewicht <span class="val" id="wmaxval">2.0</span></label>
+          <input type="range" id="wmax" min="3" max="150" step="1" value="20">
+          <div class="hint">Harde bovengrens. Bovendien wordt elke aanpassing geremd naarmate een gewicht die grens nadert: <b>niet oneindig versterken</b>.</div>
+        </div>
+        <div class="field">
+          <label>Max. verandering per stap <span class="val" id="stepmaxval">0.100</span></label>
+          <input type="range" id="stepmax" min="1" max="500" step="1" value="100">
+          <div class="hint"><b>Niet abrupt</b>: geen enkele verbinding mag in één stap meer dan dit verschuiven.</div>
+        </div>
+        <div class="field">
+          <label>Geheugenlek α <span class="val" id="memleakval">0.35</span></label>
+          <input type="range" id="memleak" min="1" max="100" step="1" value="35">
+          <div class="hint">Alleen voor geheugen-neuronen: hoe snel hun inhoud ververst. Laag = houdt lang vast.</div>
+        </div>
+        <div class="field">
+          <label>Propagatiestappen per tik <span class="val" id="propval">2</span></label>
+          <input type="range" id="prop" min="1" max="8" step="1" value="2">
+          <div class="hint">Hoe ver een signaal binnen één spelstap door de wolk reist. Bij <b>1</b> kost elke verbinding een tijdstap — reflexbogen zijn dan echt sneller dan lange omwegen.</div>
+        </div>
+        <div class="field">
+          <label>Exploratie start → eind <span class="val" id="noiseval">0.30 → 0.09</span></label>
+          <input type="range" id="noise" min="3" max="100" step="1" value="30">
+          <div class="hint">De vier knoppen worden <b>geloot</b> uit hun eigen kans; deze regelaar bepaalt hoe grillig die loting is, plus hoeveel ruis er in de wolk zit. Nooit helemaal nul — zonder exploratie komt er geen leersignaal meer binnen.</div>
+        </div>
+        <div class="checkline"><input type="checkbox" id="lranneal" checked> leersnelheid meeschalen met de exploratie</div>
+        <hr style="border:none;border-top:1px solid var(--border);margin:14px 0;">
+        <div class="checkline"><input type="checkbox" id="structplast" checked> structurele plasticiteit (snoeien &amp; nieuwe verbindingen)</div>
+        <div class="field" style="margin-top:10px;">
+          <label>Herstructureren elke <span class="val" id="structeveryval">10</span> pogingen</label>
+          <input type="range" id="structevery" min="2" max="120" step="1" value="10">
+        </div>
+        <div class="field">
+          <label>Snoeidrempel |w| <span class="val" id="pruneval">0.030</span></label>
+          <input type="range" id="prune" min="0" max="200" step="1" value="30">
+        </div>
+        <div class="field">
+          <label>Nieuwe verbindingen per ronde <span class="val" id="sproutval">6</span></label>
+          <input type="range" id="sprout" min="0" max="120" step="1" value="6">
+        </div>
+
+        <div class="checkline"><input type="checkbox" id="retype" checked> neuronen mogen van soort veranderen</div>
+        <div class="field" style="margin-top:10px;">
+          <label>Soortveranderingen per ronde <span class="val" id="retypenval">3</span></label>
+          <input type="range" id="retypen" min="0" max="12" step="1" value="3">
+          <div class="hint">Het systeem kijkt naar de bedrading die een neuron feitelijk heeft en geeft het de soort die daar het beste bij past. Verbindingen die door de nieuwe regels verboden worden, verdwijnen — dus een verandering kost iets.</div>
+        </div>
+        <div class="field">
+          <label>Max. omschakelkosten <span class="val" id="retypecostval">0.25</span></label>
+          <input type="range" id="retypecost" min="0" max="200" step="1" value="25">
+          <div class="hint">Een al toegewezen neuron wisselt alleen van soort als er <b>bijna geen gewicht verloren gaat</b>. Neutrale neuronen wisselen altijd — die hebben nog niets te verliezen.</div>
+        </div>
+
+        <div class="checkline"><input type="checkbox" id="grow" checked> nieuwe neuronen laten bijgroeien (komen neutraal binnen)</div>
+        <div class="checkline"><input type="checkbox" id="growstag" checked> alleen als het brein niet meer vooruitgaat</div>
+        <div class="field" style="margin-top:10px;">
+          <label>Max. aantal neuronen <span class="val" id="growmaxval">140</span></label>
+          <input type="range" id="growmax" min="6" max="500" step="2" value="140">
+        </div>
+        <div class="field">
+          <label>Nieuwe neuronen per ronde <span class="val" id="grownval">2</span></label>
+          <input type="range" id="grown" min="0" max="10" step="1" value="2">
+        </div>
+        <div class="field">
+          <label>Startverbindingen per nieuw neuron <span class="val" id="newlinksval">4</span></label>
+          <input type="range" id="newlinks" min="1" max="20" step="1" value="4">
+          <div class="hint">Een nieuw neuron komt <b>neutraal</b> binnen: het mag alles, hoort nergens bij, en krijgt bij de eerstvolgende ronde een soort toegewezen op grond van de verbindingen die het inmiddels heeft.</div>
+        </div>
+      </div>
+
+      
+      <div class="panel">
+        <h2>Training</h2>
+        <div class="field">
+          <label>Aantal pogingen <span class="val" id="nepval">500</span></label>
+          <input type="range" id="nep" min="10" max="3000" step="10" value="500">
+        </div>
+        <div class="field">
+          <label>Snelheid <span class="val" id="spdval">4× </span></label>
+          <input type="range" id="spd" min="0" max="6" step="1" value="2">
+          <div class="hint">Op <b>turbo</b> wordt de wereld niet meer per stap getekend en rekent hij zo snel als je machine toestaat.</div>
+        </div>
+        <div class="row3">
+          <button class="actionbtn primary" id="btnstart">▶ start</button>
+          <button class="actionbtn" id="btnpause" disabled>⏸ pauze</button>
+          <button class="actionbtn stop" id="btnstop" disabled>■ stop</button>
+        </div>
+        <div class="row2" style="margin-top:8px;">
+          <button class="actionbtn" id="btnreset">↺ brein wissen</button>
+          <button class="actionbtn" id="btnwatch">👁 kijk één poging</button>
+        </div>
+        <div class="checkline"><input type="checkbox" id="autosave" checked> automatisch opslaan zodra de training klaar is</div>
+        <div class="checkline"><input type="checkbox" id="evalon" checked> elke 20 pogingen toetsen op 10 <i>onbekende</i> werelden (zonder leren én zonder loting)</div>
+      </div>
+
+    </div>
+
+    <!-- ============ MIDDEN: wereld + netwerk ============ -->
+    <div class="col2">
+
+      <div class="stage">
+        <div class="capt">
+          <h2>Het brein — levende structuur</h2>
+          <div class="legend">
+            <span><span class="dot" style="background:var(--c-in);"></span>invoer-node</span>
+            <span><span class="dot" style="background:var(--c-sens);"></span>invoer-neuron</span>
+            <span><span class="dot" style="background:var(--c-work);"></span>worker</span>
+            <span><span class="dot" style="background:var(--c-refl);"></span>reflex</span>
+            <span><span class="dot" style="background:var(--c-mem);"></span>geheugen</span>
+            <span><span class="dot" style="background:#7c8794;"></span>neutraal</span>
+            <span><span class="dot" style="background:var(--c-out);"></span>uitvoer-node</span>
+            <span><span class="swatch" style="background:#4fd1c5;"></span>versterkend</span>
+            <span><span class="swatch" style="background:#ff6b57;"></span>remmend</span>
+          </div>
+        </div>
+        <canvas id="netcvs" width="1400" height="880"></canvas>
+        <div class="statusbar" style="justify-content:space-between;">
+          <span>neuronen <b id="n-neurons">0</b></span>
+          <span>verbindingen <b id="n-conns">0</b></span>
+          <span>gem. |w| <b id="n-meanw">0.00</b></span>
+          <span>sterk (&gt;50%) <b id="n-strong">0</b></span>
+          <span>gesnoeid <b id="n-pruned">0</b></span>
+          <span>nieuw <b id="n-sprouted">0</b></span>
+          <span>neuronen bij <b id="n-born">0</b></span>
+          <span>omgetypt <b id="n-retyped">0</b></span>
+        </div>
+        <div class="statusbar" style="margin-top:4px;">
+          <label class="checkline" style="margin:0;"><input type="checkbox" id="showweak" checked> toon zwakke verbindingen</label>
+          <label class="checkline" style="margin:0;"><input type="checkbox" id="showpulse" checked> toon signalen</label>
+          <label class="checkline" style="margin:0;"><input type="checkbox" id="showlabels" checked> labels</label>
+          <button class="actionbtn" id="relayout" style="padding:3px 9px;">herschik wolk</button>
+          <span class="hint" style="margin:0;">Klik een neuron aan om alleen zijn verbindingen te zien.</span>
+        </div>
+      </div>
+
+      <div class="stage">
+        <div class="capt">
+          <h2>De wereld</h2>
+          <div class="legend">
+            <span><span class="dot" style="background:#4fd1c5;"></span>karakter</span>
+            <span><span class="dot" style="background:#ffb454;"></span>doel</span>
+            <span><span class="dot" style="background:#39414c;"></span>obstakel</span>
+            <span><span class="swatch" style="background:#ff6b57;"></span>sensorstraal</span>
+          </div>
+        </div>
+        <canvas id="worldcvs" width="1000" height="700"></canvas>
+        <div class="progresswrap"><div class="progressbar" id="progbar"></div></div>
+        <div class="statusbar">
+          <span>poging <b id="s-ep">0</b>/<b id="s-eptot">0</b></span>
+          <span>stap <b id="s-step">0</b></span>
+          <span>beloning <b id="s-rew">0.00</b></span>
+          <span>afstand tot doel <b id="s-dist">–</b></span>
+          <span>botsingen <b id="s-col">0</b></span>
+          <span>ruis <b id="s-noise">–</b></span>
+          <span id="s-state">klaar om te starten</span>
+        </div>
+        <div class="sensorgrid" id="sensorgrid"></div>
+        <div class="btnrow" id="btnrow">
+          <div class="btnpill" id="bp-0">▲ omhoog</div>
+          <div class="btnpill" id="bp-1">▼ omlaag</div>
+          <div class="btnpill" id="bp-2">◀ links</div>
+          <div class="btnpill" id="bp-3">▶ rechts</div>
+        </div>
+      </div>
+
+      <div class="stage">
+        <div class="capt"><h2>Leercurves</h2>
+          <div class="legend">
+            <span><span class="swatch" style="background:#4fd1c5;"></span>succes % (laatste 20)</span>
+            <span><span class="swatch" style="background:#ffb454;"></span>beloning per poging</span>
+            <span><span class="swatch" style="background:#59c2ff;"></span>stappen tot doel</span>
+            <span><span class="swatch" style="background:#f78fb3;"></span>toets op onbekende werelden</span>
+          </div>
+        </div>
+        <canvas id="chart1" width="1400" height="380" style="height:190px;"></canvas>
+        <div class="capt" style="margin-top:14px;"><h2 style="font-size:12px;">Structuur in de tijd</h2>
+          <div class="legend">
+            <span><span class="swatch" style="background:#8b7cf0;"></span>aantal verbindingen</span>
+            <span><span class="swatch" style="background:#ff6b57;"></span>gemiddeld |w|</span>
+            <span><span class="swatch" style="background:#4fd1c5;"></span>aantal neuronen</span>
+          </div>
+        </div>
+        <canvas id="chart2" width="1400" height="260" style="height:130px;"></canvas>
+      </div>
+
+    </div>
+
+    <!-- ============ RECHTS: meetwaarden ============ -->
+    <div class="col3">
+      <div class="panel">
+        <h2>Prestatie</h2>
+        <div class="metric"><span class="k">pogingen gedaan</span><span class="v" id="m-eps">0</span></div>
+        <div class="metric"><span class="k">doel bereikt</span><span class="v" id="m-succ">0 (0%)</span></div>
+        <div class="metric"><span class="k">succes laatste 20</span><span class="v" id="m-succ20">0%</span></div>
+        <div class="metric"><span class="k">toets op onbekende werelden</span><span class="v" id="m-eval">–</span></div>
+        <div class="metric"><span class="k">gem. stappen bij succes</span><span class="v" id="m-steps">–</span></div>
+        <div class="metric"><span class="k">gem. beloning (laatste 20)</span><span class="v" id="m-rew">–</span></div>
+        <div class="metric"><span class="k">beste poging</span><span class="v" id="m-best">–</span></div>
+        <div class="metric"><span class="k">botsingen per poging</span><span class="v" id="m-col">–</span></div>
+        <div class="metric"><span class="k">rekentijd</span><span class="v" id="m-time">–</span></div>
+        <div id="verdict" class="verdict mid"><b>Nog niets gemeten</b>Genereer een brein en druk op start.</div>
+      </div>
+
+<div class="panel">
+        <h2>Wereld &amp; spel</h2>
+        <div class="field">
+          <label>Aantal obstakels <span class="val" id="nobsval">5</span></label>
+          <input type="range" id="nobs" min="0" max="26" step="1" value="5">
+        </div>
+        <div class="field">
+          <label>Stappen per poging <span class="val" id="maxstepsval">320</span></label>
+          <input type="range" id="maxsteps" min="80" max="2000" step="20" value="320">
+        </div>
+        <div class="field">
+          <label>Nieuwe wereld elke <span class="val" id="worldeveryval">4</span> pogingen</label>
+          <input type="range" id="worldevery" min="1" max="200" step="1" value="4">
+          <div class="hint">Start en doel liggen elke wereld tegen twee andere randen — links→rechts, boven→onder, en alles daartussen — met de obstakels in het midden. Zet je dit hoog, dan traint het brein lang in dezelfde wereld: de klassieke manier om te laten zien hoe iets een route uit z'n hoofd leert zonder te snappen wat het doet.</div>
+        </div>
+        <div class="field">
+          <label>Snelheid karakter <span class="val" id="speedval">1.1</span></label>
+          <input type="range" id="chspeed" min="3" max="45" step="1" value="11">
+        </div>
+        <div class="field">
+          <label>Wereld-seed <span class="val" id="seedval">1</span></label>
+          <input type="range" id="seed" min="1" max="9999" step="1" value="1">
+        </div>
+        <div class="checkline"><input type="checkbox" id="botsstop"> poging stopt na een botsing</div>
+      </div>
+
+<div class="panel">
+        <h2>Beloningen</h2>
+        <div class="field">
+          <label>Doel bereikt <span class="val" id="rgoalval">+10.0</span></label>
+          <input type="range" id="rgoal" min="0" max="400" step="5" value="100">
+        </div>
+        <div class="field">
+          <label>Dichter bij doel (per eenheid) <span class="val" id="rprogval">+1.00</span></label>
+          <input type="range" id="rprog" min="0" max="400" step="5" value="100">
+        </div>
+        <div class="field">
+          <label>Botsing <span class="val" id="rcolval">−0.30</span></label>
+          <input type="range" id="rcol" min="0" max="200" step="5" value="30">
+        </div>
+        <div class="field">
+          <label>Kosten per stap <span class="val" id="rstepval">−0.010</span></label>
+          <input type="range" id="rstep" min="0" max="100" step="1" value="10">
+        </div>
+        <div class="field">
+          <label>Stilstaan <span class="val" id="ridleval">−0.150</span></label>
+          <input type="range" id="ridle" min="0" max="300" step="5" value="150">
+        </div>
+        <div class="hint">Het brein krijgt <b>alleen deze getallen</b> te zien — geen voorbeeldroutes, geen kaart. Zet "dichter bij doel" op 0 en je ziet meteen hoe lastig leren wordt als er alleen aan het eind beloning is.</div>
+      </div>
+
+      <div class="panel">
+        <h2>Wat heeft het brein gebouwd?</h2>
+        <div id="structreport">
+          <div class="hint">Nog geen brein.</div>
+        </div>
+      </div>
+
+      <div class="panel">
+        <h2>Sensorgebruik</h2>
+        <div class="hint" style="margin-bottom:6px;">Hoeveel gewichtsmassa er vanaf elke invoer-node richting de uitvoer loopt. Sensoren onderaan worden door dit brein feitelijk <b>genegeerd</b>.</div>
+        <div id="sensoruse"></div>
+      </div>
+
+      <div class="panel">
+        <h2>Opslaan</h2>
+        <div class="savebar">
+          <button class="actionbtn" id="choosedir">📁 kies resultatenmap</button>
+          <button class="actionbtn" id="savenow">💾 nu opslaan</button>
+          <button class="actionbtn" id="downloadjson">⬇ download JSON</button>
+        </div>
+        <div class="savestatus" id="savestatus" style="margin-top:8px;">nog geen map gekozen — kies de map <b>resultaten-brein</b> in je projectmap.</div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- ============ ONDER: vergelijking ============ -->
+  <div class="lowerrow">
+    <div class="panel">
+      <h2>Breinen vergelijken <span class="hd" id="cmpcount">0 breinen</span></h2>
+      <div class="scrollx" style="max-height:280px;overflow-y:auto;">
+        <table>
+          <thead><tr>
+            <th>brein</th><th>neuronen</th><th>samenstelling (start → eind)</th><th>verb.</th>
+            <th>succes</th><th>laatste 20</th><th>toets</th><th>stappen</th><th>beloning</th><th>lussen</th><th>reflex</th><th>omgetypt</th><th>tijd</th>
+          </tr></thead>
+          <tbody id="cmpbody"></tbody>
+        </table>
+      </div>
+      <div class="savebar">
+        <button class="actionbtn" id="addcompare">+ huidige brein toevoegen</button>
+        <button class="actionbtn" id="clearcompare">wis tabel</button>
+      </div>
+      <div class="note">Elke afgeronde training komt hier vanzelf bij te staan én wordt als los JSON-bestand in <b>resultaten-brein</b> gezet. De viewer <a href="brein-resultaten.html">brein-resultaten.html</a> leest die map en tekent de netwerken opnieuw.</div>
+    </div>
+
+    <div class="panel">
+      <h2>Vergelijking in beeld</h2>
+      <div class="field" style="margin-bottom:8px;">
+        <label>Waarop vergelijken</label>
+        <select id="cmpmetric">
+          <option value="succ20">succes laatste 20 pogingen</option>
+          <option value="succ">succes over alle pogingen</option>
+          <option value="evalPct">toets op onbekende werelden</option>
+          <option value="avgSteps">gem. stappen bij succes (lager is beter)</option>
+          <option value="conns">aantal verbindingen</option>
+          <option value="neurons">aantal neuronen aan het eind</option>
+          <option value="retypes">soortveranderingen</option>
+          <option value="loops">aantal lussen</option>
+        </select>
+      </div>
+      <div id="cmpbars"><div class="hint">Nog geen breinen toegevoegd.</div></div>
+    </div>
+  </div>
+
+  <details class="info">
+    <summary>Hoe dit brein werkt — en waarom het geen lagen heeft</summary>
+    <div class="body">
+      <h3>Invoer (16 nodes)</h3>
+      <p>Acht sensoren meten in acht richtingen (N, NO, O, ZO, Z, ZW, W, NW) de afstand tot het dichtstbijzijnde obstakel of de wereldrand; de waarde loopt van <code>0</code> (niets in de buurt) tot <code>1</code> (er staat iets vlak voor je). Acht andere sensoren doen hetzelfde voor het doel: hoe dichterbij het doel ligt <i>en</i> hoe beter die richting naar het doel wijst, hoe hoger de waarde. Meer krijgt het brein niet — geen coördinaten, geen kaart, geen geheugen van de wereld.</p>
+      <h3>Uitvoer (4 nodes)</h3>
+      <p>Vier knoppen: omhoog, omlaag, links, rechts. Elke knop met een waarde boven de drempel wordt ingedrukt; twee tegelijk levert een diagonaal. Niets indrukken mag ook — dat kost wel beloning.</p>
+      <h3>De wolk ertussen</h3>
+      <p>Geen lagen. Je bepaalt hoeveel neuronen er beschikbaar zijn en van welk type, en de verbindingen worden willekeurig gelegd binnen de regels per type. Daarna is alles dynamisch: er is geen minimum of maximum aantal verbindingen per neuron. De enige harde eis is dat <b>elke invoer-node ergens naartoe gaat en elke uitvoer-node ergens vandaan komt</b>.</p>
+      <ul>
+        <li><b>Invoer-neuron</b> — mag als invoer alléén invoer-nodes hebben; zijn uitgang is vrij.</li>
+        <li><b>Worker-neuron</b> — mag alles met alles; moet altijd de meerderheid van de wolk vormen.</li>
+        <li><b>Reflex-/instinct-neuron</b> — krijgt alleen invoer-neuronen binnen (of invoer-nodes, tenzij je "streng" aanzet) en gaat alleen naar uitvoer-nodes. Dat is een korte boog van zintuig naar spier: sneller dan elke omweg door de wolk.</li>
+        <li><b>Geheugen-neuron</b> — heeft altijd een verbinding naar zichzelf, waardoor het z'n waarde vasthoudt over de tijd; verder mag het van en naar alles.</li>
+      </ul>
+      <h3>Leren zonder backpropagation</h3>
+      <p>Elke verbinding houdt een <i>spoor</i> bij: was ik net actief terwijl mijn doelneuron ook actief was? Dat spoor vervaagt met λ. Komt er beloning binnen, dan wordt elk gewicht bijgesteld met <code>Δw = η · beloning · spoor</code>. Drie remmen zorgen dat het niet ontspoort: de aanpassing per stap is begrensd (niet abrupt), de aanpassing wordt kleiner naarmate een gewicht zijn plafond nadert (niet oneindig versterken), en alles zakt elke stap een beetje naar nul (vervagen). Dit heet reward-gemoduleerde Hebbiaanse plasticiteit; het is hoe leren in echte zenuwstelsels grofweg beschreven wordt, en het werkt ook in netwerken vol lussen — waar backpropagation vastloopt.</p>
+      <h3>Neutrale neuronen, groei en van soort veranderen</h3>
+      <p>De wolk ligt niet vast. Loopt het leren vast, dan mogen er <b>nieuwe neuronen bijgroeien</b>; die komen <b>neutraal</b> binnen &mdash; ze horen nog nergens bij, mogen alles, en krijgen een paar willekeurige verbindingen. Bij de eerstvolgende opruimronde bepaalt het systeem welke soort het beste past bij de bedrading die zo'n neuron inmiddels heeft: hangt het alleen aan invoer-nodes, dan wordt het een invoer-neuron; zit het tussen invoer-neuronen en knoppen, dan een reflex; zit het in een lus, dan geheugen; en anders worker.</p>
+      <p>Ook bestaande neuronen mogen van soort wisselen, maar alleen als dat <b>bijna geen gewicht kost</b> &mdash; de verbindingen die door de nieuwe regels verboden worden, moeten immers weg. Zo verandert de samenstelling geleidelijk mee met wat het brein werkelijk doet, in plaats van vast te liggen op wat jij vooraf hebt ingesteld. Een neuron dat al zijn verbindingen kwijtraakt, wordt weer neutraal: vrij materiaal om opnieuw in te zetten. De meerderheidsregel voor workers blijft altijd gelden, en jouw minima en maxima per soort zijn de grenzen waarbinnen dit gebeurt.</p>
+      <h3>Structurele plasticiteit</h3>
+      <p>Om de zoveel pogingen wordt opgeruimd: verbindingen die te lang te zwak zijn verdwijnen, en er groeien nieuwe verbindingen bij op plekken waar weinig zit — altijd binnen de typeregels, en nooit zo dat een invoer- of uitvoer-node losraakt. Daardoor is de structuur die je aan het eind ziet <b>niet degene die je hebt ingesteld</b>, maar degene die het brein zelf overgehouden heeft.</p>
+      <h3>Waar je op moet letten</h3>
+      <p>Interessant is niet alleen of het doel gehaald wordt, maar wát er is ontstaan: hoeveel reflexbogen (sensor → reflex → knop), hoeveel lussen door geheugen-neuronen, welke sensoren volledig genegeerd worden, en of het kortste pad van invoer naar uitvoer twee stappen is of zes. Een brein dat het in de trainingswereld goed doet maar op de toetswerelden instort, heeft de route uit z'n hoofd geleerd in plaats van te leren navigeren — precies dezelfde faalvorm als een te klein of te lang doorgetraind taalmodel.</p>
+    </div>
+  </details>
+
+  <div class="note">
+    Alles draait lokaal in je browser; er gaat niets naar buiten. Resultaten komen als één JSON-bestand per brein in de map <b>resultaten-brein</b> in deze projectmap — kies die map één keer via "kies resultatenmap" (Chrome/Edge onthouden hem daarna), of gebruik de downloadknop. Open de pagina bij voorkeur via <b>start-server.cmd</b>.
+  </div>
+
+</div>
+<div id="tooltip"></div>
+<script>
+"use strict";
+/* =========================================================================
+   Basic Brain Test — een brein als wolk van neuronen dat een klein spel speelt.
+   Alles lokaal, geen bibliotheken, geen backpropagation.
+   ========================================================================= */
+
+const $ = id => document.getElementById(id);
+const clamp = (v,a,b)=> v<a?a:(v>b?b:v);
+const tanh = Math.tanh;
+const sigm = v => 1/(1+Math.exp(-v));
+function mulberry32(a){ return function(){ a|=0; a=a+0x6D2B79F5|0; let t=Math.imul(a^a>>>15,1|a);
+  t=t+Math.imul(t^t>>>7,61|t)^t; return ((t^t>>>14)>>>0)/4294967296; }; }
+function fmt(n,d=2){ return (Math.round(n*Math.pow(10,d))/Math.pow(10,d)).toFixed(d); }
+
+/* ======================= wereld ======================= */
+const WW=100, WH=70, AGENT_R=1.7, GOAL_R=3.4, RAY_MAX=34;
+const DIRNAME=["N","NO","O","ZO","Z","ZW","W","NW"];
+const DIRV=[]; for(let i=0;i<8;i++){ const a=-Math.PI/2 + i*Math.PI/4; DIRV.push([Math.cos(a),Math.sin(a)]); }
+const N_IN=16, N_OUT=4;
+const OUTNAME=["omhoog","omlaag","links","rechts"];
+const GOAL_MAX=Math.hypot(WW,WH);
+
+/* Vaste plekken in het brein: eerst de 16 invoer-nodes, dan de 4 uitvoer-nodes,
+   dan pas de wolk. Daardoor kunnen er tijdens het trainen neuronen bijkomen zonder
+   dat bestaande nummers verschuiven. */
+const OUT0=N_IN, HID0=N_IN+N_OUT;
+const K_IN=0, K_SENS=1, K_WORK=2, K_REFL=3, K_MEM=4, K_NEUT=5, K_OUT=6;
+const KIND_NAME=["invoer-node","invoer-neuron","worker","reflex","geheugen","neutraal","uitvoer-node"];
+const KIND_COL=["#4fd1c5","#59c2ff","#8b7cf0","#ff6b57","#f78fb3","#7c8794","#ffb454"];
+const KIND_KEY=["in","sens","work","refl","mem","neut","out"];
+const TYPES=["sens","work","refl","mem"];
+const KIND_OF={sens:K_SENS,work:K_WORK,refl:K_REFL,mem:K_MEM};
+
+function rectHit(x,y,o,pad){ return x> o.x-pad && x< o.x+o.w+pad && y> o.y-pad && y< o.y+o.h+pad; }
+function circleRect(cx,cy,r,o){
+  const nx=clamp(cx,o.x,o.x+o.w), ny=clamp(cy,o.y,o.y+o.h);
+  const dx=cx-nx, dy=cy-ny; return dx*dx+dy*dy < r*r;
+}
+/* Start en doel liggen tegen twee tegenoverliggende randen, maar wélke randen
+   wisselt per wereld: links→rechts, rechts→links, boven→onder of onder→boven.
+   De obstakels blijven in het middengebied, zodat er altijd iets te ontwijken valt
+   en het brein niet simpelweg "altijd naar rechts" kan leren. */
+const SIDES=[[0,1],[1,0],[2,3],[3,2],[0,3],[3,0],[1,2],[2,1]];
+function edgePoint(side,rnd){
+  const m=4.5, band=7;
+  switch(side){
+    case 0: return {x:m+rnd()*band,          y:5+rnd()*(WH-10)};   // links
+    case 1: return {x:WW-m-rnd()*band,       y:5+rnd()*(WH-10)};   // rechts
+    case 2: return {x:6+rnd()*(WW-12),       y:m+rnd()*band};      // boven
+    default:return {x:6+rnd()*(WW-12),       y:WH-m-rnd()*band};   // onder
+  }
+}
+function makeWorld(seed,nObs){
+  const rnd=mulberry32(seed*7919+13);
+  for(let attempt=0;attempt<80;attempt++){
+    const pair=SIDES[Math.floor(rnd()*SIDES.length)];
+    const start=edgePoint(pair[0],rnd);
+    const goal =edgePoint(pair[1],rnd);
+    if(Math.hypot(goal.x-start.x,goal.y-start.y)<Math.min(WW,WH)*0.75) continue;
+    const obs=[];
+    let guard=0;
+    while(obs.length<nObs && guard++<500){
+      const w=4+rnd()*13, h=4+rnd()*15;
+      /* obstakels graviteren naar het midden */
+      const cx=WW*(0.5+(rnd()-0.5)*0.68), cy=WH*(0.5+(rnd()-0.5)*0.72);
+      const o={x:clamp(cx-w/2,1,WW-w-1), y:clamp(cy-h/2,1,WH-h-1), w, h};
+      if(circleRect(start.x,start.y,AGENT_R+4.5,o)) continue;
+      if(circleRect(goal.x,goal.y,GOAL_R+4.5,o)) continue;
+      obs.push(o);
+    }
+    if(reachable(start,goal,obs)) return {seed,obs,start,goal,richting:pair};
+  }
+  return {seed,obs:[],start:{x:8,y:WH/2},goal:{x:WW-8,y:WH/2},richting:[0,1]};
+}
+function blocked(x,y,obs){
+  if(x<AGENT_R||x>WW-AGENT_R||y<AGENT_R||y>WH-AGENT_R) return true;
+  for(const o of obs) if(circleRect(x,y,AGENT_R,o)) return true;
+  return false;
+}
+function reachable(start,goal,obs){
+  const step=1, cols=Math.floor(WW/step), rows=Math.floor(WH/step);
+  const idx=(c,r)=>r*cols+c;
+  const seen=new Uint8Array(cols*rows);
+  const sc=clamp(Math.floor(start.x/step),0,cols-1), sr=clamp(Math.floor(start.y/step),0,rows-1);
+  const gc=clamp(Math.floor(goal.x/step),0,cols-1), gr=clamp(Math.floor(goal.y/step),0,rows-1);
+  if(blocked((sc+.5)*step,(sr+.5)*step,obs)) return false;
+  const q=[idx(sc,sr)]; seen[q[0]]=1;
+  let head=0;
+  while(head<q.length){
+    const cur=q[head++]; const c=cur%cols, r=(cur-c)/cols;
+    if(Math.abs(c-gc)<=2 && Math.abs(r-gr)<=2) return true;
+    const nb=[[c+1,r],[c-1,r],[c,r+1],[c,r-1]];
+    for(const [nc,nr] of nb){
+      if(nc<0||nr<0||nc>=cols||nr>=rows) continue;
+      const ni=idx(nc,nr); if(seen[ni]) continue;
+      if(blocked((nc+.5)*step,(nr+.5)*step,obs)) { seen[ni]=1; continue; }
+      seen[ni]=1; q.push(ni);
+    }
+  }
+  return false;
+}
+/* straal tot dichtstbijzijnde obstakel/rand in richting d */
+function rayDist(px,py,dx,dy,obs){
+  let best=RAY_MAX;
+  if(dx>1e-9) best=Math.min(best,(WW-px)/dx); else if(dx<-1e-9) best=Math.min(best,(0-px)/dx);
+  if(dy>1e-9) best=Math.min(best,(WH-py)/dy); else if(dy<-1e-9) best=Math.min(best,(0-py)/dy);
+  for(const o of obs){
+    let tmin=0, tmax=best;
+    let ok=true;
+    if(Math.abs(dx)<1e-9){ if(px<o.x||px>o.x+o.w) ok=false; }
+    else{ let t1=(o.x-px)/dx, t2=(o.x+o.w-px)/dx; if(t1>t2){const t=t1;t1=t2;t2=t;} tmin=Math.max(tmin,t1); tmax=Math.min(tmax,t2); }
+    if(ok){
+      if(Math.abs(dy)<1e-9){ if(py<o.y||py>o.y+o.h) ok=false; }
+      else{ let t1=(o.y-py)/dy, t2=(o.y+o.h-py)/dy; if(t1>t2){const t=t1;t1=t2;t2=t;} tmin=Math.max(tmin,t1); tmax=Math.min(tmax,t2); }
+    }
+    if(ok && tmax>=tmin && tmin<best && tmin>=0) best=tmin;
+  }
+  return clamp(best,0,RAY_MAX);
+}
+function sense(ag,world,out){
+  for(let i=0;i<8;i++){
+    const [dx,dy]=DIRV[i];
+    const d=rayDist(ag.x,ag.y,dx,dy,world.obs);
+    out[i]=1-d/RAY_MAX;                       // 1 = obstakel vlakbij
+  }
+  const gx=world.goal.x-ag.x, gy=world.goal.y-ag.y;
+  const gd=Math.hypot(gx,gy)||1e-6;
+  const ux=gx/gd, uy=gy/gd;
+  for(let i=0;i<8;i++){
+    const [dx,dy]=DIRV[i];
+    const cos=Math.max(0,dx*ux+dy*uy);
+    out[8+i]=cos*(1-Math.min(gd,GOAL_MAX)/GOAL_MAX);
+  }
+  return out;
+}
+
+/* ======================= brein ======================= */
+/* De regels per neuronsoort. Dit is het hart van het model:
+   - invoer-neuron : als ingang uitsluitend invoer-nodes; uitgang vrij
+   - worker        : alles mag, en moet altijd de meerderheid vormen
+   - reflex        : ingang uitsluitend invoer-neuronen, uitgang uitsluitend
+                     uitvoer-nodes — er is geen andere mogelijkheid
+   - geheugen      : altijd een verbinding naar zichzelf, verder vrij
+   - neutraal      : nog niet toegewezen; gedraagt zich als worker tot het
+                     systeem er een soort van maakt
+   Verder gaat er nooit iets naar een invoer-node toe, komt er nooit iets uit een
+   uitvoer-node vandaan, en mag een invoer-node niet rechtstreeks aan een knop hangen. */
+function canConnect(kinds,a,b){
+  const ka=kinds[a], kb=kinds[b];
+  if(a===b) return kb===K_MEM;
+  if(kb===K_IN) return false;
+  if(ka===K_OUT) return false;
+  if(kb===K_SENS) return ka===K_IN;
+  if(kb===K_REFL) return ka===K_SENS;
+  if(ka===K_REFL) return kb===K_OUT;
+  if(ka===K_IN)  return kb!==K_OUT;
+  return true;
+}
+function composeTypes(cfg,rnd){
+  const N=cfg.nNeurons;
+  const want={};
+  const others=["sens","refl","mem"];
+  for(const t of others){
+    if(!cfg.types[t].on){ want[t]=0; continue; }
+    const mn=Math.max(0,cfg.types[t].min), mx=Math.max(mn,cfg.types[t].max);
+    want[t]=mn+Math.floor(rnd()*(mx-mn+1));
+  }
+  const needWorker=Math.floor(N/2)+1;
+  let sum=want.sens+want.refl+want.mem;
+  let guard=0;
+  while(N-sum<Math.max(needWorker,cfg.types.work.min) && guard++<5000){
+    const pool=others.filter(t=>want[t]>0);
+    if(!pool.length) break;
+    want[pool[Math.floor(rnd()*pool.length)]]--;
+    sum=want.sens+want.refl+want.mem;
+  }
+  let work=N-sum;
+  if(work>cfg.types.work.max) work=cfg.types.work.max;
+  return {sens:want.sens, work, refl:want.refl, mem:want.mem, neut:0};
+}
+function countKinds(B){
+  const c={sens:0,work:0,refl:0,mem:0,neut:0};
+  for(let i=HID0;i<B.n;i++){
+    const k=B.kinds[i];
+    if(k===K_SENS)c.sens++; else if(k===K_WORK)c.work++; else if(k===K_REFL)c.refl++;
+    else if(k===K_MEM)c.mem++; else if(k===K_NEUT)c.neut++;
+  }
+  return c;
+}
+const PREFIX={[K_SENS]:"S",[K_WORK]:"W",[K_REFL]:"R",[K_MEM]:"M",[K_NEUT]:"N"};
+
+function createBrain(cfg,seed){
+  const rnd=mulberry32(seed*104729+7);
+  const comp=composeTypes(cfg,rnd);
+  const kinds=[], labels=[];
+  for(let i=0;i<8;i++){ kinds.push(K_IN); labels.push("obst "+DIRNAME[i]); }
+  for(let i=0;i<8;i++){ kinds.push(K_IN); labels.push("doel "+DIRNAME[i]); }
+  for(let i=0;i<4;i++){ kinds.push(K_OUT); labels.push(OUTNAME[i]); }
+  let ctr=0;
+  const push=(k,n)=>{ for(let i=0;i<n;i++){ kinds.push(k); labels.push(PREFIX[k]+(++ctr)); } };
+  push(K_SENS,comp.sens); push(K_WORK,comp.work); push(K_REFL,comp.refl); push(K_MEM,comp.mem);
+  const n=kinds.length;
+
+  const B={
+    n, kinds:Int8Array.from(kinds), labels, comp, nextId:ctr,
+    act:new Float32Array(n), next:new Float32Array(n), sum:new Float32Array(n),
+    clean:new Float32Array(n), prev:new Float32Array(n), dev:new Float32Array(n),
+    bias:new Float32Array(n), ebias:new Float32Array(n), press:new Uint8Array(N_OUT), rbar:0,
+    from:[], to:[], w:[], e:[], rms:[], weakAge:[],
+    pruned:0, sprouted:0, grown:0, retyped:0, born:0,
+    lay:null, seed
+  };
+  for(let i=0;i<n;i++) B.bias[i]=(rnd()-0.5)*0.2;
+
+  const cand=[];
+  for(let a=0;a<n;a++) for(let b=0;b<n;b++) if(canConnect(B.kinds,a,b)) cand.push([a,b]);
+  const nHidden=n-HID0;
+  const target=Math.min(cand.length, Math.round(cfg.density*(nHidden+N_IN)));
+  const p=cand.length? target/cand.length : 0;
+  const have=new Set();
+  const add=(a,b,w)=>{ const k=a*n+b; if(have.has(k)) return false; have.add(k);
+    B.from.push(a); B.to.push(b); B.w.push(w); B.e.push(0); B.rms.push(0); B.weakAge.push(0); return true; };
+  for(const [a,b] of cand){ if(a!==b && rnd()<p) add(a,b,(rnd()-0.5)*0.5); }
+  for(let i=0;i<n;i++) if(B.kinds[i]===K_MEM) add(i,i,0.5+rnd()*0.4);
+
+  const outdeg=new Int32Array(n), indeg=new Int32Array(n);
+  for(let c=0;c<B.from.length;c++) if(B.from[c]!==B.to[c]){ outdeg[B.from[c]]++; indeg[B.to[c]]++; }
+  const legalFrom=a=>cand.filter(q=>q[0]===a&&q[0]!==q[1]);
+  const legalTo=b=>cand.filter(q=>q[1]===b&&q[0]!==q[1]);
+  for(let i=0;i<n;i++){
+    if(B.kinds[i]===K_IN && outdeg[i]===0){ const L=legalFrom(i); if(L.length){ const q=L[Math.floor(rnd()*L.length)]; if(add(q[0],q[1],(rnd()-0.5)*0.5)){outdeg[i]++;indeg[q[1]]++;} } }
+    if(B.kinds[i]===K_OUT && indeg[i]===0){ const L=legalTo(i); if(L.length){ const q=L[Math.floor(rnd()*L.length)]; if(add(q[0],q[1],(rnd()-0.5)*0.5)){indeg[i]++;outdeg[q[0]]++;} } }
+  }
+  for(let i=HID0;i<n;i++){
+    if(indeg[i]===0){ const L=legalTo(i); if(L.length){ const q=L[Math.floor(rnd()*L.length)]; if(add(q[0],q[1],(rnd()-0.5)*0.5)){indeg[i]++;outdeg[q[0]]++;} } }
+    if(outdeg[i]===0){ const L=legalFrom(i); if(L.length){ const q=L[Math.floor(rnd()*L.length)]; if(add(q[0],q[1],(rnd()-0.5)*0.5)){outdeg[i]++;indeg[q[1]]++;} } }
+  }
+  finalizeConns(B);
+  B.comp=countKinds(B); B.compStart={...B.comp};
+  layoutBrain(B,300,false);
+  return B;
+}
+function finalizeConns(B){
+  B.cFrom=Int32Array.from(B.from); B.cTo=Int32Array.from(B.to);
+  B.cW=Float32Array.from(B.w); B.cE=Float32Array.from(B.e);
+  B.cRms=Float32Array.from(B.rms); B.cAge=Int32Array.from(B.weakAge);
+  B.nc=B.cFrom.length;
+}
+function syncBack(B){
+  B.from=Array.from(B.cFrom); B.to=Array.from(B.cTo);
+  B.w=Array.from(B.cW); B.e=Array.from(B.cE); B.rms=Array.from(B.cRms); B.weakAge=Array.from(B.cAge);
+}
+/* Het brein groeit: alle per-neuron-arrays worden groter gemaakt, bestaande
+   nummers blijven staan. */
+function expandBrain(B,extra){
+  const nn=B.n+extra;
+  const cp=(old,C)=>{ const a=new C(nn); a.set(old); return a; };
+  B.act=cp(B.act,Float32Array); B.next=cp(B.next,Float32Array); B.sum=cp(B.sum,Float32Array);
+  B.clean=cp(B.clean,Float32Array); B.prev=cp(B.prev,Float32Array); B.dev=cp(B.dev,Float32Array);
+  B.bias=cp(B.bias,Float32Array); B.ebias=cp(B.ebias,Float32Array);
+  const k=new Int8Array(nn); k.set(B.kinds); B.kinds=k;
+  if(B.lay){ const x=new Float32Array(nn), y=new Float32Array(nn); x.set(B.lay.x); y.set(B.lay.y); B.lay={x,y}; }
+  B.n=nn;
+}
+
+function resetBrainState(B){
+  B.act.fill(0); B.next.fill(0); B.clean.fill(0); B.prev.fill(0); B.dev.fill(0); B.ebias.fill(0);
+  if(B.cE) B.cE.fill(0);
+}
+const hiddenNoiseOf = expl => 0.35*expl;
+const tempOf = expl => 0.40+2.0*expl;
+function propagate(B,inp,cfg,expl,state,rnd){
+  const n=B.n, next=B.next, sum=B.sum;
+  const hn=hiddenNoiseOf(expl), tp=tempOf(expl);
+  for(let i=0;i<N_IN;i++) state[i]=inp[i];
+  for(let s=0;s<cfg.prop;s++){
+    sum.fill(0);
+    for(let c=0;c<B.nc;c++) sum[B.cTo[c]]+=B.cW[c]*state[B.cFrom[c]];
+    for(let j=0;j<n;j++){
+      const k=B.kinds[j];
+      if(k===K_IN){ next[j]=state[j]; continue; }
+      let v=sum[j]+B.bias[j];
+      if(k===K_OUT){ next[j]=sigm(v/tp); continue; }   // kans dat deze knop ingedrukt wordt
+      if(hn>0) v+=(rnd()*2-1)*hn;
+      if(k===K_MEM) next[j]=(1-cfg.memLeak)*state[j]+cfg.memLeak*tanh(v);
+      else next[j]=tanh(v);
+    }
+    state.set(next);
+  }
+}
+/* Twee keer dezelfde tik vanaf dezelfde begintoestand: één keer schoon en één keer
+   met ruis in de wolk. Het verschil is precies de duw die de exploratie gaf — en dat
+   is het enige waar beloning aan toegeschreven mag worden. Voor de vier knoppen is
+   het exacter: die worden echt geloot uit hun eigen kans, en dan is "wat ik deed min
+   wat ik gemiddeld zou doen" precies de goede maat. */
+function brainStep(B,inp,cfg,expl,rnd){
+  B.prev.set(B.act);
+  const learn=expl>0;
+  if(learn){ B.clean.set(B.prev); propagate(B,inp,cfg,0,B.clean,rnd); }
+  propagate(B,inp,cfg,expl,B.act,rnd);
+  B.dev.fill(0);
+  if(learn) for(let j=HID0;j<B.n;j++) B.dev[j]=B.act[j]-B.clean[j];
+  for(let j=OUT0;j<HID0;j++){
+    const pr=B.act[j];
+    const a=learn ? (rnd()<pr?1:0) : (pr>0.5?1:0);
+    B.press[j-OUT0]=a;
+    B.dev[j]=a-pr;
+  }
+}
+function updateTraces(B,lam){
+  const act=B.act, dev=B.dev, k1=1-lam;
+  for(let c=0;c<B.nc;c++) B.cE[c]=lam*B.cE[c]+k1*act[B.cFrom[c]]*dev[B.cTo[c]];
+  for(let j=N_IN;j<B.n;j++) B.ebias[j]=lam*B.ebias[j]+k1*dev[j];
+}
+/* Beloning telt alleen voor zover ze afwijkt van wat het brein de laatste tijd
+   gewend was (basislijn). Anders wordt bij een altijd-positieve beloning simpelweg
+   alles versterkt en leert het niets. */
+function applyReward(B,r,cfg,scale){
+  const eta=cfg.lr*(scale===undefined?1:scale), wmax=cfg.wmax, smax=cfg.stepMax;
+  B.rbar+=0.02*(r-B.rbar);
+  const rh=clamp(r-B.rbar,-10,10);
+  for(let c=0;c<B.nc;c++){
+    let w=B.cW[c];
+    let d=eta*rh*B.cE[c];
+    if((d>0)===(w>=0)) d*=(1-Math.abs(w)/wmax);      // niet oneindig versterken
+    if(d>smax) d=smax; else if(d<-smax) d=-smax;     // niet abrupt
+    B.cW[c]=clamp(w+d,-wmax,wmax);
+  }
+  for(let j=N_IN;j<B.n;j++){
+    let d=eta*0.5*rh*B.ebias[j];
+    if(d>smax) d=smax; else if(d<-smax) d=-smax;
+    B.bias[j]=clamp(B.bias[j]+d,-wmax,wmax);
+  }
+}
+/* Vervagen gebeurt één keer per poging, niet per spelstap: wat gedurende een hele
+   poging niets heeft bijgedragen, zakt een stukje terug naar nul. */
+function fadeWeights(B,cfg){
+  const f=1-cfg.decay;
+  for(let c=0;c<B.nc;c++) B.cW[c]*=f;
+  for(let j=N_IN;j<B.n;j++) B.bias[j]*=f;
+}
+
+/* ======================= structurele plasticiteit ======================= */
+/* Wat zou het kosten om neuron i soort t te maken? = de gewichtsmassa van de
+   verbindingen die dan verboden worden en dus weg zouden moeten. */
+function typeCost(B,i,t){
+  const old=B.kinds[i]; B.kinds[i]=t;
+  let cost=0;
+  for(let c=0;c<B.from.length;c++){
+    const a=B.from[c], b=B.to[c];
+    if(a!==i&&b!==i) continue;
+    if(!canConnect(B.kinds,a,b)) cost+=Math.abs(B.w[c])+0.02;
+  }
+  B.kinds[i]=old;
+  return cost;
+}
+function typeAllowed(cfg,cnt,from,to){
+  if(from===to) return false;
+  const kf=KIND_KEY[from], kt=KIND_KEY[to];
+  if(kt!=="neut"){
+    if(!cfg.types[kt] || (kt!=="work" && !cfg.types[kt].on)) return false;
+    if(cnt[kt]+1>cfg.types[kt].max) return false;
+  }
+  if(kf!=="neut" && cnt[kf]-1<cfg.types[kf].min) return false;
+  /* worker moet de meerderheid van de toegewezen neuronen blijven */
+  const w=cnt.work+(kt==="work"?1:0)-(kf==="work"?1:0);
+  const others=(cnt.sens+cnt.refl+cnt.mem)
+    +((kt==="sens"||kt==="refl"||kt==="mem")?1:0)
+    -((kf==="sens"||kf==="refl"||kf==="mem")?1:0);
+  return w>others;
+}
+/* Geef neuron i de soort die het al feitelijk is: de soort waarvan de regels het
+   minst gewicht kosten. Verboden verbindingen verdwijnen daarna. */
+function retypeNeuron(B,cfg,i,cnt,rnd){
+  const cands=[K_WORK,K_SENS,K_REFL,K_MEM];
+  let best=-1, bestCost=Infinity;
+  for(const t of cands){
+    if(!typeAllowed(cfg,cnt,B.kinds[i],t)) continue;
+    const c=typeCost(B,i,t)+ (t===K_WORK?0:0.05);
+    if(c<bestCost){ bestCost=c; best=t; }
+  }
+  if(best<0) return null;
+  const old=B.kinds[i];
+  if(old!==K_NEUT && bestCost>cfg.retypeCost) return null;   // alleen als het bijna gratis is
+  B.kinds[i]=best;
+  B.labels[i]=PREFIX[best]+(++B.nextId);
+  const kf=KIND_KEY[old], kt=KIND_KEY[best];
+  if(cnt[kf]!==undefined) cnt[kf]--;
+  if(cnt[kt]!==undefined) cnt[kt]++;
+  /* verboden verbindingen weghalen, en een geheugenneuron zijn eigen lus geven */
+  const kF=[],kT=[],kW=[],kE=[],kR=[],kA=[];
+  let removed=0;
+  for(let c=0;c<B.from.length;c++){
+    const a=B.from[c], b=B.to[c];
+    if(!canConnect(B.kinds,a,b)){ removed++; continue; }
+    kF.push(a);kT.push(b);kW.push(B.w[c]);kE.push(B.e[c]);kR.push(B.rms[c]);kA.push(B.weakAge[c]);
+  }
+  B.from=kF;B.to=kT;B.w=kW;B.e=kE;B.rms=kR;B.weakAge=kA;
+  if(best===K_MEM && !B.from.some((a,c)=>a===i&&B.to[c]===i)){
+    B.from.push(i);B.to.push(i);B.w.push(0.4+rnd()*0.3);B.e.push(0);B.rms.push(0);B.weakAge.push(0);
+  }
+  B.pruned+=removed; B.retyped++;
+  return best;
+}
+function addConn(B,a,b,w,have){
+  const key=a+"|"+b;
+  if(have.has(key)) return false;
+  if(!canConnect(B.kinds,a,b)) return false;
+  have.add(key);
+  B.from.push(a);B.to.push(b);B.w.push(w);B.e.push(0);B.rms.push(0);B.weakAge.push(0);
+  return true;
+}
+function haveSet(B){ const h=new Set(); for(let c=0;c<B.from.length;c++) h.add(B.from[c]+"|"+B.to[c]); return h; }
+
+function restructure(B,cfg,rnd,stagnating){
+  const before={n:B.n,nc:B.from.length};
+  syncBack(B);
+  let n=B.n;
+  const outdeg=new Int32Array(n), indeg=new Int32Array(n);
+  for(let c=0;c<B.from.length;c++) if(B.from[c]!==B.to[c]){ outdeg[B.from[c]]++; indeg[B.to[c]]++; }
+
+  /* 1. snoeien: wat te lang te zwak is verdwijnt */
+  const kF=[],kT=[],kW=[],kE=[],kR=[],kA=[];
+  let pruned=0;
+  for(let c=0;c<B.from.length;c++){
+    const a=B.from[c], b=B.to[c], w=B.w[c];
+    let age=Math.abs(w)<cfg.pruneT ? B.weakAge[c]+1 : 0;
+    const selfMem=(a===b);
+    const orphan=(B.kinds[a]===K_IN&&outdeg[a]<=1)||(B.kinds[b]===K_OUT&&indeg[b]<=1);
+    if(!selfMem && age>=2 && !orphan){ pruned++; outdeg[a]--; indeg[b]--; continue; }
+    kF.push(a);kT.push(b);kW.push(w);kE.push(B.e[c]);kR.push(B.rms[c]);kA.push(age);
+  }
+  B.from=kF;B.to=kT;B.w=kW;B.e=kE;B.rms=kR;B.weakAge=kA;
+
+  let cnt=countKinds(B);
+  let retyped=0, grown=0;
+
+  /* 2. losgeraakte neuronen worden weer neutraal — vrij materiaal voor het brein */
+  if(cfg.retypeOn){
+    const deg=new Int32Array(B.n);
+    for(let c=0;c<B.from.length;c++){ if(B.from[c]!==B.to[c]){ deg[B.from[c]]++; deg[B.to[c]]++; } }
+    for(let i=HID0;i<B.n;i++){
+      if(deg[i]===0 && B.kinds[i]!==K_NEUT && typeAllowed(cfg,cnt,B.kinds[i],K_NEUT)){
+        const kf=KIND_KEY[B.kinds[i]];
+        B.kinds[i]=K_NEUT; B.labels[i]="N"+(++B.nextId);
+        if(cnt[kf]!==undefined) cnt[kf]--; cnt.neut++;
+      }
+    }
+  }
+
+  /* 3. neutrale neuronen krijgen een soort, en bestaande neuronen mogen wisselen
+        als hun bedrading allang bij een andere soort past */
+  if(cfg.retypeOn){
+    const neut=[]; for(let i=HID0;i<B.n;i++) if(B.kinds[i]===K_NEUT) neut.push(i);
+    for(const i of neut){
+      if(retyped>=cfg.retypeN) break;
+      if(retypeNeuron(B,cfg,i,cnt,rnd)!==null) retyped++;
+    }
+    const pool=[]; for(let i=HID0;i<B.n;i++) if(B.kinds[i]!==K_NEUT) pool.push(i);
+    for(let k=0;k<pool.length && retyped<cfg.retypeN;k++){
+      const i=pool[Math.floor(rnd()*pool.length)];
+      if(retypeNeuron(B,cfg,i,cnt,rnd)!==null) retyped++;
+    }
+  }
+
+  /* 4. groeien: nieuwe neuronen komen neutraal binnen met een paar verbindingen */
+  if(cfg.growOn && B.n-HID0<cfg.growMax && (!cfg.growStagnant || stagnating)){
+    const room=Math.min(cfg.growN, cfg.growMax-(B.n-HID0));
+    if(room>0){
+      const oldN=B.n;
+      expandBrain(B,room);
+      const have=haveSet(B);
+      for(let k=0;k<room;k++){
+        const i=oldN+k;
+        B.kinds[i]=K_NEUT; B.labels[i]="N"+(++B.nextId);
+        B.bias[i]=(rnd()-0.5)*0.1;
+        if(B.lay){ B.lay.x[i]=LX*(0.35+rnd()*0.3); B.lay.y[i]=LY*(0.15+rnd()*0.7); }
+        let made=0, guard=0;
+        while(made<cfg.newLinks && guard++<300){
+          const other=HID0+Math.floor(rnd()*(B.n-HID0));
+          if(other===i) continue;
+          if(rnd()<0.5){ if(addConn(B,other,i,(rnd()-0.5)*0.2,have)) made++; }
+          else { if(addConn(B,i,other,(rnd()-0.5)*0.2,have)) made++; }
+        }
+        /* altijd minstens één weg naar de uitvoer en één vanaf de invoer */
+        addConn(B,i,OUT0+Math.floor(rnd()*N_OUT),(rnd()-0.5)*0.2,have);
+        addConn(B,Math.floor(rnd()*N_IN),i,(rnd()-0.5)*0.2,have);
+        grown++;
+      }
+      B.grown+=grown; B.born+=grown;
+      cnt=countKinds(B);
+    }
+  }
+
+  /* 5. nieuwe verbindingen, bij voorkeur waar weinig zit */
+  n=B.n;
+  const have=haveSet(B);
+  const deg=new Int32Array(n);
+  for(let c=0;c<B.from.length;c++){ deg[B.from[c]]++; deg[B.to[c]]++; }
+  let sprouted=0, guard=0;
+  while(sprouted<cfg.sprout && guard++<4000){
+    let a=Math.floor(rnd()*n), b=Math.floor(rnd()*n);
+    if(rnd()<0.6){ let bestA=a; for(let k=0;k<3;k++){ const c2=Math.floor(rnd()*n); if(deg[c2]<deg[bestA]) bestA=c2; } a=bestA; }
+    if(a===b) continue;
+    if(addConn(B,a,b,(rnd()-0.5)*0.12,have)){ deg[a]++; deg[b]++; sprouted++; }
+  }
+
+  /* 6. de enige harde eis herstellen: alle in- en uitvoer-nodes aangesloten */
+  const od=new Int32Array(n), id2=new Int32Array(n);
+  for(let c=0;c<B.from.length;c++) if(B.from[c]!==B.to[c]){ od[B.from[c]]++; id2[B.to[c]]++; }
+  for(let i=0;i<N_IN;i++){
+    let g=0;
+    while(od[i]===0 && g++<300){ const b=HID0+Math.floor(rnd()*(B.n-HID0)); if(addConn(B,i,b,(rnd()-0.5)*0.3,have)){ od[i]++; id2[b]++; } }
+  }
+  for(let i=OUT0;i<HID0;i++){
+    let g=0;
+    while(id2[i]===0 && g++<300){ const a=HID0+Math.floor(rnd()*(B.n-HID0)); if(addConn(B,a,i,(rnd()-0.5)*0.3,have)){ id2[i]++; od[a]++; } }
+  }
+
+  B.pruned+=pruned; B.sprouted+=sprouted;
+  finalizeConns(B);
+  B.comp=countKinds(B);
+  if(B.n!==before.n || retyped>0) layoutBrain(B,90,true);
+  return {pruned,sprouted,retyped,grown};
+}
+
+/* ---- structuuranalyse ---- */
+function analyze(B,cfg){
+  const n=B.n, thr=0.08*cfg.wmax;
+  const outAdj=Array.from({length:n},()=>[]);
+  let sumW=0, strong=0, self=0;
+  for(let c=0;c<B.nc;c++){
+    const w=Math.abs(B.cW[c]); sumW+=w;
+    if(w>0.5*cfg.wmax) strong++;
+    if(B.cFrom[c]===B.cTo[c]) { if(w>thr) self++; continue; }
+    if(w>thr) outAdj[B.cFrom[c]].push(B.cTo[c]);
+  }
+  const meanW=B.nc? sumW/B.nc : 0;
+  /* kortste pad invoer -> uitvoer over actieve verbindingen */
+  const dist=new Int32Array(n).fill(-1); const q=[];
+  for(let i=0;i<N_IN;i++){ dist[i]=0; q.push(i); }
+  let head=0, shortest=-1;
+  while(head<q.length){
+    const cur=q[head++];
+    if(B.kinds[cur]===K_OUT){ shortest=dist[cur]; break; }
+    for(const nx of outAdj[cur]) if(dist[nx]<0){ dist[nx]=dist[cur]+1; q.push(nx); }
+  }
+  /* bereikbaar vanaf invoer, en bereikt de uitvoer */
+  const reachFwd=new Uint8Array(n); for(let i=0;i<n;i++) if(dist[i]>=0) reachFwd[i]=1;
+  const inAdj=Array.from({length:n},()=>[]);
+  for(let c=0;c<B.nc;c++) if(Math.abs(B.cW[c])>thr && B.cFrom[c]!==B.cTo[c]) inAdj[B.cTo[c]].push(B.cFrom[c]);
+  const reachBwd=new Uint8Array(n); const q2=[];
+  for(let i=0;i<n;i++) if(B.kinds[i]===K_OUT){ reachBwd[i]=1; q2.push(i); }
+  head=0; while(head<q2.length){ const cur=q2[head++]; for(const p of inAdj[cur]) if(!reachBwd[p]){ reachBwd[p]=1; q2.push(p); } }
+  let useful=0, dead=0;
+  for(let i=HID0;i<n;i++){ if(reachFwd[i]&&reachBwd[i]) useful++; else dead++; }
+  /* reflexbogen: reflex-neuron met actieve in- en uitgang */
+  let reflexArcs=0;
+  for(let i=0;i<n;i++) if(B.kinds[i]===K_REFL && reachFwd[i] && outAdj[i].length) reflexArcs++;
+  /* lussen: Tarjan SCC over actieve verbindingen */
+  const loops=countLoops(n,outAdj)+self;
+  /* verbindingen per type-paar */
+  const pairs={};
+  for(let c=0;c<B.nc;c++){
+    if(Math.abs(B.cW[c])<=thr) continue;
+    const k=KIND_KEY[B.kinds[B.cFrom[c]]]+"→"+KIND_KEY[B.kinds[B.cTo[c]]];
+    pairs[k]=(pairs[k]||0)+1;
+  }
+  /* hubs */
+  const wdeg=new Float32Array(n);
+  for(let c=0;c<B.nc;c++){ const w=Math.abs(B.cW[c]); wdeg[B.cFrom[c]]+=w; wdeg[B.cTo[c]]+=w; }
+  const hubs=[]; for(let i=HID0;i<n;i++) hubs.push([i,wdeg[i]]);
+  hubs.sort((a,b)=>b[1]-a[1]);
+  /* sensorgebruik: gewichtsmassa die van elke invoer-node de uitvoer bereikt */
+  const use=[];
+  for(let i=0;i<N_IN;i++){
+    let val=new Float32Array(n); val[i]=1; let score=0;
+    for(let hop=0;hop<5;hop++){
+      const nv=new Float32Array(n);
+      for(let c=0;c<B.nc;c++){
+        const f=B.cFrom[c]; if(val[f]<=1e-6) continue;
+        nv[B.cTo[c]]+=val[f]*Math.min(1,Math.abs(B.cW[c])/cfg.wmax);
+      }
+      for(let j=OUT0;j<HID0;j++){ score+=nv[j]; nv[j]=0; }
+      val=nv;
+    }
+    use.push(score);
+  }
+  return {meanW,strong,shortest,useful,dead,reflexArcs,loops,pairs,
+    hubs:hubs.slice(0,5), sensorUse:use, activeConns:Object.values(pairs).reduce((a,b)=>a+b,0)};
+}
+function countLoops(n,adj){
+  const index=new Int32Array(n).fill(-1), low=new Int32Array(n), onstack=new Uint8Array(n);
+  const stack=[]; let idx=0, loops=0;
+  const strongconnect=(v0)=>{
+    const work=[[v0,0]];
+    while(work.length){
+      const fr=work[work.length-1]; const v=fr[0];
+      if(fr[1]===0){ index[v]=low[v]=idx++; stack.push(v); onstack[v]=1; }
+      let recursed=false;
+      while(fr[1]<adj[v].length){
+        const w=adj[v][fr[1]++];
+        if(index[w]<0){ work.push([w,0]); recursed=true; break; }
+        else if(onstack[w]) low[v]=Math.min(low[v],index[w]);
+      }
+      if(recursed) continue;
+      if(low[v]===index[v]){
+        let size=0,w;
+        do{ w=stack.pop(); onstack[w]=0; low[w]=low[v]; size++; }while(w!==v);
+        if(size>1) loops++;
+      }
+      work.pop();
+      if(work.length){ const p=work[work.length-1][0]; low[p]=Math.min(low[p],low[v]); }
+    }
+  };
+  for(let i=0;i<n;i++) if(index[i]<0) strongconnect(i);
+  return loops;
+}
+
+/* ---- lay-out van de wolk (krachtenmodel, logische ruimte 1000x420) ---- */
+const LX=1000, LY=420;
+function prefX(k){ return {[K_SENS]:0.26,[K_WORK]:0.5,[K_REFL]:0.80,[K_MEM]:0.60,[K_NEUT]:0.42}[k]||0.5; }
+function layoutBrain(B,iters,keep){
+  const n=B.n, rnd=mulberry32(B.seed*31+5+n);
+  const had=keep&&B.lay;
+  const x=new Float32Array(n), y=new Float32Array(n), fixed=new Uint8Array(n);
+  let ic=0, oc=0;
+  for(let i=0;i<n;i++){
+    if(B.kinds[i]===K_IN){ x[i]=58; y[i]=26+(LY-52)*(ic/(N_IN-1)); ic++; fixed[i]=1; }
+    else if(B.kinds[i]===K_OUT){ x[i]=LX-58; y[i]=70+(LY-140)*(oc/(N_OUT-1)); oc++; fixed[i]=1; }
+    else if(had && B.lay.x[i]){ x[i]=B.lay.x[i]; y[i]=B.lay.y[i]; }
+    else { x[i]=LX*prefX(B.kinds[i])+(rnd()-0.5)*90; y[i]=LY*(0.12+rnd()*0.76); }
+  }
+  const adj=[]; for(let c=0;c<B.nc;c++) if(B.cFrom[c]!==B.cTo[c]) adj.push([B.cFrom[c],B.cTo[c]]);
+  /* Bij een dicht bedrade wolk trekken duizenden veren alles tot één kluwen samen.
+     Daarom telt elke verbinding minder mee naarmate een neuron er meer heeft, en
+     schaalt de afstoting mee met de dichtheid. */
+  const deg=new Float32Array(n);
+  for(const [a,b] of adj){ deg[a]++; deg[b]++; }
+  const dens=adj.length/Math.max(1,n);
+  const rep=1800*clamp(1+dens/11,1,3.2);
+  const springK=0.012;
+  for(let it=0;it<iters;it++){
+    const fx=new Float32Array(n), fy=new Float32Array(n);
+    for(let i=0;i<n;i++){
+      if(fixed[i]) continue;
+      for(let j=0;j<n;j++){
+        if(i===j) continue;
+        let dx=x[i]-x[j], dy=y[i]-y[j];
+        let d2=dx*dx+dy*dy; if(d2<1) d2=1;
+        const f=rep/d2, d=Math.sqrt(d2);
+        fx[i]+=dx/d*f; fy[i]+=dy/d*f;
+      }
+    }
+    for(const [a,b] of adj){
+      let dx=x[b]-x[a], dy=y[b]-y[a];
+      const d=Math.hypot(dx,dy)||1;
+      const f=(d-120)*springK;
+      if(!fixed[a]){ const s2=1/(1+deg[a]*0.6); fx[a]+=dx/d*f*s2; fy[a]+=dy/d*f*s2; }
+      if(!fixed[b]){ const s2=1/(1+deg[b]*0.6); fx[b]-=dx/d*f*s2; fy[b]-=dy/d*f*s2; }
+    }
+    const damp=0.55*(1-it/iters)+0.08;
+    for(let i=0;i<n;i++){
+      if(fixed[i]) continue;
+      fx[i]+=(LX*prefX(B.kinds[i])-x[i])*0.008;
+      fy[i]+=(LY*0.5-y[i])*0.0015;
+      x[i]=clamp(x[i]+clamp(fx[i],-16,16)*damp,132,LX-132);
+      y[i]=clamp(y[i]+clamp(fy[i],-16,16)*damp,18,LY-18);
+    }
+  }
+  B.lay={x,y};
+}
+
+/* ======================= configuratie uit de UI ======================= */
+function readCfg(){
+  const t=(k)=>({on:$("en-"+k)? $("en-"+k).checked:true, min:+$("min-"+k).value, max:+$("max-"+k).value});
+  return {
+    nNeurons:+$("nneurons").value,
+    types:{sens:t("sens"),work:t("work"),refl:t("refl"),mem:t("mem")},
+    density:+$("density").value/10,
+    nObs:+$("nobs").value, maxSteps:+$("maxsteps").value, worldEvery:+$("worldevery").value,
+    chSpeed:+$("chspeed").value/10, seed:+$("seed").value, stopOnCollide:$("botsstop").checked,
+    lr:+$("lr").value/1000, lam:+$("elam").value/100, decay:+$("dec").value/10000,
+    wmax:+$("wmax").value/10, stepMax:+$("stepmax").value/1000, memLeak:+$("memleak").value/100,
+    prop:+$("prop").value, noise0:+$("noise").value/100,
+    lrAnneal:$("lranneal").checked,
+    structOn:$("structplast").checked, structEvery:+$("structevery").value,
+    pruneT:+$("prune").value/1000, sprout:+$("sprout").value,
+    growOn:$("grow").checked, growStagnant:$("growstag").checked,
+    growMax:+$("growmax").value, growN:+$("grown").value, newLinks:+$("newlinks").value,
+    retypeOn:$("retype").checked, retypeN:+$("retypen").value, retypeCost:+$("retypecost").value/100,
+    rGoal:+$("rgoal").value/10, rProg:+$("rprog").value/100, rCol:+$("rcol").value/100,
+    rStep:+$("rstep").value/1000, rIdle:+$("ridle").value/1000,
+    nEpisodes:+$("nep").value, evalOn:$("evalon").checked
+  };
+}
+const SPEEDS=[1,2,4,8,20,60,"turbo"];
+
+/* ======================= toestand ======================= */
+const S={
+  cfg:null, B:null, world:null, ag:{x:0,y:0}, trail:[],
+  inp:new Float32Array(N_IN), outPressed:[false,false,false,false],
+  ep:0, step:0, epReward:0, epCollisions:0, epIdle:0, prevDist:0, reached:false,
+  running:false, paused:false, watching:false, learn:true,
+  hist:[], evalHist:[], rows:[], startTime:0, elapsed:0,
+  succTotal:0, stepsSucc:[], rewards:[], collisions:0,
+  rnd:Math.random, phase:0, selected:-1, hover:-1,
+  lastRestructure:{pruned:0,sprouted:0,retyped:0,grown:0}, structLog:[],
+  resultsDirHandle:null, lastResult:null, dirty:false
+};
+
+/* ======================= spel ======================= */
+function newWorld(seedOffset){
+  S.world=makeWorld(S.cfg.seed*1000+seedOffset, S.cfg.nObs);
+}
+function startEpisode(){
+  S.ag.x=S.world.start.x; S.ag.y=S.world.start.y;
+  S.trail=[[S.ag.x,S.ag.y]];
+  S.step=0; S.epReward=0; S.epCollisions=0; S.epIdle=0; S.reached=false;
+  S.prevDist=Math.hypot(S.world.goal.x-S.ag.x,S.world.goal.y-S.ag.y);
+  resetBrainState(S.B);
+}
+/* Ruis loopt terug, maar nooit tot nul: zonder exploratie komt er geen spoor meer
+   binnen, terwijl de vervaging en het snoeien wél doorgaan — en dan valt een goed
+   getraind brein aan het eind alsnog uit elkaar. */
+function noiseEnd(v){ return Math.max(0.3*v,0.03); }
+function noiseNow(){
+  const c=S.cfg;
+  const f=c.nEpisodes>1 ? S.ep/(c.nEpisodes-1) : 1;
+  const end=noiseEnd(c.noise0);
+  return c.noise0+(end-c.noise0)*Math.min(1,f);
+}
+/* één spelstap. learn=false → geen ruis, geen plasticiteit (toetsen/kijken) */
+function gameTick(learn,noise){
+  const c=S.cfg, B=S.B, w=S.world;
+  S.lrScale=c.lrAnneal? (c.noise0>0? noise/c.noise0 : 1) : 1;
+  sense(S.ag,w,S.inp);
+  brainStep(B,S.inp,c,noise,S.rnd);
+  const P=B.press;
+  S.outPressed=[!!P[0],!!P[1],!!P[2],!!P[3]];
+  let dx=P[3]-P[2], dy=P[1]-P[0];
+  const mag=Math.hypot(dx,dy);
+  if(mag>0){ dx=dx/mag*c.chSpeed; dy=dy/mag*c.chSpeed; }
+  if(learn) updateTraces(B,c.lam);
+
+  let collided=false;
+  let nx=S.ag.x+dx, ny=S.ag.y+dy;
+  if(mag>0){
+    if(!blocked(nx,ny,w.obs)){ S.ag.x=nx; S.ag.y=ny; }
+    else if(!blocked(nx,S.ag.y,w.obs)){ S.ag.x=nx; collided=true; }
+    else if(!blocked(S.ag.x,ny,w.obs)){ S.ag.y=ny; collided=true; }
+    else collided=true;
+  }
+  if(S.trail.length<4000) S.trail.push([S.ag.x,S.ag.y]);
+
+  const dist=Math.hypot(w.goal.x-S.ag.x,w.goal.y-S.ag.y);
+  let r=c.rProg*(S.prevDist-dist)-c.rStep;
+  if(mag===0){ r-=c.rIdle; S.epIdle++; }
+  if(collided){ r-=c.rCol; S.epCollisions++; }
+  S.prevDist=dist;
+  let done=false;
+  if(dist<GOAL_R+AGENT_R){ r+=c.rGoal*(1+0.5*(1-S.step/c.maxSteps)); S.reached=true; done=true; }
+  if(collided && c.stopOnCollide) done=true;
+  S.epReward+=r;
+  if(learn) applyReward(B,r,c,S.lrScale);
+  S.step++;
+  if(S.step>=c.maxSteps) done=true;
+  return done;
+}
+function finishEpisode(){
+  const c=S.cfg;
+  S.rewards.push(S.epReward);
+  S.collisions+=S.epCollisions;
+  if(S.reached){ S.succTotal++; S.stepsSucc.push(S.step); }
+  const last20=S.hist.slice(-19).concat([{ok:S.reached}]);
+  const succ20=last20.reduce((a,h)=>a+(h.ok?1:0),0)/last20.length;
+  let mx=0; for(let i=0;i<S.B.nc;i++){ const a=Math.abs(S.B.cW[i]); if(a>mx) mx=a; }
+  S.hist.push({ep:S.ep,ok:S.reached,reward:S.epReward,steps:S.step,idle:S.step?S.epIdle/S.step:0,
+    maxW:mx, conns:S.B.nc,meanW:meanAbsW(S.B),neuronen:S.B.n-HID0,succ20});
+  fadeWeights(S.B,c);
+  S.ep++;
+  if(c.structOn && S.ep%c.structEvery===0){
+    S.lastRestructure=restructure(S.B,c,S.rnd,isStagnating(c));
+    S.structLog.push({ep:S.ep,...S.lastRestructure,neuronen:S.B.n-HID0});
+  }
+  if(c.evalOn && S.ep%20===0) runEval();
+  if(S.ep%c.worldEvery===0) newWorld(S.ep);
+  startEpisode();
+}
+/* Gaat het brein nog vooruit? Vergelijk de gemiddelde beloning van het laatste
+   blok pogingen met dat ervoor. Zo niet, dan mag er materiaal bijgroeien. */
+function isStagnating(c){
+  const k=Math.max(6,c.structEvery);
+  if(S.rewards.length<2*k) return false;
+  const a=S.rewards.slice(-2*k,-k), b=S.rewards.slice(-k);
+  const m=x=>x.reduce((p,q)=>p+q,0)/x.length;
+  return m(b)<=m(a)+Math.abs(m(a))*0.02+0.05;
+}
+function meanAbsW(B){ let s=0; for(let c=0;c<B.nc;c++) s+=Math.abs(B.cW[c]); return B.nc? s/B.nc:0; }
+
+/* toets op onbekende werelden — zonder leren, zonder ruis */
+function runEval(){
+  const c=S.cfg, B=S.B;
+  const saveW=Float32Array.from(B.cW), saveE=Float32Array.from(B.cE), saveB=Float32Array.from(B.bias);
+  const saveWorld=S.world, saveAg={x:S.ag.x,y:S.ag.y}, saveTrail=S.trail, saveStep=S.step,
+        savePrev=S.prevDist, saveR=S.epReward, saveCol=S.epCollisions, saveReach=S.reached;
+  let ok=0; const NEV=10;
+  for(let k=0;k<NEV;k++){
+    S.world=makeWorld(900000+k*37, c.nObs);
+    S.ag.x=S.world.start.x; S.ag.y=S.world.start.y; S.trail=[];
+    S.step=0; S.epReward=0; S.epCollisions=0; S.reached=false;
+    S.prevDist=Math.hypot(S.world.goal.x-S.ag.x,S.world.goal.y-S.ag.y);
+    resetBrainState(S.B);
+    let done=false;
+    while(!done) done=gameTick(false,0);
+    if(S.reached) ok++;
+  }
+  B.cW.set(saveW); B.cE.set(saveE); B.bias.set(saveB);
+  S.world=saveWorld; S.ag=saveAg; S.trail=saveTrail; S.step=saveStep;
+  S.prevDist=savePrev; S.epReward=saveR; S.epCollisions=saveCol; S.reached=saveReach;
+  resetBrainState(S.B);
+  S.evalHist.push({ep:S.ep,pct:ok/NEV});
+}
+
+/* ======================= tekenen: wereld ======================= */
+function drawWorld(){
+  const cvs=$("worldcvs"), ctx=cvs.getContext("2d");
+  const W=cvs.width, H=cvs.height, sx=W/WW, sy=H/WH;
+  ctx.clearRect(0,0,W,H);
+  ctx.fillStyle="#0f1114"; ctx.fillRect(0,0,W,H);
+  ctx.strokeStyle="#1b1f25"; ctx.lineWidth=1;
+  for(let x=0;x<=WW;x+=10){ ctx.beginPath(); ctx.moveTo(x*sx,0); ctx.lineTo(x*sx,H); ctx.stroke(); }
+  for(let y=0;y<=WH;y+=10){ ctx.beginPath(); ctx.moveTo(0,y*sy); ctx.lineTo(W,y*sy); ctx.stroke(); }
+  if(!S.world) return;
+  for(const o of S.world.obs){
+    ctx.fillStyle="#39414c"; ctx.fillRect(o.x*sx,o.y*sy,o.w*sx,o.h*sy);
+    ctx.strokeStyle="#4b5563"; ctx.lineWidth=2; ctx.strokeRect(o.x*sx,o.y*sy,o.w*sx,o.h*sy);
+  }
+  /* spoor */
+  if(S.trail.length>1){
+    ctx.strokeStyle="rgba(79,209,197,.35)"; ctx.lineWidth=2; ctx.beginPath();
+    ctx.moveTo(S.trail[0][0]*sx,S.trail[0][1]*sy);
+    for(let i=1;i<S.trail.length;i++) ctx.lineTo(S.trail[i][0]*sx,S.trail[i][1]*sy);
+    ctx.stroke();
+  }
+  /* doel */
+  const g=S.world.goal;
+  const puls=0.5+0.5*Math.sin(S.phase*0.08);
+  ctx.beginPath(); ctx.arc(g.x*sx,g.y*sy,GOAL_R*sx*(1.25+puls*0.3),0,7); ctx.fillStyle="rgba(255,180,84,.14)"; ctx.fill();
+  ctx.beginPath(); ctx.arc(g.x*sx,g.y*sy,GOAL_R*sx,0,7); ctx.fillStyle="#ffb454"; ctx.fill();
+  /* sensorstralen */
+  ctx.lineWidth=2;
+  for(let i=0;i<8;i++){
+    const [dx,dy]=DIRV[i];
+    const d=(1-S.inp[i])*RAY_MAX;
+    const a=clamp(S.inp[i],0,1);
+    ctx.strokeStyle=`rgba(255,107,87,${0.15+a*0.75})`;
+    ctx.beginPath(); ctx.moveTo(S.ag.x*sx,S.ag.y*sy);
+    ctx.lineTo((S.ag.x+dx*d)*sx,(S.ag.y+dy*d)*sy); ctx.stroke();
+  }
+  /* doelsensoren als korte gele stompjes */
+  for(let i=0;i<8;i++){
+    const [dx,dy]=DIRV[i]; const a=clamp(S.inp[8+i],0,1);
+    if(a<0.02) continue;
+    ctx.strokeStyle=`rgba(255,180,84,${0.2+a*0.8})`; ctx.lineWidth=3;
+    ctx.beginPath(); ctx.moveTo(S.ag.x*sx,S.ag.y*sy);
+    ctx.lineTo((S.ag.x+dx*a*14)*sx,(S.ag.y+dy*a*14)*sy); ctx.stroke();
+  }
+  /* karakter */
+  ctx.beginPath(); ctx.arc(S.ag.x*sx,S.ag.y*sy,AGENT_R*sx,0,7);
+  ctx.fillStyle="#4fd1c5"; ctx.fill();
+  ctx.strokeStyle="#0f1114"; ctx.lineWidth=2; ctx.stroke();
+}
+
+/* ======================= tekenen: brein ======================= */
+function fitCanvas(cvs,cssH){
+  const dpr=window.devicePixelRatio||1;
+  const w=cvs.clientWidth||900;
+  if(cvs.width!==Math.round(w*dpr)||cvs.height!==Math.round(cssH*dpr)){
+    cvs.width=Math.round(w*dpr); cvs.height=Math.round(cssH*dpr);
+  }
+  const ctx=cvs.getContext("2d");
+  ctx.setTransform(dpr,0,0,dpr,0,0);
+  return {ctx,W:w,H:cssH};
+}
+function drawNet(){
+  const cvs=$("netcvs");
+  const {ctx,W,H}=fitCanvas(cvs,500);
+  ctx.clearRect(0,0,W,H);
+  ctx.fillStyle="#0f1114"; ctx.fillRect(0,0,W,H);
+  const B=S.B; if(!B||!B.lay){ ctx.fillStyle="#5c636d"; ctx.font="13px 'IBM Plex Mono',monospace";
+    ctx.fillText("nog geen brein — druk op ⟳ nieuw brein",20,30); return; }
+  const px=i=>B.lay.x[i]/LX*(W-20)+10, py=i=>B.lay.y[i]/LY*(H-24)+12;
+  /* schaal op het zwaarste gewicht dat er werkelijk is, niet op het theoretische
+     plafond — anders lijkt een net getraind brein leeg */
+  let wref=1e-6; for(let c=0;c<B.nc;c++){ const a=Math.abs(B.cW[c]); if(a>wref) wref=a; }
+  const wmax=Math.max(wref,0.02);
+  const showWeak=$("showweak").checked, showPulse=$("showpulse").checked, showLab=$("showlabels").checked;
+  const sel=S.selected;
+  /* bij extreem grote breinen alleen de zwaarste verbindingen tekenen, anders
+     zakt de beeldsnelheid in; de drempel wordt af en toe herberekend */
+  const LIMIT=3500;
+  if(B.nc>LIMIT){
+    if(B.cutFrame===undefined || S.phase-B.cutFrame>30){
+      const samp=[], st2=Math.max(1,Math.floor(B.nc/2000));
+      for(let c=0;c<B.nc;c+=st2) samp.push(Math.abs(B.cW[c]));
+      samp.sort((a,b)=>b-a);
+      B.drawCut=samp[Math.min(samp.length-1,Math.max(0,Math.floor(samp.length*(LIMIT/B.nc))))];
+      B.cutFrame=S.phase;
+    }
+  } else B.drawCut=0;
+
+  /* verbindingen */
+  const pulses=[]; let drawn=0;
+  for(let c=0;c<B.nc;c++){
+    const a=B.cFrom[c], b=B.cTo[c], w=B.cW[c], aw=Math.abs(w);
+    if(aw<B.drawCut) continue;
+    const rel=Math.min(1,aw/wmax);
+    if(!showWeak && rel<0.42) continue;
+    if(sel>=0 && a!==sel && b!==sel) continue;
+    const x1=px(a), y1=py(a), x2=px(b), y2=py(b);
+    ctx.strokeStyle = w>=0 ? `rgba(79,209,197,${(0.05+rel*0.55).toFixed(3)})`
+                           : `rgba(255,107,87,${(0.05+rel*0.55).toFixed(3)})`;
+    ctx.lineWidth=0.4+rel*2.4;
+    ctx.beginPath();
+    if(a===b){ ctx.arc(x1,y1-9,9,0,7); ctx.stroke(); continue; }
+    const mx=(x1+x2)/2, my=(y1+y2)/2-Math.min(34,Math.abs(x2-x1)*0.12);
+    ctx.moveTo(x1,y1); ctx.quadraticCurveTo(mx,my,x2,y2); ctx.stroke(); drawn++;
+    if(showPulse){
+      const act=Math.abs(B.act[a]);
+      if(act>0.15 && rel>0.15) pulses.push([x1,y1,mx,my,x2,y2,act*rel,w>=0]);
+    }
+  }
+  /* signalen */
+  if(showPulse && pulses.length){
+    pulses.sort((p,q)=>q[6]-p[6]);
+    const lim=Math.min(pulses.length,180);
+    for(let i=0;i<lim;i++){
+      const [x1,y1,mx,my,x2,y2,st,pos]=pulses[i];
+      const t=((S.phase*0.022)+i*0.137)%1;
+      const u=1-t;
+      const bx=u*u*x1+2*u*t*mx+t*t*x2, by=u*u*y1+2*u*t*my+t*t*y2;
+      ctx.beginPath(); ctx.arc(bx,by,1.4+st*2.2,0,7);
+      ctx.fillStyle=pos?`rgba(150,255,244,${0.25+st*0.65})`:`rgba(255,170,150,${0.25+st*0.65})`;
+      ctx.fill();
+    }
+  }
+  /* neuronen */
+  for(let i=0;i<B.n;i++){
+    const k=B.kinds[i], x=px(i), y=py(i);
+    const isIO=(k===K_IN||k===K_OUT);
+    const a=Math.abs(B.act[i]);
+    const r=isIO?6.5:(k===K_MEM?6:5.5);
+    if(a>0.05){
+      ctx.beginPath(); ctx.arc(x,y,r+2+a*7,0,7);
+      ctx.fillStyle=KIND_COL[k]; ctx.globalAlpha=0.10+a*0.22; ctx.fill(); ctx.globalAlpha=1;
+    }
+    ctx.beginPath(); ctx.arc(x,y,r,0,7);
+    ctx.fillStyle=KIND_COL[k]; ctx.globalAlpha=0.35+Math.min(0.65,a*0.9); ctx.fill(); ctx.globalAlpha=1;
+    ctx.strokeStyle=(i===sel)?"#ffffff":(i===S.hover?"#c9d1d9":"#12151a");
+    ctx.lineWidth=(i===sel||i===S.hover)?2:1; ctx.stroke();
+  }
+  /* labels */
+  if(showLab){
+    ctx.font="9.5px 'IBM Plex Mono',monospace"; ctx.textBaseline="middle";
+    for(let i=0;i<B.n;i++){
+      const k=B.kinds[i];
+      if(k===K_IN){ ctx.fillStyle="#7b838d"; ctx.textAlign="right"; ctx.fillText(B.labels[i],px(i)-10,py(i)); }
+      else if(k===K_OUT){ ctx.fillStyle="#b98a45"; ctx.textAlign="left"; ctx.fillText(B.labels[i],px(i)+10,py(i)); }
+    }
+    ctx.textAlign="left";
+    ctx.fillStyle="#5c636d"; ctx.font="10px 'IBM Plex Mono',monospace";
+    ctx.fillText("invoer",12,H-8);
+    ctx.textAlign="right"; ctx.fillText("uitvoer",W-12,H-8); ctx.textAlign="left";
+  }
+  if(!showWeak || B.drawCut>0){
+    ctx.fillStyle="#5c636d"; ctx.font="10px 'IBM Plex Mono',monospace"; ctx.textAlign="center";
+    ctx.fillText(`${drawn} van ${B.nc} verbindingen getekend (alleen de sterkste)`,W/2,H-8); ctx.textAlign="left";
+  }
+  if(sel>=0){
+    ctx.fillStyle="#e9e7e1"; ctx.font="11px 'IBM Plex Mono',monospace";
+    ctx.fillText(`geselecteerd: ${B.labels[sel]} (${KIND_NAME[B.kinds[sel]]}) — klik naast een neuron om los te laten`,12,16);
+  }
+}
+/* muis op het netwerk */
+function netNodeAt(mx,my){
+  const B=S.B; if(!B||!B.lay) return -1;
+  const cvs=$("netcvs"); const W=cvs.clientWidth, H=500;
+  let best=-1,bd=14*14;
+  for(let i=0;i<B.n;i++){
+    const x=B.lay.x[i]/LX*(W-20)+10, y=B.lay.y[i]/LY*(H-24)+12;
+    const d=(x-mx)*(x-mx)+(y-my)*(y-my);
+    if(d<bd){ bd=d; best=i; }
+  }
+  return best;
+}
+
+/* ======================= grafieken ======================= */
+function drawCharts(){
+  drawChart1(); drawChart2();
+}
+function axes(ctx,W,H,pad){
+  ctx.strokeStyle="#2a2f37"; ctx.lineWidth=1;
+  for(let i=0;i<=4;i++){ const y=pad+ (H-pad*2)/4*i; ctx.beginPath(); ctx.moveTo(pad+26,y); ctx.lineTo(W-pad-26,y); ctx.stroke(); }
+}
+function series(ctx,data,W,H,pad,min,max,color,width){
+  if(data.length<2) return;
+  const x0=pad+26, x1=W-pad-26, y0=pad, y1=H-pad;
+  ctx.strokeStyle=color; ctx.lineWidth=width||1.6; ctx.beginPath();
+  for(let i=0;i<data.length;i++){
+    const x=x0+(x1-x0)*(data.length===1?0:i/(data.length-1));
+    const v=clamp((data[i]-min)/((max-min)||1),0,1);
+    const y=y1-(y1-y0)*v;
+    i?ctx.lineTo(x,y):ctx.moveTo(x,y);
+  }
+  ctx.stroke();
+}
+function drawChart1(){
+  const cvs=$("chart1"); const {ctx,W,H}=fitCanvas(cvs,190);
+  ctx.clearRect(0,0,W,H); ctx.fillStyle="#0f1114"; ctx.fillRect(0,0,W,H);
+  const pad=12; axes(ctx,W,H,pad);
+  const h=S.hist;
+  ctx.fillStyle="#5c636d"; ctx.font="9px 'IBM Plex Mono',monospace";
+  ctx.fillText("100%",2,pad+4); ctx.fillText("0%",2,H-pad+2);
+  if(h.length<2){ ctx.fillStyle="#5c636d"; ctx.font="11px 'IBM Plex Mono',monospace";
+    ctx.fillText("nog geen pogingen",W/2-50,H/2); return; }
+  const rew=h.map(d=>d.reward), st=h.map(d=>d.steps);
+  const rmin=Math.min(...rew), rmax=Math.max(...rew);
+  series(ctx,h.map(d=>d.reward),W,H,pad,rmin,rmax,"#ffb454",1.3);
+  series(ctx,h.map(d=>d.steps),W,H,pad,0,S.cfg.maxSteps,"#59c2ff",1.1);
+  series(ctx,h.map(d=>d.succ20*100),W,H,pad,0,100,"#4fd1c5",2.2);
+  /* toetspunten */
+  if(S.evalHist.length){
+    const x0=pad+26,x1=W-pad-26,y0=pad,y1=H-pad;
+    ctx.strokeStyle="#f78fb3"; ctx.lineWidth=1.8; ctx.beginPath();
+    S.evalHist.forEach((e,i)=>{
+      const x=x0+(x1-x0)*(h.length<=1?0:clamp((e.ep-1)/(h.length-1),0,1));
+      const y=y1-(y1-y0)*e.pct;
+      i?ctx.lineTo(x,y):ctx.moveTo(x,y);
+      ctx.save();
+    });
+    ctx.stroke();
+    S.evalHist.forEach(e=>{
+      const x=x0+(x1-x0)*(h.length<=1?0:clamp((e.ep-1)/(h.length-1),0,1));
+      const y=y1-(y1-y0)*e.pct;
+      ctx.beginPath(); ctx.arc(x,y,2.6,0,7); ctx.fillStyle="#f78fb3"; ctx.fill();
+    });
+  }
+  ctx.fillStyle="#5c636d"; ctx.font="9px 'IBM Plex Mono',monospace";
+  ctx.fillText(`beloning ${fmt(rmin,1)} … ${fmt(rmax,1)}`,pad+30,H-3);
+}
+function drawChart2(){
+  const cvs=$("chart2"); const {ctx,W,H}=fitCanvas(cvs,130);
+  ctx.clearRect(0,0,W,H); ctx.fillStyle="#0f1114"; ctx.fillRect(0,0,W,H);
+  const pad=10; axes(ctx,W,H,pad);
+  const h=S.hist; if(h.length<2) return;
+  const cs=h.map(d=>d.conns), ws=h.map(d=>d.meanW), ns=h.map(d=>d.neuronen||0);
+  const cmin=Math.min(...cs)*0.95, cmax=Math.max(...cs)*1.05;
+  const wmin=0, wmax=Math.max(...ws)*1.1||1;
+  const nmin=Math.min(...ns)*0.9, nmax=Math.max(...ns)*1.1||1;
+  series(ctx,cs,W,H,pad,cmin,cmax,"#8b7cf0",1.8);
+  series(ctx,ws,W,H,pad,wmin,wmax,"#ff6b57",1.8);
+  series(ctx,ns,W,H,pad,nmin,nmax,"#4fd1c5",1.6);
+  ctx.fillStyle="#5c636d"; ctx.font="9px 'IBM Plex Mono',monospace";
+  ctx.fillText(`verb. ${Math.round(cmin)}–${Math.round(cmax)}  ·  |w| 0–${fmt(wmax,2)}  ·  neuronen ${Math.round(nmin)}–${Math.round(nmax)}`,pad+28,H-2);
+}
+
+/* ======================= UI-uitvoer ======================= */
+function buildSensorGrid(){
+  const g=$("sensorgrid"); g.innerHTML="";
+  for(let i=0;i<16;i++){
+    const d=document.createElement("div"); d.className="sensorcell";
+    d.innerHTML=`<span class="bar" id="sb-${i}" style="height:0%"></span><span class="v">${i<8?"O":"D"}·${DIRNAME[i%8]}<br><b id="sv-${i}">0.00</b></span>`;
+    g.appendChild(d);
+  }
+}
+function updateSensorUI(){
+  for(let i=0;i<16;i++){
+    const v=S.inp[i]||0;
+    const b=$("sb-"+i), t=$("sv-"+i);
+    if(b) b.style.height=(clamp(v,0,1)*100).toFixed(0)+"%";
+    if(b) b.style.background=i<8?"#ff6b57":"#ffb454";
+    if(t) t.textContent=fmt(v,2);
+  }
+  for(let i=0;i<4;i++) $("bp-"+i).classList.toggle("on",!!S.outPressed[i]);
+}
+function updateStatus(){
+  $("s-ep").textContent=S.ep; $("s-eptot").textContent=S.cfg?S.cfg.nEpisodes:0;
+  $("s-step").textContent=S.step; $("s-rew").textContent=fmt(S.epReward,2);
+  $("s-dist").textContent=S.world?fmt(Math.hypot(S.world.goal.x-S.ag.x,S.world.goal.y-S.ag.y),1):"–";
+  $("s-col").textContent=S.epCollisions;
+  $("s-noise").textContent=S.running?fmt(noiseNow(),2):"–";
+  const pct=S.cfg&&S.cfg.nEpisodes?clamp(S.ep/S.cfg.nEpisodes,0,1)*100:0;
+  $("progbar").style.width=pct.toFixed(1)+"%";
+  if(S.B){
+    $("n-neurons").textContent=S.B.n-N_IN-N_OUT;
+    $("n-conns").textContent=S.B.nc;
+    $("n-meanw").textContent=fmt(meanAbsW(S.B),3);
+    let strong=0; const wm=S.cfg.wmax;
+    for(let c=0;c<S.B.nc;c++) if(Math.abs(S.B.cW[c])>0.5*wm) strong++;
+    $("n-strong").textContent=strong;
+    $("n-pruned").textContent=S.B.pruned; $("n-sprouted").textContent=S.B.sprouted;
+    $("n-born").textContent=S.B.born; $("n-retyped").textContent=S.B.retyped;
+  }
+}
+function updateMetrics(){
+  const h=S.hist;
+  $("m-eps").textContent=S.ep;
+  const pct=S.ep?S.succTotal/S.ep:0;
+  $("m-succ").textContent=`${S.succTotal} (${(pct*100).toFixed(0)}%)`;
+  const s20=h.length?h[h.length-1].succ20:0;
+  $("m-succ20").textContent=(s20*100).toFixed(0)+"%";
+  $("m-eval").textContent=S.evalHist.length?((S.evalHist[S.evalHist.length-1].pct*100).toFixed(0)+"%"):"–";
+  $("m-steps").textContent=S.stepsSucc.length?fmt(S.stepsSucc.reduce((a,b)=>a+b,0)/S.stepsSucc.length,0):"–";
+  const last=S.rewards.slice(-20);
+  $("m-rew").textContent=last.length?fmt(last.reduce((a,b)=>a+b,0)/last.length,2):"–";
+  $("m-best").textContent=S.rewards.length?fmt(Math.max(...S.rewards),2):"–";
+  $("m-col").textContent=S.ep?fmt(S.collisions/S.ep,2):"–";
+  $("m-time").textContent=S.elapsed?fmt(S.elapsed/1000,1)+"s":"–";
+  renderVerdict(s20);
+}
+function renderVerdict(s20){
+  const el=$("verdict");
+  if(!S.hist.length){ el.className="verdict mid"; el.innerHTML="<b>Nog niets gemeten</b>Genereer een brein en druk op start."; return; }
+  const ev=S.evalHist.length?S.evalHist[S.evalHist.length-1].pct:null;
+  const gap=(ev!==null)?(s20-ev):0;
+  if(s20>=0.7 && (ev===null||ev>=0.5)){
+    el.className="verdict good";
+    el.innerHTML="<b>Dit brein kan het</b>Het haalt het doel structureel, ook buiten de wereld waarin het geoefend heeft. Kijk in de wolk welke verbindingen zijn overgebleven — dat is de gevonden oplossing.";
+  } else if(s20>=0.5 && gap>0.3){
+    el.className="verdict mid";
+    el.innerHTML="<b>Uit het hoofd geleerd</b>Het doet het goed in de trainingswereld maar zakt weg op onbekende werelden. Laat de wereld vaker wisselen, of geef minder neuronen — precies dezelfde faalvorm als een overgetraind model.";
+  } else if(s20>=0.35){
+    el.className="verdict mid";
+    el.innerHTML="<b>Het begint te werken</b>Er zit een signaal in, maar het is nog onbetrouwbaar. Meer pogingen, iets meer worker-neuronen of een hogere beloning voor 'dichter bij doel' helpt meestal.";
+  } else {
+    el.className="verdict bad";
+    el.innerHTML="<b>Nog geen greep op het spel</b>Vaak is de wolk te dun bedraad (verhoog de startdichtheid), de leersnelheid te hoog, of vervaagt alles sneller dan het opgebouwd wordt. Check ook of er überhaupt een pad van invoer naar uitvoer bestaat.";
+  }
+}
+function renderStructReport(){
+  const el=$("structreport");
+  if(!S.B){ el.innerHTML='<div class="hint">Nog geen brein.</div>'; return; }
+  const A=analyze(S.B,S.cfg); S.lastAnalysis=A;
+  const c=S.B.comp;
+  const pairRows=Object.entries(A.pairs).sort((a,b)=>b[1]-a[1]).slice(0,8);
+  const total=c.sens+c.work+c.refl+c.mem+c.neut;
+  const bar=(lab,v,max,col)=>`<div class="barrow"><span class="bl">${lab}</span>
+    <span class="bar-track"><span class="bar-fill" style="width:${max?clamp(v/max,0,1)*100:0}%;background:${col}"></span></span>
+    <span class="bv">${v}</span></div>`;
+  const c0=S.B.compStart||c;
+  el.innerHTML=
+    `<div class="hint" style="margin-bottom:6px;">Nu <b>${S.B.n-HID0}</b> neuronen (gestart met ${c0.sens+c0.work+c0.refl+c0.mem}).</div>`+
+    bar("invoer-neuronen",c.sens,total,"#59c2ff")+
+    bar("worker",c.work,total,"#8b7cf0")+
+    bar("reflex",c.refl,total,"#ff6b57")+
+    bar("geheugen",c.mem,total,"#f78fb3")+
+    bar("neutraal (nog geen soort)",c.neut,total,"#7c8794")+
+    `<div class="metric" style="margin-top:10px;"><span class="k">actieve verbindingen</span><span class="v">${A.activeConns} / ${S.B.nc}</span></div>`+
+    `<div class="metric"><span class="k">kortste pad invoer→uitvoer</span><span class="v">${A.shortest<0?"géén!":A.shortest+" stappen"}</span></div>`+
+    `<div class="metric"><span class="k">werkende reflexbogen</span><span class="v">${A.reflexArcs}</span></div>`+
+    `<div class="metric"><span class="k">lussen (terugkoppeling)</span><span class="v">${A.loops}</span></div>`+
+    `<div class="metric"><span class="k">neuronen die meedoen</span><span class="v">${A.useful} van ${total}</span></div>`+
+    `<div class="metric"><span class="k">losgeraakte neuronen</span><span class="v">${A.dead}</span></div>`+
+    `<div class="metric"><span class="k">verbindingen gesnoeid / bijgegroeid</span><span class="v">${S.B.pruned} / ${S.B.sprouted}</span></div>`+
+    `<div class="metric"><span class="k">neuronen bijgegroeid</span><span class="v">${S.B.born}</span></div>`+
+    `<div class="metric"><span class="k">van soort veranderd</span><span class="v">${S.B.retyped}</span></div>`+
+    `<div class="hint" style="margin-top:10px;">Sterkste verbindingssoorten:</div>`+
+    `<div class="scrollx"><table><tbody>${pairRows.map(([k,v])=>`<tr><td>${k}</td><td style="text-align:right">${v}</td></tr>`).join("")||'<tr><td>–</td></tr>'}</tbody></table></div>`+
+    `<div class="hint" style="margin-top:8px;">Drukste neuronen: ${A.hubs.map(([i,v])=>`${S.B.labels[i]} (${fmt(v,1)})`).join(", ")||"–"}</div>`;
+  /* sensorgebruik */
+  const mx=Math.max(...A.sensorUse,1e-6);
+  $("sensoruse").innerHTML=A.sensorUse.map((v,i)=>
+    `<div class="barrow"><span class="bl">${S.B.labels[i]}</span>
+     <span class="bar-track"><span class="bar-fill" style="width:${clamp(v/mx,0,1)*100}%;background:${i<8?"#ff6b57":"#ffb454"}"></span></span>
+     <span class="bv">${fmt(v,2)}</span></div>`).join("");
+}
+
+/* ======================= trainingslus ======================= */
+let rafId=null;
+function loop(){
+  rafId=requestAnimationFrame(loop);
+  S.phase++;
+  if(S.running && !S.paused){
+    const spd=SPEEDS[+$("spd").value];
+    if(spd==="turbo"){
+      const t0=performance.now();
+      while(performance.now()-t0<14 && S.running){
+        if(gameTick(true,noiseNow())) finishEpisode();
+        if(S.ep>=S.cfg.nEpisodes){ stopTraining(true); break; }
+      }
+    } else {
+      for(let i=0;i<spd && S.running;i++){
+        if(gameTick(true,noiseNow())) finishEpisode();
+        if(S.ep>=S.cfg.nEpisodes){ stopTraining(true); break; }
+      }
+    }
+    S.elapsed=performance.now()-S.startTime;
+  } else if(S.watching){
+    if(gameTick(false,0)){ S.watching=false; $("s-state").textContent="poging bekeken"; }
+  }
+  drawWorld(); drawNet(); updateSensorUI(); updateStatus();
+  if(S.phase%12===0){ drawCharts(); updateMetrics(); }
+  if(S.phase%90===0 && S.B) renderStructReport();
+}
+function startTraining(){
+  if(!S.B){ genBrain(); }
+  S.cfg=readCfg();
+  S.hist=[]; S.evalHist=[]; S.rewards=[]; S.stepsSucc=[]; S.succTotal=0; S.collisions=0; S.structLog=[];
+  S.ep=0; S.elapsed=0; S.startTime=performance.now();
+  S.rnd=mulberry32(S.cfg.seed*7717+991);
+  newWorld(0); startEpisode();
+  S.running=true; S.paused=false; S.watching=false;
+  $("btnstart").disabled=true; $("btnpause").disabled=false; $("btnstop").disabled=false;
+  $("s-state").textContent="training loopt";
+}
+function stopTraining(finished){
+  S.running=false; S.paused=false;
+  $("btnstart").disabled=false; $("btnpause").disabled=true; $("btnstop").disabled=true;
+  $("btnpause").textContent="⏸ pauze";
+  $("s-state").textContent=finished?"training klaar":"gestopt";
+  drawCharts(); updateMetrics(); renderStructReport();
+  if(S.hist.length){
+    const row=buildResult();
+    S.rows.push(row); renderCompare();
+    if($("autosave").checked) persistResult(row);
+  }
+}
+
+/* ======================= brein maken ======================= */
+function genBrain(){
+  S.cfg=readCfg();
+  const seed=Math.floor(Math.random()*1e6);
+  S.B=createBrain(S.cfg,seed);
+  S.selected=-1;
+  resetBrainState(S.B);
+  S.hist=[]; S.evalHist=[]; S.rewards=[]; S.stepsSucc=[]; S.succTotal=0; S.collisions=0; S.structLog=[]; S.ep=0; S.elapsed=0;
+  newWorld(0); startEpisode();
+  updateTypeCounts(); renderStructReport(); updateStatus(); updateMetrics(); drawCharts();
+  $("s-state").textContent="brein gegenereerd";
+}
+function updateTypeCounts(){
+  const c=S.B?S.B.comp:null;
+  for(const k of ["sens","work","refl","mem"]) $("cnt-"+k).textContent=c?c[k]:"–";
+  $("hd-neurons").textContent = S.B ? `${S.B.n-HID0} neuronen · ${c.neut} neutraal` : "16 in · 4 uit";
+}
+function validateTypes(){
+  const cfg=readCfg();
+  const el=$("typevalidate");
+  const N=cfg.nNeurons;
+  let minOthers=0;
+  for(const k of ["sens","refl","mem"]) if(cfg.types[k].on) minOthers+=Math.max(0,cfg.types[k].min);
+  const workerLeft=N-minOthers;
+  const need=Math.floor(N/2)+1;
+  for(const k of ["sens","work","refl","mem"]){
+    const b=$("tb-"+({sens:"sens",work:"work",refl:"refl",mem:"mem"})[k]);
+    if(b) b.classList.toggle("off", !cfg.types[k].on);
+  }
+  if(workerLeft<need){
+    el.className="validate bad";
+    el.innerHTML=`Er blijven maximaal <b>${Math.max(0,workerLeft)}</b> worker-neuronen over, maar de regel eist er minstens <b>${need}</b> (de meerderheid). Verlaag de minima van de andere types of verhoog het aantal neuronen. Bij het genereren worden de andere types automatisch teruggeschroefd.`;
+  } else {
+    el.className="validate ok";
+    el.innerHTML=`Ruimte voor <b>${workerLeft}</b> worker-neuronen van de ${N}; de meerderheidsregel (≥ ${need}) wordt gehaald.`;
+  }
+  if(!cfg.types.sens.on && cfg.types.refl.on){
+    el.className="validate bad";
+    el.innerHTML+=` <br>Let op: reflex-neuronen kunnen alleen invoer krijgen van invoer-neuronen, en die staan uit — reflexen blijven dan doof.`;
+  }
+}
+
+/* ======================= vergelijken + opslaan ======================= */
+function buildResult(){
+  const A=S.lastAnalysis||analyze(S.B,S.cfg);
+  const h=S.hist;
+  const succ20=h.length?h[h.length-1].succ20:0;
+  const ev=S.evalHist.length?S.evalHist[S.evalHist.length-1].pct:null;
+  return {
+    tijdstip:new Date().toISOString(),
+    spel:"doel bereiken (2D)",
+    brein:$("brainname").value||"brein",
+    config:{
+      /* alles wat je in de pagina kunt instellen, precies zoals het stond */
+      startNeuronen:S.cfg.nNeurons, samenstelling:S.B.comp, samenstellingStart:S.B.compStart,
+      neuronenNu:S.B.n-HID0,
+      types:{
+        sens:{aan:S.cfg.types.sens.on,min:S.cfg.types.sens.min,max:S.cfg.types.sens.max},
+        work:{aan:true,min:S.cfg.types.work.min,max:S.cfg.types.work.max},
+        refl:{aan:S.cfg.types.refl.on,min:S.cfg.types.refl.min,max:S.cfg.types.refl.max},
+        mem:{aan:S.cfg.types.mem.on,min:S.cfg.types.mem.min,max:S.cfg.types.mem.max}
+      },
+      startdichtheid:S.cfg.density,
+      wereld:{obstakels:S.cfg.nObs, stappenPerPoging:S.cfg.maxSteps, nieuweWereldElke:S.cfg.worldEvery,
+        seed:S.cfg.seed, snelheidKarakter:S.cfg.chSpeed, stoptNaBotsing:S.cfg.stopOnCollide},
+      leren:{leersnelheid:S.cfg.lr, sporenVervaging:S.cfg.lam, vervagingPerPoging:S.cfg.decay,
+        maxGewicht:S.cfg.wmax, maxVeranderingPerStap:S.cfg.stepMax, geheugenlek:S.cfg.memLeak,
+        propagatiestappen:S.cfg.prop, exploratieStart:S.cfg.noise0, exploratieEind:noiseEnd(S.cfg.noise0),
+        leersnelheidMeeschalen:S.cfg.lrAnneal},
+      structureel:{aan:S.cfg.structOn, herstructureerElke:S.cfg.structEvery,
+        snoeidrempel:S.cfg.pruneT, nieuweVerbindingenPerRonde:S.cfg.sprout,
+        groeiAan:S.cfg.growOn, alleenBijStagnatie:S.cfg.growStagnant, maxNeuronen:S.cfg.growMax,
+        nieuweNeuronenPerRonde:S.cfg.growN, startverbindingenNieuwNeuron:S.cfg.newLinks,
+        typeVeranderingAan:S.cfg.retypeOn, typeVeranderingenPerRonde:S.cfg.retypeN,
+        maxOmschakelkosten:S.cfg.retypeCost},
+      beloningen:{doel:S.cfg.rGoal,vooruitgang:S.cfg.rProg,botsing:-S.cfg.rCol,
+        perStap:-S.cfg.rStep,stilstaan:-S.cfg.rIdle},
+      training:{pogingen:S.cfg.nEpisodes, toetsenAan:S.cfg.evalOn}
+    },
+    resultaat:{
+      pogingen:S.ep, succes:S.succTotal, succesPct:S.ep?S.succTotal/S.ep:0,
+      succes20:succ20, toetsPct:ev,
+      gemStappenBijSucces:S.stepsSucc.length?S.stepsSucc.reduce((a,b)=>a+b,0)/S.stepsSucc.length:null,
+      gemBeloningLaatste20:S.rewards.slice(-20).reduce((a,b)=>a+b,0)/Math.max(1,S.rewards.slice(-20).length),
+      besteBeloning:S.rewards.length?Math.max(...S.rewards):null,
+      botsingenPerPoging:S.ep?S.collisions/S.ep:0, rekentijdMs:Math.round(S.elapsed)
+    },
+    structuur:{
+      verbindingen:S.B.nc, actieveVerbindingen:A.activeConns, gemAbsW:A.meanW,
+      sterkeVerbindingen:A.strong, kortstePad:A.shortest, reflexbogen:A.reflexArcs,
+      lussen:A.loops, meedoendeNeuronen:A.useful, losgeraakt:A.dead,
+      gesnoeid:S.B.pruned, bijgegroeid:S.B.sprouted,
+      nieuweNeuronen:S.B.born, typeVeranderingen:S.B.retyped, neutraalNu:S.B.comp.neut,
+      verbindingenPerTypepaar:A.pairs, sensorGebruik:A.sensorUse,
+      hubs:A.hubs.map(([i,v])=>({neuron:S.B.labels[i],type:KIND_NAME[S.B.kinds[i]],massa:v}))
+    },
+    historie:S.hist.map(d=>({poging:d.ep,ok:d.ok,beloning:d.reward,stappen:d.steps,stilstaan:d.idle,
+      verbindingen:d.conns,neuronen:d.neuronen,gemW:d.meanW,succes20:d.succ20})),
+    toetsen:S.evalHist.map(e=>({poging:e.ep,pct:e.pct})),
+    herstructureringen:S.structLog,
+    netwerk:{
+      neuronen:Array.from({length:S.B.n},(_,i)=>({i,type:KIND_KEY[S.B.kinds[i]],label:S.B.labels[i],
+        x:Math.round(S.B.lay.x[i]),y:Math.round(S.B.lay.y[i]),bias:+fmt(S.B.bias[i],4)})),
+      verbindingen:Array.from({length:S.B.nc},(_,c)=>[S.B.cFrom[c],S.B.cTo[c],+fmt(S.B.cW[c],4)])
+    }
+  };
+}
+function renderCompare(){
+  const b=$("cmpbody"); b.innerHTML="";
+  S.rows.forEach(r=>{
+    const c=r.config.samenstelling;
+    const c0=r.config.samenstellingStart||c;
+    const tr=document.createElement("tr");
+    const okCls=r.resultaat.succes20>=0.7?"ok":(r.resultaat.succes20>=0.4?"mid":"no");
+    tr.innerHTML=`<td>${r.brein}</td><td>${r.config.startNeuronen} → ${r.config.neuronenNu}</td>
+      <td>${c0.sens}/${c0.work}/${c0.refl}/${c0.mem} → ${c.sens}/${c.work}/${c.refl}/${c.mem}${c.neut?"+"+c.neut+"n":""}</td>
+      <td>${r.structuur.verbindingen}</td>
+      <td>${(r.resultaat.succesPct*100).toFixed(0)}%</td>
+      <td><span class="badge ${okCls}">${(r.resultaat.succes20*100).toFixed(0)}%</span></td>
+      <td>${r.resultaat.toetsPct===null?"–":(r.resultaat.toetsPct*100).toFixed(0)+"%"}</td>
+      <td>${r.resultaat.gemStappenBijSucces?fmt(r.resultaat.gemStappenBijSucces,0):"–"}</td>
+      <td>${fmt(r.resultaat.gemBeloningLaatste20,1)}</td>
+      <td>${r.structuur.lussen}</td><td>${r.structuur.reflexbogen}</td>
+      <td>${r.structuur.typeVeranderingen||0}</td>
+      <td>${fmt(r.resultaat.rekentijdMs/1000,1)}s</td>`;
+    b.appendChild(tr);
+  });
+  $("cmpcount").textContent=S.rows.length+(S.rows.length===1?" brein":" breinen");
+  renderCmpBars();
+}
+function renderCmpBars(){
+  const el=$("cmpbars"); const key=$("cmpmetric").value;
+  if(!S.rows.length){ el.innerHTML='<div class="hint">Nog geen breinen toegevoegd.</div>'; return; }
+  const get=r=>({succ20:r.resultaat.succes20*100, succ:r.resultaat.succesPct*100,
+    evalPct:(r.resultaat.toetsPct||0)*100, avgSteps:r.resultaat.gemStappenBijSucces||0,
+    conns:r.structuur.verbindingen, loops:r.structuur.lussen,
+    neurons:r.config.neuronenNu, retypes:r.structuur.typeVeranderingen||0})[key];
+  const vals=S.rows.map(get); const mx=Math.max(...vals,1e-6);
+  const suffix=(key==="succ20"||key==="succ"||key==="evalPct")?"%":"";
+  el.innerHTML=S.rows.map((r,i)=>
+    `<div class="barrow"><span class="bl">${r.brein}</span>
+     <span class="bar-track"><span class="bar-fill" style="width:${clamp(vals[i]/mx,0,1)*100}%;background:${["#4fd1c5","#ffb454","#59c2ff","#f78fb3","#8b7cf0"][i%5]}"></span></span>
+     <span class="bv">${fmt(vals[i],suffix?0:1)}${suffix}</span></div>`).join("");
+}
+
+/* map-handles onthouden */
+const DIRDB_NAME="llm-lab-dirs", DIRDB_STORE="handles";
+function dirDbOpen(){ return new Promise((res,rej)=>{ const q=indexedDB.open(DIRDB_NAME,1);
+  q.onupgradeneeded=()=>{ if(!q.result.objectStoreNames.contains(DIRDB_STORE)) q.result.createObjectStore(DIRDB_STORE); };
+  q.onsuccess=()=>res(q.result); q.onerror=()=>rej(q.error); }); }
+async function dirDbGet(key){ try{ const db=await dirDbOpen();
+  return await new Promise((res,rej)=>{ const tx=db.transaction(DIRDB_STORE,"readonly");
+    const q=tx.objectStore(DIRDB_STORE).get(key); q.onsuccess=()=>res(q.result||null); q.onerror=()=>rej(q.error); });
+  }catch(e){ return null; } }
+async function dirDbSet(key,h){ try{ const db=await dirDbOpen();
+  await new Promise((res,rej)=>{ const tx=db.transaction(DIRDB_STORE,"readwrite");
+    tx.objectStore(DIRDB_STORE).put(h,key); tx.oncomplete=res; tx.onerror=()=>rej(tx.error); }); }catch(e){} }
+
+function fileTimestamp(d){ const p=n=>String(n).padStart(2,"0");
+  return `${d.getFullYear()}${p(d.getMonth()+1)}${p(d.getDate())}-${p(d.getHours())}${p(d.getMinutes())}${p(d.getSeconds())}`; }
+function safeName(s){ return (s||"brein").replace(/[^a-z0-9_-]+/gi,"-").slice(0,40); }
+async function persistResult(row){
+  const st=$("savestatus");
+  S.lastResult=row;
+  if(!S.resultsDirHandle){ st.innerHTML='nog geen map gekozen — kies de map <b>resultaten-brein</b> in je projectmap, of gebruik de downloadknop.'; return; }
+  try{
+    const naam=`brein_${safeName(row.brein)}_${fileTimestamp(new Date(row.tijdstip))}.json`;
+    const fh=await S.resultsDirHandle.getFileHandle(naam,{create:true});
+    const wr=await fh.createWritable();
+    await wr.write(JSON.stringify(row,null,2)); await wr.close();
+    row.__saved=true;
+    st.textContent=`opgeslagen als "${S.resultsDirHandle.name}/${naam}" — ${new Date().toLocaleTimeString("nl-NL")}`;
+  }catch(err){ st.textContent="opslaan mislukt: "+err.message; }
+}
+async function persistPending(){ for(const r of S.rows) if(!r.__saved) await persistResult(r); }
+
+/* ======================= wiring ======================= */
+function bindSlider(id,valId,fn){
+  const el=$(id);
+  const upd=()=>{ $(valId).textContent=fn(+el.value); };
+  el.addEventListener("input",()=>{ upd(); if(S.cfg) S.cfg=readCfg(); validateTypes(); });
+  upd();
+}
+function initUI(){
+  buildSensorGrid();
+  bindSlider("nneurons","nneuronsval",v=>v);
+  bindSlider("density","densval",v=>fmt(v/10,1));
+  bindSlider("nobs","nobsval",v=>v);
+  bindSlider("maxsteps","maxstepsval",v=>v);
+  bindSlider("worldevery","worldeveryval",v=>v);
+  bindSlider("chspeed","speedval",v=>fmt(v/10,1));
+  bindSlider("seed","seedval",v=>v);
+  bindSlider("lr","lrval",v=>fmt(v/1000,3));
+  bindSlider("elam","elamval",v=>fmt(v/100,2));
+  bindSlider("dec","decval",v=>fmt(v/10000,4));
+  bindSlider("wmax","wmaxval",v=>fmt(v/10,1));
+  bindSlider("stepmax","stepmaxval",v=>fmt(v/1000,3));
+  bindSlider("memleak","memleakval",v=>fmt(v/100,2));
+  bindSlider("prop","propval",v=>v);
+  bindSlider("noise","noiseval",v=>`${fmt(v/100,2)} → ${fmt(noiseEnd(v/100),2)}`);
+  bindSlider("structevery","structeveryval",v=>v);
+  bindSlider("prune","pruneval",v=>fmt(v/1000,3));
+  bindSlider("sprout","sproutval",v=>v);
+  bindSlider("growmax","growmaxval",v=>v);
+  bindSlider("grown","grownval",v=>v);
+  bindSlider("newlinks","newlinksval",v=>v);
+  bindSlider("retypen","retypenval",v=>v);
+  bindSlider("retypecost","retypecostval",v=>fmt(v/100,2));
+  bindSlider("rgoal","rgoalval",v=>"+"+fmt(v/10,1));
+  bindSlider("rprog","rprogval",v=>"+"+fmt(v/100,2));
+  bindSlider("rcol","rcolval",v=>"−"+fmt(v/100,2));
+  bindSlider("rstep","rstepval",v=>"−"+fmt(v/1000,3));
+  bindSlider("ridle","ridleval",v=>"−"+fmt(v/1000,3));
+  bindSlider("nep","nepval",v=>v);
+  bindSlider("spd","spdval",v=>SPEEDS[v]==="turbo"?"turbo":SPEEDS[v]+"×");
+
+  ["en-sens","en-refl","en-mem"].forEach(id=>$(id).addEventListener("change",validateTypes));
+  ["min-sens","max-sens","min-work","max-work","min-refl","max-refl","min-mem","max-mem"]
+    .forEach(id=>$(id).addEventListener("input",validateTypes));
+
+  $("genbrain").addEventListener("click",()=>{ if(S.running) stopTraining(false); genBrain(); });
+  $("preset").addEventListener("click",applyPreset);
+  $("btnstart").addEventListener("click",startTraining);
+  $("btnpause").addEventListener("click",()=>{ S.paused=!S.paused;
+    $("btnpause").textContent=S.paused?"▶ verder":"⏸ pauze"; $("s-state").textContent=S.paused?"gepauzeerd":"training loopt"; });
+  $("btnstop").addEventListener("click",()=>stopTraining(false));
+  $("btnreset").addEventListener("click",()=>{ if(S.running) stopTraining(false); genBrain(); });
+  $("btnwatch").addEventListener("click",()=>{
+    if(!S.B) return; if(S.running){ S.paused=true; $("btnpause").textContent="▶ verder"; }
+    startEpisode(); S.watching=true; $("s-state").textContent="één poging bekijken (zonder leren)";
+  });
+  $("relayout").addEventListener("click",()=>{ if(S.B){ S.B.seed=Math.floor(Math.random()*1e6); layoutBrain(S.B); } });
+  $("addcompare").addEventListener("click",()=>{
+    if(!S.B||!S.hist.length){ $("savestatus").textContent="eerst een training draaien."; return; }
+    const row=buildResult(); S.rows.push(row); renderCompare(); persistResult(row);
+  });
+  $("clearcompare").addEventListener("click",()=>{ S.rows=[]; renderCompare(); });
+  $("cmpmetric").addEventListener("change",renderCmpBars);
+  $("savenow").addEventListener("click",()=>{
+    if(!S.B||!S.hist.length){ $("savestatus").textContent="eerst een training draaien."; return; }
+    persistResult(buildResult());
+  });
+  $("downloadjson").addEventListener("click",()=>{
+    const data=S.rows.length?S.rows:(S.hist.length?[buildResult()]:[]);
+    if(!data.length){ $("savestatus").textContent="nog niets te downloaden."; return; }
+    const blob=new Blob([JSON.stringify(data.length===1?data[0]:data,null,2)],{type:"application/json"});
+    const url=URL.createObjectURL(blob); const a=document.createElement("a");
+    a.href=url; a.download=`brein_${safeName($("brainname").value)}_${fileTimestamp(new Date())}.json`; a.click();
+    URL.revokeObjectURL(url);
+  });
+  $("choosedir").addEventListener("click",async()=>{
+    const st=$("savestatus");
+    if(!window.showDirectoryPicker){ st.textContent="deze browser ondersteunt geen mapkeuze — gebruik de downloadknop (Chrome of Edge werkt wel)."; return; }
+    try{
+      S.resultsDirHandle=await window.showDirectoryPicker({id:"llm-lab-brein",mode:"readwrite",startIn:"documents"});
+      await dirDbSet("breinDir",S.resultsDirHandle);
+      st.textContent=`map gekozen: "${S.resultsDirHandle.name}" — elk afgerond brein komt hier als eigen JSON-bestand.`;
+      await persistPending();
+    }catch(e){}
+  });
+
+  const cvs=$("netcvs");
+  cvs.addEventListener("mousemove",e=>{
+    const r=cvs.getBoundingClientRect();
+    S.hover=netNodeAt(e.clientX-r.left,e.clientY-r.top);
+    const tp=$("tooltip");
+    if(S.hover>=0&&S.B){
+      const i=S.hover; let ind=0,outd=0;
+      for(let c=0;c<S.B.nc;c++){ if(S.B.cTo[c]===i) ind++; if(S.B.cFrom[c]===i) outd++; }
+      tp.style.display="block"; tp.style.left=(e.clientX+14)+"px"; tp.style.top=(e.clientY+14)+"px";
+      tp.innerHTML=`<b>${S.B.labels[i]}</b><br>${KIND_NAME[S.B.kinds[i]]}<br>activatie ${fmt(S.B.act[i],3)}<br>in ${ind} · uit ${outd}<br>bias ${fmt(S.B.bias[i],3)}`;
+    } else tp.style.display="none";
+  });
+  cvs.addEventListener("mouseleave",()=>{ S.hover=-1; $("tooltip").style.display="none"; });
+  cvs.addEventListener("click",e=>{
+    const r=cvs.getBoundingClientRect();
+    const i=netNodeAt(e.clientX-r.left,e.clientY-r.top);
+    S.selected=(i===S.selected)?-1:i;
+  });
+  window.addEventListener("resize",()=>{ drawNet(); drawCharts(); });
+  validateTypes();
+}
+function applyPreset(){
+  const set=(id,v)=>{ $(id).value=v; $(id).dispatchEvent(new Event("input")); };
+  set("nneurons",60); set("density",250); set("nobs",5); set("maxsteps",320); set("worldevery",5);
+  set("chspeed",11); set("lr",8); set("elam",60); set("dec",5); set("wmax",20); set("stepmax",100);
+  set("memleak",35); set("prop",2); set("noise",30); set("structevery",10); set("prune",30); set("sprout",6);
+  set("rgoal",100); set("rprog",100); set("rcol",30); set("rstep",10); set("ridle",150); set("nep",500); set("spd",2);
+  set("growmax",140); set("grown",2); set("newlinks",4); set("retypen",3); set("retypecost",25);
+  $("grow").checked=true; $("growstag").checked=true; $("retype").checked=true; $("structplast").checked=true;
+  $("min-sens").value=4; $("max-sens").value=14; $("min-work").value=12; $("max-work").value=400;
+  $("min-refl").value=2; $("max-refl").value=10; $("min-mem").value=2; $("max-mem").value=10;
+  $("en-sens").checked=true; $("en-refl").checked=true; $("en-mem").checked=true;
+  validateTypes();
+}
+async function restoreDir(){
+  const saved=await dirDbGet("breinDir"); if(!saved) return;
+  const st=$("savestatus");
+  try{
+    const perm=await saved.queryPermission({mode:"readwrite"});
+    if(perm==="granted"){ S.resultsDirHandle=saved; st.textContent=`map onthouden: "${saved.name}" — resultaten worden hier opgeslagen.`; return; }
+    st.innerHTML=`map "${saved.name}" onthouden — <button class="actionbtn" id="resumedir" style="margin-left:4px;">🔓 hervat toegang</button>`;
+    $("resumedir").addEventListener("click",async()=>{
+      try{ const p=await saved.requestPermission({mode:"readwrite"});
+        if(p==="granted"){ S.resultsDirHandle=saved; st.textContent=`map hervat: "${saved.name}".`; await persistPending(); }
+        else st.textContent="toegang geweigerd — kies de map opnieuw.";
+      }catch(e){ st.textContent="toegang mislukt — kies de map opnieuw."; }
+    });
+  }catch(e){}
+}
+
+/* ======================= start ======================= */
+initUI();
+genBrain();
+restoreDir();
+loop();
+/* Zelfde training, maar zonder tekenen — handig om instellingen door te meten. */
+function runHeadless(nEp,brainSeed,evalOn){
+  S.cfg=readCfg(); S.cfg.nEpisodes=nEp; S.cfg.evalOn=!!evalOn;
+  if(brainSeed!==undefined) S.B=createBrain(S.cfg,brainSeed);
+  S.hist=[]; S.evalHist=[]; S.rewards=[]; S.stepsSucc=[]; S.succTotal=0; S.collisions=0; S.structLog=[]; S.ep=0;
+  S.rnd=mulberry32(S.cfg.seed*7717+991);
+  newWorld(0); startEpisode();
+  while(S.ep<nEp){ if(gameTick(true,noiseNow())) finishEpisode(); }
+  return {succ:S.succTotal, succ20:S.hist[S.hist.length-1].succ20, evals:S.evalHist.map(e=>e.pct),
+    hist:S.hist.map(h=>({ok:h.ok,reward:h.reward,steps:h.steps,idle:h.idle,maxW:h.maxW,meanW:h.meanW}))};
+}
+window.__brain={S,createBrain,analyze,makeWorld,readCfg,startTraining,stopTraining,runHeadless,genBrain,
+  canConnect,countKinds,restructure,K:{K_IN,K_SENS,K_WORK,K_REFL,K_MEM,K_NEUT,K_OUT,HID0,OUT0}};
+</script>
+</body>
+</html>

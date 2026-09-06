@@ -1,0 +1,4353 @@
+{
+  "tijdstip": "2026-09-06T18:41:45.617Z",
+  "spel": "doel bereiken (2D)",
+  "brein": "brein-01",
+  "config": {
+    "neuronen": 142,
+    "samenstelling": {
+      "sens": 4,
+      "work": 32,
+      "refl": 2,
+      "mem": 2
+    },
+    "strengReflex": false,
+    "startdichtheid": 6,
+    "obstakels": 3,
+    "stappenPerPoging": 320,
+    "nieuweWereldElke": 5,
+    "seed": 1,
+    "snelheid": 1.1,
+    "leersnelheid": 0.008,
+    "sporenVervaging": 0.6,
+    "vervaging": 0.0005,
+    "maxGewicht": 2,
+    "maxStap": 0.1,
+    "geheugenlek": 0.35,
+    "propagatiestappen": 2,
+    "ruisStart": 0.3,
+    "structureel": true,
+    "herstructureerElke": 10,
+    "snoeidrempel": 0.03,
+    "nieuweVerbindingen": 6,
+    "beloningen": {
+      "doel": 10,
+      "vooruitgang": 1,
+      "botsing": -0.3,
+      "perStap": -0.01,
+      "stilstaan": -0.15
+    }
+  },
+  "resultaat": {
+    "pogingen": 219,
+    "succes": 76,
+    "succesPct": 0.3470319634703196,
+    "succes20": 0.55,
+    "toetsPct": 0,
+    "gemStappenBijSucces": 152.60526315789474,
+    "gemBeloningLaatste20": 49.31241065339342,
+    "besteBeloning": 97.95245081870118,
+    "botsingenPerPoging": 107.84018264840182,
+    "rekentijdMs": 239714
+  },
+  "structuur": {
+    "verbindingen": 346,
+    "actieveVerbindingen": 73,
+    "gemAbsW": 0.11284220062338914,
+    "sterkeVerbindingen": 0,
+    "kortstePad": 2,
+    "reflexbogen": 0,
+    "lussen": 3,
+    "meedoendeNeuronen": 18,
+    "losgeraakt": 22,
+    "gesnoeid": 128,
+    "bijgegroeid": 126,
+    "verbindingenPerTypepaar": {
+      "in→work": 16,
+      "sens→work": 6,
+      "sens→out": 2,
+      "sens→refl": 1,
+      "work→out": 14,
+      "work→work": 26,
+      "work→mem": 2,
+      "mem→work": 3,
+      "mem→out": 1,
+      "mem→mem": 2
+    },
+    "sensorGebruik": [
+      0.01744601850396066,
+      0.05085201207839418,
+      0.02639774685667362,
+      0.015663787792618677,
+      0.048317900244001066,
+      0.011175400330103002,
+      0.04585658895666711,
+      0.06031087035080418,
+      0.06501356855005724,
+      0.0595957995246863,
+      0.03476097718157689,
+      0.02241968553789775,
+      0.032472630322445184,
+      0.05515523323992966,
+      0.07433468653471209,
+      0.054017272170312935
+    ],
+    "hubs": [
+      {
+        "neuron": "M2",
+        "type": "geheugen",
+        "massa": 3.0255277156829834
+      },
+      {
+        "neuron": "W18",
+        "type": "worker",
+        "massa": 2.8122265338897705
+      },
+      {
+        "neuron": "M1",
+        "type": "geheugen",
+        "massa": 2.753528594970703
+      },
+      {
+        "neuron": "W4",
+        "type": "worker",
+        "massa": 2.277165412902832
+      },
+      {
+        "neuron": "W13",
+        "type": "worker",
+        "massa": 2.249072790145874
+      }
+    ]
+  },
+  "historie": [
+    {
+      "poging": 0,
+      "ok": false,
+      "beloning": 12.37537799392437,
+      "stappen": 320,
+      "verbindingen": 348,
+      "gemW": 0.12704140304797865,
+      "succes20": 0
+    },
+    {
+      "poging": 1,
+      "ok": false,
+      "beloning": -14.511939952835524,
+      "stappen": 320,
+      "verbindingen": 348,
+      "gemW": 0.12692883282521172,
+      "succes20": 0
+    },
+    {
+      "poging": 2,
+      "ok": false,
+      "beloning": 38.72362589667245,
+      "stappen": 320,
+      "verbindingen": 348,
+      "gemW": 0.12701229960022056,
+      "succes20": 0
+    },
+    {
+      "poging": 3,
+      "ok": false,
+      "beloning": 54.81803061086391,
+      "stappen": 320,
+      "verbindingen": 348,
+      "gemW": 0.1270373657796714,
+      "succes20": 0
+    },
+    {
+      "poging": 4,
+      "ok": false,
+      "beloning": -23.44583293699973,
+      "stappen": 320,
+      "verbindingen": 348,
+      "gemW": 0.12685624764056008,
+      "succes20": 0
+    },
+    {
+      "poging": 5,
+      "ok": false,
+      "beloning": 32.29413918220441,
+      "stappen": 320,
+      "verbindingen": 348,
+      "gemW": 0.12675119543347063,
+      "succes20": 0
+    },
+    {
+      "poging": 6,
+      "ok": false,
+      "beloning": 45.07455256728924,
+      "stappen": 320,
+      "verbindingen": 348,
+      "gemW": 0.1265653436448179,
+      "succes20": 0
+    },
+    {
+      "poging": 7,
+      "ok": false,
+      "beloning": 53.94279021263668,
+      "stappen": 320,
+      "verbindingen": 348,
+      "gemW": 0.12649678338309697,
+      "succes20": 0
+    },
+    {
+      "poging": 8,
+      "ok": false,
+      "beloning": 60.47357165696905,
+      "stappen": 320,
+      "verbindingen": 348,
+      "gemW": 0.1266401233051197,
+      "succes20": 0
+    },
+    {
+      "poging": 9,
+      "ok": false,
+      "beloning": 68.61632163285917,
+      "stappen": 320,
+      "verbindingen": 348,
+      "gemW": 0.1267296734551,
+      "succes20": 0
+    },
+    {
+      "poging": 10,
+      "ok": false,
+      "beloning": 13.256560646987229,
+      "stappen": 320,
+      "verbindingen": 354,
+      "gemW": 0.1245883280764226,
+      "succes20": 0
+    },
+    {
+      "poging": 11,
+      "ok": false,
+      "beloning": 8.77197600479119,
+      "stappen": 320,
+      "verbindingen": 354,
+      "gemW": 0.12417558249050625,
+      "succes20": 0
+    },
+    {
+      "poging": 12,
+      "ok": false,
+      "beloning": 11.778860970048253,
+      "stappen": 320,
+      "verbindingen": 354,
+      "gemW": 0.1237008925681897,
+      "succes20": 0
+    },
+    {
+      "poging": 13,
+      "ok": false,
+      "beloning": 9.263512506418566,
+      "stappen": 320,
+      "verbindingen": 354,
+      "gemW": 0.12353236877588335,
+      "succes20": 0
+    },
+    {
+      "poging": 14,
+      "ok": false,
+      "beloning": 5.176453308485468,
+      "stappen": 320,
+      "verbindingen": 354,
+      "gemW": 0.12344260101955079,
+      "succes20": 0
+    },
+    {
+      "poging": 15,
+      "ok": false,
+      "beloning": 30.688864333809946,
+      "stappen": 320,
+      "verbindingen": 354,
+      "gemW": 0.12354801000802289,
+      "succes20": 0
+    },
+    {
+      "poging": 16,
+      "ok": false,
+      "beloning": 30.01676037377981,
+      "stappen": 320,
+      "verbindingen": 354,
+      "gemW": 0.1236281322708648,
+      "succes20": 0
+    },
+    {
+      "poging": 17,
+      "ok": false,
+      "beloning": 42.46081089937716,
+      "stappen": 320,
+      "verbindingen": 354,
+      "gemW": 0.12322034189999788,
+      "succes20": 0
+    },
+    {
+      "poging": 18,
+      "ok": false,
+      "beloning": 37.768326345588314,
+      "stappen": 320,
+      "verbindingen": 354,
+      "gemW": 0.12315891042291213,
+      "succes20": 0
+    },
+    {
+      "poging": 19,
+      "ok": true,
+      "beloning": 67.68241702692097,
+      "stappen": 230,
+      "verbindingen": 354,
+      "gemW": 0.12307124540945094,
+      "succes20": 0.05
+    },
+    {
+      "poging": 20,
+      "ok": false,
+      "beloning": 11.131052886360598,
+      "stappen": 320,
+      "verbindingen": 313,
+      "gemW": 0.13779001355062598,
+      "succes20": 0.05
+    },
+    {
+      "poging": 21,
+      "ok": false,
+      "beloning": 22.5703721913603,
+      "stappen": 320,
+      "verbindingen": 313,
+      "gemW": 0.13826863308208057,
+      "succes20": 0.05
+    },
+    {
+      "poging": 22,
+      "ok": false,
+      "beloning": 30.519287599706175,
+      "stappen": 320,
+      "verbindingen": 313,
+      "gemW": 0.13884875202884736,
+      "succes20": 0.05
+    },
+    {
+      "poging": 23,
+      "ok": false,
+      "beloning": 37.38016964888739,
+      "stappen": 320,
+      "verbindingen": 313,
+      "gemW": 0.13875294105631833,
+      "succes20": 0.05
+    },
+    {
+      "poging": 24,
+      "ok": false,
+      "beloning": 37.25591435290433,
+      "stappen": 320,
+      "verbindingen": 313,
+      "gemW": 0.13919659306893287,
+      "succes20": 0.05
+    },
+    {
+      "poging": 25,
+      "ok": false,
+      "beloning": 20.80217099583917,
+      "stappen": 320,
+      "verbindingen": 313,
+      "gemW": 0.13870326712126502,
+      "succes20": 0.05
+    },
+    {
+      "poging": 26,
+      "ok": false,
+      "beloning": 17.830502872427598,
+      "stappen": 320,
+      "verbindingen": 313,
+      "gemW": 0.13830123707531586,
+      "succes20": 0.05
+    },
+    {
+      "poging": 27,
+      "ok": true,
+      "beloning": 80.42638195139548,
+      "stappen": 148,
+      "verbindingen": 313,
+      "gemW": 0.1382241179629762,
+      "succes20": 0.1
+    },
+    {
+      "poging": 28,
+      "ok": false,
+      "beloning": 23.725767367856236,
+      "stappen": 320,
+      "verbindingen": 313,
+      "gemW": 0.1381841175475369,
+      "succes20": 0.1
+    },
+    {
+      "poging": 29,
+      "ok": true,
+      "beloning": 81.3509176108621,
+      "stappen": 128,
+      "verbindingen": 313,
+      "gemW": 0.1381334980671553,
+      "succes20": 0.15
+    },
+    {
+      "poging": 30,
+      "ok": false,
+      "beloning": 7.848487939125549,
+      "stappen": 320,
+      "verbindingen": 314,
+      "gemW": 0.13767879560091503,
+      "succes20": 0.15
+    },
+    {
+      "poging": 31,
+      "ok": false,
+      "beloning": 8.236051826910904,
+      "stappen": 320,
+      "verbindingen": 314,
+      "gemW": 0.13703099618944678,
+      "succes20": 0.15
+    },
+    {
+      "poging": 32,
+      "ok": false,
+      "beloning": 26.064018285905533,
+      "stappen": 320,
+      "verbindingen": 314,
+      "gemW": 0.13638654476696044,
+      "succes20": 0.15
+    },
+    {
+      "poging": 33,
+      "ok": false,
+      "beloning": 4.144181093436111,
+      "stappen": 320,
+      "verbindingen": 314,
+      "gemW": 0.13588784119873576,
+      "succes20": 0.15
+    },
+    {
+      "poging": 34,
+      "ok": false,
+      "beloning": 35.05999182096832,
+      "stappen": 320,
+      "verbindingen": 314,
+      "gemW": 0.13523155163860862,
+      "succes20": 0.15
+    },
+    {
+      "poging": 35,
+      "ok": false,
+      "beloning": 13.284775773344514,
+      "stappen": 320,
+      "verbindingen": 314,
+      "gemW": 0.13542210723267525,
+      "succes20": 0.15
+    },
+    {
+      "poging": 36,
+      "ok": false,
+      "beloning": -14.374463921279437,
+      "stappen": 320,
+      "verbindingen": 314,
+      "gemW": 0.13517602418318012,
+      "succes20": 0.15
+    },
+    {
+      "poging": 37,
+      "ok": false,
+      "beloning": 16.113218286441807,
+      "stappen": 320,
+      "verbindingen": 314,
+      "gemW": 0.13542594384271534,
+      "succes20": 0.15
+    },
+    {
+      "poging": 38,
+      "ok": false,
+      "beloning": -15.704239391146379,
+      "stappen": 320,
+      "verbindingen": 314,
+      "gemW": 0.13543041148617832,
+      "succes20": 0.15
+    },
+    {
+      "poging": 39,
+      "ok": false,
+      "beloning": 27.685876158776484,
+      "stappen": 320,
+      "verbindingen": 314,
+      "gemW": 0.13494366850662431,
+      "succes20": 0.1
+    },
+    {
+      "poging": 40,
+      "ok": false,
+      "beloning": 27.44943550546648,
+      "stappen": 320,
+      "verbindingen": 316,
+      "gemW": 0.13511991113589344,
+      "succes20": 0.1
+    },
+    {
+      "poging": 41,
+      "ok": false,
+      "beloning": 34.600999936521745,
+      "stappen": 320,
+      "verbindingen": 316,
+      "gemW": 0.13562249661941977,
+      "succes20": 0.1
+    },
+    {
+      "poging": 42,
+      "ok": false,
+      "beloning": 41.99840954956486,
+      "stappen": 320,
+      "verbindingen": 316,
+      "gemW": 0.13613619203856098,
+      "succes20": 0.1
+    },
+    {
+      "poging": 43,
+      "ok": true,
+      "beloning": 91.38335596770862,
+      "stappen": 160,
+      "verbindingen": 316,
+      "gemW": 0.13632453652982943,
+      "succes20": 0.15
+    },
+    {
+      "poging": 44,
+      "ok": true,
+      "beloning": 82.77381036726491,
+      "stappen": 179,
+      "verbindingen": 316,
+      "gemW": 0.13637920707181284,
+      "succes20": 0.2
+    },
+    {
+      "poging": 45,
+      "ok": true,
+      "beloning": 85.96447172431101,
+      "stappen": 154,
+      "verbindingen": 316,
+      "gemW": 0.1364844150139797,
+      "succes20": 0.25
+    },
+    {
+      "poging": 46,
+      "ok": true,
+      "beloning": 93.24173637863306,
+      "stappen": 135,
+      "verbindingen": 316,
+      "gemW": 0.13659881917123176,
+      "succes20": 0.3
+    },
+    {
+      "poging": 47,
+      "ok": true,
+      "beloning": 67.0408508314709,
+      "stappen": 252,
+      "verbindingen": 316,
+      "gemW": 0.13683274326126882,
+      "succes20": 0.3
+    },
+    {
+      "poging": 48,
+      "ok": true,
+      "beloning": 93.62068187443714,
+      "stappen": 127,
+      "verbindingen": 316,
+      "gemW": 0.1368337759639054,
+      "succes20": 0.35
+    },
+    {
+      "poging": 49,
+      "ok": false,
+      "beloning": 27.078292138244407,
+      "stappen": 320,
+      "verbindingen": 316,
+      "gemW": 0.13656675444821578,
+      "succes20": 0.3
+    },
+    {
+      "poging": 50,
+      "ok": false,
+      "beloning": -4.997235420004882,
+      "stappen": 320,
+      "verbindingen": 320,
+      "gemW": 0.13466764849144966,
+      "succes20": 0.3
+    },
+    {
+      "poging": 51,
+      "ok": false,
+      "beloning": -3.5251749188002726,
+      "stappen": 320,
+      "verbindingen": 320,
+      "gemW": 0.13405264110188,
+      "succes20": 0.3
+    },
+    {
+      "poging": 52,
+      "ok": false,
+      "beloning": -3.6111319954710623,
+      "stappen": 320,
+      "verbindingen": 320,
+      "gemW": 0.133384282089537,
+      "succes20": 0.3
+    },
+    {
+      "poging": 53,
+      "ok": false,
+      "beloning": -2.085094306944676,
+      "stappen": 320,
+      "verbindingen": 320,
+      "gemW": 0.1327009293498122,
+      "succes20": 0.3
+    },
+    {
+      "poging": 54,
+      "ok": false,
+      "beloning": -1.6688677628349686,
+      "stappen": 320,
+      "verbindingen": 320,
+      "gemW": 0.13206068550387046,
+      "succes20": 0.3
+    },
+    {
+      "poging": 55,
+      "ok": false,
+      "beloning": -32.49362132239375,
+      "stappen": 320,
+      "verbindingen": 320,
+      "gemW": 0.13203089145881677,
+      "succes20": 0.3
+    },
+    {
+      "poging": 56,
+      "ok": false,
+      "beloning": -28.43314632219211,
+      "stappen": 320,
+      "verbindingen": 320,
+      "gemW": 0.13189611971811246,
+      "succes20": 0.3
+    },
+    {
+      "poging": 57,
+      "ok": false,
+      "beloning": -26.909818420938887,
+      "stappen": 320,
+      "verbindingen": 320,
+      "gemW": 0.1318861993127939,
+      "succes20": 0.3
+    },
+    {
+      "poging": 58,
+      "ok": false,
+      "beloning": 22.850280178136003,
+      "stappen": 320,
+      "verbindingen": 320,
+      "gemW": 0.13160123904090143,
+      "succes20": 0.3
+    },
+    {
+      "poging": 59,
+      "ok": false,
+      "beloning": -26.53798259658851,
+      "stappen": 320,
+      "verbindingen": 320,
+      "gemW": 0.13136980913986918,
+      "succes20": 0.3
+    },
+    {
+      "poging": 60,
+      "ok": false,
+      "beloning": 10.385323844782288,
+      "stappen": 320,
+      "verbindingen": 320,
+      "gemW": 0.13121867960435338,
+      "succes20": 0.3
+    },
+    {
+      "poging": 61,
+      "ok": false,
+      "beloning": 23.530898417668926,
+      "stappen": 320,
+      "verbindingen": 320,
+      "gemW": 0.1309537749963056,
+      "succes20": 0.3
+    },
+    {
+      "poging": 62,
+      "ok": false,
+      "beloning": 28.131979174160602,
+      "stappen": 320,
+      "verbindingen": 320,
+      "gemW": 0.13092967301818134,
+      "succes20": 0.3
+    },
+    {
+      "poging": 63,
+      "ok": true,
+      "beloning": 90.49018057728844,
+      "stappen": 127,
+      "verbindingen": 320,
+      "gemW": 0.13091549150121864,
+      "succes20": 0.3
+    },
+    {
+      "poging": 64,
+      "ok": false,
+      "beloning": 29.15022447974282,
+      "stappen": 320,
+      "verbindingen": 320,
+      "gemW": 0.13074986759602325,
+      "succes20": 0.25
+    },
+    {
+      "poging": 65,
+      "ok": false,
+      "beloning": 14.448825901499784,
+      "stappen": 320,
+      "verbindingen": 320,
+      "gemW": 0.13082029414035787,
+      "succes20": 0.2
+    },
+    {
+      "poging": 66,
+      "ok": false,
+      "beloning": 16.59271751834421,
+      "stappen": 320,
+      "verbindingen": 320,
+      "gemW": 0.1308707443306048,
+      "succes20": 0.15
+    },
+    {
+      "poging": 67,
+      "ok": true,
+      "beloning": 84.31584312194272,
+      "stappen": 125,
+      "verbindingen": 320,
+      "gemW": 0.13088444473032723,
+      "succes20": 0.15
+    },
+    {
+      "poging": 68,
+      "ok": false,
+      "beloning": 17.577124963546947,
+      "stappen": 320,
+      "verbindingen": 320,
+      "gemW": 0.13108656305412297,
+      "succes20": 0.1
+    },
+    {
+      "poging": 69,
+      "ok": true,
+      "beloning": 88.30507140114821,
+      "stappen": 112,
+      "verbindingen": 320,
+      "gemW": 0.1311478808769607,
+      "succes20": 0.15
+    },
+    {
+      "poging": 70,
+      "ok": true,
+      "beloning": 92.848430100316,
+      "stappen": 117,
+      "verbindingen": 319,
+      "gemW": 0.13157538965718127,
+      "succes20": 0.2
+    },
+    {
+      "poging": 71,
+      "ok": true,
+      "beloning": 91.18206439914664,
+      "stappen": 113,
+      "verbindingen": 319,
+      "gemW": 0.13158162062269488,
+      "succes20": 0.25
+    },
+    {
+      "poging": 72,
+      "ok": true,
+      "beloning": 91.01302075496582,
+      "stappen": 124,
+      "verbindingen": 319,
+      "gemW": 0.131497474352254,
+      "succes20": 0.3
+    },
+    {
+      "poging": 73,
+      "ok": true,
+      "beloning": 93.02548722560489,
+      "stappen": 118,
+      "verbindingen": 319,
+      "gemW": 0.1313921438711097,
+      "succes20": 0.35
+    },
+    {
+      "poging": 74,
+      "ok": true,
+      "beloning": 89.19556409678535,
+      "stappen": 128,
+      "verbindingen": 319,
+      "gemW": 0.13145022119649433,
+      "succes20": 0.4
+    },
+    {
+      "poging": 75,
+      "ok": false,
+      "beloning": -61.30032258787123,
+      "stappen": 320,
+      "verbindingen": 319,
+      "gemW": 0.13131418804635167,
+      "succes20": 0.4
+    },
+    {
+      "poging": 76,
+      "ok": false,
+      "beloning": 6.620820241599972,
+      "stappen": 320,
+      "verbindingen": 319,
+      "gemW": 0.131072584822844,
+      "succes20": 0.4
+    },
+    {
+      "poging": 77,
+      "ok": false,
+      "beloning": -60.156415418986484,
+      "stappen": 320,
+      "verbindingen": 319,
+      "gemW": 0.13094268717911084,
+      "succes20": 0.4
+    },
+    {
+      "poging": 78,
+      "ok": false,
+      "beloning": -65.73603457852974,
+      "stappen": 320,
+      "verbindingen": 319,
+      "gemW": 0.13083577395174478,
+      "succes20": 0.4
+    },
+    {
+      "poging": 79,
+      "ok": false,
+      "beloning": -59.238589374570545,
+      "stappen": 320,
+      "verbindingen": 319,
+      "gemW": 0.13064289586414177,
+      "succes20": 0.4
+    },
+    {
+      "poging": 80,
+      "ok": false,
+      "beloning": 24.25062234720787,
+      "stappen": 320,
+      "verbindingen": 322,
+      "gemW": 0.12944875663288824,
+      "succes20": 0.4
+    },
+    {
+      "poging": 81,
+      "ok": false,
+      "beloning": 24.506906353349894,
+      "stappen": 320,
+      "verbindingen": 322,
+      "gemW": 0.12945027725397962,
+      "succes20": 0.4
+    },
+    {
+      "poging": 82,
+      "ok": false,
+      "beloning": 20.377876697591766,
+      "stappen": 320,
+      "verbindingen": 322,
+      "gemW": 0.1296320496255717,
+      "succes20": 0.4
+    },
+    {
+      "poging": 83,
+      "ok": false,
+      "beloning": 23.9872812612311,
+      "stappen": 320,
+      "verbindingen": 322,
+      "gemW": 0.12951654734911386,
+      "succes20": 0.35
+    },
+    {
+      "poging": 84,
+      "ok": true,
+      "beloning": 73.62558316070348,
+      "stappen": 196,
+      "verbindingen": 322,
+      "gemW": 0.12944682188598172,
+      "succes20": 0.4
+    },
+    {
+      "poging": 85,
+      "ok": false,
+      "beloning": 35.60773626892736,
+      "stappen": 320,
+      "verbindingen": 322,
+      "gemW": 0.12968187205426926,
+      "succes20": 0.4
+    },
+    {
+      "poging": 86,
+      "ok": false,
+      "beloning": 22.25375987504713,
+      "stappen": 320,
+      "verbindingen": 322,
+      "gemW": 0.12986469975316908,
+      "succes20": 0.4
+    },
+    {
+      "poging": 87,
+      "ok": true,
+      "beloning": 67.49176442522656,
+      "stappen": 236,
+      "verbindingen": 322,
+      "gemW": 0.13009648451759473,
+      "succes20": 0.4
+    },
+    {
+      "poging": 88,
+      "ok": true,
+      "beloning": 71.61668850449487,
+      "stappen": 243,
+      "verbindingen": 322,
+      "gemW": 0.13026225627819366,
+      "succes20": 0.45
+    },
+    {
+      "poging": 89,
+      "ok": true,
+      "beloning": 78.79166711616976,
+      "stappen": 210,
+      "verbindingen": 322,
+      "gemW": 0.13026689810704395,
+      "succes20": 0.45
+    },
+    {
+      "poging": 90,
+      "ok": false,
+      "beloning": -25.038265304328814,
+      "stappen": 320,
+      "verbindingen": 323,
+      "gemW": 0.1299133529928412,
+      "succes20": 0.4
+    },
+    {
+      "poging": 91,
+      "ok": false,
+      "beloning": -20.95487717144185,
+      "stappen": 320,
+      "verbindingen": 323,
+      "gemW": 0.12947572485562528,
+      "succes20": 0.35
+    },
+    {
+      "poging": 92,
+      "ok": false,
+      "beloning": -23.39562762772945,
+      "stappen": 320,
+      "verbindingen": 323,
+      "gemW": 0.12920341629249507,
+      "succes20": 0.3
+    },
+    {
+      "poging": 93,
+      "ok": false,
+      "beloning": -18.345283066479315,
+      "stappen": 320,
+      "verbindingen": 323,
+      "gemW": 0.128875540888035,
+      "succes20": 0.25
+    },
+    {
+      "poging": 94,
+      "ok": false,
+      "beloning": -23.075093284863108,
+      "stappen": 320,
+      "verbindingen": 323,
+      "gemW": 0.128494279142671,
+      "succes20": 0.2
+    },
+    {
+      "poging": 95,
+      "ok": false,
+      "beloning": -0.9704474840156785,
+      "stappen": 320,
+      "verbindingen": 323,
+      "gemW": 0.12800742820303185,
+      "succes20": 0.2
+    },
+    {
+      "poging": 96,
+      "ok": false,
+      "beloning": -7.035415753606769,
+      "stappen": 320,
+      "verbindingen": 323,
+      "gemW": 0.12765767643135906,
+      "succes20": 0.2
+    },
+    {
+      "poging": 97,
+      "ok": false,
+      "beloning": -0.32045308000080586,
+      "stappen": 320,
+      "verbindingen": 323,
+      "gemW": 0.12736975376626863,
+      "succes20": 0.2
+    },
+    {
+      "poging": 98,
+      "ok": false,
+      "beloning": 12.488721666660734,
+      "stappen": 320,
+      "verbindingen": 323,
+      "gemW": 0.12700193781685373,
+      "succes20": 0.2
+    },
+    {
+      "poging": 99,
+      "ok": true,
+      "beloning": 47.14209048276257,
+      "stappen": 283,
+      "verbindingen": 323,
+      "gemW": 0.1266764235969679,
+      "succes20": 0.25
+    },
+    {
+      "poging": 100,
+      "ok": false,
+      "beloning": 26.62270734101248,
+      "stappen": 320,
+      "verbindingen": 325,
+      "gemW": 0.12637523194058584,
+      "succes20": 0.25
+    },
+    {
+      "poging": 101,
+      "ok": false,
+      "beloning": 29.046575935835836,
+      "stappen": 320,
+      "verbindingen": 325,
+      "gemW": 0.12611814618110656,
+      "succes20": 0.25
+    },
+    {
+      "poging": 102,
+      "ok": false,
+      "beloning": 27.492597459589817,
+      "stappen": 320,
+      "verbindingen": 325,
+      "gemW": 0.12600736272163116,
+      "succes20": 0.25
+    },
+    {
+      "poging": 103,
+      "ok": true,
+      "beloning": 92.88491824715148,
+      "stappen": 121,
+      "verbindingen": 325,
+      "gemW": 0.12601005616956032,
+      "succes20": 0.3
+    },
+    {
+      "poging": 104,
+      "ok": false,
+      "beloning": 22.06374939959279,
+      "stappen": 320,
+      "verbindingen": 325,
+      "gemW": 0.12582275055778713,
+      "succes20": 0.25
+    },
+    {
+      "poging": 105,
+      "ok": true,
+      "beloning": 71.29948630008005,
+      "stappen": 179,
+      "verbindingen": 325,
+      "gemW": 0.12578638726128982,
+      "succes20": 0.3
+    },
+    {
+      "poging": 106,
+      "ok": true,
+      "beloning": 84.98437174130902,
+      "stappen": 153,
+      "verbindingen": 325,
+      "gemW": 0.1257222556021924,
+      "succes20": 0.35
+    },
+    {
+      "poging": 107,
+      "ok": false,
+      "beloning": 11.173650958245787,
+      "stappen": 320,
+      "verbindingen": 325,
+      "gemW": 0.12562197859327381,
+      "succes20": 0.3
+    },
+    {
+      "poging": 108,
+      "ok": true,
+      "beloning": 87.22623326494654,
+      "stappen": 127,
+      "verbindingen": 325,
+      "gemW": 0.12556408159291516,
+      "succes20": 0.3
+    },
+    {
+      "poging": 109,
+      "ok": true,
+      "beloning": 91.91567969008634,
+      "stappen": 108,
+      "verbindingen": 325,
+      "gemW": 0.12549427672656469,
+      "succes20": 0.3
+    },
+    {
+      "poging": 110,
+      "ok": true,
+      "beloning": 96.80684090337175,
+      "stappen": 116,
+      "verbindingen": 328,
+      "gemW": 0.12471289921157266,
+      "succes20": 0.35
+    },
+    {
+      "poging": 111,
+      "ok": true,
+      "beloning": 85.95813803955647,
+      "stappen": 153,
+      "verbindingen": 328,
+      "gemW": 0.12460732233650959,
+      "succes20": 0.4
+    },
+    {
+      "poging": 112,
+      "ok": true,
+      "beloning": 96.25673980037145,
+      "stappen": 122,
+      "verbindingen": 328,
+      "gemW": 0.12455180798807726,
+      "succes20": 0.45
+    },
+    {
+      "poging": 113,
+      "ok": true,
+      "beloning": 96.9449191822387,
+      "stappen": 110,
+      "verbindingen": 328,
+      "gemW": 0.12447898008678926,
+      "succes20": 0.5
+    },
+    {
+      "poging": 114,
+      "ok": true,
+      "beloning": 96.42678465112702,
+      "stappen": 117,
+      "verbindingen": 328,
+      "gemW": 0.12444754704980679,
+      "succes20": 0.55
+    },
+    {
+      "poging": 115,
+      "ok": false,
+      "beloning": -4.602678405654228,
+      "stappen": 320,
+      "verbindingen": 328,
+      "gemW": 0.12435859952635904,
+      "succes20": 0.55
+    },
+    {
+      "poging": 116,
+      "ok": false,
+      "beloning": 3.368705617874577,
+      "stappen": 320,
+      "verbindingen": 328,
+      "gemW": 0.12427444413102731,
+      "succes20": 0.55
+    },
+    {
+      "poging": 117,
+      "ok": false,
+      "beloning": -2.697816354555594,
+      "stappen": 320,
+      "verbindingen": 328,
+      "gemW": 0.12424403713219628,
+      "succes20": 0.55
+    },
+    {
+      "poging": 118,
+      "ok": false,
+      "beloning": -1.345695603271865,
+      "stappen": 320,
+      "verbindingen": 328,
+      "gemW": 0.1241663788600041,
+      "succes20": 0.55
+    },
+    {
+      "poging": 119,
+      "ok": true,
+      "beloning": 87.202937620002,
+      "stappen": 122,
+      "verbindingen": 328,
+      "gemW": 0.12411610717408178,
+      "succes20": 0.55
+    },
+    {
+      "poging": 120,
+      "ok": false,
+      "beloning": -11.176117465728318,
+      "stappen": 320,
+      "verbindingen": 330,
+      "gemW": 0.12357499994651527,
+      "succes20": 0.55
+    },
+    {
+      "poging": 121,
+      "ok": false,
+      "beloning": -17.417262332846757,
+      "stappen": 320,
+      "verbindingen": 330,
+      "gemW": 0.12375483921125785,
+      "succes20": 0.55
+    },
+    {
+      "poging": 122,
+      "ok": false,
+      "beloning": 8.240362721381288,
+      "stappen": 320,
+      "verbindingen": 330,
+      "gemW": 0.12391400557985022,
+      "succes20": 0.55
+    },
+    {
+      "poging": 123,
+      "ok": false,
+      "beloning": -0.3602885573399715,
+      "stappen": 320,
+      "verbindingen": 330,
+      "gemW": 0.12409526282713297,
+      "succes20": 0.5
+    },
+    {
+      "poging": 124,
+      "ok": false,
+      "beloning": 23.556414420533134,
+      "stappen": 320,
+      "verbindingen": 330,
+      "gemW": 0.12450514041155464,
+      "succes20": 0.5
+    },
+    {
+      "poging": 125,
+      "ok": false,
+      "beloning": 22.005663212292966,
+      "stappen": 320,
+      "verbindingen": 330,
+      "gemW": 0.12431843700275445,
+      "succes20": 0.45
+    },
+    {
+      "poging": 126,
+      "ok": true,
+      "beloning": 50.96291518618564,
+      "stappen": 264,
+      "verbindingen": 330,
+      "gemW": 0.12458911440229382,
+      "succes20": 0.45
+    },
+    {
+      "poging": 127,
+      "ok": true,
+      "beloning": 75.86323082153345,
+      "stappen": 188,
+      "verbindingen": 330,
+      "gemW": 0.12467370982692845,
+      "succes20": 0.5
+    },
+    {
+      "poging": 128,
+      "ok": true,
+      "beloning": 78.72787583569098,
+      "stappen": 172,
+      "verbindingen": 330,
+      "gemW": 0.12475457374349583,
+      "succes20": 0.5
+    },
+    {
+      "poging": 129,
+      "ok": true,
+      "beloning": 81.23032527860568,
+      "stappen": 166,
+      "verbindingen": 330,
+      "gemW": 0.12478553116432688,
+      "succes20": 0.5
+    },
+    {
+      "poging": 130,
+      "ok": false,
+      "beloning": -17.15926890153826,
+      "stappen": 320,
+      "verbindingen": 330,
+      "gemW": 0.12482125136549725,
+      "succes20": 0.45
+    },
+    {
+      "poging": 131,
+      "ok": false,
+      "beloning": -15.497967260444753,
+      "stappen": 320,
+      "verbindingen": 330,
+      "gemW": 0.12430375943905815,
+      "succes20": 0.4
+    },
+    {
+      "poging": 132,
+      "ok": false,
+      "beloning": -16.39753697762701,
+      "stappen": 320,
+      "verbindingen": 330,
+      "gemW": 0.12390415409375265,
+      "succes20": 0.35
+    },
+    {
+      "poging": 133,
+      "ok": false,
+      "beloning": -12.579023450149043,
+      "stappen": 320,
+      "verbindingen": 330,
+      "gemW": 0.12343817282305805,
+      "succes20": 0.3
+    },
+    {
+      "poging": 134,
+      "ok": false,
+      "beloning": -17.31440139176687,
+      "stappen": 320,
+      "verbindingen": 330,
+      "gemW": 0.12322279097914526,
+      "succes20": 0.25
+    },
+    {
+      "poging": 135,
+      "ok": false,
+      "beloning": 14.004644121572525,
+      "stappen": 320,
+      "verbindingen": 330,
+      "gemW": 0.1229536910710687,
+      "succes20": 0.25
+    },
+    {
+      "poging": 136,
+      "ok": false,
+      "beloning": 15.886101224344129,
+      "stappen": 320,
+      "verbindingen": 330,
+      "gemW": 0.12270198124919482,
+      "succes20": 0.25
+    },
+    {
+      "poging": 137,
+      "ok": false,
+      "beloning": 16.00822214441092,
+      "stappen": 320,
+      "verbindingen": 330,
+      "gemW": 0.1224062928513652,
+      "succes20": 0.25
+    },
+    {
+      "poging": 138,
+      "ok": true,
+      "beloning": 50.191488829384724,
+      "stappen": 256,
+      "verbindingen": 330,
+      "gemW": 0.12237245897289761,
+      "succes20": 0.3
+    },
+    {
+      "poging": 139,
+      "ok": false,
+      "beloning": 14.929215353943365,
+      "stappen": 320,
+      "verbindingen": 330,
+      "gemW": 0.12222014997916465,
+      "succes20": 0.25
+    },
+    {
+      "poging": 140,
+      "ok": false,
+      "beloning": -16.485785138658617,
+      "stappen": 320,
+      "verbindingen": 331,
+      "gemW": 0.12196558415172255,
+      "succes20": 0.25
+    },
+    {
+      "poging": 141,
+      "ok": false,
+      "beloning": 12.996545526961244,
+      "stappen": 320,
+      "verbindingen": 331,
+      "gemW": 0.12205284720833985,
+      "succes20": 0.25
+    },
+    {
+      "poging": 142,
+      "ok": false,
+      "beloning": -0.07922638969864626,
+      "stappen": 320,
+      "verbindingen": 331,
+      "gemW": 0.12214915067157243,
+      "succes20": 0.25
+    },
+    {
+      "poging": 143,
+      "ok": false,
+      "beloning": 20.41604213548642,
+      "stappen": 320,
+      "verbindingen": 331,
+      "gemW": 0.12231425015435883,
+      "succes20": 0.25
+    },
+    {
+      "poging": 144,
+      "ok": false,
+      "beloning": 22.194267753923928,
+      "stappen": 320,
+      "verbindingen": 331,
+      "gemW": 0.12223601321270548,
+      "succes20": 0.25
+    },
+    {
+      "poging": 145,
+      "ok": true,
+      "beloning": 36.791384936247454,
+      "stappen": 307,
+      "verbindingen": 331,
+      "gemW": 0.12245820243660012,
+      "succes20": 0.3
+    },
+    {
+      "poging": 146,
+      "ok": true,
+      "beloning": 73.35365783159241,
+      "stappen": 192,
+      "verbindingen": 331,
+      "gemW": 0.12246797861504295,
+      "succes20": 0.3
+    },
+    {
+      "poging": 147,
+      "ok": true,
+      "beloning": 78.69242901770818,
+      "stappen": 174,
+      "verbindingen": 331,
+      "gemW": 0.12258922367207593,
+      "succes20": 0.3
+    },
+    {
+      "poging": 148,
+      "ok": true,
+      "beloning": 72.95692020952865,
+      "stappen": 186,
+      "verbindingen": 331,
+      "gemW": 0.12276309649910204,
+      "succes20": 0.3
+    },
+    {
+      "poging": 149,
+      "ok": true,
+      "beloning": 85.42673301407021,
+      "stappen": 151,
+      "verbindingen": 331,
+      "gemW": 0.12287723352524854,
+      "succes20": 0.3
+    },
+    {
+      "poging": 150,
+      "ok": true,
+      "beloning": 88.36543394816033,
+      "stappen": 87,
+      "verbindingen": 333,
+      "gemW": 0.12258543151094475,
+      "succes20": 0.35
+    },
+    {
+      "poging": 151,
+      "ok": true,
+      "beloning": 87.31675329541416,
+      "stappen": 97,
+      "verbindingen": 333,
+      "gemW": 0.12261701830873943,
+      "succes20": 0.4
+    },
+    {
+      "poging": 152,
+      "ok": true,
+      "beloning": 88.00674003360123,
+      "stappen": 99,
+      "verbindingen": 333,
+      "gemW": 0.12265390550889713,
+      "succes20": 0.45
+    },
+    {
+      "poging": 153,
+      "ok": true,
+      "beloning": 86.6702630031217,
+      "stappen": 106,
+      "verbindingen": 333,
+      "gemW": 0.1225790608297249,
+      "succes20": 0.5
+    },
+    {
+      "poging": 154,
+      "ok": true,
+      "beloning": 88.83942901873628,
+      "stappen": 95,
+      "verbindingen": 333,
+      "gemW": 0.12245708642570811,
+      "succes20": 0.55
+    },
+    {
+      "poging": 155,
+      "ok": false,
+      "beloning": -29.38831576550431,
+      "stappen": 320,
+      "verbindingen": 333,
+      "gemW": 0.12194490244272291,
+      "succes20": 0.55
+    },
+    {
+      "poging": 156,
+      "ok": false,
+      "beloning": -30.88089320140163,
+      "stappen": 320,
+      "verbindingen": 333,
+      "gemW": 0.12151447459669512,
+      "succes20": 0.55
+    },
+    {
+      "poging": 157,
+      "ok": false,
+      "beloning": -23.524803006491457,
+      "stappen": 320,
+      "verbindingen": 333,
+      "gemW": 0.12113745394993124,
+      "succes20": 0.55
+    },
+    {
+      "poging": 158,
+      "ok": false,
+      "beloning": -6.230280088858928,
+      "stappen": 320,
+      "verbindingen": 333,
+      "gemW": 0.1208951662333197,
+      "succes20": 0.5
+    },
+    {
+      "poging": 159,
+      "ok": false,
+      "beloning": -2.850234422891959,
+      "stappen": 320,
+      "verbindingen": 333,
+      "gemW": 0.12068510566528344,
+      "succes20": 0.5
+    },
+    {
+      "poging": 160,
+      "ok": false,
+      "beloning": 12.476811521010355,
+      "stappen": 320,
+      "verbindingen": 334,
+      "gemW": 0.12072728417115286,
+      "succes20": 0.5
+    },
+    {
+      "poging": 161,
+      "ok": false,
+      "beloning": 20.60441201972139,
+      "stappen": 320,
+      "verbindingen": 334,
+      "gemW": 0.12062879692120715,
+      "succes20": 0.5
+    },
+    {
+      "poging": 162,
+      "ok": false,
+      "beloning": 20.516433174491183,
+      "stappen": 320,
+      "verbindingen": 334,
+      "gemW": 0.12067319414034468,
+      "succes20": 0.5
+    },
+    {
+      "poging": 163,
+      "ok": false,
+      "beloning": 14.67269560581081,
+      "stappen": 320,
+      "verbindingen": 334,
+      "gemW": 0.1206734625063732,
+      "succes20": 0.5
+    },
+    {
+      "poging": 164,
+      "ok": false,
+      "beloning": 17.70094208272693,
+      "stappen": 320,
+      "verbindingen": 334,
+      "gemW": 0.12053353578581762,
+      "succes20": 0.5
+    },
+    {
+      "poging": 165,
+      "ok": false,
+      "beloning": -13.627513687561036,
+      "stappen": 320,
+      "verbindingen": 334,
+      "gemW": 0.12032719721395835,
+      "succes20": 0.45
+    },
+    {
+      "poging": 166,
+      "ok": false,
+      "beloning": -44.097014496468674,
+      "stappen": 320,
+      "verbindingen": 334,
+      "gemW": 0.1201800938867678,
+      "succes20": 0.4
+    },
+    {
+      "poging": 167,
+      "ok": false,
+      "beloning": -14.27957311580504,
+      "stappen": 320,
+      "verbindingen": 334,
+      "gemW": 0.11999925892686117,
+      "succes20": 0.35
+    },
+    {
+      "poging": 168,
+      "ok": false,
+      "beloning": -12.249328339444556,
+      "stappen": 320,
+      "verbindingen": 334,
+      "gemW": 0.11986851873628106,
+      "succes20": 0.3
+    },
+    {
+      "poging": 169,
+      "ok": false,
+      "beloning": -76.91343076498377,
+      "stappen": 320,
+      "verbindingen": 334,
+      "gemW": 0.11970149361764423,
+      "succes20": 0.25
+    },
+    {
+      "poging": 170,
+      "ok": true,
+      "beloning": 59.10141506622714,
+      "stappen": 211,
+      "verbindingen": 337,
+      "gemW": 0.11912121623339966,
+      "succes20": 0.25
+    },
+    {
+      "poging": 171,
+      "ok": true,
+      "beloning": 72.65775177135093,
+      "stappen": 167,
+      "verbindingen": 337,
+      "gemW": 0.11909597824695202,
+      "succes20": 0.25
+    },
+    {
+      "poging": 172,
+      "ok": true,
+      "beloning": 79.47830954864025,
+      "stappen": 149,
+      "verbindingen": 337,
+      "gemW": 0.119057307383239,
+      "succes20": 0.25
+    },
+    {
+      "poging": 173,
+      "ok": true,
+      "beloning": 91.75297458460427,
+      "stappen": 101,
+      "verbindingen": 337,
+      "gemW": 0.11901665904119788,
+      "succes20": 0.25
+    },
+    {
+      "poging": 174,
+      "ok": true,
+      "beloning": 88.18130891560108,
+      "stappen": 116,
+      "verbindingen": 337,
+      "gemW": 0.11900605556889485,
+      "succes20": 0.25
+    },
+    {
+      "poging": 175,
+      "ok": false,
+      "beloning": 16.187443239650715,
+      "stappen": 320,
+      "verbindingen": 337,
+      "gemW": 0.118834071595067,
+      "succes20": 0.25
+    },
+    {
+      "poging": 176,
+      "ok": true,
+      "beloning": 77.45876282351449,
+      "stappen": 152,
+      "verbindingen": 337,
+      "gemW": 0.11870524455663314,
+      "succes20": 0.3
+    },
+    {
+      "poging": 177,
+      "ok": false,
+      "beloning": -28.530764320660722,
+      "stappen": 320,
+      "verbindingen": 337,
+      "gemW": 0.11856450117953143,
+      "succes20": 0.3
+    },
+    {
+      "poging": 178,
+      "ok": true,
+      "beloning": 76.0018849065491,
+      "stappen": 165,
+      "verbindingen": 337,
+      "gemW": 0.11837122882426183,
+      "succes20": 0.35
+    },
+    {
+      "poging": 179,
+      "ok": true,
+      "beloning": 71.21246895422459,
+      "stappen": 173,
+      "verbindingen": 337,
+      "gemW": 0.11823297061512485,
+      "succes20": 0.4
+    },
+    {
+      "poging": 180,
+      "ok": true,
+      "beloning": 87.69600196225029,
+      "stappen": 96,
+      "verbindingen": 340,
+      "gemW": 0.11758073764195776,
+      "succes20": 0.45
+    },
+    {
+      "poging": 181,
+      "ok": true,
+      "beloning": 87.0207539815865,
+      "stappen": 98,
+      "verbindingen": 340,
+      "gemW": 0.11760029492981951,
+      "succes20": 0.5
+    },
+    {
+      "poging": 182,
+      "ok": true,
+      "beloning": 70.93527326502183,
+      "stappen": 166,
+      "verbindingen": 340,
+      "gemW": 0.11739808360991233,
+      "succes20": 0.55
+    },
+    {
+      "poging": 183,
+      "ok": true,
+      "beloning": 87.02652573138587,
+      "stappen": 106,
+      "verbindingen": 340,
+      "gemW": 0.11737788170370657,
+      "succes20": 0.6
+    },
+    {
+      "poging": 184,
+      "ok": true,
+      "beloning": 87.48298277084905,
+      "stappen": 96,
+      "verbindingen": 340,
+      "gemW": 0.11732087397797253,
+      "succes20": 0.65
+    },
+    {
+      "poging": 185,
+      "ok": false,
+      "beloning": 1.2293625676472855,
+      "stappen": 320,
+      "verbindingen": 340,
+      "gemW": 0.11714280665276901,
+      "succes20": 0.65
+    },
+    {
+      "poging": 186,
+      "ok": false,
+      "beloning": -0.5197317347761686,
+      "stappen": 320,
+      "verbindingen": 340,
+      "gemW": 0.11692167615709717,
+      "succes20": 0.65
+    },
+    {
+      "poging": 187,
+      "ok": false,
+      "beloning": 1.9147063449247588,
+      "stappen": 320,
+      "verbindingen": 340,
+      "gemW": 0.11674021746456513,
+      "succes20": 0.65
+    },
+    {
+      "poging": 188,
+      "ok": false,
+      "beloning": 20.648058558500452,
+      "stappen": 320,
+      "verbindingen": 340,
+      "gemW": 0.11664599011282381,
+      "succes20": 0.65
+    },
+    {
+      "poging": 189,
+      "ok": false,
+      "beloning": 19.49310858826888,
+      "stappen": 320,
+      "verbindingen": 340,
+      "gemW": 0.11651399294736192,
+      "succes20": 0.65
+    },
+    {
+      "poging": 190,
+      "ok": false,
+      "beloning": 14.199192555412996,
+      "stappen": 320,
+      "verbindingen": 342,
+      "gemW": 0.11572214506419473,
+      "succes20": 0.6
+    },
+    {
+      "poging": 191,
+      "ok": false,
+      "beloning": 16.99343398450935,
+      "stappen": 320,
+      "verbindingen": 342,
+      "gemW": 0.11559584929079514,
+      "succes20": 0.55
+    },
+    {
+      "poging": 192,
+      "ok": true,
+      "beloning": 92.83600439026303,
+      "stappen": 104,
+      "verbindingen": 342,
+      "gemW": 0.11549072079387716,
+      "succes20": 0.55
+    },
+    {
+      "poging": 193,
+      "ok": true,
+      "beloning": 94.45831227460086,
+      "stappen": 99,
+      "verbindingen": 342,
+      "gemW": 0.1154160439241024,
+      "succes20": 0.55
+    },
+    {
+      "poging": 194,
+      "ok": true,
+      "beloning": 92.20444379720807,
+      "stappen": 102,
+      "verbindingen": 342,
+      "gemW": 0.11538681144041843,
+      "succes20": 0.55
+    },
+    {
+      "poging": 195,
+      "ok": true,
+      "beloning": 37.469588190869075,
+      "stappen": 285,
+      "verbindingen": 342,
+      "gemW": 0.1152271415407862,
+      "succes20": 0.6
+    },
+    {
+      "poging": 196,
+      "ok": false,
+      "beloning": 10.482785405203414,
+      "stappen": 320,
+      "verbindingen": 342,
+      "gemW": 0.11519303942665632,
+      "succes20": 0.55
+    },
+    {
+      "poging": 197,
+      "ok": false,
+      "beloning": 17.87643216199668,
+      "stappen": 320,
+      "verbindingen": 342,
+      "gemW": 0.11504737933081907,
+      "succes20": 0.55
+    },
+    {
+      "poging": 198,
+      "ok": false,
+      "beloning": -27.732079263507575,
+      "stappen": 320,
+      "verbindingen": 342,
+      "gemW": 0.11496463722661028,
+      "succes20": 0.5
+    },
+    {
+      "poging": 199,
+      "ok": false,
+      "beloning": 16.83109281568476,
+      "stappen": 320,
+      "verbindingen": 342,
+      "gemW": 0.11484513138230258,
+      "succes20": 0.45
+    },
+    {
+      "poging": 200,
+      "ok": true,
+      "beloning": 84.17087944178247,
+      "stappen": 165,
+      "verbindingen": 346,
+      "gemW": 0.11379230512720613,
+      "succes20": 0.45
+    },
+    {
+      "poging": 201,
+      "ok": true,
+      "beloning": 43.06327382358702,
+      "stappen": 307,
+      "verbindingen": 346,
+      "gemW": 0.1136331369776031,
+      "succes20": 0.45
+    },
+    {
+      "poging": 202,
+      "ok": true,
+      "beloning": 97.95245081870118,
+      "stappen": 110,
+      "verbindingen": 346,
+      "gemW": 0.11358927537127253,
+      "succes20": 0.45
+    },
+    {
+      "poging": 203,
+      "ok": true,
+      "beloning": 95.45353616268886,
+      "stappen": 118,
+      "verbindingen": 346,
+      "gemW": 0.11356665778600993,
+      "succes20": 0.45
+    },
+    {
+      "poging": 204,
+      "ok": true,
+      "beloning": 94.76890737982524,
+      "stappen": 110,
+      "verbindingen": 346,
+      "gemW": 0.11353581654637342,
+      "succes20": 0.45
+    },
+    {
+      "poging": 205,
+      "ok": true,
+      "beloning": 92.60046641221196,
+      "stappen": 102,
+      "verbindingen": 346,
+      "gemW": 0.1134887128520617,
+      "succes20": 0.5
+    },
+    {
+      "poging": 206,
+      "ok": false,
+      "beloning": 10.781413128726495,
+      "stappen": 320,
+      "verbindingen": 346,
+      "gemW": 0.11337553313125807,
+      "succes20": 0.5
+    },
+    {
+      "poging": 207,
+      "ok": false,
+      "beloning": 20.176062703520397,
+      "stappen": 320,
+      "verbindingen": 346,
+      "gemW": 0.11333558190616677,
+      "succes20": 0.5
+    },
+    {
+      "poging": 208,
+      "ok": false,
+      "beloning": 18.434366968889712,
+      "stappen": 320,
+      "verbindingen": 346,
+      "gemW": 0.11320255202647686,
+      "succes20": 0.5
+    },
+    {
+      "poging": 209,
+      "ok": false,
+      "beloning": 13.930177000909572,
+      "stappen": 320,
+      "verbindingen": 346,
+      "gemW": 0.11314212763345548,
+      "succes20": 0.5
+    },
+    {
+      "poging": 210,
+      "ok": false,
+      "beloning": -4.308856240104823,
+      "stappen": 320,
+      "verbindingen": 346,
+      "gemW": 0.11349976303411184,
+      "succes20": 0.5
+    },
+    {
+      "poging": 211,
+      "ok": false,
+      "beloning": 10.308156511215548,
+      "stappen": 320,
+      "verbindingen": 346,
+      "gemW": 0.11347111751866457,
+      "succes20": 0.5
+    },
+    {
+      "poging": 212,
+      "ok": false,
+      "beloning": 9.428332220246705,
+      "stappen": 320,
+      "verbindingen": 346,
+      "gemW": 0.11338025591715718,
+      "succes20": 0.45
+    },
+    {
+      "poging": 213,
+      "ok": true,
+      "beloning": 66.59263925194867,
+      "stappen": 198,
+      "verbindingen": 346,
+      "gemW": 0.11339292877536762,
+      "succes20": 0.45
+    },
+    {
+      "poging": 214,
+      "ok": true,
+      "beloning": 88.27108120490477,
+      "stappen": 112,
+      "verbindingen": 346,
+      "gemW": 0.11334643055849057,
+      "succes20": 0.45
+    },
+    {
+      "poging": 215,
+      "ok": true,
+      "beloning": 68.54853568231947,
+      "stappen": 178,
+      "verbindingen": 346,
+      "gemW": 0.11322259009516976,
+      "succes20": 0.45
+    },
+    {
+      "poging": 216,
+      "ok": false,
+      "beloning": -18.438042925944806,
+      "stappen": 320,
+      "verbindingen": 346,
+      "gemW": 0.11311200029294766,
+      "succes20": 0.45
+    },
+    {
+      "poging": 217,
+      "ok": true,
+      "beloning": 89.17091187786569,
+      "stappen": 97,
+      "verbindingen": 346,
+      "gemW": 0.11299899532567344,
+      "succes20": 0.5
+    },
+    {
+      "poging": 218,
+      "ok": true,
+      "beloning": 88.51282882888944,
+      "stappen": 102,
+      "verbindingen": 346,
+      "gemW": 0.11291428337296244,
+      "succes20": 0.55
+    }
+  ],
+  "toetsen": [
+    {
+      "poging": 20,
+      "pct": 0
+    },
+    {
+      "poging": 40,
+      "pct": 0
+    },
+    {
+      "poging": 60,
+      "pct": 0.1
+    },
+    {
+      "poging": 80,
+      "pct": 0.3
+    },
+    {
+      "poging": 100,
+      "pct": 0
+    },
+    {
+      "poging": 120,
+      "pct": 0
+    },
+    {
+      "poging": 140,
+      "pct": 0
+    },
+    {
+      "poging": 160,
+      "pct": 0.1
+    },
+    {
+      "poging": 180,
+      "pct": 0.1
+    },
+    {
+      "poging": 200,
+      "pct": 0
+    }
+  ],
+  "netwerk": {
+    "neuronen": [
+      {
+        "i": 0,
+        "type": "in",
+        "label": "obst N",
+        "x": 58,
+        "y": 30,
+        "bias": -0.0393
+      },
+      {
+        "i": 1,
+        "type": "in",
+        "label": "obst NO",
+        "x": 58,
+        "y": 54,
+        "bias": 0.0269
+      },
+      {
+        "i": 2,
+        "type": "in",
+        "label": "obst O",
+        "x": 58,
+        "y": 78,
+        "bias": -0.016
+      },
+      {
+        "i": 3,
+        "type": "in",
+        "label": "obst ZO",
+        "x": 58,
+        "y": 102,
+        "bias": 0.0986
+      },
+      {
+        "i": 4,
+        "type": "in",
+        "label": "obst Z",
+        "x": 58,
+        "y": 126,
+        "bias": -0.052
+      },
+      {
+        "i": 5,
+        "type": "in",
+        "label": "obst ZW",
+        "x": 58,
+        "y": 150,
+        "bias": -0.0871
+      },
+      {
+        "i": 6,
+        "type": "in",
+        "label": "obst W",
+        "x": 58,
+        "y": 174,
+        "bias": -0.0851
+      },
+      {
+        "i": 7,
+        "type": "in",
+        "label": "obst NW",
+        "x": 58,
+        "y": 198,
+        "bias": 0.0943
+      },
+      {
+        "i": 8,
+        "type": "in",
+        "label": "doel N",
+        "x": 58,
+        "y": 222,
+        "bias": -0.0474
+      },
+      {
+        "i": 9,
+        "type": "in",
+        "label": "doel NO",
+        "x": 58,
+        "y": 246,
+        "bias": 0.0935
+      },
+      {
+        "i": 10,
+        "type": "in",
+        "label": "doel O",
+        "x": 58,
+        "y": 270,
+        "bias": 0.03
+      },
+      {
+        "i": 11,
+        "type": "in",
+        "label": "doel ZO",
+        "x": 58,
+        "y": 294,
+        "bias": 0.0508
+      },
+      {
+        "i": 12,
+        "type": "in",
+        "label": "doel Z",
+        "x": 58,
+        "y": 318,
+        "bias": 0
+      },
+      {
+        "i": 13,
+        "type": "in",
+        "label": "doel ZW",
+        "x": 58,
+        "y": 342,
+        "bias": -0.0195
+      },
+      {
+        "i": 14,
+        "type": "in",
+        "label": "doel W",
+        "x": 58,
+        "y": 366,
+        "bias": -0.0825
+      },
+      {
+        "i": 15,
+        "type": "in",
+        "label": "doel NW",
+        "x": 58,
+        "y": 390,
+        "bias": -0.0315
+      },
+      {
+        "i": 16,
+        "type": "sens",
+        "label": "S1",
+        "x": 444,
+        "y": 321,
+        "bias": 0.0867
+      },
+      {
+        "i": 17,
+        "type": "sens",
+        "label": "S2",
+        "x": 260,
+        "y": 112,
+        "bias": 0.0202
+      },
+      {
+        "i": 18,
+        "type": "sens",
+        "label": "S3",
+        "x": 225,
+        "y": 273,
+        "bias": 0.0181
+      },
+      {
+        "i": 19,
+        "type": "sens",
+        "label": "S4",
+        "x": 414,
+        "y": 281,
+        "bias": 0.1274
+      },
+      {
+        "i": 20,
+        "type": "work",
+        "label": "W1",
+        "x": 357,
+        "y": 167,
+        "bias": 0.0125
+      },
+      {
+        "i": 21,
+        "type": "work",
+        "label": "W2",
+        "x": 346,
+        "y": 336,
+        "bias": 0.0715
+      },
+      {
+        "i": 22,
+        "type": "work",
+        "label": "W3",
+        "x": 500,
+        "y": 303,
+        "bias": -0.0685
+      },
+      {
+        "i": 23,
+        "type": "work",
+        "label": "W4",
+        "x": 297,
+        "y": 196,
+        "bias": 0.0277
+      },
+      {
+        "i": 24,
+        "type": "work",
+        "label": "W5",
+        "x": 325,
+        "y": 112,
+        "bias": -0.0371
+      },
+      {
+        "i": 25,
+        "type": "work",
+        "label": "W6",
+        "x": 340,
+        "y": 216,
+        "bias": 0.0726
+      },
+      {
+        "i": 26,
+        "type": "work",
+        "label": "W7",
+        "x": 360,
+        "y": 193,
+        "bias": 0.0145
+      },
+      {
+        "i": 27,
+        "type": "work",
+        "label": "W8",
+        "x": 456,
+        "y": 141,
+        "bias": -0.0922
+      },
+      {
+        "i": 28,
+        "type": "work",
+        "label": "W9",
+        "x": 500,
+        "y": 228,
+        "bias": -0.0153
+      },
+      {
+        "i": 29,
+        "type": "work",
+        "label": "W10",
+        "x": 295,
+        "y": 301,
+        "bias": 0.0295
+      },
+      {
+        "i": 30,
+        "type": "work",
+        "label": "W11",
+        "x": 530,
+        "y": 250,
+        "bias": 0.0021
+      },
+      {
+        "i": 31,
+        "type": "work",
+        "label": "W12",
+        "x": 354,
+        "y": 251,
+        "bias": -0.0181
+      },
+      {
+        "i": 32,
+        "type": "work",
+        "label": "W13",
+        "x": 452,
+        "y": 269,
+        "bias": -0.0041
+      },
+      {
+        "i": 33,
+        "type": "work",
+        "label": "W14",
+        "x": 378,
+        "y": 91,
+        "bias": 0.095
+      },
+      {
+        "i": 34,
+        "type": "work",
+        "label": "W15",
+        "x": 280,
+        "y": 161,
+        "bias": 0.0316
+      },
+      {
+        "i": 35,
+        "type": "work",
+        "label": "W16",
+        "x": 229,
+        "y": 139,
+        "bias": 0.0755
+      },
+      {
+        "i": 36,
+        "type": "work",
+        "label": "W17",
+        "x": 299,
+        "y": 130,
+        "bias": -0.1328
+      },
+      {
+        "i": 37,
+        "type": "work",
+        "label": "W18",
+        "x": 469,
+        "y": 201,
+        "bias": 0.0001
+      },
+      {
+        "i": 38,
+        "type": "work",
+        "label": "W19",
+        "x": 448,
+        "y": 229,
+        "bias": 0.0684
+      },
+      {
+        "i": 39,
+        "type": "work",
+        "label": "W20",
+        "x": 390,
+        "y": 314,
+        "bias": -0.0216
+      },
+      {
+        "i": 40,
+        "type": "work",
+        "label": "W21",
+        "x": 328,
+        "y": 248,
+        "bias": -0.0213
+      },
+      {
+        "i": 41,
+        "type": "work",
+        "label": "W22",
+        "x": 414,
+        "y": 155,
+        "bias": 0.0382
+      },
+      {
+        "i": 42,
+        "type": "work",
+        "label": "W23",
+        "x": 289,
+        "y": 251,
+        "bias": 0.0126
+      },
+      {
+        "i": 43,
+        "type": "work",
+        "label": "W24",
+        "x": 428,
+        "y": 108,
+        "bias": -0.0186
+      },
+      {
+        "i": 44,
+        "type": "work",
+        "label": "W25",
+        "x": 394,
+        "y": 235,
+        "bias": -0.0061
+      },
+      {
+        "i": 45,
+        "type": "work",
+        "label": "W26",
+        "x": 392,
+        "y": 209,
+        "bias": 0.078
+      },
+      {
+        "i": 46,
+        "type": "work",
+        "label": "W27",
+        "x": 323,
+        "y": 166,
+        "bias": -0.0635
+      },
+      {
+        "i": 47,
+        "type": "work",
+        "label": "W28",
+        "x": 426,
+        "y": 189,
+        "bias": -0.0526
+      },
+      {
+        "i": 48,
+        "type": "work",
+        "label": "W29",
+        "x": 317,
+        "y": 283,
+        "bias": -0.0141
+      },
+      {
+        "i": 49,
+        "type": "work",
+        "label": "W30",
+        "x": 370,
+        "y": 286,
+        "bias": 0.0619
+      },
+      {
+        "i": 50,
+        "type": "work",
+        "label": "W31",
+        "x": 227,
+        "y": 204,
+        "bias": 0.0422
+      },
+      {
+        "i": 51,
+        "type": "work",
+        "label": "W32",
+        "x": 279,
+        "y": 220,
+        "bias": 0.037
+      },
+      {
+        "i": 52,
+        "type": "refl",
+        "label": "R1",
+        "x": 587,
+        "y": 177,
+        "bias": 0.0101
+      },
+      {
+        "i": 53,
+        "type": "refl",
+        "label": "R2",
+        "x": 729,
+        "y": 264,
+        "bias": -0.0304
+      },
+      {
+        "i": 54,
+        "type": "mem",
+        "label": "M1",
+        "x": 518,
+        "y": 176,
+        "bias": 0.004
+      },
+      {
+        "i": 55,
+        "type": "mem",
+        "label": "M2",
+        "x": 361,
+        "y": 137,
+        "bias": 0.0106
+      },
+      {
+        "i": 56,
+        "type": "out",
+        "label": "omhoog",
+        "x": 942,
+        "y": 70,
+        "bias": -0.1795
+      },
+      {
+        "i": 57,
+        "type": "out",
+        "label": "omlaag",
+        "x": 942,
+        "y": 163,
+        "bias": -0.0015
+      },
+      {
+        "i": 58,
+        "type": "out",
+        "label": "links",
+        "x": 942,
+        "y": 257,
+        "bias": -1.9986
+      },
+      {
+        "i": 59,
+        "type": "out",
+        "label": "rechts",
+        "x": 942,
+        "y": 350,
+        "bias": 1.9976
+      }
+    ],
+    "verbindingen": [
+      [
+        0,
+        35,
+        -0.139
+      ],
+      [
+        0,
+        51,
+        -0.157
+      ],
+      [
+        1,
+        23,
+        0.0507
+      ],
+      [
+        1,
+        29,
+        -0.0736
+      ],
+      [
+        1,
+        35,
+        -0.0796
+      ],
+      [
+        1,
+        39,
+        -0.0651
+      ],
+      [
+        1,
+        41,
+        0.1088
+      ],
+      [
+        1,
+        44,
+        -0.0771
+      ],
+      [
+        1,
+        52,
+        0.1494
+      ],
+      [
+        2,
+        26,
+        -0.1072
+      ],
+      [
+        2,
+        27,
+        -0.156
+      ],
+      [
+        2,
+        34,
+        -0.1495
+      ],
+      [
+        2,
+        38,
+        0.0793
+      ],
+      [
+        2,
+        43,
+        -0.1312
+      ],
+      [
+        2,
+        48,
+        0.1307
+      ],
+      [
+        2,
+        50,
+        -0.1238
+      ],
+      [
+        2,
+        51,
+        0.1125
+      ],
+      [
+        3,
+        25,
+        0.1078
+      ],
+      [
+        3,
+        33,
+        0.0941
+      ],
+      [
+        3,
+        40,
+        -0.1008
+      ],
+      [
+        3,
+        45,
+        0.1146
+      ],
+      [
+        3,
+        51,
+        0.1099
+      ],
+      [
+        4,
+        21,
+        -0.0992
+      ],
+      [
+        4,
+        23,
+        -0.1015
+      ],
+      [
+        4,
+        24,
+        0.0479
+      ],
+      [
+        4,
+        40,
+        0.1339
+      ],
+      [
+        4,
+        41,
+        0.1612
+      ],
+      [
+        4,
+        50,
+        0.1467
+      ],
+      [
+        5,
+        20,
+        -0.0809
+      ],
+      [
+        5,
+        31,
+        -0.0409
+      ],
+      [
+        5,
+        51,
+        0.1435
+      ],
+      [
+        6,
+        20,
+        -0.1462
+      ],
+      [
+        6,
+        24,
+        -0.0791
+      ],
+      [
+        6,
+        26,
+        -0.1864
+      ],
+      [
+        6,
+        28,
+        -0.1628
+      ],
+      [
+        6,
+        55,
+        -0.1126
+      ],
+      [
+        7,
+        16,
+        0.1095
+      ],
+      [
+        7,
+        18,
+        -0.1563
+      ],
+      [
+        7,
+        37,
+        -0.1582
+      ],
+      [
+        8,
+        19,
+        -0.0484
+      ],
+      [
+        8,
+        25,
+        0.1815
+      ],
+      [
+        8,
+        31,
+        0.1206
+      ],
+      [
+        8,
+        37,
+        0.1668
+      ],
+      [
+        9,
+        20,
+        -0.0439
+      ],
+      [
+        9,
+        23,
+        0.1261
+      ],
+      [
+        9,
+        34,
+        -0.071
+      ],
+      [
+        9,
+        40,
+        -0.1549
+      ],
+      [
+        9,
+        41,
+        0.177
+      ],
+      [
+        9,
+        45,
+        -0.1489
+      ],
+      [
+        9,
+        46,
+        0.0734
+      ],
+      [
+        10,
+        21,
+        -0.0638
+      ],
+      [
+        10,
+        23,
+        -0.0575
+      ],
+      [
+        10,
+        28,
+        0.0858
+      ],
+      [
+        10,
+        49,
+        0.0764
+      ],
+      [
+        11,
+        29,
+        -0.0403
+      ],
+      [
+        11,
+        38,
+        -0.11
+      ],
+      [
+        11,
+        51,
+        -0.0827
+      ],
+      [
+        12,
+        22,
+        0.1843
+      ],
+      [
+        12,
+        23,
+        -0.0529
+      ],
+      [
+        12,
+        40,
+        -0.1498
+      ],
+      [
+        13,
+        25,
+        0.1767
+      ],
+      [
+        13,
+        29,
+        0.1396
+      ],
+      [
+        13,
+        36,
+        -0.1161
+      ],
+      [
+        13,
+        39,
+        -0.1683
+      ],
+      [
+        13,
+        44,
+        -0.0416
+      ],
+      [
+        13,
+        50,
+        0.1687
+      ],
+      [
+        14,
+        21,
+        0.1639
+      ],
+      [
+        14,
+        29,
+        0.1958
+      ],
+      [
+        14,
+        34,
+        0.1781
+      ],
+      [
+        14,
+        38,
+        -0.05
+      ],
+      [
+        14,
+        41,
+        -0.0315
+      ],
+      [
+        14,
+        42,
+        -0.1229
+      ],
+      [
+        14,
+        44,
+        0.1864
+      ],
+      [
+        14,
+        45,
+        -0.0409
+      ],
+      [
+        14,
+        49,
+        0.1619
+      ],
+      [
+        14,
+        50,
+        0.1156
+      ],
+      [
+        14,
+        55,
+        -0.1286
+      ],
+      [
+        15,
+        18,
+        0.0708
+      ],
+      [
+        15,
+        29,
+        -0.1241
+      ],
+      [
+        15,
+        48,
+        -0.1471
+      ],
+      [
+        15,
+        49,
+        0.2053
+      ],
+      [
+        15,
+        50,
+        0.1123
+      ],
+      [
+        16,
+        27,
+        0.1302
+      ],
+      [
+        16,
+        28,
+        0.1882
+      ],
+      [
+        16,
+        32,
+        0.0873
+      ],
+      [
+        16,
+        43,
+        0.1535
+      ],
+      [
+        16,
+        44,
+        -0.0777
+      ],
+      [
+        16,
+        46,
+        0.1342
+      ],
+      [
+        16,
+        59,
+        0.3408
+      ],
+      [
+        17,
+        35,
+        0.1972
+      ],
+      [
+        17,
+        37,
+        0.2013
+      ],
+      [
+        17,
+        43,
+        0.0802
+      ],
+      [
+        17,
+        46,
+        -0.1093
+      ],
+      [
+        17,
+        48,
+        -0.0536
+      ],
+      [
+        18,
+        25,
+        0.2093
+      ],
+      [
+        18,
+        36,
+        -0.1584
+      ],
+      [
+        18,
+        37,
+        -0.1961
+      ],
+      [
+        18,
+        47,
+        0.0777
+      ],
+      [
+        19,
+        32,
+        -0.1912
+      ],
+      [
+        19,
+        36,
+        -0.0644
+      ],
+      [
+        19,
+        37,
+        0.0438
+      ],
+      [
+        19,
+        41,
+        -0.116
+      ],
+      [
+        19,
+        53,
+        0.1773
+      ],
+      [
+        19,
+        57,
+        0.1822
+      ],
+      [
+        20,
+        23,
+        0.0397
+      ],
+      [
+        20,
+        25,
+        -0.1
+      ],
+      [
+        20,
+        37,
+        0.0815
+      ],
+      [
+        20,
+        44,
+        0.1087
+      ],
+      [
+        20,
+        58,
+        0.3451
+      ],
+      [
+        21,
+        30,
+        -0.1245
+      ],
+      [
+        21,
+        39,
+        -0.0633
+      ],
+      [
+        21,
+        47,
+        -0.1687
+      ],
+      [
+        22,
+        24,
+        0.0801
+      ],
+      [
+        22,
+        44,
+        -0.0935
+      ],
+      [
+        22,
+        54,
+        -0.1542
+      ],
+      [
+        22,
+        59,
+        -0.2213
+      ],
+      [
+        23,
+        30,
+        0.2024
+      ],
+      [
+        23,
+        33,
+        -0.1512
+      ],
+      [
+        23,
+        48,
+        -0.0948
+      ],
+      [
+        23,
+        49,
+        0.1296
+      ],
+      [
+        23,
+        50,
+        0.032
+      ],
+      [
+        23,
+        57,
+        -0.3988
+      ],
+      [
+        24,
+        47,
+        -0.0795
+      ],
+      [
+        25,
+        33,
+        -0.1335
+      ],
+      [
+        25,
+        36,
+        -0.1495
+      ],
+      [
+        25,
+        56,
+        0.1799
+      ],
+      [
+        26,
+        22,
+        0.1384
+      ],
+      [
+        26,
+        27,
+        0.1004
+      ],
+      [
+        26,
+        28,
+        0.195
+      ],
+      [
+        26,
+        32,
+        0.102
+      ],
+      [
+        26,
+        40,
+        -0.1736
+      ],
+      [
+        26,
+        41,
+        -0.0494
+      ],
+      [
+        26,
+        43,
+        0.1593
+      ],
+      [
+        26,
+        54,
+        0.0387
+      ],
+      [
+        27,
+        21,
+        0.0378
+      ],
+      [
+        27,
+        22,
+        0.173
+      ],
+      [
+        27,
+        29,
+        -0.1545
+      ],
+      [
+        27,
+        32,
+        -0.133
+      ],
+      [
+        27,
+        34,
+        0.0928
+      ],
+      [
+        27,
+        47,
+        -0.0505
+      ],
+      [
+        27,
+        56,
+        -0.0216
+      ],
+      [
+        28,
+        22,
+        -0.1592
+      ],
+      [
+        28,
+        38,
+        0.0657
+      ],
+      [
+        28,
+        58,
+        -0.2716
+      ],
+      [
+        29,
+        32,
+        0.0778
+      ],
+      [
+        29,
+        38,
+        -0.1935
+      ],
+      [
+        29,
+        44,
+        0.1367
+      ],
+      [
+        29,
+        57,
+        0.4193
+      ],
+      [
+        30,
+        25,
+        -0.1171
+      ],
+      [
+        30,
+        31,
+        -0.0809
+      ],
+      [
+        30,
+        36,
+        -0.0665
+      ],
+      [
+        30,
+        40,
+        -0.0574
+      ],
+      [
+        30,
+        44,
+        0.1726
+      ],
+      [
+        30,
+        47,
+        0.1477
+      ],
+      [
+        30,
+        51,
+        -0.1281
+      ],
+      [
+        30,
+        58,
+        -0.049
+      ],
+      [
+        30,
+        59,
+        0.0271
+      ],
+      [
+        31,
+        26,
+        -0.1163
+      ],
+      [
+        31,
+        30,
+        -0.0599
+      ],
+      [
+        31,
+        34,
+        0.0785
+      ],
+      [
+        31,
+        36,
+        0.1269
+      ],
+      [
+        31,
+        38,
+        -0.0743
+      ],
+      [
+        31,
+        46,
+        0.1308
+      ],
+      [
+        32,
+        21,
+        -0.0459
+      ],
+      [
+        32,
+        23,
+        0.1322
+      ],
+      [
+        32,
+        26,
+        0.0394
+      ],
+      [
+        32,
+        42,
+        -0.1954
+      ],
+      [
+        32,
+        45,
+        -0.2064
+      ],
+      [
+        32,
+        58,
+        0.3143
+      ],
+      [
+        33,
+        20,
+        -0.0344
+      ],
+      [
+        33,
+        35,
+        0.0984
+      ],
+      [
+        33,
+        45,
+        0.0345
+      ],
+      [
+        33,
+        49,
+        0.0771
+      ],
+      [
+        33,
+        54,
+        0.1932
+      ],
+      [
+        34,
+        23,
+        0.1059
+      ],
+      [
+        34,
+        32,
+        -0.163
+      ],
+      [
+        34,
+        43,
+        -0.1637
+      ],
+      [
+        34,
+        45,
+        0.1945
+      ],
+      [
+        34,
+        50,
+        0.0451
+      ],
+      [
+        34,
+        55,
+        0.1827
+      ],
+      [
+        35,
+        20,
+        -0.0927
+      ],
+      [
+        35,
+        24,
+        -0.1873
+      ],
+      [
+        35,
+        32,
+        -0.1611
+      ],
+      [
+        35,
+        51,
+        -0.0715
+      ],
+      [
+        36,
+        20,
+        0.1046
+      ],
+      [
+        36,
+        33,
+        0.1362
+      ],
+      [
+        36,
+        41,
+        -0.107
+      ],
+      [
+        36,
+        43,
+        0.0513
+      ],
+      [
+        37,
+        20,
+        0.1557
+      ],
+      [
+        37,
+        24,
+        -0.1101
+      ],
+      [
+        37,
+        32,
+        0.0959
+      ],
+      [
+        37,
+        33,
+        0.1055
+      ],
+      [
+        37,
+        39,
+        0.1591
+      ],
+      [
+        37,
+        49,
+        0.1555
+      ],
+      [
+        37,
+        57,
+        -0.703
+      ],
+      [
+        37,
+        59,
+        -0.0843
+      ],
+      [
+        38,
+        23,
+        0.1348
+      ],
+      [
+        38,
+        27,
+        -0.1615
+      ],
+      [
+        38,
+        31,
+        0.0868
+      ],
+      [
+        38,
+        33,
+        0.1885
+      ],
+      [
+        38,
+        41,
+        -0.075
+      ],
+      [
+        38,
+        56,
+        0.3433
+      ],
+      [
+        38,
+        59,
+        -0.0644
+      ],
+      [
+        39,
+        21,
+        -0.1853
+      ],
+      [
+        39,
+        23,
+        -0.0838
+      ],
+      [
+        39,
+        51,
+        0.203
+      ],
+      [
+        39,
+        55,
+        0.0898
+      ],
+      [
+        39,
+        59,
+        0.2403
+      ],
+      [
+        40,
+        24,
+        0.1675
+      ],
+      [
+        40,
+        28,
+        0.0759
+      ],
+      [
+        40,
+        39,
+        -0.0771
+      ],
+      [
+        40,
+        59,
+        -0.0914
+      ],
+      [
+        41,
+        20,
+        0.0353
+      ],
+      [
+        41,
+        25,
+        0.062
+      ],
+      [
+        41,
+        32,
+        -0.1768
+      ],
+      [
+        41,
+        46,
+        0.0735
+      ],
+      [
+        41,
+        48,
+        0.1293
+      ],
+      [
+        41,
+        56,
+        0.2299
+      ],
+      [
+        41,
+        59,
+        0.3753
+      ],
+      [
+        42,
+        21,
+        0.0485
+      ],
+      [
+        42,
+        30,
+        -0.196
+      ],
+      [
+        42,
+        33,
+        0.0707
+      ],
+      [
+        42,
+        38,
+        -0.0385
+      ],
+      [
+        42,
+        43,
+        -0.0366
+      ],
+      [
+        43,
+        20,
+        0.0653
+      ],
+      [
+        43,
+        31,
+        0.0845
+      ],
+      [
+        43,
+        50,
+        -0.1917
+      ],
+      [
+        43,
+        54,
+        -0.0329
+      ],
+      [
+        43,
+        56,
+        0.0537
+      ],
+      [
+        44,
+        21,
+        -0.0892
+      ],
+      [
+        44,
+        23,
+        0.1678
+      ],
+      [
+        44,
+        30,
+        -0.1273
+      ],
+      [
+        44,
+        33,
+        -0.0744
+      ],
+      [
+        44,
+        34,
+        0.0452
+      ],
+      [
+        44,
+        50,
+        -0.1084
+      ],
+      [
+        44,
+        54,
+        -0.105
+      ],
+      [
+        45,
+        23,
+        -0.1166
+      ],
+      [
+        45,
+        59,
+        0.1192
+      ],
+      [
+        46,
+        28,
+        -0.039
+      ],
+      [
+        46,
+        40,
+        -0.1062
+      ],
+      [
+        46,
+        47,
+        0.0858
+      ],
+      [
+        47,
+        24,
+        0.0718
+      ],
+      [
+        47,
+        26,
+        0.1436
+      ],
+      [
+        47,
+        29,
+        -0.1824
+      ],
+      [
+        47,
+        30,
+        -0.0552
+      ],
+      [
+        47,
+        31,
+        -0.0727
+      ],
+      [
+        47,
+        33,
+        -0.0449
+      ],
+      [
+        47,
+        34,
+        -0.0399
+      ],
+      [
+        47,
+        35,
+        -0.1044
+      ],
+      [
+        47,
+        37,
+        0.1241
+      ],
+      [
+        47,
+        46,
+        -0.1981
+      ],
+      [
+        47,
+        51,
+        0.0757
+      ],
+      [
+        47,
+        55,
+        -0.0371
+      ],
+      [
+        47,
+        57,
+        -0.1789
+      ],
+      [
+        48,
+        24,
+        0.1391
+      ],
+      [
+        48,
+        44,
+        -0.0901
+      ],
+      [
+        48,
+        51,
+        -0.0428
+      ],
+      [
+        49,
+        20,
+        0.0374
+      ],
+      [
+        49,
+        24,
+        -0.1488
+      ],
+      [
+        49,
+        37,
+        0.1825
+      ],
+      [
+        49,
+        57,
+        -0.4629
+      ],
+      [
+        50,
+        36,
+        0.1478
+      ],
+      [
+        50,
+        54,
+        -0.1253
+      ],
+      [
+        51,
+        40,
+        0.0787
+      ],
+      [
+        51,
+        44,
+        -0.0541
+      ],
+      [
+        51,
+        54,
+        -0.0703
+      ],
+      [
+        52,
+        57,
+        0.0555
+      ],
+      [
+        52,
+        59,
+        0.0604
+      ],
+      [
+        54,
+        22,
+        -0.0868
+      ],
+      [
+        54,
+        30,
+        -0.1956
+      ],
+      [
+        54,
+        58,
+        -0.2947
+      ],
+      [
+        55,
+        25,
+        -0.1987
+      ],
+      [
+        55,
+        26,
+        -0.1416
+      ],
+      [
+        55,
+        27,
+        0.1448
+      ],
+      [
+        55,
+        32,
+        0.0838
+      ],
+      [
+        55,
+        33,
+        -0.0671
+      ],
+      [
+        55,
+        35,
+        -0.1465
+      ],
+      [
+        55,
+        38,
+        -0.1875
+      ],
+      [
+        55,
+        43,
+        -0.0924
+      ],
+      [
+        55,
+        51,
+        -0.1038
+      ],
+      [
+        54,
+        54,
+        0.6853
+      ],
+      [
+        55,
+        55,
+        0.6048
+      ],
+      [
+        53,
+        59,
+        0.0745
+      ],
+      [
+        10,
+        26,
+        0.0467
+      ],
+      [
+        12,
+        17,
+        -0.0485
+      ],
+      [
+        6,
+        41,
+        -0.0421
+      ],
+      [
+        35,
+        30,
+        0.0371
+      ],
+      [
+        35,
+        50,
+        0.033
+      ],
+      [
+        33,
+        51,
+        -0.0457
+      ],
+      [
+        46,
+        30,
+        0.0485
+      ],
+      [
+        49,
+        55,
+        -0.0463
+      ],
+      [
+        46,
+        31,
+        0.0333
+      ],
+      [
+        7,
+        23,
+        0.0398
+      ],
+      [
+        7,
+        27,
+        -0.0288
+      ],
+      [
+        39,
+        36,
+        -0.0441
+      ],
+      [
+        39,
+        29,
+        0.051
+      ],
+      [
+        8,
+        54,
+        0.0302
+      ],
+      [
+        52,
+        58,
+        0.0591
+      ],
+      [
+        19,
+        49,
+        0.0296
+      ],
+      [
+        12,
+        55,
+        0.0526
+      ],
+      [
+        24,
+        46,
+        -0.0437
+      ],
+      [
+        8,
+        41,
+        -0.0461
+      ],
+      [
+        3,
+        35,
+        0.0417
+      ],
+      [
+        48,
+        28,
+        -0.0529
+      ],
+      [
+        10,
+        18,
+        -0.0481
+      ],
+      [
+        0,
+        21,
+        -0.0546
+      ],
+      [
+        11,
+        22,
+        0.0405
+      ],
+      [
+        45,
+        27,
+        -0.0421
+      ],
+      [
+        25,
+        29,
+        0.0444
+      ],
+      [
+        22,
+        37,
+        0.0509
+      ],
+      [
+        4,
+        20,
+        0.0416
+      ],
+      [
+        52,
+        56,
+        -0.0918
+      ],
+      [
+        0,
+        45,
+        0.0475
+      ],
+      [
+        1,
+        24,
+        -0.0263
+      ],
+      [
+        8,
+        22,
+        0.0334
+      ],
+      [
+        17,
+        47,
+        -0.0551
+      ],
+      [
+        16,
+        57,
+        0.0272
+      ],
+      [
+        18,
+        39,
+        0.0377
+      ],
+      [
+        32,
+        27,
+        0.0404
+      ],
+      [
+        5,
+        48,
+        -0.0453
+      ],
+      [
+        11,
+        53,
+        -0.049
+      ],
+      [
+        5,
+        18,
+        0.0486
+      ],
+      [
+        0,
+        37,
+        -0.0378
+      ],
+      [
+        0,
+        39,
+        0.0523
+      ],
+      [
+        12,
+        16,
+        -0.0386
+      ],
+      [
+        6,
+        17,
+        0.0533
+      ],
+      [
+        51,
+        34,
+        -0.0553
+      ],
+      [
+        10,
+        41,
+        0.0454
+      ],
+      [
+        2,
+        30,
+        0.0335
+      ],
+      [
+        1,
+        40,
+        0.0417
+      ],
+      [
+        13,
+        53,
+        0.0429
+      ],
+      [
+        49,
+        48,
+        0.0324
+      ],
+      [
+        6,
+        31,
+        -0.0422
+      ],
+      [
+        15,
+        23,
+        0.059
+      ],
+      [
+        24,
+        28,
+        -0.04
+      ],
+      [
+        17,
+        50,
+        -0.0479
+      ],
+      [
+        32,
+        28,
+        -0.0032
+      ],
+      [
+        7,
+        49,
+        -0.0158
+      ],
+      [
+        2,
+        41,
+        -0.0011
+      ],
+      [
+        22,
+        28,
+        -0.0326
+      ],
+      [
+        54,
+        36,
+        -0.0558
+      ],
+      [
+        13,
+        22,
+        0.0416
+      ],
+      [
+        3,
+        50,
+        0.0076
+      ],
+      [
+        0,
+        48,
+        -0.0119
+      ],
+      [
+        13,
+        41,
+        0.0592
+      ],
+      [
+        12,
+        30,
+        0.0483
+      ]
+    ]
+  }
+}

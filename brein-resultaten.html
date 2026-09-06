@@ -1,0 +1,489 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Resultaten breinen — lokaal model lab</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#14161a; --panel:#1b1e24; --panel-alt:#20242b; --border:#2a2f37;
+    --text:#e9e7e1; --text-dim:#9199a3; --text-faint:#5c636d;
+    --pos:#4fd1c5; --neg:#ff6b57; --warn:#ffb454; --grid:#22262d;
+    --c-in:#4fd1c5; --c-out:#ffb454; --c-sens:#59c2ff; --c-work:#8b7cf0;
+    --c-refl:#ff6b57; --c-mem:#f78fb3;
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{background:var(--bg);color:var(--text);font-family:'Inter',sans-serif;line-height:1.5;
+    background-image:linear-gradient(var(--grid) 1px,transparent 1px),linear-gradient(90deg,var(--grid) 1px,transparent 1px);
+    background-size:28px 28px;background-attachment:fixed;}
+  h1,h2,h3{font-family:'Space Grotesk',sans-serif;margin:0;letter-spacing:.2px;}
+  .wrap{max-width:1400px;margin:0 auto;padding:22px 24px 60px;}
+  a{color:var(--pos);}
+  .breadcrumb{font-size:12.5px;color:var(--text-dim);margin-bottom:12px;}
+  .breadcrumb a{color:var(--text-dim);text-decoration:none;border-bottom:1px dotted var(--text-faint);}
+  .breadcrumb a:hover{color:var(--pos);border-color:var(--pos);}
+  header{padding-bottom:18px;margin-bottom:20px;border-bottom:1px solid var(--border);}
+  header h1{font-size:24px;font-weight:600;}
+  header .sub{color:var(--text-dim);font-size:13.5px;max-width:720px;margin-top:6px;}
+  .panel{background:var(--panel);border:1px solid var(--border);border-radius:4px;padding:18px;min-width:0;}
+  .panel + .panel{margin-top:18px;}
+  .panel h2{font-size:13px;color:var(--text-dim);font-weight:600;letter-spacing:.3px;
+    margin-bottom:12px;padding-bottom:10px;border-bottom:1px solid var(--border);
+    display:flex;justify-content:space-between;align-items:center;gap:8px;}
+  .panel h2 .hd{color:var(--text-faint);font-family:'IBM Plex Mono',monospace;font-size:10.5px;font-weight:400;}
+  .actionbtn{background:var(--panel-alt);color:var(--text);border:1px solid var(--border);
+    padding:8px 12px;border-radius:3px;font-family:'IBM Plex Mono',monospace;font-size:12px;cursor:pointer;}
+  .actionbtn:hover{border-color:var(--text-dim);}
+  .actionbtn.primary{background:var(--pos);color:#0d1210;border-color:var(--pos);font-weight:600;}
+  .loadbar{display:flex;gap:10px;align-items:center;flex-wrap:wrap;}
+  .status{font-size:11.5px;color:var(--text-faint);font-family:'IBM Plex Mono',monospace;}
+  input[type=file]{font-family:'IBM Plex Mono',monospace;font-size:11.5px;color:var(--text-dim);}
+  select{background:var(--panel-alt);color:var(--text);border:1px solid var(--border);
+    padding:6px 8px;border-radius:3px;font-family:'IBM Plex Mono',monospace;font-size:12px;}
+  table{width:100%;border-collapse:collapse;font-size:11.5px;}
+  th,td{text-align:left;padding:6px 7px;border-bottom:1px solid var(--border);white-space:nowrap;}
+  th{color:var(--text-faint);font-weight:500;font-family:'IBM Plex Mono',monospace;font-size:10px;cursor:pointer;user-select:none;}
+  th:hover{color:var(--pos);}
+  td{font-family:'IBM Plex Mono',monospace;color:var(--text);}
+  tr.sel td{background:rgba(79,209,197,.07);}
+  tbody tr{cursor:pointer;}
+  tbody tr:hover td{background:rgba(255,255,255,.03);}
+  .scrollx{overflow-x:auto;}
+  .scrollx::-webkit-scrollbar{height:7px;} .scrollx::-webkit-scrollbar-thumb{background:var(--border);border-radius:4px;}
+  .badge{padding:1px 6px;border-radius:2px;font-size:10px;}
+  .badge.ok{background:rgba(79,209,197,.15);color:var(--pos);}
+  .badge.no{background:rgba(255,107,87,.15);color:var(--neg);}
+  .badge.mid{background:rgba(255,180,84,.15);color:var(--warn);}
+  .cols{display:grid;grid-template-columns:1fr 360px;gap:18px;align-items:start;}
+  .cols > *{min-width:0;}
+  @media (max-width:1050px){ .cols{grid-template-columns:1fr;} }
+  canvas{display:block;width:100%;}
+  #netcvs{background:#0f1114;border:1px solid var(--border);border-radius:3px;height:420px;}
+  #curves{background:#0f1114;border:1px solid var(--border);border-radius:3px;height:230px;}
+  .legend{display:flex;gap:12px;font-size:10.5px;color:var(--text-faint);flex-wrap:wrap;align-items:center;}
+  .dot{display:inline-block;width:8px;height:8px;border-radius:50%;margin-right:5px;vertical-align:middle;}
+  .swatch{display:inline-block;width:11px;height:2px;margin-right:5px;vertical-align:middle;}
+  .barrow{display:flex;align-items:center;gap:9px;margin-top:7px;font-family:'IBM Plex Mono',monospace;font-size:11px;}
+  .barrow .bl{min-width:130px;color:var(--text-dim);flex-shrink:0;overflow:hidden;text-overflow:ellipsis;}
+  .bar-track{flex:1;height:8px;background:var(--panel-alt);border:1px solid var(--border);border-radius:4px;overflow:hidden;}
+  .bar-fill{height:100%;border-radius:4px;background:var(--pos);}
+  .barrow .bv{min-width:56px;text-align:right;color:var(--text-faint);}
+  .metric{display:flex;justify-content:space-between;gap:10px;padding:6px 0;border-bottom:1px solid var(--border);font-size:12.5px;}
+  .metric:last-child{border-bottom:none;}
+  .metric .k{color:var(--text-dim);}
+  .metric .v{font-family:'IBM Plex Mono',monospace;font-weight:500;text-align:right;}
+  .hint{font-size:11.5px;color:var(--text-faint);line-height:1.5;margin-top:6px;}
+  .hint b{color:var(--warn);}
+  .note{font-size:12px;color:var(--text-faint);margin-top:14px;line-height:1.6;}
+  .note b{color:var(--text-dim);}
+  .verdict{margin-top:8px;padding:12px 14px;border-radius:3px;font-size:12.5px;border:1px solid;line-height:1.55;}
+  .verdict.good{background:rgba(79,209,197,.08);border-color:var(--pos);color:var(--pos);}
+  .verdict.mid{background:rgba(255,180,84,.08);border-color:var(--warn);color:var(--warn);}
+  .verdict.bad{background:rgba(255,107,87,.08);border-color:var(--neg);color:var(--neg);}
+  .verdict b{display:block;font-family:'Space Grotesk',sans-serif;font-size:13.5px;margin-bottom:3px;}
+  .empty{color:var(--text-faint);font-size:12.5px;}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="breadcrumb"><a href="index.html">← Hoofdmenu</a> · <a href="brein-test.html">Basic Brain Test</a></div>
+  <header>
+    <h1>Resultaten breinen</h1>
+    <div class="sub">Leg opgeslagen breinen naast elkaar: wat ze presteerden, hoe ze leerden, en — het interessantst — welke structuur er in de neuronwolk is overgebleven. Kies de map <b>resultaten-brein</b> of sleep losse JSON-bestanden erin.</div>
+  </header>
+
+  <div class="panel">
+    <h2>Bestanden laden <span class="hd" id="cnt">0 breinen</span></h2>
+    <div class="loadbar">
+      <button class="actionbtn primary" id="choosedir">📁 kies map resultaten-brein</button>
+      <input type="file" id="fileinput" accept="application/json" multiple>
+      <button class="actionbtn" id="clearall">wis</button>
+      <span class="status" id="status">nog niets geladen</span>
+    </div>
+  </div>
+
+  <div class="panel">
+    <h2>Alle breinen <span class="hd">klik op een rij voor het netwerk</span></h2>
+    <div class="scrollx">
+      <table id="tbl">
+        <thead><tr>
+          <th data-k="brein">brein</th><th data-k="tijd">tijdstip</th><th data-k="neuronen">neuronen</th>
+          <th data-k="comp">S/W/R/M (start → eind)</th>
+          <th data-k="geboren">bij</th><th data-k="omgetypt">omgetypt</th><th data-k="verb">verb.</th><th data-k="actief">actief</th>
+          <th data-k="succes">succes</th><th data-k="succes20">laatste 20</th><th data-k="toets">toets</th>
+          <th data-k="stappen">stappen</th><th data-k="beloning">beloning</th>
+          <th data-k="pad">pad</th><th data-k="reflex">reflex</th><th data-k="lussen">lussen</th>
+          <th data-k="dood">los</th><th data-k="tijdms">rekentijd</th>
+        </tr></thead>
+        <tbody id="tbody"></tbody>
+      </table>
+    </div>
+    <div class="empty" id="tblempty">Nog geen resultaten geladen.</div>
+  </div>
+
+  <div class="cols">
+    <div>
+      <div class="panel">
+        <h2>Leercurves <span class="hd">succes per 20 pogingen, één lijn per brein</span></h2>
+        <canvas id="curves" width="1200" height="460"></canvas>
+        <div class="legend" id="curvelegend" style="margin-top:8px;"></div>
+      </div>
+
+      <div class="panel">
+        <h2>Netwerk van het gekozen brein <span class="hd" id="netname">–</span></h2>
+        <div class="legend" style="margin-bottom:8px;">
+          <span><span class="dot" style="background:var(--c-in);"></span>invoer-node</span>
+          <span><span class="dot" style="background:var(--c-sens);"></span>invoer-neuron</span>
+          <span><span class="dot" style="background:var(--c-work);"></span>worker</span>
+          <span><span class="dot" style="background:var(--c-refl);"></span>reflex</span>
+          <span><span class="dot" style="background:var(--c-mem);"></span>geheugen</span>
+          <span><span class="dot" style="background:var(--c-out);"></span>uitvoer-node</span>
+          <span><span class="swatch" style="background:#4fd1c5;"></span>versterkend</span>
+          <span><span class="swatch" style="background:#ff6b57;"></span>remmend</span>
+        </div>
+        <canvas id="netcvs" width="1200" height="840"></canvas>
+        <div class="hint" id="netinfo">Kies hierboven een brein.</div>
+      </div>
+    </div>
+
+    <div>
+      <div class="panel">
+        <h2>Vergelijken</h2>
+        <select id="metric">
+          <option value="succes20">succes laatste 20 pogingen</option>
+          <option value="succes">succes over alle pogingen</option>
+          <option value="toets">toets op onbekende werelden</option>
+          <option value="gap">gat training − toets (overfitting)</option>
+          <option value="stappen">gem. stappen bij succes</option>
+          <option value="verb">aantal verbindingen</option>
+          <option value="actief">actieve verbindingen</option>
+          <option value="lussen">lussen</option>
+          <option value="reflex">reflexbogen</option>
+          <option value="neuronen">aantal neuronen</option>
+        </select>
+        <div id="bars" style="margin-top:10px;"><div class="empty">Nog niets geladen.</div></div>
+      </div>
+
+      <div class="panel">
+        <h2>Gekozen brein</h2>
+        <div id="detail"><div class="empty">Kies een brein in de tabel.</div></div>
+      </div>
+
+      <div class="panel">
+        <h2>Conclusie</h2>
+        <div id="conclusion"><div class="empty">Laad minstens twee breinen.</div></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="note">
+    De bestanden worden alleen in je browser gelezen; er gaat niets naar buiten. Elk bestand is één afgeronde training uit
+    <a href="brein-test.html">brein-test.html</a> en bevat naast de scores ook de volledige eindstructuur van het netwerk, zodat het hier opnieuw getekend kan worden.
+  </div>
+</div>
+
+<script>
+"use strict";
+const $=id=>document.getElementById(id);
+const clamp=(v,a,b)=>v<a?a:(v>b?b:v);
+const fmt=(n,d=2)=>(n===null||n===undefined||isNaN(n))?"–":(Math.round(n*Math.pow(10,d))/Math.pow(10,d)).toFixed(d);
+const KIND_COL={in:"#4fd1c5",sens:"#59c2ff",work:"#8b7cf0",refl:"#ff6b57",mem:"#f78fb3",neut:"#7c8794",out:"#ffb454"};
+const KIND_NAME={in:"invoer-node",sens:"invoer-neuron",work:"worker",refl:"reflex",mem:"geheugen",neut:"neutraal",out:"uitvoer-node"};
+const SERIES=["#4fd1c5","#ffb454","#59c2ff","#f78fb3","#8b7cf0","#ff6b57","#8ed081","#e0c46c"];
+const LX=1000, LY=420;
+
+let rows=[], sel=-1, sortKey="succes20", sortDir=-1;
+
+function row(o,naam){
+  const cf=o.config||{};
+  /* nieuwe bestanden hebben genest opgeslagen instellingen; oude bestanden plat */
+  const wr=cf.wereld||cf, ln=cf.leren||cf, st0=cf.structureel||cf;
+  const c=cf.samenstelling||{sens:0,work:0,refl:0,mem:0,neut:0};
+  const c0=cf.samenstellingStart||c;
+  const r=o.resultaat||{}, st=o.structuur||{};
+  const nNu=cf.neuronenNu||(c.sens+c.work+c.refl+c.mem+(c.neut||0));
+  const nStart=cf.startNeuronen||cf.neuronen||nNu;
+  return {
+    raw:o, bestand:naam, cf, wr, ln, st0,
+    brein:o.brein||naam, tijd:o.tijdstip||"",
+    neuronen:nNu, neuronenStart:nStart,
+    comp:`${c.sens}/${c.work}/${c.refl}/${c.mem}${c.neut?"+"+c.neut+"n":""}`,
+    compStart:`${c0.sens}/${c0.work}/${c0.refl}/${c0.mem}`, compObj:c,
+    verb:st.verbindingen||0, actief:st.actieveVerbindingen||0,
+    succes:r.succesPct||0, succes20:r.succes20||0,
+    toets:(r.toetsPct===null||r.toetsPct===undefined)?null:r.toetsPct,
+    gap:(r.toetsPct===null||r.toetsPct===undefined)?null:(r.succes20-r.toetsPct),
+    stappen:r.gemStappenBijSucces||null, beloning:r.gemBeloningLaatste20||0,
+    pad:st.kortstePad===undefined?-1:st.kortstePad, reflex:st.reflexbogen||0,
+    lussen:st.lussen||0, dood:st.losgeraakt||0, tijdms:r.rekentijdMs||0,
+    geboren:st.nieuweNeuronen||0, omgetypt:st.typeVeranderingen||0,
+    pogingen:r.pogingen||0
+  };
+}
+function laadJSON(txt,naam){
+  let d; try{ d=JSON.parse(txt); }catch(e){ return 0; }
+  const arr=Array.isArray(d)?d:[d];
+  let n=0;
+  for(const o of arr){
+    if(!o||!o.resultaat||!o.structuur) continue;
+    const key=(o.brein||"")+"|"+(o.tijdstip||"");
+    if(rows.some(r=>r.brein+"|"+r.tijd===key)) continue;
+    rows.push(row(o,naam)); n++;
+  }
+  return n;
+}
+function renderAll(){
+  $("cnt").textContent=rows.length+(rows.length===1?" brein":" breinen");
+  renderTable(); renderBars(); renderCurves(); renderDetail(); renderConclusion();
+}
+function renderTable(){
+  const tb=$("tbody"); tb.innerHTML="";
+  $("tblempty").style.display=rows.length?"none":"block";
+  const sorted=[...rows].sort((a,b)=>{
+    const x=a[sortKey], y=b[sortKey];
+    if(typeof x==="string") return sortDir*x.localeCompare(y);
+    return sortDir*(((x===null?-1:x))-((y===null?-1:y)));
+  });
+  sorted.forEach(r=>{
+    const i=rows.indexOf(r);
+    const cls=r.succes20>=0.6?"ok":(r.succes20>=0.35?"mid":"no");
+    const tr=document.createElement("tr");
+    if(i===sel) tr.className="sel";
+    tr.innerHTML=`<td>${r.brein}</td><td>${r.tijd?r.tijd.slice(0,16).replace("T"," "):"–"}</td>
+      <td>${r.neuronenStart===r.neuronen?r.neuronen:r.neuronenStart+" → "+r.neuronen}</td>
+      <td>${r.compStart} → ${r.comp}</td><td>${r.geboren}</td><td>${r.omgetypt}</td>
+      <td>${r.verb}</td><td>${r.actief}</td>
+      <td>${(r.succes*100).toFixed(0)}%</td>
+      <td><span class="badge ${cls}">${(r.succes20*100).toFixed(0)}%</span></td>
+      <td>${r.toets===null?"–":(r.toets*100).toFixed(0)+"%"}</td>
+      <td>${r.stappen?fmt(r.stappen,0):"–"}</td><td>${fmt(r.beloning,1)}</td>
+      <td>${r.pad<0?"géén":r.pad}</td><td>${r.reflex}</td><td>${r.lussen}</td><td>${r.dood}</td>
+      <td>${fmt(r.tijdms/1000,1)}s</td>`;
+    tr.addEventListener("click",()=>{ sel=i; renderTable(); renderDetail(); drawNet(); });
+    tb.appendChild(tr);
+  });
+}
+document.querySelectorAll("#tbl th").forEach(th=>th.addEventListener("click",()=>{
+  const k=th.dataset.k; if(sortKey===k) sortDir*=-1; else { sortKey=k; sortDir=-1; }
+  renderTable();
+}));
+function renderBars(){
+  const el=$("bars"), key=$("metric").value;
+  if(!rows.length){ el.innerHTML='<div class="empty">Nog niets geladen.</div>'; return; }
+  const pct=["succes","succes20","toets","gap"].includes(key);
+  const vals=rows.map(r=>{ const v=r[key]; return v===null?0:(pct?v*100:v); });
+  const mx=Math.max(...vals.map(Math.abs),1e-6);
+  el.innerHTML=rows.map((r,i)=>
+    `<div class="barrow"><span class="bl">${r.brein}</span>
+     <span class="bar-track"><span class="bar-fill" style="width:${clamp(Math.abs(vals[i])/mx,0,1)*100}%;background:${SERIES[i%SERIES.length]}"></span></span>
+     <span class="bv">${fmt(vals[i],pct?0:1)}${pct?"%":""}</span></div>`).join("");
+}
+function fit(cvs,cssH){
+  const dpr=window.devicePixelRatio||1, w=cvs.clientWidth||900;
+  cvs.width=Math.round(w*dpr); cvs.height=Math.round(cssH*dpr);
+  const ctx=cvs.getContext("2d"); ctx.setTransform(dpr,0,0,dpr,0,0);
+  return {ctx,W:w,H:cssH};
+}
+function renderCurves(){
+  const {ctx,W,H}=fit($("curves"),230);
+  ctx.clearRect(0,0,W,H); ctx.fillStyle="#0f1114"; ctx.fillRect(0,0,W,H);
+  const pad=14, x0=pad+30, x1=W-pad, y0=pad, y1=H-pad-12;
+  ctx.strokeStyle="#2a2f37"; ctx.lineWidth=1;
+  for(let i=0;i<=4;i++){ const y=y0+(y1-y0)/4*i; ctx.beginPath(); ctx.moveTo(x0,y); ctx.lineTo(x1,y); ctx.stroke(); }
+  ctx.fillStyle="#5c636d"; ctx.font="9px 'IBM Plex Mono',monospace";
+  ctx.fillText("100%",2,y0+4); ctx.fillText("0%",2,y1+3);
+  if(!rows.length){ ctx.fillStyle="#5c636d"; ctx.font="11px 'IBM Plex Mono',monospace";
+    ctx.fillText("nog geen resultaten",W/2-50,H/2); $("curvelegend").innerHTML=""; return; }
+  const maxEp=Math.max(...rows.map(r=>r.pogingen),1);
+  rows.forEach((r,i)=>{
+    const h=r.raw.historie||[];
+    if(h.length<2) return;
+    ctx.strokeStyle=SERIES[i%SERIES.length]; ctx.lineWidth=(i===sel)?2.6:1.5;
+    ctx.globalAlpha=(sel<0||i===sel)?1:0.45;
+    ctx.beginPath();
+    h.forEach((d,k)=>{
+      const x=x0+(x1-x0)*(d.poging/maxEp);
+      const y=y1-(y1-y0)*clamp(d.succes20||0,0,1);
+      k?ctx.lineTo(x,y):ctx.moveTo(x,y);
+    });
+    ctx.stroke(); ctx.globalAlpha=1;
+    const t=r.raw.toetsen||[];
+    if(t.length){
+      ctx.setLineDash([3,3]); ctx.lineWidth=1.2; ctx.globalAlpha=(sel<0||i===sel)?0.8:0.3;
+      ctx.beginPath();
+      t.forEach((d,k)=>{ const x=x0+(x1-x0)*(d.poging/maxEp), y=y1-(y1-y0)*clamp(d.pct,0,1);
+        k?ctx.lineTo(x,y):ctx.moveTo(x,y); });
+      ctx.stroke(); ctx.setLineDash([]); ctx.globalAlpha=1;
+    }
+  });
+  ctx.fillStyle="#5c636d"; ctx.font="9px 'IBM Plex Mono',monospace";
+  ctx.fillText("poging 0",x0,H-2); ctx.fillText("poging "+maxEp,x1-56,H-2);
+  $("curvelegend").innerHTML=rows.map((r,i)=>
+    `<span><span class="swatch" style="background:${SERIES[i%SERIES.length]}"></span>${r.brein}</span>`).join("")
+    +'<span style="margin-left:8px;">— doorgetrokken = training · gestippeld = toets op onbekende werelden</span>';
+}
+function drawNet(){
+  const {ctx,W,H}=fit($("netcvs"),420);
+  ctx.clearRect(0,0,W,H); ctx.fillStyle="#0f1114"; ctx.fillRect(0,0,W,H);
+  if(sel<0||!rows[sel]||!rows[sel].raw.netwerk){
+    ctx.fillStyle="#5c636d"; ctx.font="12px 'IBM Plex Mono',monospace";
+    ctx.fillText("kies een brein in de tabel",20,30); $("netname").textContent="–"; return;
+  }
+  const r=rows[sel], net=r.raw.netwerk;
+  $("netname").textContent=r.brein;
+  const N=net.neuronen, C=net.verbindingen||[];
+  const wmax=Math.max(...C.map(c=>Math.abs(c[2])),0.001);
+  const px=i=>N[i].x/LX*(W-20)+10, py=i=>N[i].y/LY*(H-24)+12;
+  for(const [a,b,w] of C){
+    if(!N[a]||!N[b]) continue;
+    const rel=Math.min(1,Math.abs(w)/wmax);
+    ctx.strokeStyle=w>=0?`rgba(79,209,197,${(0.04+rel*0.6).toFixed(3)})`:`rgba(255,107,87,${(0.04+rel*0.6).toFixed(3)})`;
+    ctx.lineWidth=0.35+rel*2.4;
+    ctx.beginPath();
+    const x1=px(a),y1=py(a),x2=px(b),y2=py(b);
+    if(a===b){ ctx.arc(x1,y1-9,9,0,7); ctx.stroke(); continue; }
+    const mx=(x1+x2)/2, my=(y1+y2)/2-Math.min(34,Math.abs(x2-x1)*0.12);
+    ctx.moveTo(x1,y1); ctx.quadraticCurveTo(mx,my,x2,y2); ctx.stroke();
+  }
+  N.forEach((nd,i)=>{
+    const col=KIND_COL[nd.type]||"#888";
+    const rr=(nd.type==="in"||nd.type==="out")?6.5:5.5;
+    ctx.beginPath(); ctx.arc(px(i),py(i),rr,0,7);
+    ctx.fillStyle=col; ctx.globalAlpha=.85; ctx.fill(); ctx.globalAlpha=1;
+    ctx.strokeStyle="#12151a"; ctx.lineWidth=1; ctx.stroke();
+  });
+  ctx.font="9.5px 'IBM Plex Mono',monospace"; ctx.textBaseline="middle";
+  N.forEach((nd,i)=>{
+    if(nd.type==="in"){ ctx.fillStyle="#7b838d"; ctx.textAlign="right"; ctx.fillText(nd.label,px(i)-10,py(i)); }
+    else if(nd.type==="out"){ ctx.fillStyle="#b98a45"; ctx.textAlign="left"; ctx.fillText(nd.label,px(i)+10,py(i)); }
+  });
+  ctx.textAlign="left";
+  const st=r.raw.structuur||{};
+  $("netinfo").innerHTML=`${C.length} verbindingen · ${st.actieveVerbindingen||0} daarvan tellen echt mee · zwaarste gewicht ${fmt(wmax,2)} · `+
+    `kortste pad invoer→uitvoer ${st.kortstePad<0?"géén":st.kortstePad+" stappen"} · ${st.reflexbogen||0} reflexbogen · ${st.lussen||0} lussen`;
+}
+function renderDetail(){
+  const el=$("detail");
+  if(sel<0||!rows[sel]){ el.innerHTML='<div class="empty">Kies een brein in de tabel.</div>'; return; }
+  const r=rows[sel], o=r.raw, st=o.structuur||{}, cf=o.config||{}, rs=o.resultaat||{};
+  const use=st.sensorGebruik||[];
+  const labels=(o.netwerk&&o.netwerk.neuronen||[]).filter(n=>n.type==="in").map(n=>n.label);
+  const mx=Math.max(...use,1e-6);
+  const pairs=Object.entries(st.verbindingenPerTypepaar||{}).sort((a,b)=>b[1]-a[1]).slice(0,6);
+  el.innerHTML=
+    `<div class="metric"><span class="k">pogingen</span><span class="v">${rs.pogingen||0}</span></div>`+
+    `<div class="metric"><span class="k">succes / laatste 20</span><span class="v">${(r.succes*100).toFixed(0)}% / ${(r.succes20*100).toFixed(0)}%</span></div>`+
+    `<div class="metric"><span class="k">toets onbekende werelden</span><span class="v">${r.toets===null?"–":(r.toets*100).toFixed(0)+"%"}</span></div>`+
+    `<div class="metric"><span class="k">neuronen nu (S/W/R/M)</span><span class="v">${r.neuronen} (${r.comp})</span></div>`+
+    `<div class="metric"><span class="k">gestart met</span><span class="v">${r.neuronenStart} (${r.compStart})</span></div>`+
+    `<div class="metric"><span class="k">bijgegroeid / omgetypt</span><span class="v">${r.geboren} / ${r.omgetypt}</span></div>`+
+    `<div class="metric"><span class="k">verbindingen (actief)</span><span class="v">${r.verb} (${r.actief})</span></div>`+
+    `<div class="metric"><span class="k">verb. gesnoeid / bijgegroeid</span><span class="v">${st.gesnoeid||0} / ${st.bijgegroeid||0}</span></div>`+
+    `<div class="metric"><span class="k">leersnelheid η · sporen λ</span><span class="v">${fmt(r.ln.leersnelheid,3)} · ${fmt(r.ln.sporenVervaging,2)}</span></div>`+
+    `<div class="metric"><span class="k">startdichtheid</span><span class="v">${fmt(cf.startdichtheid,1)}</span></div>`+
+    `<div class="metric"><span class="k">obstakels · nieuwe wereld elke</span><span class="v">${r.wr.obstakels} · ${r.wr.nieuweWereldElke}</span></div>`+
+    `<div class="hint" style="margin-top:10px;">Sterkste verbindingssoorten: ${pairs.map(([k,v])=>k+" ("+v+")").join(", ")||"–"}</div>`+
+    `<div class="hint" style="margin-top:10px;margin-bottom:2px;">Sensorgebruik — hoeveel invloed elke invoer-node op de knoppen heeft:</div>`+
+    use.map((v,i)=>`<div class="barrow"><span class="bl">${labels[i]||("in "+i)}</span>
+      <span class="bar-track"><span class="bar-fill" style="width:${clamp(v/mx,0,1)*100}%;background:${i<8?"#ff6b57":"#ffb454"}"></span></span>
+      <span class="bv">${fmt(v,2)}</span></div>`).join("")+
+    `<details style="margin-top:12px;"><summary style="cursor:pointer;font-size:11.5px;color:var(--text-faint);">alle opgeslagen instellingen</summary>
+     <pre style="font-family:'IBM Plex Mono',monospace;font-size:10px;color:var(--text-dim);white-space:pre-wrap;word-break:break-word;margin:8px 0 0;">${
+       JSON.stringify(cf,null,1).replace(/[<>&]/g,ch=>({"<":"&lt;",">":"&gt;","&":"&amp;"}[ch]))}</pre></details>`;
+}
+function renderConclusion(){
+  const el=$("conclusion");
+  if(rows.length<2){ el.innerHTML='<div class="empty">Laad minstens twee breinen om te vergelijken.</div>'; return; }
+  const best=[...rows].sort((a,b)=>b.succes20-a.succes20)[0];
+  const bestGen=[...rows].filter(r=>r.toets!==null).sort((a,b)=>b.toets-a.toets)[0];
+  const overfit=[...rows].filter(r=>r.gap!==null).sort((a,b)=>b.gap-a.gap)[0];
+  const cor=(f)=>{
+    const xs=rows.map(f), ys=rows.map(r=>r.succes20);
+    const mx=xs.reduce((a,b)=>a+b,0)/xs.length, my=ys.reduce((a,b)=>a+b,0)/ys.length;
+    let num=0,dx=0,dy=0;
+    for(let i=0;i<xs.length;i++){ num+=(xs[i]-mx)*(ys[i]-my); dx+=(xs[i]-mx)**2; dy+=(ys[i]-my)**2; }
+    return (dx&&dy)?num/Math.sqrt(dx*dy):0;
+  };
+  const cN=cor(r=>r.neuronen), cV=cor(r=>r.verb), cR=cor(r=>r.reflex), cL=cor(r=>r.lussen);
+  const rel=v=>Math.abs(v)<0.25?"nauwelijks verband":(v>0?"hoe meer, hoe beter":"hoe meer, hoe slechter");
+  let cls="mid", txt="";
+  if(overfit && overfit.gap>0.3){ cls="mid";
+    txt=`<b>Let op ${overfit.brein}</b>Dat brein scoort ${(overfit.succes20*100).toFixed(0)}% in de trainingswereld maar ${(overfit.toets*100).toFixed(0)}% op onbekende werelden — het heeft de route uit z'n hoofd geleerd in plaats van te leren navigeren.`;
+  } else if(best.succes20>=0.6){ cls="good";
+    txt=`<b>${best.brein} presteert het best</b>${(best.succes20*100).toFixed(0)}% in de laatste 20 pogingen${bestGen?`, en ${bestGen.brein} generaliseert het best met ${(bestGen.toets*100).toFixed(0)}% op onbekende werelden`:""}.`;
+  } else { cls="bad";
+    txt=`<b>Geen van de breinen heeft het spel echt te pakken</b>De beste is ${best.brein} met ${(best.succes20*100).toFixed(0)}%. Meer pogingen, een dichter bedrade wolk of een hogere beloning voor "dichter bij doel" is meestal de eerste stap.`;
+  }
+  if(rows.length<4){
+    el.innerHTML=`<div class="verdict ${cls}">${txt}</div>`+
+      `<div class="hint" style="margin-top:12px;">Vanaf vier breinen wordt hier ook het verband getoond tussen bouw (neuronen, verbindingen, reflexbogen, lussen) en prestatie.</div>`;
+    return;
+  }
+  el.innerHTML=`<div class="verdict ${cls}">${txt}</div>`+
+    `<div class="hint" style="margin-top:12px;">Verband met het succespercentage over deze ${rows.length} breinen:</div>`+
+    `<div class="metric"><span class="k">aantal neuronen</span><span class="v">${fmt(cN,2)} — ${rel(cN)}</span></div>`+
+    `<div class="metric"><span class="k">aantal verbindingen</span><span class="v">${fmt(cV,2)} — ${rel(cV)}</span></div>`+
+    `<div class="metric"><span class="k">reflexbogen</span><span class="v">${fmt(cR,2)} — ${rel(cR)}</span></div>`+
+    `<div class="metric"><span class="k">lussen</span><span class="v">${fmt(cL,2)} — ${rel(cL)}</span></div>`+
+    `<div class="hint">Dit is een ruwe correlatie over een handvol runs; met minder dan ongeveer tien breinen zegt een waarde onder 0,5 vrijwel niets.</div>`;
+}
+
+/* ---- laden ---- */
+$("fileinput").addEventListener("change",async e=>{
+  let n=0;
+  for(const f of e.target.files){ try{ n+=laadJSON(await f.text(),f.name); }catch(err){} }
+  $("status").textContent=`${n} brein(en) geladen uit ${e.target.files.length} bestand(en)`;
+  renderAll(); if(sel<0&&rows.length){ sel=0; renderTable(); renderDetail(); drawNet(); }
+});
+$("clearall").addEventListener("click",()=>{ rows=[]; sel=-1; $("status").textContent="gewist"; renderAll(); drawNet(); });
+$("metric").addEventListener("change",renderBars);
+const DIRDB_NAME="llm-lab-dirs", DIRDB_STORE="handles";
+function dirDbOpen(){ return new Promise((res,rej)=>{ const q=indexedDB.open(DIRDB_NAME,1);
+  q.onupgradeneeded=()=>{ if(!q.result.objectStoreNames.contains(DIRDB_STORE)) q.result.createObjectStore(DIRDB_STORE); };
+  q.onsuccess=()=>res(q.result); q.onerror=()=>rej(q.error); }); }
+async function dirDbGet(k){ try{ const db=await dirDbOpen();
+  return await new Promise((res,rej)=>{ const tx=db.transaction(DIRDB_STORE,"readonly");
+    const q=tx.objectStore(DIRDB_STORE).get(k); q.onsuccess=()=>res(q.result||null); q.onerror=()=>rej(q.error); }); }catch(e){ return null; } }
+async function dirDbSet(k,h){ try{ const db=await dirDbOpen();
+  await new Promise((res,rej)=>{ const tx=db.transaction(DIRDB_STORE,"readwrite");
+    tx.objectStore(DIRDB_STORE).put(h,k); tx.oncomplete=res; tx.onerror=()=>rej(tx.error); }); }catch(e){} }
+async function readDir(dir){
+  let n=0, files=0;
+  for await (const [naam,h] of dir.entries()){
+    if(h.kind!=="file"||!naam.toLowerCase().endsWith(".json")) continue;
+    files++;
+    try{ const f=await h.getFile(); n+=laadJSON(await f.text(),naam); }catch(e){}
+  }
+  $("status").textContent=`${n} brein(en) geladen uit ${files} bestand(en) in "${dir.name}"`;
+  renderAll(); if(sel<0&&rows.length){ sel=0; renderTable(); renderDetail(); drawNet(); }
+}
+$("choosedir").addEventListener("click",async()=>{
+  if(!window.showDirectoryPicker){ $("status").textContent="deze browser ondersteunt geen mapkeuze (gebruik Chrome of Edge) — kies de bestanden met de knop ernaast."; return; }
+  try{
+    const dir=await window.showDirectoryPicker({id:"llm-lab-brein",mode:"read",startIn:"documents"});
+    await dirDbSet("breinDirRead",dir);
+    await readDir(dir);
+  }catch(e){}
+});
+(async()=>{
+  const saved=await dirDbGet("breinDirRead");
+  if(!saved) return;
+  try{
+    const perm=await saved.queryPermission({mode:"read"});
+    if(perm==="granted"){ await readDir(saved); return; }
+    $("status").innerHTML=`map "${saved.name}" onthouden — <button class="actionbtn" id="resumedir">🔓 hervat toegang</button>`;
+    $("resumedir").addEventListener("click",async()=>{
+      try{ const p=await saved.requestPermission({mode:"read"}); if(p==="granted") await readDir(saved);
+        else $("status").textContent="toegang geweigerd — kies de map opnieuw."; }catch(e){}
+    });
+  }catch(e){}
+})();
+window.addEventListener("resize",()=>{ renderCurves(); drawNet(); });
+renderAll(); drawNet();
+window.__viewer={get rows(){return rows;},laadJSON,renderAll,drawNet,select:i=>{sel=i;renderTable();renderDetail();drawNet();}};
+</script>
+</body>
+</html>
