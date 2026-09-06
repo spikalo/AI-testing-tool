@@ -184,8 +184,11 @@
   .note{font-size:12px;color:var(--text-faint);line-height:1.6;margin-top:12px;}
   .note b{color:var(--text-dim);}
   input[type=file]{display:none;}
-  .warnbox{border:1px solid rgba(255,180,84,.3);background:rgba(255,180,84,.07);border-radius:3px;
-    padding:10px 12px;font-size:12px;color:var(--warn);margin-top:12px;}
+  .warnbox{border:1px solid rgba(255,180,84,.35);background:rgba(255,180,84,.07);border-radius:3px;
+    padding:12px 14px;font-size:12.5px;color:var(--warn);margin-top:12px;line-height:1.65;}
+  .warnbox code{font-family:'IBM Plex Mono',monospace;background:#101216;color:var(--pos);
+    padding:1px 6px;border-radius:2px;font-size:11.5px;}
+  .warnbox b{color:var(--text);}
 </style>
 </head>
 <body>
@@ -231,7 +234,14 @@ ollama pull gemma3:4b</pre>
           <pre class="cmd">ollama run llama3.2:3b</pre>
         </div>
         <div class="step">
-          <div class="n">stap 4</div>
+          <div class="n">stap 4 — belangrijk</div>
+          <h4>Open deze pagina via localhost</h4>
+          <p>Open je deze pagina rechtstreeks vanaf schijf, dan weigert Ollama de verbinding (CORS). Start daarom <b>start-server.cmd</b> in de projectmap en gebruik het adres hieronder. Handmatig kan ook, vanuit de projectmap:</p>
+          <pre class="cmd">python -m http.server 8080</pre>
+          <pre class="cmd">http://localhost:8080/ollama-test.html</pre>
+        </div>
+        <div class="step">
+          <div class="n">stap 5</div>
           <h4>Controleer de verbinding</h4>
           <p>Het bolletje rechtsboven wordt <b style="color:var(--pos)">groen</b> zodra deze pagina Ollama kan bereiken. In je browser moet dit adres "Ollama is running" tonen:</p>
           <pre class="cmd">http://localhost:11434</pre>
@@ -257,6 +267,17 @@ ollama pull gemma3:4b</pre>
       <label class="chk"><input type="checkbox" id="useps" checked> volg draaiend model (/api/ps)</label>
     </div>
     <div class="status" id="connstatus">nog niet verbonden — klik op "verbind" of klap de installatie-eisen uit.</div>
+    <div class="warnbox hidden" id="corswarn">
+      <b>Ollama draait wel, maar blokkeert deze pagina (CORS).</b><br>
+      Je opende deze pagina rechtstreeks vanaf schijf (<code>file://</code>). De browser stuurt dan
+      <code>Origin: null</code>, en dat staat niet in de standaardlijst van Ollama. Twee oplossingen:<br><br>
+      <b>1 — aanbevolen:</b> start <code>start-server.cmd</code> in deze projectmap en open de pagina via
+      <code>http://localhost:8080/ollama-test.html</code>. Ollama vertrouwt localhost standaard, dus dan werkt het meteen.<br><br>
+      <b>2 — of geef Ollama toestemming.</b> Windows, in PowerShell:<br>
+      <code>setx OLLAMA_ORIGINS "*"</code><br>
+      daarna Ollama volledig afsluiten via het systeemvak en opnieuw starten.
+      macOS/Linux: <code>OLLAMA_ORIGINS="*" ollama serve</code>
+    </div>
   </div>
 
   <div class="panel hidden" id="modelpanel">
@@ -1301,7 +1322,8 @@ const S = {
   resultaten: [],
   abort: null,
   dirHandle: null,
-  laatsteRapport: null
+  laatsteRapport: null,
+  corsProbleem: false
 };
 
 const $ = id => document.getElementById(id);
@@ -1327,6 +1349,8 @@ async function ping(){
     S.verbonden = true;
     await lesPs();
     vulModelSelect();
+    S.corsProbleem = false;
+    $("corswarn").classList.add("hidden");
     setLed("on", "verbonden · " + S.modellen.length + " model" + (S.modellen.length===1?"":"len"));
     connstatus.textContent = "verbonden met " + host +
       (S.draaiend ? " — draaiend model: " + S.draaiend : " — geen model geladen (start er één met: ollama run <model>)");
@@ -1334,9 +1358,22 @@ async function ping(){
     return true;
   }catch(e){
     S.verbonden = false; S.modellen = []; S.draaiend = null;
-    setLed("off", "geen verbinding");
-    connstatus.textContent = "geen verbinding met " + host + " — " + (e.name==="AbortError" ? "time-out" : e.message) +
-      ". Klap de installatie-eisen uit; waarschijnlijk draait Ollama niet, of blokkeert CORS (OLLAMA_ORIGINS).";
+    /* Onderscheid maken tussen "Ollama draait niet" en "Ollama draait wel maar
+       blokkeert deze pagina". Een no-cors-verzoek slaagt (opaque) zodra de server
+       bereikbaar is, ook als het antwoord door CORS wordt afgeschermd. */
+    let bereikbaar = false;
+    try{ await fetch(host + "/api/tags", {mode:"no-cors", cache:"no-store"}); bereikbaar = true; }catch(e2){}
+    S.corsProbleem = bereikbaar;
+    $("corswarn").classList.toggle("hidden", !bereikbaar);
+    if (bereikbaar){
+      setLed("wait", "geblokkeerd (CORS)");
+      connstatus.textContent = "Ollama is bereikbaar op " + host + ", maar weigert deze pagina. " +
+        "Dat is een CORS-blokkade, geen storing — zie het oranje kader hieronder.";
+    } else {
+      setLed("off", "geen verbinding");
+      connstatus.textContent = "geen verbinding met " + host + " — " + (e.name==="AbortError" ? "time-out" : e.message) +
+        ". Draait Ollama? Controleer met \"ollama serve\" of open " + host + " in je browser.";
+    }
     vulModelSelect(); werkStartKnop();
     return false;
   }
@@ -2009,6 +2046,7 @@ bouwRail();
 ping();
 setInterval(async () => {
   if (S.bezig) return;
+  if (!S.verbonden){ await ping(); return; }
   const was = S.verbonden, wasDraaiend = S.draaiend;
   try{
     const r = await fetch(S.host + "/api/tags", {cache:"no-store"});

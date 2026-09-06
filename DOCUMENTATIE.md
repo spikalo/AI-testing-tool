@@ -39,6 +39,7 @@ AI-testing-tool/
 ├── resultaten.html            resultaten van test 01 vergelijken
 ├── ollama-test.html           test 02 — lokale LLM's via de Ollama-API
 ├── ollama-resultaten.html     resultaten van test 02 + modelkeuze-advies
+├── start-server.cmd           lokale webserver op poort 8080 (nodig voor de LLM-test)
 ├── resultaten/                JSON-runs van test 01
 ├── resultaten-llm/            JSON-runs van test 02 (één bestand per model)
 ├── datasets/                  MNIST / EMNIST (niet in git)
@@ -325,9 +326,42 @@ zwakste vaardigheid hoe vaak je pipeline stukloopt.
 7. De pagina blijft klaarstaan: kies een ander model en start opnieuw.
 8. Vergelijken en kiezen doe je op `ollama-resultaten.html`.
 
-**Blijft het bolletje rood?** Dan blokkeert Ollama de pagina via CORS. Zet
-`OLLAMA_ORIGINS` op `*` en herstart Ollama (Windows: `setx OLLAMA_ORIGINS "*"`, daarna
-Ollama afsluiten via het systeemvak en opnieuw starten).
+### Hoe je de pagina opent — en waarom dat uitmaakt
+
+Start **`start-server.cmd`** in de projectmap. Dat zet een kleine webserver op
+`http://localhost:8080` en opent het hoofdmenu. Handmatig kan ook, vanuit de map:
+`python -m http.server 8080`.
+
+De reden is CORS. Open je `ollama-test.html` rechtstreeks vanaf schijf, dan is de
+oorsprong van de pagina `file://…` en stuurt de browser bij elk verzoek de header
+`Origin: null` mee. Ollama vergelijkt die header met zijn lijst toegestane oorsprongen —
+daar staan onder meer `http://localhost:*` en `http://127.0.0.1:*` in, maar `null` niet.
+Het verzoek komt wél bij Ollama aan en wordt netjes beantwoord; de **browser** gooit het
+antwoord daarna weg omdat de juiste `Access-Control-Allow-Origin` ontbreekt. Vandaar het
+verwarrende beeld: `http://localhost:11434` in je adresbalk zegt "Ollama is running",
+maar de testpagina ziet niets.
+
+Serveer je de pagina vanaf `http://localhost:8080`, dan is dát de oorsprong en staat die
+wél op de lijst. Geen configuratie nodig.
+
+**Het bolletje vertelt je welk van de twee het is:**
+
+| Kleur | Betekenis | Wat je doet |
+|---|---|---|
+| groen | verbonden | niets |
+| **oranje** — "geblokkeerd (CORS)" | Ollama is bereikbaar, maar weigert deze pagina | via `start-server.cmd` openen, of `OLLAMA_ORIGINS` zetten |
+| rood | Ollama helemaal niet bereikbaar | `ollama serve` starten, poort/host controleren |
+
+Dat onderscheid wordt gemeten, niet gegokt: mislukt het gewone verzoek, dan doet de
+pagina hetzelfde verzoek nog eens met `mode: "no-cors"`. Slaagt dát wel, dan staat de
+server aan en is het dus een CORS-blokkade.
+
+**Toch liever vanaf schijf werken?** Geef Ollama dan toestemming voor alle oorsprongen
+en herstart het:
+
+- Windows: `setx OLLAMA_ORIGINS "*"`, daarna Ollama volledig afsluiten via het
+  systeemvak en opnieuw starten (een nieuwe waarde geldt pas voor nieuwe processen).
+- macOS / Linux: `OLLAMA_ORIGINS="*" ollama serve`
 
 ---
 
@@ -347,6 +381,8 @@ Ollama afsluiten via het systeemvak en opnieuw starten).
 - **Denkmodus verandert het speelveld.** Aanzetten geeft reasoning-modellen een
   duidelijk voordeel op de logica-opdrachten, ten koste van tijd. Vergelijk alleen
   runs met dezelfde instelling; die staat in `opties.denkmodus`.
+- **Openen via localhost is geen luxe.** De LLM-test werkt niet vanaf `file://` zonder
+  Ollama's CORS-instelling aan te passen; zie §8.
 - **File System Access API.** Automatisch opslaan in een map werkt in Chrome en Edge.
   In andere browsers gebruik je de downloadknop.
 
@@ -371,6 +407,18 @@ Ollama afsluiten via het systeemvak en opnieuw starten).
 - Ondersteuning voor thinking-modellen: `think` wordt standaard uitgezet, is met één
   vinkje aan te zetten, en denkstappen (zowel het aparte `thinking`-veld als inline
   `<think>`-blokken) worden apart bewaard in plaats van meegescoord.
+
+### 2026-09-06 — CORS opgelost en zichtbaar gemaakt
+- Probleem in de praktijk: `http://localhost:11434` toonde "Ollama is running", maar de
+  testpagina bleef op "geen verbinding" staan. Oorzaak: de pagina werd vanaf schijf
+  geopend, waardoor de browser `Origin: null` stuurt — niet in Ollama's standaardlijst.
+- Nieuw: `start-server.cmd`, dat de projectmap op `http://localhost:8080` serveert en het
+  hoofdmenu opent. Daarmee is de oorsprong een localhost-adres dat Ollama standaard
+  vertrouwt, en is er geen enkele configuratie meer nodig.
+- De testpagina onderscheidt nu "niet bereikbaar" (rood) van "bereikbaar maar geblokkeerd"
+  (oranje), gemeten met een tweede verzoek in `mode: "no-cors"`, en toont bij een
+  blokkade een kader met beide oplossingen.
+- Extra stap in het uitschuifbare vak met installatie-eisen; README en index bijgewerkt.
 
 ### 2026-09-05 — Beginsituatie
 - `nn-layer-test.html`, `resultaten.html` en `index.html` bestonden al; 58 runs

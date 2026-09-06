@@ -14,14 +14,23 @@ De centrale vraag achter dit project:
 ## Snelstart
 
 1. Clone of download deze map.
-2. Open `index.html` in Chrome of Edge (dubbelklikken volstaat).
+2. Start **`start-server.cmd`** (Windows). Dat serveert deze map op
+   `http://localhost:8080` en opent het hoofdmenu. Handmatig kan ook, vanuit deze map:
+   `python -m http.server 8080`.
 3. Kies een test:
    - **NN Layer Test** — bouw zelf een klein neuraal netwerk en zie waar het omslaat.
    - **Ollama LLM-test** — test een lokaal draaiend taalmodel op 18 vaste opdrachten.
 
+> **Waarom niet gewoon dubbelklikken?** Voor de NN-test kan dat prima. Maar een pagina
+> die je rechtstreeks vanaf schijf opent (`file://`) stuurt `Origin: null` mee, en dat
+> weigert Ollama standaard — de LLM-test krijgt dan geen verbinding. Via `localhost`
+> speelt dat niet. Wil je toch vanaf schijf werken, zet dan `OLLAMA_ORIGINS` op `*` en
+> herstart Ollama.
+
 Voor de LLM-test heb je [Ollama](https://ollama.com/download) nodig met minstens één
 model. De pagina zelf bevat een uitschuifbaar vak met alle installatiestappen en een
-groen/rood statusbolletje voor de verbinding.
+statusbolletje: groen = verbonden, oranje = Ollama draait wel maar blokkeert de pagina
+(CORS), rood = niet bereikbaar.
 
 ```bash
 ollama pull llama3.2:3b
@@ -36,6 +45,7 @@ ollama run llama3.2:3b
 | `nn-layer-test.html` | Neuraal netwerk trainen in de browser (koffiereviews, spam, MNIST-cijfers, EMNIST-letters) |
 | `resultaten.html` | Runs van de NN-test vergelijken |
 | `ollama-test.html` | Testbatterij voor lokale LLM's via de Ollama-API |
+| `start-server.cmd` | Start een lokale webserver op poort 8080 en opent het hoofdmenu |
 | `ollama-resultaten.html` | LLM's naast elkaar leggen + adviesformulier "welk model voor mijn taak" |
 | `resultaten/` | Opgeslagen runs van de NN-test (JSON) |
 | `resultaten-llm/` | Opgeslagen runs van de LLM-test (JSON, één bestand per model) |
