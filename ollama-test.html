@@ -1,0 +1,2036 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Ollama LLM-test — lokaal model lab</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#14161a; --panel:#1b1e24; --panel-alt:#20242b; --border:#2a2f37;
+    --text:#e9e7e1; --text-dim:#9199a3; --text-faint:#5c636d;
+    --pos:#4fd1c5; --neg:#ff6b57; --warn:#ffb454; --grid:#22262d;
+    --c-gen:#4fd1c5; --c-struct:#5c9eff; --c-class:#ffb454;
+    --c-logic:#8b7cf0; --c-code:#e879c1; --c-agent:#ff6b57;
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    background:var(--bg); color:var(--text); font-family:'Inter',sans-serif; line-height:1.5;
+    background-image:linear-gradient(var(--grid) 1px, transparent 1px),linear-gradient(90deg, var(--grid) 1px, transparent 1px);
+    background-size:28px 28px; background-attachment:fixed;
+  }
+  h1,h2,h3{font-family:'Space Grotesk',sans-serif;margin:0;letter-spacing:.2px;}
+  .mono{font-family:'IBM Plex Mono',monospace;}
+  .wrap{max-width:1300px;margin:0 auto;padding:22px 24px 70px;}
+  a{color:var(--pos);}
+  .breadcrumb{font-size:12.5px;color:var(--text-dim);margin-bottom:12px;}
+  .breadcrumb a{color:var(--text-dim);text-decoration:none;border-bottom:1px dotted var(--text-faint);}
+  .breadcrumb a:hover{color:var(--pos);border-color:var(--pos);}
+
+  header.page{padding-bottom:18px;margin-bottom:20px;border-bottom:1px solid var(--border);
+    display:flex;justify-content:space-between;align-items:flex-end;gap:20px;flex-wrap:wrap;}
+  header.page h1{font-size:24px;font-weight:600;}
+  header.page .sub{color:var(--text-dim);font-size:13.5px;max-width:680px;margin-top:6px;}
+
+  /* ---- verbindingsindicator ---- */
+  .conn{display:flex;align-items:center;gap:9px;background:var(--panel);border:1px solid var(--border);
+    border-radius:3px;padding:9px 13px;font-family:'IBM Plex Mono',monospace;font-size:12px;}
+  .led{width:11px;height:11px;border-radius:50%;background:var(--text-faint);flex:none;position:relative;}
+  .led.on{background:var(--pos);box-shadow:0 0 0 0 rgba(79,209,197,.6);animation:pulse 2.2s infinite;}
+  .led.off{background:var(--neg);}
+  .led.wait{background:var(--warn);}
+  @keyframes pulse{0%{box-shadow:0 0 0 0 rgba(79,209,197,.5);}70%{box-shadow:0 0 0 9px rgba(79,209,197,0);}100%{box-shadow:0 0 0 0 rgba(79,209,197,0);}}
+
+  .panel{background:var(--panel);border:1px solid var(--border);border-radius:4px;padding:18px;}
+  .panel + .panel{margin-top:16px;}
+  .panel > h2{font-size:13px;color:var(--text-dim);font-weight:600;letter-spacing:.3px;
+    margin-bottom:12px;padding-bottom:10px;border-bottom:1px solid var(--border);}
+
+  /* ---- uitschuifbaar vak ---- */
+  details.req{background:var(--panel);border:1px solid var(--border);border-radius:4px;margin-bottom:16px;}
+  details.req[open]{border-color:var(--warn);}
+  details.req > summary{cursor:pointer;padding:14px 18px;font-family:'IBM Plex Mono',monospace;font-size:12.5px;
+    color:var(--warn);list-style:none;display:flex;align-items:center;gap:10px;}
+  details.req > summary::-webkit-details-marker{display:none;}
+  details.req > summary::before{content:"▸";display:inline-block;transition:.15s;color:var(--warn);}
+  details.req[open] > summary::before{transform:rotate(90deg);}
+  .reqbody{padding:0 18px 18px;border-top:1px solid var(--border);margin-top:2px;padding-top:16px;}
+  .steps{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:14px;}
+  .step{background:var(--panel-alt);border:1px solid var(--border);border-radius:3px;padding:14px;}
+  .step .n{font-family:'IBM Plex Mono',monospace;font-size:10.5px;color:var(--warn);margin-bottom:6px;}
+  .step h4{font-family:'Space Grotesk',sans-serif;font-size:14px;margin:0 0 6px;font-weight:600;}
+  .step p{font-size:12.5px;color:var(--text-dim);margin:0 0 8px;}
+  pre.cmd{background:#101216;border:1px solid var(--border);border-radius:3px;padding:9px 11px;margin:0;
+    font-family:'IBM Plex Mono',monospace;font-size:11.5px;color:var(--pos);overflow-x:auto;white-space:pre;}
+  pre.cmd + pre.cmd{margin-top:6px;}
+  .reqnote{font-size:12px;color:var(--text-faint);margin-top:14px;line-height:1.6;}
+  .reqnote b{color:var(--text-dim);}
+  .reqnote code{font-family:'IBM Plex Mono',monospace;color:var(--warn);background:#101216;padding:1px 5px;border-radius:2px;}
+
+  /* ---- knoppen / velden ---- */
+  .bar{display:flex;gap:10px;flex-wrap:wrap;align-items:center;}
+  .actionbtn{background:var(--panel-alt);color:var(--text);border:1px solid var(--border);
+    padding:9px 14px;border-radius:3px;font-family:'IBM Plex Mono',monospace;font-size:12px;cursor:pointer;}
+  .actionbtn:hover:not(:disabled){border-color:var(--text-dim);}
+  .actionbtn.primary{background:var(--pos);color:#0d1210;border-color:var(--pos);font-weight:600;}
+  .actionbtn.primary:hover:not(:disabled){filter:brightness(1.1);}
+  .actionbtn.danger{border-color:var(--neg);color:var(--neg);}
+  .actionbtn:disabled{opacity:.35;cursor:not-allowed;}
+  input[type=text],select{background:var(--panel-alt);color:var(--text);border:1px solid var(--border);
+    padding:8px 9px;border-radius:3px;font-family:'IBM Plex Mono',monospace;font-size:12.5px;}
+  input[type=text]{min-width:210px;}
+  label.chk{display:flex;align-items:center;gap:7px;font-size:12px;color:var(--text-dim);
+    font-family:'IBM Plex Mono',monospace;cursor:pointer;}
+  .status{font-size:11.5px;color:var(--text-faint);font-family:'IBM Plex Mono',monospace;margin-top:10px;}
+
+  /* ---- modelkaart ---- */
+  .modelgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(165px,1fr));gap:12px 20px;}
+  .kv .k{display:block;font-size:10px;color:var(--text-faint);text-transform:uppercase;letter-spacing:.35px;
+    margin-bottom:3px;font-family:'IBM Plex Mono',monospace;}
+  .kv .v{color:var(--text);font-family:'IBM Plex Mono',monospace;font-size:13.5px;word-break:break-word;}
+  .kv .v.big{font-size:17px;color:var(--pos);}
+  .desc{margin-top:14px;padding-top:14px;border-top:1px solid var(--border);}
+  .desc .k{font-size:10px;color:var(--text-faint);text-transform:uppercase;letter-spacing:.35px;
+    font-family:'IBM Plex Mono',monospace;margin-bottom:6px;}
+  .desc pre{margin:0;white-space:pre-wrap;word-break:break-word;font-family:'IBM Plex Mono',monospace;
+    font-size:11.5px;color:var(--text-dim);max-height:150px;overflow:auto;background:#101216;
+    border:1px solid var(--border);border-radius:3px;padding:10px;}
+
+  /* ---- voortgangsrail ---- */
+  .rail{display:flex;gap:3px;flex-wrap:wrap;margin-bottom:6px;}
+  .railcell{flex:1 1 26px;height:26px;border-radius:2px;border:1px solid var(--border);background:var(--panel-alt);
+    position:relative;font-family:'IBM Plex Mono',monospace;font-size:9px;color:var(--text-faint);
+    display:flex;align-items:center;justify-content:center;transition:.2s;cursor:default;}
+  .railcell.active{border-color:var(--text);color:var(--text);animation:blink 1s infinite;}
+  @keyframes blink{50%{opacity:.45;}}
+  .railcell.done{color:#0d1210;font-weight:600;border-color:transparent;}
+  .raillegend{display:flex;gap:14px;flex-wrap:wrap;font-size:11px;color:var(--text-dim);margin-top:10px;}
+  .raillegend span{display:flex;align-items:center;gap:5px;}
+  .dot{width:8px;height:8px;border-radius:50%;display:inline-block;flex:none;}
+
+  .bigprog{height:6px;background:var(--panel-alt);border-radius:3px;overflow:hidden;margin:12px 0 4px;}
+  .bigprog > i{display:block;height:100%;background:var(--pos);width:0;transition:width .3s;}
+
+  /* ---- testkaarten ---- */
+  #testlist{display:flex;flex-direction:column;gap:14px;}
+  .tcard{border:1px solid var(--border);border-left-width:3px;border-radius:4px;background:var(--panel);overflow:hidden;}
+  .tcard .th{display:flex;gap:12px;align-items:center;flex-wrap:wrap;padding:12px 16px;
+    font-family:'IBM Plex Mono',monospace;font-size:12px;background:var(--panel-alt);}
+  .tcard .th .cat{font-size:10px;letter-spacing:.4px;text-transform:uppercase;}
+  .tcard .th .ttl{flex:1;color:var(--text);font-weight:600;font-size:13px;font-family:'Space Grotesk',sans-serif;}
+  .lvl{font-size:10px;padding:2px 7px;border-radius:2px;border:1px solid var(--border);color:var(--text-dim);}
+  .lvl.l1{border-color:#3f6b5f;color:#7fd8c8;}
+  .lvl.l2{border-color:#6b5c33;color:var(--warn);}
+  .lvl.l3{border-color:#6b3a33;color:var(--neg);}
+  .scorepill{font-size:12px;padding:2px 9px;border-radius:2px;font-weight:600;}
+  .tbody{padding:14px 16px;display:none;}
+  .tcard.open .tbody{display:block;}
+  .tcard .th{cursor:pointer;}
+  .subhead{font-family:'IBM Plex Mono',monospace;font-size:10px;color:var(--text-faint);
+    text-transform:uppercase;letter-spacing:.35px;margin:0 0 6px;}
+  .promptbox,.answerbox{background:#101216;border:1px solid var(--border);border-radius:3px;padding:11px 12px;
+    font-family:'IBM Plex Mono',monospace;font-size:11.5px;white-space:pre-wrap;word-break:break-word;
+    max-height:230px;overflow:auto;color:var(--text-dim);}
+  .answerbox{color:var(--text);max-height:320px;}
+  .answerbox.streaming{border-color:var(--pos);}
+  .caret{display:inline-block;width:7px;height:13px;background:var(--pos);vertical-align:-2px;animation:blink .9s infinite;}
+  .split{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-top:12px;}
+  @media (max-width:900px){ .split{grid-template-columns:1fr;} }
+  .checks{margin-top:12px;display:flex;flex-direction:column;gap:5px;}
+  .ck{display:flex;gap:9px;align-items:baseline;font-family:'IBM Plex Mono',monospace;font-size:11.5px;
+    padding:5px 8px;border-radius:2px;background:var(--panel-alt);}
+  .ck .mark{flex:none;width:14px;}
+  .ck.ok{color:var(--text-dim);} .ck.ok .mark{color:var(--pos);}
+  .ck.no{color:var(--text);} .ck.no .mark{color:var(--neg);}
+  .ck.part{color:var(--text-dim);} .ck.part .mark{color:var(--warn);}
+  .ck .info{color:var(--text-faint);margin-left:auto;text-align:right;padding-left:12px;}
+  .metrics{display:flex;gap:16px;flex-wrap:wrap;font-family:'IBM Plex Mono',monospace;
+    font-size:11px;color:var(--text-faint);margin-top:10px;}
+  .metrics b{color:var(--text-dim);font-weight:500;}
+  .flagrow{display:flex;gap:6px;flex-wrap:wrap;margin-top:10px;}
+  .flag{font-family:'IBM Plex Mono',monospace;font-size:10px;padding:2px 7px;border-radius:2px;
+    background:rgba(255,107,87,.13);color:var(--neg);border:1px solid rgba(255,107,87,.25);}
+
+  /* ---- eindanalyse ---- */
+  .anagrid{display:grid;grid-template-columns:340px 1fr;gap:18px;align-items:start;}
+  @media (max-width:1050px){ .anagrid{grid-template-columns:1fr;} }
+  canvas{display:block;max-width:100%;}
+  .catbars{display:flex;flex-direction:column;gap:9px;}
+  .catbar .top{display:flex;justify-content:space-between;font-family:'IBM Plex Mono',monospace;
+    font-size:11.5px;color:var(--text-dim);margin-bottom:4px;}
+  .catbar .track{height:9px;background:var(--panel-alt);border-radius:2px;overflow:hidden;display:flex;gap:2px;}
+  .catbar .track i{display:block;height:100%;}
+  .lvlmini{display:flex;gap:4px;margin-top:4px;}
+  .lvlmini span{font-family:'IBM Plex Mono',monospace;font-size:9.5px;color:var(--text-faint);
+    border:1px solid var(--border);border-radius:2px;padding:1px 5px;}
+  .findings{display:flex;flex-direction:column;gap:10px;}
+  .finding{border:1px solid var(--border);border-left:3px solid var(--warn);border-radius:3px;
+    padding:11px 13px;background:var(--panel-alt);}
+  .finding h4{font-family:'Space Grotesk',sans-serif;font-size:13.5px;margin:0 0 4px;font-weight:600;}
+  .finding .cnt{font-family:'IBM Plex Mono',monospace;font-size:10.5px;color:var(--neg);}
+  .finding p{margin:6px 0 0;font-size:12.5px;color:var(--text-dim);}
+  .finding p.fix{color:var(--pos);}
+  .finding p.fix::before{content:"→ ";}
+  .finding.good{border-left-color:var(--pos);}
+  .verdict{font-size:13.5px;color:var(--text-dim);line-height:1.65;}
+  .verdict b{color:var(--text);}
+  .bigscore{display:flex;align-items:baseline;gap:10px;margin-bottom:4px;}
+  .bigscore .n{font-family:'Space Grotesk',sans-serif;font-size:44px;font-weight:700;line-height:1;}
+  .bigscore .of{font-family:'IBM Plex Mono',monospace;font-size:12px;color:var(--text-faint);}
+  .empty{color:var(--text-faint);font-size:13px;padding:26px 0;text-align:center;}
+  .hidden{display:none!important;}
+  .note{font-size:12px;color:var(--text-faint);line-height:1.6;margin-top:12px;}
+  .note b{color:var(--text-dim);}
+  input[type=file]{display:none;}
+  .warnbox{border:1px solid rgba(255,180,84,.3);background:rgba(255,180,84,.07);border-radius:3px;
+    padding:10px 12px;font-size:12px;color:var(--warn);margin-top:12px;}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <div class="breadcrumb"><a href="index.html">← Hoofdmenu</a> · <a href="ollama-resultaten.html">LLM-resultaten →</a></div>
+
+  <header class="page">
+    <div>
+      <h1>Ollama LLM-test</h1>
+      <div class="sub">Eén vaste testbatterij van 18 opdrachten over 6 vaardigheden × 3 moeilijkheidsgraden. Elk model krijgt exact dezelfde vragen, zodat je precies kunt zien wáár een klein of slecht getraind model omvalt — en wat je eraan kunt doen.</div>
+    </div>
+    <div class="conn" id="conn">
+      <span class="led" id="led"></span>
+      <span id="connlabel">niet verbonden</span>
+    </div>
+  </header>
+
+  <details class="req">
+    <summary>Installatie-eisen &amp; opstarten — klik om uit te klappen</summary>
+    <div class="reqbody">
+      <div class="steps">
+        <div class="step">
+          <div class="n">stap 1</div>
+          <h4>Installeer Ollama</h4>
+          <p>Download de installer van <a href="https://ollama.com/download" target="_blank" rel="noopener">ollama.com/download</a> (Windows / macOS / Linux) en doorloop de installatie. Ollama draait daarna als achtergronddienst op <span class="mono">localhost:11434</span>.</p>
+          <pre class="cmd"># controle in een terminal / PowerShell
+ollama --version</pre>
+        </div>
+        <div class="step">
+          <div class="n">stap 2</div>
+          <h4>Installeer een model</h4>
+          <p>Haal minstens één model binnen. Klein = snel maar zwakker; groter = trager maar sterker. Goede vergelijkingsset voor deze test:</p>
+          <pre class="cmd">ollama pull llama3.2:3b
+ollama pull qwen2.5:7b
+ollama pull gemma3:4b</pre>
+        </div>
+        <div class="step">
+          <div class="n">stap 3</div>
+          <h4>Start Ollama + het model</h4>
+          <p>Start de server (meestal draait die al) en laad het model dat je wilt testen. Zolang het model geladen is, ziet deze pagina het als "draaiend model".</p>
+          <pre class="cmd">ollama serve</pre>
+          <pre class="cmd">ollama run llama3.2:3b</pre>
+        </div>
+        <div class="step">
+          <div class="n">stap 4</div>
+          <h4>Controleer de verbinding</h4>
+          <p>Het bolletje rechtsboven wordt <b style="color:var(--pos)">groen</b> zodra deze pagina Ollama kan bereiken. In je browser moet dit adres "Ollama is running" tonen:</p>
+          <pre class="cmd">http://localhost:11434</pre>
+        </div>
+      </div>
+      <div class="reqnote">
+        <b>Blijft het bolletje rood?</b> Dan blokkeert Ollama deze pagina via CORS. Zet de omgevingsvariabele <code>OLLAMA_ORIGINS</code> op <code>*</code> en herstart Ollama.<br>
+        Windows (PowerShell, daarna Ollama afsluiten via het systeemvak en opnieuw starten): <code>setx OLLAMA_ORIGINS "*"</code><br>
+        macOS / Linux: <code>OLLAMA_ORIGINS="*" ollama serve</code><br><br>
+        <b>Geen model in de lijst?</b> Voer <code>ollama list</code> uit; is die leeg, doe dan eerst stap 2.<br>
+        <b>Tip voor eerlijke vergelijking:</b> de test draait altijd met <code>temperature 0</code> en een vaste <code>seed</code>, zodat verschillen door het model komen en niet door toeval.
+      </div>
+    </div>
+  </details>
+
+  <div class="panel">
+    <h2>1 · Verbinding &amp; model</h2>
+    <div class="bar">
+      <input type="text" id="host" value="http://localhost:11434" spellcheck="false">
+      <button class="actionbtn" id="reconnect">↻ verbind</button>
+      <select id="modelselect"><option value="">— geen model gevonden —</option></select>
+      <button class="actionbtn" id="loadinfo">⓵ haal modelgegevens op</button>
+      <label class="chk"><input type="checkbox" id="useps" checked> volg draaiend model (/api/ps)</label>
+    </div>
+    <div class="status" id="connstatus">nog niet verbonden — klik op "verbind" of klap de installatie-eisen uit.</div>
+  </div>
+
+  <div class="panel hidden" id="modelpanel">
+    <h2>2 · Modelgegevens <span class="mono" style="color:var(--text-faint);font-weight:400"> — wordt meegeslagen in het resultaatbestand</span></h2>
+    <div class="modelgrid" id="modelgrid"></div>
+    <div class="desc" id="modeldesc"></div>
+  </div>
+
+  <div class="panel">
+    <h2>3 · Test uitvoeren</h2>
+    <div class="bar">
+      <button class="actionbtn primary" id="start" disabled>▶ start de test</button>
+      <button class="actionbtn" id="pause" disabled>⏸ pauzeer</button>
+      <button class="actionbtn danger" id="stop" disabled>■ stop</button>
+      <label class="chk"><input type="checkbox" id="stepwise"> wacht op mijn klik na elke stap</label>
+      <label class="chk" id="denklabel" style="display:none"><input type="checkbox" id="denken"> denkmodus (think) aanzetten</label>
+      <button class="actionbtn hidden" id="next">→ volgende stap</button>
+      <span style="flex:1"></span>
+      <button class="actionbtn" id="choosedir">📁 kies resultatenmap</button>
+      <button class="actionbtn" id="download" disabled>⇩ download JSON</button>
+    </div>
+    <div class="bigprog"><i id="progbar"></i></div>
+    <div class="rail" id="rail"></div>
+    <div class="raillegend" id="raillegend"></div>
+    <div class="status" id="runstatus">klaar om te starten zodra er verbinding en een model is.</div>
+    <div class="status" id="savestatus"></div>
+  </div>
+
+  <div class="panel hidden" id="analysepanel">
+    <h2>4 · Analyse van dit model</h2>
+    <div class="anagrid">
+      <div>
+        <div class="bigscore"><span class="n" id="totalscore">—</span><span class="of">/ 100 totaalscore</span></div>
+        <div class="verdict" id="verdict"></div>
+        <canvas id="radar" width="330" height="300" style="margin-top:14px;"></canvas>
+        <div class="raillegend" id="radarlegend" style="margin-top:2px;"></div>
+      </div>
+      <div>
+        <div class="subhead">score per vaardigheid en moeilijkheidsgraad</div>
+        <div class="catbars" id="catbars"></div>
+        <div class="subhead" style="margin-top:20px;">waar valt het om — score per moeilijkheidsgraad</div>
+        <canvas id="levelchart" width="640" height="150"></canvas>
+        <div class="subhead" style="margin-top:20px;">wat er precies misgaat, en wat je eraan kunt doen</div>
+        <div class="findings" id="findings"></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="panel">
+    <h2>Testverloop</h2>
+    <div id="testlist"><div class="empty">Nog niets uitgevoerd. De 18 opdrachten verschijnen hier één voor één, met de vraag, het antwoord van het model en de beoordeling.</div></div>
+  </div>
+
+  <div class="note" id="footnote">
+    De testset ligt vast (<b class="mono" id="tsv">—</b>): elk model krijgt exact dezelfde 18 opdrachten, met <b>temperature 0</b> en <b>seed 42</b>. Resultaten sla je op als één JSON-bestand per model in de map <b>resultaten-llm</b> van deze projectmap; vergelijken doe je op de <a href="ollama-resultaten.html">LLM-resultatenpagina</a>.
+  </div>
+
+</div>
+<script>
+"use strict";
+/* ==========================================================================
+   Ollama LLM-test — vaste testbatterij voor lokaal draaiende modellen
+   ========================================================================== */
+
+const TESTSET_VERSION = "ollama-suite-v1";
+document.getElementById("tsv").textContent = TESTSET_VERSION;
+
+const CATS = {
+  gen:    {nr:1, naam:"Generatief & creatief",      kort:"gen",    kleur:"#4fd1c5",
+           uitleg:"schrijven, herschrijven, brainstormen — fluency, tone of voice, variatie"},
+  struct: {nr:2, naam:"Structuur & transformatie",  kort:"struct", kleur:"#5c9eff",
+           uitleg:"samenvatten, vertalen, data-extractie — compleetheid, accuraatheid, formaat"},
+  klas:   {nr:3, naam:"Analyse & classificatie",    kort:"klas",   kleur:"#ffb454",
+           uitleg:"labelen, modereren, reviewen — precisie, geen false positives, consistentie"},
+  logic:  {nr:4, naam:"Logica & redeneren",         kort:"logic",  kleur:"#8b7cf0",
+           uitleg:"rekenen, puzzels, business-logica — denkstappen en robuustheid tegen ruis"},
+  code:   {nr:5, naam:"Techniek & code",            kort:"code",   kleur:"#e879c1",
+           uitleg:"code schrijven en debuggen — draait de code écht, en klopt hij?"},
+  agent:  {nr:6, naam:"Agentisch gedrag",           kort:"agent",  kleur:"#ff6b57",
+           uitleg:"plannen, tools kiezen, herstellen na een fout — binnen de kaders blijven"}
+};
+const LEVELNAAM = {1:"makkelijk", 2:"gemiddeld", 3:"groot-model-taak"};
+
+/* ---------- faalpatronen: wat het is, en wat je eraan doet ---------- */
+const VLAGGEN = {
+  formaat:      {naam:"Formaatafwijking",
+    wat:"Het model levert niet het gevraagde formaat: extra uitleg om de JSON heen, markdown-hekjes, verkeerde sleutels of een andere regelopbouw.",
+    fix:"Gebruik de Ollama-parameter format:\"json\" of een JSON-schema/grammar, geef 1–2 voorbeelden mee (few-shot), zet temperature op 0 en parse defensief in je eigen code."},
+  lengte:       {naam:"Lengte- en telinstructies genegeerd",
+    wat:"Het gevraagde aantal zinnen, woorden of regels klopt niet. Kleine modellen kunnen niet betrouwbaar tellen.",
+    fix:"Reken niet op tellen: begrens met num_predict, laat je eigen code afkappen of controleren, en vraag om een structuur die je kunt tellen (genummerde regels) in plaats van 'exact 3 zinnen'."},
+  verbod:       {naam:"Verbodsinstructie genegeerd",
+    wat:"Een 'gebruik dit woord niet' of 'geen uitleg' wordt genegeerd — negaties zijn zwak voor kleine modellen.",
+    fix:"Herschrijf negaties als positieve instructies ('gebruik uitsluitend deze woorden'), of filter achteraf in code en vraag zo nodig één keer opnieuw."},
+  meta:         {naam:"Het model praat eromheen",
+    wat:"Inleidingen als 'Natuurlijk! Hier is...' of afsluitende uitleg, terwijl er alleen om het antwoord gevraagd was.",
+    fix:"Zet een strakke system-prompt ('antwoord uitsluitend met ...'), gebruik stop-sequences, en strip inleidingen in je eigen code."},
+  feit:         {naam:"Feiten kwijt of verzonnen",
+    wat:"Cruciale details uit de bron ontbreken, of er duiken getallen/namen op die er niet stonden — klassieke hallucinatie.",
+    fix:"Verklein de context, splits in extractie-eerst-dan-samenvatten, houd temperature op 0 en laat het model letterlijk citeren wat het gebruikt."},
+  reken:        {naam:"Reken- of redeneerfout",
+    wat:"De uitkomst klopt niet, ook als de tussenstappen er goed uitzien — het model 'gokt' een plausibel getal.",
+    fix:"Vraag expliciet om tussenstappen (chain-of-thought) en laat rekenwerk door code doen via tool use. Lukt dat niet: kies een groter of reasoning-getuned model."},
+  afleiding:    {naam:"Afgeleid door irrelevante informatie",
+    wat:"Ruis in de prompt (namen, aantallen die er niet toe doen) wordt meegenomen in de berekening.",
+    fix:"Voorfilter de prompt of geef de input als vaste velden in plaats van lopende tekst; few-shot met ruis erin helpt ook."},
+  code:         {naam:"Code niet uitvoerbaar of fout",
+    wat:"De gegenereerde code geeft een syntaxfout of zakt op de testgevallen — vooral randgevallen.",
+    fix:"Kies een code-getuned model (qwen2.5-coder, deepseek-coder), zet temperature laag, stuur de testgevallen mee in de prompt en laat het model daarop itereren."},
+  tool:         {naam:"Verkeerde of verzonnen tool",
+    wat:"De agent kiest de verkeerde tool, verzint een tool die niet bestaat, of vult de argumenten fout in.",
+    fix:"Gebruik native tool-calling (de tools-parameter van Ollama) in plaats van tools in de prompt, bied minder tools tegelijk aan en valideer de tool-naam hard in je eigen code."},
+  herstel:      {naam:"Geen herstel na een fout",
+    wat:"Na een mislukte tool-aanroep herhaalt het model dezelfde actie, of het stopt, in plaats van een alternatief te kiezen.",
+    fix:"Geef de foutmelding terug mét de toegestane vervolgacties, houd een expliciete staat bij in je agent-loop en bouw een harde retry-teller met fallback in je eigen code."},
+  consistentie: {naam:"Wisselende antwoorden bij herhaling",
+    wat:"Dezelfde vraag levert bij herhaling een ander label of antwoord op — onbruikbaar voor productie.",
+    fix:"Zet temperature op 0, top_k op 1 en een vaste seed. Blijft het wisselen, dan zit het model op de rand van zijn kunnen: vereenvoudig de labels of neem een groter model."},
+  herhaling:    {naam:"Herhaling / loop in de output",
+    wat:"Het model blijft dezelfde zin of frase herhalen — typisch voor te kleine of te zwaar gekwantiseerde modellen.",
+    fix:"Verhoog repeat_penalty (1.1–1.3), begrens num_predict, kort de prompt in en probeer een minder agressieve quantisatie (Q5/Q6 in plaats van Q2/Q3)."},
+  taal:         {naam:"Taalwissel",
+    wat:"Er wordt (deels) in het Engels geantwoord terwijl om Nederlands gevraagd is.",
+    fix:"Zet de system-prompt zelf in het Nederlands, geef een Nederlands voorbeeld mee, of kies een model met betere meertalige dekking (qwen2.5, gemma3, mistral-nemo)."},
+  afgekapt:     {naam:"Antwoord afgekapt",
+    wat:"Het model liep tegen de token- of contextlimiet aan en stopte midden in het antwoord.",
+    fix:"Verhoog num_predict en num_ctx, of kort de prompt in. Let op: een grotere context kost fors meer geheugen op lokale hardware."}
+};
+
+/* ==========================================================================
+   Hulpfuncties voor de beoordeling
+   ========================================================================== */
+const woorden = s => (String(s).trim().match(/\S+/g) || []).length;
+const zinnen  = s => (String(s).trim().match(/[^.!?\n]+[.!?]+/g) || []).filter(x => x.trim().length > 3).length;
+const regels  = s => String(s).split(/\n/).map(r => r.trim()).filter(Boolean);
+const norm    = s => String(s).toLowerCase().replace(/\s+/g, " ").trim();
+
+function stripFence(s){
+  const m = String(s).match(/```[a-zA-Z]*\s*([\s\S]*?)```/);
+  return m ? m[1].trim() : String(s).trim();
+}
+function extractCode(s){
+  const m = String(s).match(/```(?:js|javascript)?\s*([\s\S]*?)```/i);
+  if (m) return {code: m[1].trim(), fenced: true};
+  return {code: String(s).trim(), fenced: false};
+}
+function parseJSONLoose(out){
+  const t = String(out).trim();
+  let body = t, fenced = false, extra = false, ok = false, val = null;
+  const f = t.match(/```(?:json)?\s*([\s\S]*?)```/i);
+  if (f) { fenced = true; body = f[1].trim(); }
+  try { val = JSON.parse(body); ok = true; }
+  catch (e) {
+    const m = body.match(/[[{][\s\S]*[\]}]/);
+    if (m) { try { val = JSON.parse(m[0]); ok = true; extra = m[0].trim().length < body.trim().length; } catch (e2) {} }
+  }
+  return {ok, val, fenced, extra, puur: ok && !fenced && !extra};
+}
+function deepEqual(a, b){
+  if (a === b) return true;
+  if (typeof a === "number" && typeof b === "number") return Math.abs(a - b) < 1e-9;
+  if (a === null || b === null || typeof a !== "object" || typeof b !== "object") return false;
+  if (Array.isArray(a) !== Array.isArray(b)) return false;
+  const ka = Object.keys(a), kb = Object.keys(b);
+  if (ka.length !== kb.length) return false;
+  return ka.every(k => Object.prototype.hasOwnProperty.call(b, k) && deepEqual(a[k], b[k]));
+}
+const NL_STOP = ["de","het","een","en","van","is","dat","op","niet","voor","met","zijn","er","aan","om","je","wordt","worden","naar","bij","ook","maar","als","door","uit","dit","deze","meer","wel"];
+const EN_STOP = ["the","and","of","to","is","that","for","with","are","this","you","your","from","will","should","have","which","can","not","here"];
+function talenScore(s){
+  const w = norm(s).match(/[a-zà-ü]+/g) || [];
+  let nl = 0, en = 0;
+  for (const x of w) { if (NL_STOP.includes(x)) nl++; if (EN_STOP.includes(x)) en++; }
+  return {nl, en, nederlands: nl >= en || w.length < 12};
+}
+function herhaling(s){
+  const w = (norm(s).match(/[\wà-ü]+/g) || []);
+  if (w.length < 30) return 0;
+  const seen = new Map(); let max = 1;
+  for (let i = 0; i + 6 <= w.length; i++){
+    const g = w.slice(i, i + 6).join(" ");
+    const c = (seen.get(g) || 0) + 1; seen.set(g, c);
+    if (c > max) max = c;
+  }
+  return max;
+}
+const heeftMeta = s => /^(natuurlijk|zeker|hier (is|zijn|volgt)|sure|certainly|of course|graag|uiteraard|hieronder|ok[ée]?,)/i.test(String(s).trim());
+const getallenIn = s => (String(s).match(/\d+(?:[.,]\d+)?/g) || []);
+
+/* ---------- code uitvoeren in een web worker met timeout ---------- */
+const WORKER_SRC = `
+self.onmessage = function(e){
+  var d = e.data, fn = null;
+  try { fn = (new Function(d.code + "\\n;return typeof " + d.fname + " === 'function' ? " + d.fname + " : null;"))(); }
+  catch (err) { self.postMessage({loadError: String(err && err.message || err)}); return; }
+  if (!fn) { self.postMessage({loadError: "functie " + d.fname + " niet gevonden"}); return; }
+  var res = d.cases.map(function(c){
+    try { return {value: fn.apply(null, c.args)}; }
+    catch (err) { return {err: String(err && err.message || err)}; }
+  });
+  self.postMessage({results: res});
+};`;
+function runInWorker(code, fname, cases, timeoutMs){
+  return new Promise(resolve => {
+    let w, url, klaar = false;
+    const af = (r) => { if (klaar) return; klaar = true; try{ w && w.terminate(); }catch(e){} try{ URL.revokeObjectURL(url); }catch(e){} resolve(r); };
+    try {
+      url = URL.createObjectURL(new Blob([WORKER_SRC], {type:"text/javascript"}));
+      w = new Worker(url);
+    } catch (e) { return af({loadError: "worker kon niet starten: " + e.message}); }
+    const t = setTimeout(() => af({loadError: "time-out (mogelijk een oneindige lus in de code)"}), timeoutMs || 2500);
+    w.onmessage = ev => { clearTimeout(t); af(ev.data); };
+    w.onerror = ev => { clearTimeout(t); af({loadError: "fout bij laden: " + (ev.message || "onbekend")}); };
+    w.postMessage({code, fname, cases});
+  });
+}
+
+/* ---------- check-fabriek ---------- */
+function chk(id, label, weight, flag, fn){ return {id, label, weight, flag, fn}; }
+const OK   = (info) => ({ok:true,  score:1, info: info || ""});
+const NEE  = (info) => ({ok:false, score:0, info: info || ""});
+const DEEL = (s, info) => ({ok: s >= 0.999, score: Math.max(0, Math.min(1, s)), info: info || ""});
+
+/* ==========================================================================
+   De testset — vast, identiek voor elk model
+   ========================================================================== */
+
+/* --- bronteksten --- */
+const TXT_KLACHT =
+`"Hey! Ik ben echt he-le-maal klaar met jullie!! Bestelling 88421 die ik op 12 maart heb gedaan is nog steeds niet geleverd en ik heb wel gewoon € 149,95 betaald. Dit is echt belachelijk, regel het nu."`;
+
+const TXT_VERGADERING =
+`Tijdens de kwartaalvergadering van 4 juni meldde Van Dijk Logistiek een omzetstijging van 12 procent ten opzichte van vorig kwartaal. De groei kwam vooral uit de nieuwe koelketen-dienst, die sinds maart draait en inmiddels 38 vaste klanten heeft. Tegelijk stegen de brandstofkosten met 9 procent, waardoor de marge onder druk staat. Directeur Miriam Sol kondigde aan dat er twee elektrische trucks worden aangeschaft om die kosten te drukken. Verder werd besloten het distributiecentrum in Venlo pas in 2027 uit te breiden, omdat de vergunning nog niet rond is. Het personeelsbestand groeide met veertien mensen, vooral planners en chauffeurs. Het ziekteverzuim daalde licht naar 4,1 procent.`;
+
+const TXT_MAIL =
+`Beste Karin,
+
+Zoals besproken stuur ik de gegevens. Je kunt me bereiken op 06-24 88 91 03 of, als ik in de fabriek ben, op 0475-772819. Mail mag ook: j.veldkamp@brixxo.nl (voor facturen: crediteuren@brixxo.nl).
+De eerste termijn van € 2.450,00 vervalt op 14 juli 2026, de tweede termijn van € 1.075,50 op 1 september 2026. De offerte zelf dateert van 27-05-2026.
+
+Groet, Jasper`;
+
+const TXT_ROMMEL =
+`1) Bakkerij De Korenaar, Utrecht — invoice 12 Jan 2026, EUR 1.299,95 — PAID
+2) Steeltech GmbH (Duisburg) — factuur d.d. 3 februari 2026 — bedrag: 4.500 euro — nog niet betaald
+3) Vandenberghe bvba, Gent — 2026/02/28 — 875,00 EUR — betaald
+4) Zeewind Charters, Den Helder — 07-03-2026 — €12.040,50 — openstaand`;
+
+const TXT_REVIEWS =
+`1. Binnen een dag geleverd en precies zoals beschreven. Top.
+2. Na twee weken al kapot, en de klantenservice reageert niet.
+3. Het pakket is aangekomen. Ik heb het nog niet uitgepakt.
+4. Prijs-kwaliteit is uitstekend, ik koop hier vaker.
+5. Verkeerde maat gestuurd en de retour kost mij 7 euro.`;
+const GOLD_REVIEWS = ["positief","negatief","neutraal","positief","negatief"];
+
+const TXT_TICKETS =
+`1. Ik kan niet inloggen, de wachtwoord-resetmail komt niet aan.
+2. De productieserver ligt eruit, niemand kan werken.
+3. Op factuur 2026-0912 staat een verkeerd btw-tarief.
+4. Kunnen jullie mijn adresgegevens aanpassen?
+5. Waar vind ik de openingstijden van jullie kantoor?
+6. Er wordt twee keer per maand geïncasseerd in plaats van één keer.`;
+const GOLD_TICKET_CAT = ["account","technisch","facturatie","account","overig","facturatie"];
+const GOLD_TICKET_URG = ["midden","hoog","midden","laag","laag","hoog"];
+
+const TXT_PRIVACY =
+`Wij bewaren je gegevens zolang wij dat nodig achten. Je gegevens worden gedeeld met onze marketingpartners. Je kunt een verzoek tot inzage sturen naar privacy@example.nl; wij reageren binnen 30 dagen. Voor het plaatsen van analytische cookies vragen wij vooraf toestemming.`;
+
+const TOOLS_FACTUUR =
+`[
+  {"naam":"zoek_klant",   "beschrijving":"zoekt een klant op klantnummer", "argumenten":{"klantnummer":"string"}},
+  {"naam":"maak_factuur", "beschrijving":"maakt een factuur aan",          "argumenten":{"klantnummer":"string","bedrag":"number"}},
+  {"naam":"stuur_email",  "beschrijving":"stuurt een e-mail",              "argumenten":{"aan":"string","onderwerp":"string","tekst":"string"}}
+]`;
+
+const TOOLS_VOORRAAD =
+`[
+  {"naam":"check_voorraad",    "beschrijving":"geeft de vrije voorraad van een artikel", "argumenten":{"artikel":"string"}},
+  {"naam":"reserveer_artikel", "beschrijving":"reserveert een aantal stuks",             "argumenten":{"artikel":"string","aantal":"number"}},
+  {"naam":"meld_backorder",    "beschrijving":"meldt het ontbrekende aantal als backorder", "argumenten":{"artikel":"string","aantal":"number"}}
+]`;
+
+/* --- de 18 opdrachten --- */
+const TESTS = [
+
+/* ============ 1. GENERATIEF & CREATIEF ============ */
+{
+  id:"gen-1", cat:"gen", level:1, titel:"Productbeschrijving met harde eisen",
+  waarom:"Basale schrijftaak. Meet fluency én of het model zich aan simpele tel- en verbodsregels houdt.",
+  num_predict:400,
+  prompt:
+`Schrijf een wervende productbeschrijving voor een herbruikbare RVS-waterfles van 750 ml.
+
+Eisen:
+- exact 3 zinnen
+- in totaal tussen de 40 en 80 woorden
+- schrijf in het Nederlands
+- gebruik het woord "duurzaam" NIET
+
+Geef alleen de productbeschrijving, zonder inleiding of uitleg.`,
+  checks:[
+    chk("z3","exact 3 zinnen",2,"lengte", c => { const n = zinnen(c.out); return n===3 ? OK("3 zinnen") : NEE(n+" zinnen"); }),
+    chk("w","40–80 woorden",2,"lengte", c => { const n = woorden(c.out); return (n>=40&&n<=80)?OK(n+" woorden"):NEE(n+" woorden"); }),
+    chk("nl","in het Nederlands",1,"taal", c => talenScore(c.out).nederlands ? OK() : NEE("lijkt Engels")),
+    chk("verbod",'woord "duurzaam" vermeden',3,"verbod", c => /duurzaam/i.test(c.out) ? NEE("gebruikt het toch") : OK()),
+    chk("meta","geen inleiding of uitleg",1,"meta", c => heeftMeta(c.out) ? NEE("begint met een inleiding") : OK())
+  ]
+},
+{
+  id:"gen-2", cat:"gen", level:2, titel:"Herschrijven met behoud van feiten",
+  waarom:"Tone of voice omzetten zonder feiten te verliezen — hier lekt bij kleine modellen vaak informatie weg.",
+  num_predict:500,
+  prompt:
+`Herschrijf de onderstaande klacht als een formele, zakelijke e-mail aan de klantenservice.
+
+Eisen:
+- maximaal 80 woorden
+- formele toon: geen uitroeptekens, geen spreektaal
+- behoud deze drie feiten letterlijk: ordernummer 88421, de datum 12 maart, het bedrag € 149,95
+- schrijf in het Nederlands
+
+Geef alleen de e-mailtekst, zonder inleiding of uitleg.
+
+KLACHT:
+` + TXT_KLACHT,
+  checks:[
+    chk("f1","ordernummer 88421 behouden",2,"feit", c => /88421/.test(c.out)?OK():NEE("ontbreekt")),
+    chk("f2","datum 12 maart behouden",2,"feit", c => /12\s*(maart|-0?3-|\/0?3\/)/i.test(c.out)?OK():NEE("ontbreekt")),
+    chk("f3","bedrag 149,95 behouden",2,"feit", c => /149[.,]95/.test(c.out)?OK():NEE("ontbreekt")),
+    chk("w","maximaal 80 woorden",2,"lengte", c => { const n = woorden(c.out); return n<=80?OK(n+" woorden"):NEE(n+" woorden"); }),
+    chk("uitroep","geen uitroeptekens",2,"verbod", c => /!/.test(c.out)?NEE("uitroepteken gevonden"):OK()),
+    chk("spreek","geen spreektaal",1,"verbod", c => /\b(hey|hoi|echt belachelijk|gewoon even|joh|man)\b/i.test(c.out)?NEE("spreektaal gevonden"):OK()),
+    chk("nl","in het Nederlands",1,"taal", c => talenScore(c.out).nederlands?OK():NEE("lijkt Engels"))
+  ]
+},
+{
+  id:"gen-3", cat:"gen", level:3, titel:"5 campagneconcepten in strak formaat",
+  waarom:"Creativiteit + variatie + een strak regelformaat + drie verboden woorden tegelijk. Dit vraagt om instructies vasthouden over vijf regels heen.",
+  num_predict:700,
+  prompt:
+`Bedenk 5 campagneconcepten voor een B2B-boekhoudpakket voor het MKB.
+
+Houd je strikt aan deze eisen:
+- exact 5 regels, genummerd "1." tot en met "5."
+- elke regel exact in dit formaat:
+  <TITEL IN HOOFDLETTERS> | doelgroep: <doelgroep> | belofte: <maximaal 12 woorden>
+- alle 5 doelgroepen moeten verschillend zijn
+- de woorden "innovatief", "revolutionair" en "oplossing" mogen nergens voorkomen
+- Nederlands, geen inleiding, geen uitleg, geen lege regels`,
+  checks:[
+    chk("n5","exact 5 genummerde regels",2,"formaat", c => {
+      const r = regels(c.out).filter(x => /^\d+[.)]/.test(x));
+      return r.length===5 ? OK("5 regels") : NEE(r.length+" genummerde regels");
+    }),
+    chk("fmt","elke regel in het gevraagde formaat",3,"formaat", c => {
+      const r = regels(c.out).filter(x => /^\d+[.)]/.test(x));
+      if (!r.length) return NEE("geen regels gevonden");
+      const g = r.filter(x => /doelgroep\s*:/i.test(x) && /belofte\s*:/i.test(x) && (x.match(/\|/g)||[]).length>=2);
+      return DEEL(g.length/Math.max(5,r.length), g.length+"/"+r.length+" regels kloppen");
+    }),
+    chk("caps","titel in hoofdletters",1,"formaat", c => {
+      const r = regels(c.out).filter(x => /^\d+[.)]/.test(x));
+      if (!r.length) return NEE("geen regels");
+      const g = r.filter(x => { const t = (x.split("|")[0]||"").replace(/^\d+[.)]\s*/,"").trim();
+        return t.length>2 && t === t.toUpperCase(); });
+      return DEEL(g.length/r.length, g.length+"/"+r.length);
+    }),
+    chk("uniek","5 verschillende doelgroepen",2,"formaat", c => {
+      const d = regels(c.out).map(x => (x.match(/doelgroep\s*:\s*([^|]+)/i)||[])[1]).filter(Boolean).map(norm);
+      const u = new Set(d);
+      return d.length ? DEEL(u.size/5, u.size+" unieke van "+d.length) : NEE("geen doelgroepen gevonden");
+    }),
+    chk("belofte","belofte max 12 woorden",2,"lengte", c => {
+      const b = regels(c.out).map(x => (x.match(/belofte\s*:\s*(.+)$/i)||[])[1]).filter(Boolean);
+      if (!b.length) return NEE("geen beloftes gevonden");
+      const g = b.filter(x => woorden(x) <= 12);
+      return DEEL(g.length/b.length, g.length+"/"+b.length+" binnen 12 woorden");
+    }),
+    chk("verbod","verboden woorden vermeden",3,"verbod", c => {
+      const hit = ["innovatief","revolutionair","oplossing"].filter(w => new RegExp(w,"i").test(c.out));
+      return hit.length ? NEE("gebruikt: "+hit.join(", ")) : OK();
+    }),
+    chk("meta","geen extra tekst",1,"meta", c => {
+      const r = regels(c.out);
+      const extra = r.filter(x => !/^\d+[.)]/.test(x));
+      return extra.length ? NEE(extra.length+" extra regel(s)") : OK();
+    })
+  ]
+},
+
+/* ============ 2. STRUCTUUR & TRANSFORMATIE ============ */
+{
+  id:"struct-1", cat:"struct", level:1, titel:"Samenvatten in 2 zinnen",
+  waarom:"Compleetheid versus beknoptheid. Hier zie je direct of het model getallen verzint die niet in de bron staan.",
+  num_predict:300,
+  prompt:
+`Vat de onderstaande tekst samen.
+
+Eisen:
+- exact 2 zinnen
+- maximaal 40 woorden in totaal
+- noem alleen feiten die in de tekst staan
+- Nederlands, geen inleiding
+
+TEKST:
+` + TXT_VERGADERING,
+  checks:[
+    chk("z2","exact 2 zinnen",2,"lengte", c => { const n = zinnen(c.out); return n===2?OK():NEE(n+" zinnen"); }),
+    chk("w","maximaal 40 woorden",2,"lengte", c => { const n = woorden(c.out); return n<=40?OK(n+" woorden"):NEE(n+" woorden"); }),
+    chk("kern1","noemt de omzetstijging",2,"feit", c => /12\s*(%|procent)/i.test(c.out)?OK():NEE("12% ontbreekt")),
+    chk("kern2","noemt de kostendruk of marge",1,"feit", c => /(marge|brandstof|kosten)/i.test(c.out)?OK():NEE("ontbreekt")),
+    chk("halluc","geen verzonnen getallen",2,"feit", c => {
+      const toegestaan = ["4","12","38","9","2027","14","4,1","4.1","2","3","0912"];
+      const fout = getallenIn(c.out).filter(g => !toegestaan.includes(g));
+      return fout.length ? NEE("niet in de bron: "+fout.join(", ")) : OK();
+    }),
+    chk("meta","geen inleiding",1,"meta", c => heeftMeta(c.out)?NEE("inleiding gevonden"):OK())
+  ]
+},
+{
+  id:"struct-2", cat:"struct", level:2, titel:"Data-extractie naar JSON",
+  waarom:"De klassieke productietaak: gestructureerde data uit vrije tekst halen, in exact het gevraagde schema.",
+  num_predict:600,
+  prompt:
+`Haal uit de onderstaande e-mail alle gegevens en geef ALLEEN geldige JSON terug, in exact dit schema:
+
+{"telefoonnummers":[],"emailadressen":[],"bedragen_eur":[],"datums_iso":[]}
+
+Regels:
+- bedragen als getal met een punt als decimaalteken (dus 1234.50)
+- datums als "YYYY-MM-DD"
+- geen uitleg, geen markdown, alleen de JSON
+
+E-MAIL:
+` + TXT_MAIL,
+  checks:[
+    chk("json","geldige JSON",3,"formaat", c => parseJSONLoose(c.out).ok?OK():NEE("kon niet parsen")),
+    chk("puur","alleen JSON, geen tekst of markdown",1,"formaat", c => {
+      const p = parseJSONLoose(c.out);
+      return p.puur ? OK() : NEE(p.fenced ? "markdown-hekjes" : "extra tekst eromheen");
+    }),
+    chk("sleutels","exact de 4 gevraagde sleutels",2,"formaat", c => {
+      const p = parseJSONLoose(c.out); if (!p.ok || typeof p.val !== "object" || Array.isArray(p.val)) return NEE("geen object");
+      const w = ["telefoonnummers","emailadressen","bedragen_eur","datums_iso"];
+      const k = Object.keys(p.val);
+      const mist = w.filter(x => !k.includes(x)), teveel = k.filter(x => !w.includes(x));
+      return (!mist.length && !teveel.length) ? OK() : NEE((mist.length?"mist "+mist.join(","):"")+(teveel.length?" extra "+teveel.join(","):""));
+    }),
+    chk("tel","beide telefoonnummers",2,"feit", c => {
+      const p = parseJSONLoose(c.out); if (!p.ok) return NEE("geen JSON");
+      const got = new Set((p.val.telefoonnummers||[]).map(x => String(x).replace(/\D/g,"")));
+      const w = ["0624889103","0475772819"];
+      return DEEL(w.filter(x => got.has(x)).length/2, [...got].join(" / ") || "leeg");
+    }),
+    chk("mail","beide e-mailadressen",2,"feit", c => {
+      const p = parseJSONLoose(c.out); if (!p.ok) return NEE("geen JSON");
+      const got = new Set((p.val.emailadressen||[]).map(x => norm(x)));
+      const w = ["j.veldkamp@brixxo.nl","crediteuren@brixxo.nl"];
+      return DEEL(w.filter(x => got.has(x)).length/2, [...got].join(" / ") || "leeg");
+    }),
+    chk("bed","bedragen correct én als getal",2,"formaat", c => {
+      const p = parseJSONLoose(c.out); if (!p.ok) return NEE("geen JSON");
+      const arr = p.val.bedragen_eur||[];
+      const num = arr.every(x => typeof x === "number");
+      const got = arr.map(x => Number(String(x).replace(/[^\d.,-]/g,"").replace(/\.(?=\d{3}\b)/g,"").replace(",",".")));
+      const w = [2450, 1075.5];
+      const hit = w.filter(x => got.some(g => Math.abs(g-x) < 0.005)).length;
+      return DEEL((hit/2) * (num?1:0.6), (num?"":"niet numeriek · ") + arr.join(" / "));
+    }),
+    chk("dat","alle 3 datums in ISO",2,"formaat", c => {
+      const p = parseJSONLoose(c.out); if (!p.ok) return NEE("geen JSON");
+      const got = (p.val.datums_iso||[]).map(x => String(x).trim());
+      const w = ["2026-07-14","2026-09-01","2026-05-27"];
+      const hit = w.filter(x => got.includes(x)).length;
+      return DEEL(hit/3, got.join(" / ") || "leeg");
+    })
+  ]
+},
+{
+  id:"struct-3", cat:"struct", level:3, titel:"Rommelige meertalige data normaliseren",
+  waarom:"Vier records, drie datumnotaties, twee talen, bedragen met punten én komma's. Dit is waar kleine modellen structureel omvallen.",
+  num_predict:900,
+  prompt:
+`Zet de onderstaande regels om naar een JSON-array met exact 4 objecten.
+
+Elk object heeft precies deze sleutels:
+{"klant": string, "land": "NL" of "BE" of "DE", "datum": "YYYY-MM-DD", "bedrag": number, "betaald": boolean}
+
+Regels:
+- normaliseer alle datums naar YYYY-MM-DD
+- bedrag als getal met punt als decimaalteken, zonder valutateken en zonder duizendtalscheiding
+- land afleiden uit de plaats of rechtsvorm
+- antwoord met ALLEEN de JSON-array, geen uitleg, geen markdown
+
+REGELS:
+` + TXT_ROMMEL,
+  checks:[
+    chk("json","geldige JSON-array",3,"formaat", c => {
+      const p = parseJSONLoose(c.out);
+      return (p.ok && Array.isArray(p.val)) ? OK() : NEE(p.ok ? "geen array" : "kon niet parsen");
+    }),
+    chk("puur","alleen JSON",1,"formaat", c => parseJSONLoose(c.out).puur ? OK() : NEE("extra tekst of markdown")),
+    chk("n4","4 objecten",2,"formaat", c => {
+      const p = parseJSONLoose(c.out); const a = Array.isArray(p.val)?p.val:[];
+      return a.length===4?OK():NEE(a.length+" objecten");
+    }),
+    chk("datum","alle datums correct in ISO",3,"formaat", c => {
+      const p = parseJSONLoose(c.out); const a = Array.isArray(p.val)?p.val:[];
+      const w = ["2026-01-12","2026-02-03","2026-02-28","2026-03-07"];
+      const got = a.map(o => String(o && o.datum || "").trim());
+      const hit = w.filter((x,i) => got[i] === x).length;
+      return DEEL(hit/4, got.join(" ") || "leeg");
+    }),
+    chk("bedrag","alle bedragen numeriek correct",3,"formaat", c => {
+      const p = parseJSONLoose(c.out); const a = Array.isArray(p.val)?p.val:[];
+      const w = [1299.95, 4500, 875, 12040.5];
+      let hit = 0;
+      a.forEach((o,i) => { const v = o && o.bedrag; if (typeof v === "number" && Math.abs(v - w[i]) < 0.005) hit++; });
+      return DEEL(hit/4, a.map(o=>o&&o.bedrag).join(" / ") || "leeg");
+    }),
+    chk("land","landcodes correct",2,"feit", c => {
+      const p = parseJSONLoose(c.out); const a = Array.isArray(p.val)?p.val:[];
+      const w = ["NL","DE","BE","NL"];
+      const hit = w.filter((x,i) => String(a[i] && a[i].land || "").toUpperCase() === x).length;
+      return DEEL(hit/4, a.map(o=>o&&o.land).join(" ") || "leeg");
+    }),
+    chk("betaald","betaald-status als boolean correct",2,"formaat", c => {
+      const p = parseJSONLoose(c.out); const a = Array.isArray(p.val)?p.val:[];
+      const w = [true,false,true,false];
+      const hit = w.filter((x,i) => a[i] && a[i].betaald === x).length;
+      return DEEL(hit/4, a.map(o=>o&&String(o.betaald)).join(" ") || "leeg");
+    })
+  ]
+},
+
+/* ============ 3. ANALYSE & CLASSIFICATIE ============ */
+{
+  id:"klas-1", cat:"klas", level:1, titel:"Sentiment labelen (3× voor consistentie)",
+  waarom:"Simpele classificatie. Wordt drie keer gedraaid: dezelfde vraag hoort drie keer hetzelfde antwoord te geven.",
+  num_predict:200, herhaal:3,
+  prompt:
+`Classificeer elke review als "positief", "negatief" of "neutraal".
+
+Antwoord met exact 5 regels, in dit formaat en niets anders:
+1: <label>
+2: <label>
+3: <label>
+4: <label>
+5: <label>
+
+REVIEWS:
+` + TXT_REVIEWS,
+  checks:[
+    chk("fmt","5 regels in het gevraagde formaat",2,"formaat", c => {
+      const r = regels(c.out).filter(x => /^\d\s*[:.-]/.test(x));
+      return r.length===5?OK():NEE(r.length+" bruikbare regels");
+    }),
+    chk("acc","alle 5 labels correct",5,null, c => {
+      const got = leesLabels(c.out);
+      const hit = GOLD_REVIEWS.filter((g,i) => got[i] === g).length;
+      return DEEL(hit/5, hit+"/5 correct — "+got.map((x,i)=> (x===GOLD_REVIEWS[i]?"✓":"✗")+(x||"?")).join(" "));
+    }),
+    chk("cons","3× hetzelfde antwoord",3,"consistentie", c => {
+      const sets = c.outs.map(leesLabels).map(a => a.join("|"));
+      const gelijk = sets.every(s => s === sets[0]);
+      return gelijk ? OK("3/3 identiek") : NEE("wisselt: "+[...new Set(sets)].length+" verschillende uitkomsten");
+    }),
+    chk("labels","geen verzonnen labels",1,"formaat", c => {
+      const bad = leesLabels(c.out).filter(x => x && !["positief","negatief","neutraal"].includes(x));
+      return bad.length?NEE("onbekend: "+bad.join(", ")):OK();
+    })
+  ]
+},
+{
+  id:"klas-2", cat:"klas", level:2, titel:"Supporttickets labelen met urgentie",
+  waarom:"Twee dimensies tegelijk, in JSON, met een gesloten labelset. Verzonnen categorieën zijn hier direct zichtbaar.",
+  num_predict:700,
+  prompt:
+`Label elk supportticket met een categorie en een urgentie.
+
+Toegestane categorieën: "facturatie", "technisch", "account", "overig".
+Toegestane urgenties: "laag", "midden", "hoog".
+
+Antwoord met ALLEEN deze JSON-array, zonder uitleg en zonder markdown:
+[{"id":1,"categorie":"...","urgentie":"..."}, ...]
+
+TICKETS:
+` + TXT_TICKETS,
+  checks:[
+    chk("json","geldige JSON-array met 6 items",2,"formaat", c => {
+      const p = parseJSONLoose(c.out); const a = Array.isArray(p.val)?p.val:[];
+      return (p.ok && a.length===6)?OK():NEE(p.ok?a.length+" items":"kon niet parsen");
+    }),
+    chk("puur","alleen JSON",1,"formaat", c => parseJSONLoose(c.out).puur?OK():NEE("extra tekst of markdown")),
+    chk("gesloten","geen verzonnen categorieën",2,"formaat", c => {
+      const p = parseJSONLoose(c.out); const a = Array.isArray(p.val)?p.val:[];
+      const bad = a.map(o => norm(o && o.categorie)).filter(x => x && !["facturatie","technisch","account","overig"].includes(x));
+      return bad.length?NEE("buiten de labelset: "+[...new Set(bad)].join(", ")):OK();
+    }),
+    chk("cat","categorieën correct",4,null, c => {
+      const p = parseJSONLoose(c.out); const a = Array.isArray(p.val)?p.val:[];
+      const hit = GOLD_TICKET_CAT.filter((g,i) => norm(a[i] && a[i].categorie) === g).length;
+      return DEEL(hit/6, hit+"/6 correct");
+    }),
+    chk("urg","urgenties correct",3,null, c => {
+      const p = parseJSONLoose(c.out); const a = Array.isArray(p.val)?p.val:[];
+      const hit = GOLD_TICKET_URG.filter((g,i) => norm(a[i] && a[i].urgentie) === g).length;
+      return DEEL(hit/6, hit+"/6 correct");
+    })
+  ]
+},
+{
+  id:"klas-3", cat:"klas", level:3, titel:"Compliance-review met citaten",
+  waarom:"Beoordelen tegen regels, met bewijs. Kleine modellen zeggen hier vaak overal PASS (of overal FAIL) — false positives worden meteen zichtbaar.",
+  num_predict:800,
+  prompt:
+`Beoordeel de onderstaande privacytekst tegen 4 regels.
+
+Antwoord met exact 4 regels, in dit formaat en niets anders:
+REGEL 1: PASS of FAIL — <letterlijk citaat uit de tekst, of "geen">
+REGEL 2: ...
+REGEL 3: ...
+REGEL 4: ...
+
+REGELS:
+1. Er moet een concrete bewaartermijn genoemd worden.
+2. Er moet een contactmogelijkheid voor inzage in staan.
+3. Delen met derden voor marketing mag alleen als de tekst expliciete toestemming noemt.
+4. Voor niet-noodzakelijke cookies moet vooraf toestemming worden gevraagd.
+
+TEKST:
+` + TXT_PRIVACY,
+  checks:[
+    chk("fmt","4 regels in het gevraagde formaat",2,"formaat", c => {
+      const r = leesRegelOordeel(c.out);
+      return r.length===4?OK():NEE(r.length+" bruikbare regels");
+    }),
+    chk("r1","regel 1 = FAIL (geen bewaartermijn)",2,null, c => {
+      const r = leesRegelOordeel(c.out); return r[0]==="FAIL"?OK():NEE(r[0]||"geen oordeel"); }),
+    chk("r2","regel 2 = PASS (inzage mogelijk)",2,null, c => {
+      const r = leesRegelOordeel(c.out); return r[1]==="PASS"?OK():NEE(r[1]||"geen oordeel"); }),
+    chk("r3","regel 3 = FAIL (geen toestemming genoemd)",2,null, c => {
+      const r = leesRegelOordeel(c.out); return r[2]==="FAIL"?OK():NEE(r[2]||"geen oordeel"); }),
+    chk("r4","regel 4 = PASS (cookietoestemming vooraf)",2,null, c => {
+      const r = leesRegelOordeel(c.out); return r[3]==="PASS"?OK():NEE(r[3]||"geen oordeel"); }),
+    chk("citaat","citaat aanwezig bij elk FAIL",1,"feit", c => {
+      const rr = regels(c.out).filter(x => /^regel\s*\d/i.test(x));
+      const fails = rr.filter(x => /FAIL/i.test(x));
+      if (!fails.length) return NEE("geen enkele FAIL gevonden");
+      const met = fails.filter(x => /[—:–-]\s*\S[\s\S]{9,}/.test(x.replace(/^regel\s*\d\s*:?\s*fail/i,"")));
+      return DEEL(met.length/fails.length, met.length+"/"+fails.length+" met citaat");
+    }),
+    chk("fp","geen extra of dubbele oordelen",1,"formaat", c => {
+      const rr = regels(c.out).filter(x => /^regel\s*\d/i.test(x));
+      return rr.length<=4?OK():NEE(rr.length+" regels");
+    })
+  ]
+},
+
+/* ============ 4. LOGICA & REDENEREN ============ */
+{
+  id:"logic-1", cat:"logic", level:1, titel:"Rekensom in twee stappen",
+  waarom:"Basisrekenwerk met een vast antwoordformaat. Faalt een model hier al, dan is het ongeschikt voor alles met getallen.",
+  num_predict:500,
+  prompt:
+`Een jas kost € 180,00. Er geldt 25% korting. Daarna komen er nog € 6,95 verzendkosten bij.
+
+Hoeveel betaal je in totaal? Geef eerst je tussenstappen en sluit af met een laatste regel in exact dit formaat:
+ANTWOORD: <bedrag met 2 decimalen>`,
+  checks:[
+    chk("fmt","antwoordregel aanwezig",2,"formaat", c => /ANTWOORD\s*:/i.test(c.out)?OK():NEE("geen ANTWOORD-regel")),
+    chk("goed","uitkomst 141,95 correct",4,"reken", c => {
+      const v = leesBedrag(c.out);
+      return (v!==null && Math.abs(v-141.95)<0.005)?OK("141,95"):NEE(v===null?"geen bedrag gevonden":String(v));
+    }),
+    chk("stap","tussenstap 135 zichtbaar",2,"reken", c => /135([.,]0+)?\b/.test(c.out)?OK():NEE("tussenstap ontbreekt"))
+  ]
+},
+{
+  id:"logic-2", cat:"logic", level:2, titel:"Redeneren met afleiders",
+  waarom:"Dezelfde som, maar met ruis erin. Meet robuustheid: pakt het model de irrelevante getallen op?",
+  num_predict:600,
+  prompt:
+`Trein A vertrekt om 08:12 uit Zwolle. De machinist heet Bert en houdt van vogels. De rit duurt 47 minuten. Onderweg staat de trein 6 minuten stil bij een sein. Er zitten 214 reizigers in, waarvan 31 met een fiets. In Amersfoort stapt 40% van de reizigers uit.
+
+Hoe laat komt trein A aan? Geef eerst je tussenstappen en sluit af met een laatste regel in exact dit formaat:
+ANTWOORD: <uu:mm>`,
+  checks:[
+    chk("fmt","antwoordregel aanwezig",2,"formaat", c => /ANTWOORD\s*:/i.test(c.out)?OK():NEE("geen ANTWOORD-regel")),
+    chk("goed","uitkomst 09:05 correct",4,"reken", c => {
+      const m = String(c.out).match(/ANTWOORD\s*:\s*(\d{1,2})[:.](\d{2})/i);
+      if (!m) return NEE("geen tijd gevonden");
+      const t = (+m[1])*60 + (+m[2]);
+      return t === 9*60+5 ? OK("09:05") : NEE(m[1]+":"+m[2]);
+    }),
+    chk("stap","gebruikt 47 en 6 minuten",2,"reken", c => {
+      const heeft = /\b47\b/.test(c.out) && /\b6\b/.test(c.out);
+      return heeft?OK():NEE("tussenstappen ontbreken");
+    }),
+    chk("ruis","niet afgeleid door reizigersaantallen",2,"afleiding", c => {
+      const kop = String(c.out).split(/ANTWOORD\s*:/i)[0] || "";
+      const hit = ["214","31","40"].filter(g => new RegExp("\\b"+g+"\\b").test(kop));
+      return hit.length ? NEE("gebruikt afleiders: "+hit.join(", ")) : OK();
+    })
+  ]
+},
+{
+  id:"logic-3", cat:"logic", level:3, titel:"Roosterpuzzel met 5 voorwaarden",
+  waarom:"Er is precies één oplossing. Dit vraagt om echt doorredeneren; een model dat gokt komt er nooit op.",
+  num_predict:1000,
+  prompt:
+`Vier collega's — Ada, Bram, Chi en Dries — draaien elk precies één dienst: maandag, dinsdag, woensdag of donderdag. Elke dag is bezet door precies één persoon.
+
+Voorwaarden:
+1. Bram werkt eerder in de week dan Chi.
+2. Ada werkt niet op maandag en niet op donderdag.
+3. Dries werkt op maandag of op donderdag.
+4. Ada werkt op de dag direct ná Bram.
+5. Chi werkt niet op donderdag.
+
+Wie werkt op welke dag? Redeneer stap voor stap en sluit af met een laatste regel in exact dit formaat:
+ANTWOORD: maandag=<naam>; dinsdag=<naam>; woensdag=<naam>; donderdag=<naam>`,
+  checks:[
+    chk("fmt","antwoordregel in het gevraagde formaat",2,"formaat", c => {
+      const m = leesRooster(c.out);
+      return m ? OK() : NEE("geen bruikbare ANTWOORD-regel");
+    }),
+    chk("ma","maandag = Bram",1.5,"reken", c => { const m = leesRooster(c.out); return m && m.maandag==="bram"?OK():NEE(m?m.maandag:"—"); }),
+    chk("di","dinsdag = Ada",1.5,"reken", c => { const m = leesRooster(c.out); return m && m.dinsdag==="ada"?OK():NEE(m?m.dinsdag:"—"); }),
+    chk("wo","woensdag = Chi",1.5,"reken", c => { const m = leesRooster(c.out); return m && m.woensdag==="chi"?OK():NEE(m?m.woensdag:"—"); }),
+    chk("do","donderdag = Dries",1.5,"reken", c => { const m = leesRooster(c.out); return m && m.donderdag==="dries"?OK():NEE(m?m.donderdag:"—"); }),
+    chk("stap","zichtbare denkstappen",1,"reken", c => woorden(String(c.out).split(/ANTWOORD/i)[0]) >= 25 ? OK() : NEE("gokt zonder redenering"))
+  ]
+},
+
+/* ============ 5. TECHNIEK & CODE ============ */
+{
+  id:"code-1", cat:"code", level:1, titel:"Functie schrijven: slugify",
+  waarom:"De code wordt hier écht uitgevoerd in een sandbox. Draaien = objectief, geen interpretatie nodig.",
+  num_predict:800,
+  code:{
+    fname:"slugify",
+    cases:[
+      {args:["Hallo Wereld"], expect:"hallo-wereld"},
+      {args:["  Café  del   Mar! "], expect:"cafe-del-mar"},
+      {args:["A---B"], expect:"a-b"},
+      {args:["Één, twee & drie"], expect:"een-twee-drie"}
+    ]
+  },
+  prompt:
+`Schrijf één JavaScript-functie met exact deze signatuur:
+
+function slugify(tekst) { ... }
+
+Gedrag:
+- alles naar kleine letters
+- accenten normaliseren (é wordt e, ç wordt c)
+- spaties en leestekens vervangen door één koppelteken
+- geen koppeltekens aan het begin of het eind
+- meerdere koppeltekens achter elkaar worden er één
+
+Geef ALLEEN de code in één \`\`\`js codeblok. Geen uitleg, geen voorbeelden, geen console.log.`,
+  checks:[
+    chk("fence","code in een codeblok",1,"formaat", c => extractCode(c.out).fenced?OK():NEE("geen codeblok")),
+    chk("laad","code draait zonder fout",3,"code", c => c.code && !c.code.loadError ? OK() : NEE(c.code ? c.code.loadError : "niet uitgevoerd")),
+    chk("t1",'slugify("Hallo Wereld")',1,"code", c => codeCase(c,0)),
+    chk("t2",'slugify("  Café  del   Mar! ")',1,"code", c => codeCase(c,1)),
+    chk("t3",'slugify("A---B")',1,"code", c => codeCase(c,2)),
+    chk("t4",'slugify("Één, twee & drie")',1,"code", c => codeCase(c,3)),
+    chk("schoon","geen uitleg of console.log",1,"meta", c => /console\.log/.test(c.out)?NEE("console.log gevonden"):(heeftMeta(c.out)?NEE("uitleg eromheen"):OK()))
+  ]
+},
+{
+  id:"code-2", cat:"code", level:2, titel:"Bug vinden en oplossen: mediaan",
+  waarom:"Debuggen vraagt begrip, niet reproductie. Er zitten twee bugs in: lexicografisch sorteren én het even-geval.",
+  num_predict:800,
+  code:{
+    fname:"mediaan",
+    cases:[
+      {args:[[3,1,2]], expect:2},
+      {args:[[10,2,33,4]], expect:7},
+      {args:[[1,2,3,4,5,6,7,8,9,10]], expect:5.5},
+      {args:[[5]], expect:5}
+    ]
+  },
+  prompt:
+`De onderstaande JavaScript-functie bevat een of meer bugs.
+
+function mediaan(getallen) {
+  const s = getallen.sort();
+  const m = Math.floor(s.length / 2);
+  return s[m];
+}
+
+Lever de gecorrigeerde functie, met dezelfde naam en signatuur, terug in één \`\`\`js codeblok. Geen uitleg.`,
+  checks:[
+    chk("fence","code in een codeblok",1,"formaat", c => extractCode(c.out).fenced?OK():NEE("geen codeblok")),
+    chk("laad","code draait zonder fout",3,"code", c => c.code && !c.code.loadError ? OK() : NEE(c.code ? c.code.loadError : "niet uitgevoerd")),
+    chk("t1","oneven lijst [3,1,2] → 2",1,"code", c => codeCase(c,0)),
+    chk("t2","numeriek sorteren [10,2,33,4] → 7",1.5,"code", c => codeCase(c,1)),
+    chk("t3","even lijst → gemiddelde van twee → 5.5",1.5,"code", c => codeCase(c,2)),
+    chk("t4","lijst van één → 5",1,"code", c => codeCase(c,3)),
+    chk("schoon","geen uitleg buiten het codeblok",1,"meta", c => heeftMeta(c.out)?NEE("uitleg eromheen"):OK())
+  ]
+},
+{
+  id:"code-3", cat:"code", level:3, titel:"Parsen, valideren, groeperen en sorteren",
+  waarom:"Vier eisen in één functie, inclusief randgevallen en een sorteervolgorde met tie-break. Typisch werk waar 3B-modellen op stuklopen.",
+  num_predict:1200,
+  code:{
+    fname:"verwerkBestellingen",
+    cases:[
+      {args:[["KL-014;3;19.95","KL-002;1;100","KL-014;2;5.00","kapot;abc;1","KL-002;0;50","KL-003;2;10"]],
+       expect:[{klant:"KL-002",aantal:1,totaal:100},{klant:"KL-014",aantal:5,totaal:69.85},{klant:"KL-003",aantal:2,totaal:20}]},
+      {args:[["A;1;10","B;1;10"]],
+       expect:[{klant:"A",aantal:1,totaal:10},{klant:"B",aantal:1,totaal:10}]},
+      {args:[[]], expect:[]},
+      {args:[["X;2;-5","X;1;3"]], expect:[{klant:"X",aantal:1,totaal:3}]}
+    ]
+  },
+  prompt:
+`Schrijf één JavaScript-functie:
+
+function verwerkBestellingen(regels) { ... }
+
+Invoer: een array van strings in het formaat "<klantcode>;<aantal>;<prijs_per_stuk>", bijvoorbeeld "KL-014;3;19.95".
+
+Eisen:
+- sla regels over die niet exact 3 velden hebben, waarbij het aantal geen geheel getal groter dan 0 is, of waarbij de prijs geen getal groter dan of gelijk aan 0 is
+- groepeer per klantcode: tel het aantal op, en tel het bedrag op (aantal × prijs), afgerond op 2 decimalen
+- retourneer een array van objecten met exact de sleutels {klant, aantal, totaal}
+- sorteer op totaal aflopend; bij een gelijk totaal alfabetisch op klant
+- gebruik geen eval en geen externe libraries
+
+Geef ALLEEN de code in één \`\`\`js codeblok. Geen uitleg.`,
+  checks:[
+    chk("fence","code in een codeblok",1,"formaat", c => extractCode(c.out).fenced?OK():NEE("geen codeblok")),
+    chk("laad","code draait zonder fout",3,"code", c => c.code && !c.code.loadError ? OK() : NEE(c.code ? c.code.loadError : "niet uitgevoerd")),
+    chk("t1","groeperen, filteren en sorteren",2,"code", c => codeCase(c,0)),
+    chk("t2","tie-break alfabetisch op klant",1.5,"code", c => codeCase(c,1)),
+    chk("t3","lege invoer geeft lege array",1,"code", c => codeCase(c,2)),
+    chk("t4","negatieve prijs wordt overgeslagen",1.5,"code", c => codeCase(c,3)),
+    chk("eval","geen eval gebruikt",1,"code", c => /\beval\s*\(/.test(c.out)?NEE("eval gevonden"):OK())
+  ]
+},
+
+/* ============ 6. AGENTISCH GEDRAG ============ */
+{
+  id:"agent-1", cat:"agent", level:1, titel:"Doel opknippen in stappen",
+  waarom:"Planning is de basis van elke agent. Meet of het model een doel in uitvoerbare, korte stappen kan hakken.",
+  num_predict:500,
+  prompt:
+`Doel: een nieuwe medewerker moet op zijn eerste werkdag op alle systemen kunnen inloggen.
+
+Maak een plan.
+
+Eisen:
+- maximaal 6 stappen, genummerd "1." tot en met maximaal "6."
+- elke stap begint met een werkwoord in de gebiedende wijs (bijvoorbeeld "Vraag", "Maak", "Controleer")
+- elke stap maximaal 12 woorden
+- geen inleiding, geen afsluiting, geen uitleg`,
+  checks:[
+    chk("aantal","3 tot 6 genummerde stappen",2,"formaat", c => {
+      const r = regels(c.out).filter(x => /^\d+[.)]/.test(x));
+      return (r.length>=3 && r.length<=6)?OK(r.length+" stappen"):NEE(r.length+" stappen");
+    }),
+    chk("kort","elke stap maximaal 12 woorden",2,"lengte", c => {
+      const r = regels(c.out).filter(x => /^\d+[.)]/.test(x));
+      if (!r.length) return NEE("geen stappen");
+      const g = r.filter(x => woorden(x.replace(/^\d+[.)]\s*/,"")) <= 12);
+      return DEEL(g.length/r.length, g.length+"/"+r.length);
+    }),
+    chk("werkwoord","stappen beginnen met een werkwoord",1,"formaat", c => {
+      const r = regels(c.out).filter(x => /^\d+[.)]/.test(x));
+      if (!r.length) return NEE("geen stappen");
+      const stop = ["de","het","een","er","dit","dat","je","we","om","voor","na","in","als","zorg dat"];
+      const g = r.filter(x => { const w = norm(x.replace(/^\d+[.)]\s*/,"")).split(" ")[0]||""; return w && !stop.includes(w); });
+      return DEEL(g.length/r.length, g.length+"/"+r.length+" (heuristisch)");
+    }),
+    chk("meta","geen inleiding of afsluiting",2,"meta", c => {
+      const extra = regels(c.out).filter(x => !/^\d+[.)]/.test(x));
+      return extra.length?NEE(extra.length+" extra regel(s)"):OK();
+    })
+  ]
+},
+{
+  id:"agent-2", cat:"agent", level:2, titel:"De juiste tool kiezen",
+  waarom:"Tool-selectie plus correcte argumenten, als pure JSON. Hier ontstaat in productie de meeste schade.",
+  num_predict:400,
+  prompt:
+`Je hebt toegang tot deze tools:
+
+` + TOOLS_FACTUUR + `
+
+Opdracht: maak voor klant KL-0087 een factuur van 249,50 euro.
+
+Antwoord met ALLEEN één JSON-object, in exact dit formaat, zonder uitleg en zonder markdown:
+{"tool":"<naam>","argumenten":{...}}
+
+Past geen enkele tool, antwoord dan met {"tool":"geen","argumenten":{}}`,
+  checks:[
+    chk("puur","alleen JSON, geen uitleg",3,"formaat", c => {
+      const p = parseJSONLoose(c.out);
+      return p.puur?OK():NEE(!p.ok?"kon niet parsen":(p.fenced?"markdown-hekjes":"extra tekst"));
+    }),
+    chk("tool","kiest maak_factuur",3,"tool", c => {
+      const p = parseJSONLoose(c.out); const t = norm(p.val && p.val.tool);
+      return t==="maak_factuur"?OK():NEE(t||"geen tool");
+    }),
+    chk("bestaat","geen verzonnen tool",1,"tool", c => {
+      const p = parseJSONLoose(c.out); const t = norm(p.val && p.val.tool);
+      return (!t || ["zoek_klant","maak_factuur","stuur_email","geen"].includes(t))?OK():NEE("bestaat niet: "+t);
+    }),
+    chk("arg1","klantnummer KL-0087",2,"tool", c => {
+      const p = parseJSONLoose(c.out); const a = (p.val && p.val.argumenten) || {};
+      return /KL-?0087/i.test(String(a.klantnummer||""))?OK():NEE(String(a.klantnummer||"—"));
+    }),
+    chk("arg2","bedrag 249.5 als getal",2,"tool", c => {
+      const p = parseJSONLoose(c.out); const a = (p.val && p.val.argumenten) || {};
+      const v = a.bedrag;
+      const n = typeof v === "number" ? v : Number(String(v).replace(",","."));
+      const goed = Math.abs(n - 249.5) < 0.005;
+      return goed ? (typeof v === "number" ? OK() : DEEL(0.6,"correct maar als tekst")) : NEE(String(v===undefined?"—":v));
+    })
+  ]
+},
+{
+  id:"agent-3", cat:"agent", level:3, titel:"Herstellen na een mislukte tool-aanroep",
+  waarom:"Een echte mini-agentloop van twee beurten: de eerste aanroep faalt en het model moet zelf een geldig alternatief kiezen — zonder tools te verzinnen.",
+  num_predict:400,
+  prompts:[
+`Je hebt toegang tot deze tools:
+
+` + TOOLS_VOORRAAD + `
+
+Opdracht: zorg dat 5 stuks van artikel A-77 klaarstaan voor verzending.
+
+Antwoord met ALLEEN één JSON-object, in exact dit formaat, zonder uitleg en zonder markdown:
+{"tool":"<naam>","argumenten":{...}}`,
+  (vorige) =>
+`Je vorige tool-aanroep was:
+` + vorige[0].trim() + `
+
+Het systeem gaf deze fout terug:
+{"resultaat":"FOUT: voorraad ontoereikend, er zijn slechts 2 stuks op voorraad"}
+
+Bepaal de volgende stap. Je mag UITSLUITEND de eerder genoemde tools gebruiken (check_voorraad, reserveer_artikel, meld_backorder).
+
+Antwoord opnieuw met ALLEEN één JSON-object, in hetzelfde formaat, zonder uitleg en zonder markdown.`
+  ],
+  checks:[
+    chk("p1","beurt 1: geldige JSON-toolaanroep",2,"formaat", c => {
+      const p = parseJSONLoose(c.outs[0]||"");
+      return p.puur?OK():NEE(!p.ok?"kon niet parsen":"niet puur JSON");
+    }),
+    chk("p1t","beurt 1: zinnige tool gekozen",2,"tool", c => {
+      const t = norm((parseJSONLoose(c.outs[0]||"").val||{}).tool);
+      return ["reserveer_artikel","check_voorraad"].includes(t)?OK(t):NEE(t||"geen");
+    }),
+    chk("p2","beurt 2: geldige JSON-toolaanroep",2,"formaat", c => {
+      const p = parseJSONLoose(c.outs[1]||"");
+      return p.puur?OK():NEE(!p.ok?"kon niet parsen":"niet puur JSON");
+    }),
+    chk("guard","beurt 2: geen verzonnen tool",3,"tool", c => {
+      const t = norm((parseJSONLoose(c.outs[1]||"").val||{}).tool);
+      return ["check_voorraad","reserveer_artikel","meld_backorder"].includes(t)?OK(t):NEE("buiten de kaders: "+(t||"geen"));
+    }),
+    chk("herstel","beurt 2: niet dezelfde mislukte aanroep herhaald",2,"herstel", c => {
+      const a = parseJSONLoose(c.outs[0]||"").val, b = parseJSONLoose(c.outs[1]||"").val;
+      return (a && b && deepEqual(a,b)) ? NEE("herhaalt exact dezelfde aanroep") : OK();
+    }),
+    chk("keuze","beurt 2: kiest meld_backorder",2,"herstel", c => {
+      const t = norm((parseJSONLoose(c.outs[1]||"").val||{}).tool);
+      return t==="meld_backorder"?OK():NEE(t||"geen");
+    }),
+    chk("aantal","beurt 2: meldt 3 ontbrekende stuks",1,"reken", c => {
+      const v = parseJSONLoose(c.outs[1]||"").val||{};
+      const n = Number((v.argumenten||{}).aantal);
+      return n===3?OK("3"):(n===5?DEEL(0.5,"5 in plaats van 3"):NEE(isNaN(n)?"—":String(n)));
+    })
+  ]
+}
+];
+
+/* ---------- kleine parsers voor de checks ---------- */
+function leesLabels(out){
+  const res = [];
+  for (const r of regels(out)){
+    const m = r.match(/^(\d)\s*[:.\-)]\s*(.+)$/);
+    if (m) { const i = (+m[1]) - 1; if (i >= 0 && i < 5) res[i] = norm(m[2]).replace(/[^a-z]/g, ""); }
+  }
+  for (let i = 0; i < 5; i++) if (!res[i]) res[i] = "";
+  return res;
+}
+function leesRegelOordeel(out){
+  const res = [];
+  for (const r of regels(out)){
+    const m = r.match(/^regel\s*(\d)\s*:?\s*(PASS|FAIL|GESLAAGD|VOLDOET)/i);
+    if (m) { const i = (+m[1]) - 1; if (i >= 0 && i < 4) res[i] = /FAIL/i.test(m[2]) ? "FAIL" : "PASS"; }
+  }
+  return res.filter(x => x !== undefined).length === 4 ? res : res;
+}
+function leesBedrag(out){
+  const m = String(out).match(/ANTWOORD\s*:\s*€?\s*([\d.,]+)/i);
+  if (!m) return null;
+  let s = m[1].replace(/\.(?=\d{3}\b)/g, "").replace(",", ".");
+  const v = parseFloat(s);
+  return isNaN(v) ? null : v;
+}
+function leesRooster(out){
+  const m = String(out).match(/ANTWOORD\s*:\s*(.+)$/im);
+  if (!m) return null;
+  const s = norm(m[1]); const r = {};
+  for (const d of ["maandag","dinsdag","woensdag","donderdag"]){
+    const mm = s.match(new RegExp(d + "\\s*[=:]\\s*([a-zà-ü]+)"));
+    r[d] = mm ? mm[1] : "";
+  }
+  return (r.maandag || r.dinsdag || r.woensdag || r.donderdag) ? r : null;
+}
+function codeCase(c, i){
+  if (!c.code || c.code.loadError) return NEE("code draaide niet");
+  const r = (c.code.results || [])[i];
+  const verwacht = c.test.code.cases[i].expect;
+  if (!r) return NEE("geen resultaat");
+  if (r.err) return NEE("fout: " + r.err);
+  return deepEqual(r.value, verwacht) ? OK() : NEE("kreeg " + JSON.stringify(r.value));
+}
+
+/* ==========================================================================
+   Staat, verbinding en modelgegevens
+   ========================================================================== */
+const S = {
+  host: "http://localhost:11434",
+  verbonden: false,
+  modellen: [],
+  draaiend: null,
+  gekozen: "",
+  modelinfo: null,
+  bezig: false, pauze: false, stoppen: false,
+  wachtOpKlik: false, klikResolver: null,
+  resultaten: [],
+  abort: null,
+  dirHandle: null,
+  laatsteRapport: null
+};
+
+const $ = id => document.getElementById(id);
+const led = $("led"), connlabel = $("connlabel"), connstatus = $("connstatus");
+
+function setLed(kleur, tekst){
+  led.className = "led " + kleur;
+  connlabel.textContent = tekst;
+}
+
+async function ping(){
+  const host = $("host").value.replace(/\/+$/, "");
+  S.host = host;
+  setLed("wait", "verbinden…");
+  try{
+    const ctrl = new AbortController();
+    const t = setTimeout(() => ctrl.abort(), 4000);
+    const r = await fetch(host + "/api/tags", {cache:"no-store", signal:ctrl.signal});
+    clearTimeout(t);
+    if (!r.ok) throw new Error("HTTP " + r.status);
+    const d = await r.json();
+    S.modellen = d.models || [];
+    S.verbonden = true;
+    await lesPs();
+    vulModelSelect();
+    setLed("on", "verbonden · " + S.modellen.length + " model" + (S.modellen.length===1?"":"len"));
+    connstatus.textContent = "verbonden met " + host +
+      (S.draaiend ? " — draaiend model: " + S.draaiend : " — geen model geladen (start er één met: ollama run <model>)");
+    werkStartKnop();
+    return true;
+  }catch(e){
+    S.verbonden = false; S.modellen = []; S.draaiend = null;
+    setLed("off", "geen verbinding");
+    connstatus.textContent = "geen verbinding met " + host + " — " + (e.name==="AbortError" ? "time-out" : e.message) +
+      ". Klap de installatie-eisen uit; waarschijnlijk draait Ollama niet, of blokkeert CORS (OLLAMA_ORIGINS).";
+    vulModelSelect(); werkStartKnop();
+    return false;
+  }
+}
+async function lesPs(){
+  try{
+    const r = await fetch(S.host + "/api/ps", {cache:"no-store"});
+    if (!r.ok) return;
+    const d = await r.json();
+    S.draaiend = (d.models && d.models[0] && (d.models[0].name || d.models[0].model)) || null;
+  }catch(e){ /* /api/ps niet beschikbaar */ }
+}
+function vulModelSelect(){
+  const sel = $("modelselect"), oud = S.gekozen;
+  sel.innerHTML = "";
+  if (!S.modellen.length){
+    sel.innerHTML = '<option value="">— geen model gevonden —</option>';
+    S.gekozen = ""; return;
+  }
+  for (const m of S.modellen){
+    const naam = m.name || m.model;
+    const o = document.createElement("option");
+    o.value = naam;
+    const d = m.details || {};
+    o.textContent = naam + (d.parameter_size ? "  ·  " + d.parameter_size : "") + (d.quantization_level ? " " + d.quantization_level : "");
+    sel.appendChild(o);
+  }
+  const volgPs = $("useps").checked && S.draaiend;
+  const keuze = (volgPs && S.modellen.some(m => (m.name||m.model) === S.draaiend)) ? S.draaiend
+              : (S.modellen.some(m => (m.name||m.model) === oud) ? oud : (S.modellen[0].name || S.modellen[0].model));
+  sel.value = keuze; S.gekozen = keuze;
+  werkDenkKnop();
+}
+
+/* ---------- modelgegevens ophalen ---------- */
+async function haalModelInfo(){
+  if (!S.verbonden || !S.gekozen) return;
+  connstatus.textContent = "modelgegevens ophalen voor " + S.gekozen + "…";
+  let show = {};
+  try{
+    const r = await fetch(S.host + "/api/show", {
+      method:"POST", headers:{"Content-Type":"application/json"},
+      body: JSON.stringify({model: S.gekozen})
+    });
+    if (r.ok) show = await r.json();
+  }catch(e){ /* verder met wat we hebben */ }
+
+  const tag = S.modellen.find(m => (m.name||m.model) === S.gekozen) || {};
+  const det = Object.assign({}, tag.details || {}, show.details || {});
+  const mi = show.model_info || {};
+  const arch = mi["general.architecture"] || det.family || "—";
+  const paramAantal = mi["general.parameter_count"] || null;
+  const ctxKey = Object.keys(mi).find(k => /\.context_length$/.test(k));
+  const beschrijving = mi["general.description"] || (show.modelfile ? (show.modelfile.match(/^#\s*(.+)$/m) || [])[1] : "") || "";
+
+  S.modelinfo = {
+    naam: S.gekozen,
+    familie: det.family || "—",
+    architectuur: arch,
+    parameterGrootte: det.parameter_size || (paramAantal ? (paramAantal/1e9).toFixed(1) + "B" : "—"),
+    parameterAantal: paramAantal ? Number(paramAantal) : null,
+    quantisatie: det.quantization_level || "—",
+    formaat: det.format || "—",
+    contextLengte: ctxKey ? mi[ctxKey] : (det.context_length || null),
+    grootteBytes: tag.size || null,
+    digest: (tag.digest || "").slice(0, 12),
+    gewijzigd: tag.modified_at || null,
+    capabilities: show.capabilities || [],
+    systemPrompt: show.system || "",
+    template: (show.template || "").slice(0, 900),
+    beschrijving: String(beschrijving).slice(0, 900),
+    licentieFragment: (show.license || "").split("\n").slice(0, 3).join(" ").slice(0, 240),
+    parametersVanMaker: (show.parameters || "").slice(0, 500)
+  };
+  toonModelInfo(); werkDenkKnop();
+  connstatus.textContent = "modelgegevens geladen voor " + S.gekozen + " — klaar om te testen.";
+  werkStartKnop();
+}
+function kanDenken(){
+  const c = (S.modelinfo && S.modelinfo.capabilities) || [];
+  const t = S.modellen.find(m => (m.name||m.model) === S.gekozen);
+  const c2 = (t && t.capabilities) || [];
+  return c.includes("thinking") || c2.includes("thinking");
+}
+function werkDenkKnop(){
+  const aan = kanDenken();
+  $("denklabel").style.display = aan ? "flex" : "none";
+  if (aan && !$("denklabel").dataset.uitgelegd){
+    $("denklabel").title = "Dit model kan hardop nadenken. Uit = alleen het eindantwoord (sneller en eerlijker te vergelijken); aan = denkstappen worden apart bewaard en de tokenlimiet gaat 3x omhoog.";
+    $("denklabel").dataset.uitgelegd = "1";
+  }
+}
+function bytesNaarGB(b){ return b ? (b/1073741824).toFixed(2) + " GB" : "—"; }
+function toonModelInfo(){
+  const m = S.modelinfo; if (!m) return;
+  $("modelpanel").classList.remove("hidden");
+  const rijen = [
+    ["model", m.naam, true],
+    ["parameters", m.parameterGrootte, true],
+    ["quantisatie", m.quantisatie],
+    ["architectuur", m.architectuur],
+    ["familie", m.familie],
+    ["contextlengte", m.contextLengte ? Number(m.contextLengte).toLocaleString("nl-NL") + " tokens" : "—"],
+    ["bestandsgrootte", bytesNaarGB(m.grootteBytes)],
+    ["capabilities", (m.capabilities||[]).join(", ") || "—"],
+    ["digest", m.digest || "—"]
+  ];
+  $("modelgrid").innerHTML = rijen.map(([k,v,big]) =>
+    '<div class="kv"><span class="k">' + k + '</span><span class="v' + (big?" big":"") + '">' + esc(String(v)) + '</span></div>').join("");
+
+  const blokken = [];
+  if (m.beschrijving) blokken.push(["omschrijving van de maker", m.beschrijving]);
+  if (m.systemPrompt)  blokken.push(["systeemprompt in het model", m.systemPrompt]);
+  if (m.parametersVanMaker) blokken.push(["standaardparameters van de maker", m.parametersVanMaker]);
+  if (m.licentieFragment) blokken.push(["licentie (fragment)", m.licentieFragment]);
+  if (!blokken.length) blokken.push(["omschrijving", "Dit model levert geen omschrijving of systeemprompt via de Ollama-API. Alleen de technische gegevens hierboven zijn beschikbaar."]);
+  $("modeldesc").innerHTML = blokken.map(([k,v]) =>
+    '<div class="k">' + k + '</div><pre>' + esc(v) + '</pre>').join('<div style="height:10px"></div>');
+}
+const esc = s => String(s).replace(/[&<>"]/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+
+/* ==========================================================================
+   Praten met het model
+   ========================================================================== */
+async function vraag(prompt, numPredict, onChunk){
+  const denkt = kanDenken();
+  const denkAan = denkt && $("denken").checked;
+  const body = {
+    model: S.gekozen,
+    prompt: prompt,
+    stream: true,
+    options: {temperature: 0, seed: 42, top_k: 1, num_predict: (numPredict || 600) * (denkAan ? 3 : 1)}
+  };
+  if (denkt) body.think = denkAan;
+  S.abort = new AbortController();
+  const t0 = performance.now();
+  const r = await fetch(S.host + "/api/generate", {
+    method: "POST", headers: {"Content-Type":"application/json"},
+    body: JSON.stringify(body), signal: S.abort.signal
+  });
+  if (!r.ok) throw new Error("Ollama gaf HTTP " + r.status + " terug");
+  const reader = r.body.getReader(), dec = new TextDecoder();
+  let buf = "", tekst = "", denkTekst = "", laatste = null, eersteTokenMs = null;
+  while (true){
+    const {done, value} = await reader.read();
+    if (done) break;
+    buf += dec.decode(value, {stream:true});
+    const stukken = buf.split("\n"); buf = stukken.pop();
+    for (const s of stukken){
+      if (!s.trim()) continue;
+      let j; try { j = JSON.parse(s); } catch(e){ continue; }
+      if (j.error) throw new Error(j.error);
+      if (j.thinking) denkTekst += j.thinking;
+      if (j.response){
+        if (eersteTokenMs === null) eersteTokenMs = performance.now() - t0;
+        tekst += j.response; onChunk && onChunk(tekst);
+      }
+      if (j.done) laatste = j;
+    }
+  }
+  const totaalMs = performance.now() - t0;
+  const evalCount = laatste && laatste.eval_count || 0;
+  const evalDur = laatste && laatste.eval_duration || 0;
+  const inline = tekst.match(/<think>([\s\S]*?)<\/think>/i);
+  if (inline){ denkTekst += inline[1]; tekst = tekst.replace(/<think>[\s\S]*?<\/think>/gi, "").trim(); }
+  return {
+    tekst, denkTekst,
+    meta: {
+      denkTokens: denkTekst ? denkTekst.split(/\s+/).length : 0,
+      totaalMs: Math.round(totaalMs),
+      eersteTokenMs: eersteTokenMs === null ? null : Math.round(eersteTokenMs),
+      tokens: evalCount,
+      promptTokens: (laatste && laatste.prompt_eval_count) || 0,
+      tokensPerSec: evalDur ? +(evalCount / (evalDur/1e9)).toFixed(1) : null,
+      doneReason: (laatste && laatste.done_reason) || "stop"
+    }
+  };
+}
+
+/* ==========================================================================
+   Voortgangsrail
+   ========================================================================== */
+function bouwRail(){
+  const rail = $("rail"); rail.innerHTML = "";
+  for (const key of Object.keys(CATS)){
+    const c = CATS[key];
+    const g = document.createElement("div"); g.className = "railgroup";
+    g.innerHTML = '<div class="rglabel" style="color:' + c.kleur + '">' + c.nr + ' · ' + c.naam + '</div>';
+    const row = document.createElement("div"); row.className = "rgcells";
+    TESTS.filter(t => t.cat === key).forEach(t => {
+      const cell = document.createElement("div");
+      cell.className = "railcell"; cell.id = "rail-" + t.id;
+      cell.textContent = "L" + t.level; cell.title = t.titel;
+      row.appendChild(cell);
+    });
+    g.appendChild(row); rail.appendChild(g);
+  }
+  $("raillegend").innerHTML =
+    '<span><span class="dot" style="background:#4fd1c5"></span>80–100 goed</span>' +
+    '<span><span class="dot" style="background:#ffb454"></span>55–79 wisselvallig</span>' +
+    '<span><span class="dot" style="background:#ff6b57"></span>0–54 onbruikbaar</span>' +
+    '<span><span class="dot" style="background:#2a2f37"></span>nog niet uitgevoerd</span>';
+}
+const scoreKleur = s => s >= 80 ? "#4fd1c5" : s >= 55 ? "#ffb454" : "#ff6b57";
+function railStatus(id, status, score){
+  const c = $("rail-" + id); if (!c) return;
+  c.className = "railcell" + (status === "bezig" ? " active" : status === "klaar" ? " done" : "");
+  if (status === "klaar"){ c.style.background = scoreKleur(score); c.textContent = Math.round(score); }
+}
+
+/* ==========================================================================
+   De testloop
+   ========================================================================== */
+async function pauzeCheck(){
+  while (S.pauze && !S.stoppen) await new Promise(r => setTimeout(r, 150));
+  if (S.stoppen) throw new Error("__gestopt__");
+}
+function wachtOpVolgende(){
+  $("next").classList.remove("hidden");
+  $("runstatus").textContent = "stap afgerond — klik op „volgende stap” om verder te gaan.";
+  return new Promise(res => { S.klikResolver = () => { $("next").classList.add("hidden"); S.klikResolver = null; res(); }; });
+}
+
+async function startTest(){
+  if (!S.verbonden || !S.gekozen) return;
+  if (!S.modelinfo || S.modelinfo.naam !== S.gekozen) await haalModelInfo();
+
+  S.bezig = true; S.stoppen = false; S.pauze = false; S.resultaten = []; S.laatsteRapport = null;
+  $("testlist").innerHTML = "";
+  $("analysepanel").classList.add("hidden");
+  $("start").disabled = true; $("pause").disabled = false; $("stop").disabled = false; $("download").disabled = true;
+  bouwRail();
+  const t0 = Date.now();
+
+  try{
+    for (let i = 0; i < TESTS.length; i++){
+      await pauzeCheck();
+      const test = TESTS[i];
+      $("runstatus").textContent = "stap " + (i+1) + "/" + TESTS.length + " — " + CATS[test.cat].naam + " · " + test.titel;
+      railStatus(test.id, "bezig");
+      const kaart = maakKaart(test, i);
+      const res = await draaiTest(test, kaart);
+      S.resultaten.push(res);
+      railStatus(test.id, "klaar", res.score);
+      $("progbar").style.width = ((i+1)/TESTS.length*100) + "%";
+      if ($("stepwise").checked && i < TESTS.length - 1) await wachtOpVolgende();
+    }
+    const rapport = maakRapport(Date.now() - t0);
+    S.laatsteRapport = rapport;
+    toonAnalyse(rapport);
+    $("download").disabled = false;
+    $("runstatus").textContent = "test afgerond — totaalscore " + rapport.totaal.score + "/100.";
+    await bewaar(rapport);
+  }catch(e){
+    if (e.message === "__gestopt__"){ $("runstatus").textContent = "test gestopt door de gebruiker."; }
+    else { $("runstatus").textContent = "test afgebroken: " + e.message; }
+  }finally{
+    S.bezig = false;
+    $("start").disabled = false; $("pause").disabled = true; $("stop").disabled = true;
+    $("next").classList.add("hidden");
+    $("pause").textContent = "⏸ pauzeer";
+  }
+}
+
+function maakKaart(test, i){
+  const c = CATS[test.cat];
+  const el = document.createElement("div");
+  el.className = "tcard open"; el.style.borderLeftColor = c.kleur;
+  el.innerHTML =
+    '<div class="th">' +
+      '<span class="cat mono" style="color:' + c.kleur + '">' + String(i+1).padStart(2,"0") + ' · ' + c.kort + '</span>' +
+      '<span class="lvl l' + test.level + '">niveau ' + test.level + ' — ' + LEVELNAAM[test.level] + '</span>' +
+      '<span class="ttl">' + esc(test.titel) + '</span>' +
+      '<span class="scorepill mono" style="color:var(--text-faint)">bezig…</span>' +
+    '</div>' +
+    '<div class="tbody">' +
+      '<div style="font-size:12.5px;color:var(--text-dim);margin-bottom:12px">' + esc(test.waarom) + '</div>' +
+      '<div class="split">' +
+        '<div><div class="subhead">de vraag (identiek voor elk model)</div><div class="promptbox"></div></div>' +
+        '<div><div class="subhead">antwoord van het model</div><div class="answerbox streaming"><span class="caret"></span></div></div>' +
+      '</div>' +
+      '<div class="checks"></div><div class="metrics"></div><div class="flagrow"></div>' +
+    '</div>';
+  el.querySelector(".th").addEventListener("click", () => el.classList.toggle("open"));
+  const lijst = $("testlist");
+  if (lijst.querySelector(".empty")) lijst.innerHTML = "";
+  lijst.appendChild(el);
+  el.scrollIntoView({behavior:"smooth", block:"nearest"});
+  return el;
+}
+
+async function draaiTest(test, kaart){
+  const promptbox = kaart.querySelector(".promptbox");
+  const answerbox = kaart.querySelector(".answerbox");
+  const prompts = test.prompts ? test.prompts : new Array(test.herhaal || 1).fill(test.prompt);
+
+  const outs = [], metas = [], gebruikt = [], denk = [];
+  for (let p = 0; p < prompts.length; p++){
+    await pauzeCheck();
+    const pr = typeof prompts[p] === "function" ? prompts[p](outs) : prompts[p];
+    gebruikt.push(pr);
+    promptbox.textContent = prompts.length > 1
+      ? gebruikt.map((x,i2) => "── beurt " + (i2+1) + " ──\n" + x).join("\n\n")
+      : pr;
+    if (prompts.length > 1) answerbox.innerHTML += (p ? '<div style="color:var(--text-faint);margin:8px 0">── beurt ' + (p+1) + ' ──</div>' : "");
+    const startHTML = answerbox.innerHTML.replace(/<span class="caret"><\/span>/, "");
+    const r = await vraag(pr, test.num_predict, tekst => {
+      answerbox.innerHTML = startHTML + esc(tekst) + '<span class="caret"></span>';
+      answerbox.scrollTop = answerbox.scrollHeight;
+    });
+    answerbox.innerHTML = startHTML + esc(r.tekst);
+    outs.push(r.tekst); metas.push(r.meta); denk.push(r.denkTekst || "");
+    if (r.denkTekst){
+      answerbox.innerHTML = startHTML + esc(r.tekst) +
+        '<details style="margin-top:10px"><summary style="cursor:pointer;color:var(--text-faint);font-size:11px">denkstappen van het model (' + r.meta.denkTokens + ' woorden)</summary><div style="color:var(--text-faint);white-space:pre-wrap;font-size:11px;margin-top:6px">' + esc(r.denkTekst) + '</div></details>';
+    }
+  }
+  answerbox.classList.remove("streaming");
+
+  /* code uitvoeren indien van toepassing */
+  let codeRes = null;
+  if (test.code){
+    const {code} = extractCode(outs[0]);
+    codeRes = await runInWorker(code, test.code.fname, test.code.cases, 2500);
+  }
+
+  const ctx = {out: outs[0], outs, metas, test, code: codeRes};
+  const checks = test.checks.map(ch => {
+    let r; try { r = ch.fn(ctx); } catch(e){ r = NEE("beoordeling mislukt: " + e.message); }
+    return {id: ch.id, label: ch.label, weight: ch.weight, flag: ch.flag,
+            ok: !!r.ok, score: typeof r.score === "number" ? r.score : (r.ok ? 1 : 0), info: r.info || ""};
+  });
+  const maxW = checks.reduce((a,c) => a + c.weight, 0);
+  const haal = checks.reduce((a,c) => a + c.weight * c.score, 0);
+  const score = maxW ? Math.round(haal / maxW * 100) : 0;
+
+  /* automatische vlaggen bovenop de check-vlaggen */
+  const vlaggen = new Set(checks.filter(c => c.score < 0.999 && c.flag).map(c => c.flag));
+  const alles = outs.join("\n");
+  if (metas.some(m => m.doneReason === "length")) vlaggen.add("afgekapt");
+  if (herhaling(alles) >= 3) vlaggen.add("herhaling");
+  if (!talenScore(alles).nederlands) vlaggen.add("taal");
+
+  /* kaart afmaken */
+  const pill = kaart.querySelector(".scorepill");
+  pill.textContent = score + " / 100";
+  pill.style.color = scoreKleur(score);
+  pill.style.background = "rgba(255,255,255,.04)";
+  kaart.querySelector(".checks").innerHTML = checks.map(c =>
+    '<div class="ck ' + (c.score >= 0.999 ? "ok" : c.score > 0 ? "part" : "no") + '">' +
+      '<span class="mark">' + (c.score >= 0.999 ? "✓" : c.score > 0 ? "◐" : "✗") + '</span>' +
+      '<span>' + esc(c.label) + '</span>' +
+      (c.info ? '<span class="info">' + esc(c.info) + '</span>' : "") +
+    '</div>').join("");
+  const totMs = metas.reduce((a,m) => a + m.totaalMs, 0);
+  const tps = metas.filter(m => m.tokensPerSec).map(m => m.tokensPerSec);
+  kaart.querySelector(".metrics").innerHTML =
+    '<span><b>tijd</b> ' + (totMs/1000).toFixed(1) + ' s</span>' +
+    '<span><b>tokens</b> ' + metas.reduce((a,m)=>a+m.tokens,0) + '</span>' +
+    (tps.length ? '<span><b>snelheid</b> ' + (tps.reduce((a,b)=>a+b,0)/tps.length).toFixed(1) + ' tok/s</span>' : "") +
+    (metas[0].eersteTokenMs !== null ? '<span><b>eerste token</b> ' + metas[0].eersteTokenMs + ' ms</span>' : "") +
+    '<span><b>afsluiting</b> ' + metas.map(m=>m.doneReason).join(", ") + '</span>' +
+    (codeRes ? '<span><b>sandbox</b> ' + (codeRes.loadError ? "fout: " + esc(codeRes.loadError) : "code uitgevoerd") + '</span>' : "");
+  kaart.querySelector(".flagrow").innerHTML = [...vlaggen].map(f =>
+    '<span class="flag" title="' + esc(VLAGGEN[f] ? VLAGGEN[f].wat : "") + '">' + esc(VLAGGEN[f] ? VLAGGEN[f].naam : f) + '</span>').join("");
+  if (score >= 80) kaart.classList.remove("open");
+
+  return {
+    id: test.id, cat: test.cat, level: test.level, titel: test.titel,
+    prompts: gebruikt, antwoorden: outs, denkstappen: denk.some(Boolean) ? denk : null, checks, score,
+    vlaggen: [...vlaggen], meta: metas,
+    codeSandbox: codeRes ? (codeRes.loadError ? {fout: codeRes.loadError} : {uitgevoerd: true}) : null
+  };
+}
+
+/* ==========================================================================
+   Rapport en analyse
+   ========================================================================== */
+function gem(a){ return a.length ? a.reduce((x,y)=>x+y,0)/a.length : 0; }
+
+function maakRapport(duurMs){
+  const R = S.resultaten;
+  const perCat = {}, perNiveau = {};
+  for (const k of Object.keys(CATS)){
+    const rr = R.filter(r => r.cat === k);
+    perCat[k] = {
+      score: Math.round(gem(rr.map(r => r.score))),
+      perNiveau: {1: pak(rr,1), 2: pak(rr,2), 3: pak(rr,3)}
+    };
+  }
+  for (const l of [1,2,3]) perNiveau[l] = Math.round(gem(R.filter(r => r.level === l).map(r => r.score)));
+  function pak(rr, l){ const x = rr.find(r => r.level === l); return x ? x.score : null; }
+
+  const vlagTel = {};
+  R.forEach(r => r.vlaggen.forEach(f => vlagTel[f] = (vlagTel[f]||0) + 1));
+
+  const alleMeta = R.flatMap(r => r.meta);
+  const tps = alleMeta.filter(m => m.tokensPerSec).map(m => m.tokensPerSec);
+  const snelheid = {
+    gemTokensPerSec: tps.length ? +gem(tps).toFixed(1) : null,
+    gemEersteTokenMs: Math.round(gem(alleMeta.filter(m=>m.eersteTokenMs!==null).map(m=>m.eersteTokenMs))),
+    totaalTokens: alleMeta.reduce((a,m)=>a+m.tokens,0),
+    totaleTijdMs: duurMs
+  };
+
+  const totaal = Math.round(gem(R.map(r => r.score)));
+  const rapport = {
+    schema: "ollama-llm-test/v1",
+    testsetVersie: TESTSET_VERSION,
+    tijdstip: new Date().toISOString(),
+    host: S.host,
+    model: S.modelinfo || {naam: S.gekozen},
+    opties: {temperature: 0, seed: 42, top_k: 1, denkmodus: kanDenken() ? ($("denken").checked ? "aan" : "uit") : "niet beschikbaar"},
+    totaal: {score: totaal, aantalTests: R.length},
+    perCategorie: perCat,
+    perNiveau,
+    snelheid,
+    vlaggen: vlagTel,
+    tests: R
+  };
+  rapport.analyse = maakAnalyse(rapport);
+  return rapport;
+}
+
+function maakAnalyse(rap){
+  const bev = [];
+  const cats = Object.keys(CATS);
+  const sterk = cats.filter(k => rap.perCategorie[k].score >= 75).sort((a,b) => rap.perCategorie[b].score - rap.perCategorie[a].score);
+  const zwak  = cats.filter(k => rap.perCategorie[k].score < 55).sort((a,b) => rap.perCategorie[a].score - rap.perCategorie[b].score);
+
+  /* 1 — waar valt het om */
+  let cliff = null;
+  for (const l of [1,2,3]) if (cliff === null && rap.perNiveau[l] < 55) cliff = l;
+  if (cliff === 1){
+    bev.push({soort:"cliff", titel:"Valt al om bij de makkelijkste opdrachten",
+      wat:"Zelfs op niveau 1 blijft de score onder de 55. Dit model is voor deze taken structureel te klein of te zwaar gekwantiseerd.",
+      fix:"Neem een groter model (7–8B in plaats van 1–3B) of een minder agressieve quantisatie (Q5_K_M in plaats van Q2/Q3). Blijf je op deze hardware, splits de taken dan op tot ze triviaal zijn."});
+  } else if (cliff === 2){
+    bev.push({soort:"cliff", titel:"Breekpunt ligt bij niveau 2",
+      wat:"Makkelijke opdrachten lukken (" + rap.perNiveau[1] + "/100), maar zodra er meerdere eisen tegelijk gelden zakt het door (" + rap.perNiveau[2] + "/100).",
+      fix:"Knip elke taak op in enkelvoudige stappen met één eis per aanroep, en laat je eigen code het samenvoegen. Dat is vaak effectiever dan een groter model."});
+  } else if (cliff === 3){
+    bev.push({soort:"cliff", titel:"Breekpunt ligt bij niveau 3",
+      wat:"Tot en met niveau 2 is dit model bruikbaar (" + rap.perNiveau[2] + "/100); de zware opdrachten zakken weg naar " + rap.perNiveau[3] + "/100.",
+      fix:"Zet dit model in voor routinewerk en routeer alleen de zware gevallen door naar een groter model. Een drempel op basis van invoerlengte of aantal eisen werkt daarvoor prima."});
+  } else {
+    bev.push({soort:"goed", titel:"Geen duidelijk breekpunt",
+      wat:"Het model houdt stand tot en met niveau 3 (" + rap.perNiveau[3] + "/100). Voor een lokaal model is dat sterk.",
+      fix:"Test met langere invoer en meer gelijktijdige eisen om het echte plafond te vinden."});
+  }
+
+  /* 2 — faalpatronen */
+  const gesorteerd = Object.entries(rap.vlaggen).sort((a,b) => b[1]-a[1]);
+  for (const [f, n] of gesorteerd.slice(0, 5)){
+    const v = VLAGGEN[f]; if (!v) continue;
+    bev.push({soort:"vlag", vlag:f, aantal:n, titel:v.naam, wat:v.wat, fix:v.fix});
+  }
+
+  /* 3 — snelheid */
+  const tps = rap.snelheid.gemTokensPerSec;
+  if (tps !== null){
+    const traag = tps < 12;
+    bev.push({soort: traag ? "vlag" : "goed", titel: traag ? "Traag op deze hardware" : "Bruikbare snelheid",
+      wat: "Gemiddeld " + tps + " tokens/s, eerste token na ongeveer " + rap.snelheid.gemEersteTokenMs + " ms. De hele batterij duurde " + (rap.snelheid.totaleTijdMs/1000/60).toFixed(1) + " minuten.",
+      fix: traag
+        ? "Kijk of het model volledig in het GPU-geheugen past (ollama ps toont dat), verlaag num_ctx, of kies een kleinere quantisatie. Draait het op CPU, dan is dit het plafond."
+        : "Deze snelheid is genoeg voor interactief gebruik; voor batchwerk kun je meerdere aanroepen parallel doen."});
+  }
+
+  /* 4 — samenvattend oordeel */
+  const geschikt = sterk.map(k => CATS[k].naam.toLowerCase());
+  const nietGeschikt = zwak.map(k => CATS[k].naam.toLowerCase());
+  const oordeel =
+    "Totaalscore <b>" + rap.totaal.score + "/100</b>. " +
+    (geschikt.length ? "Sterk in <b>" + geschikt.join("</b>, <b>") + "</b>. " : "Geen enkele vaardigheid haalt de 75. ") +
+    (nietGeschikt.length ? "Onbetrouwbaar voor <b>" + nietGeschikt.join("</b>, <b>") + "</b>. " : "Geen vaardigheid zakt onder de 55. ") +
+    "Per moeilijkheidsgraad: niveau 1 " + rap.perNiveau[1] + ", niveau 2 " + rap.perNiveau[2] + ", niveau 3 " + rap.perNiveau[3] + ".";
+
+  return {oordeel, sterk, zwak, breekpunt: cliff, bevindingen: bev};
+}
+
+/* ---------- weergave van de analyse ---------- */
+function toonAnalyse(rap){
+  $("analysepanel").classList.remove("hidden");
+  $("totalscore").textContent = rap.totaal.score;
+  $("totalscore").style.color = scoreKleur(rap.totaal.score);
+  $("verdict").innerHTML = rap.analyse.oordeel;
+
+  $("catbars").innerHTML = Object.keys(CATS).map(k => {
+    const c = CATS[k], p = rap.perCategorie[k];
+    const seg = [1,2,3].map(l => {
+      const s = p.perNiveau[l] === null ? 0 : p.perNiveau[l];
+      return '<i style="width:' + (s/3) + '%;background:' + c.kleur + ';opacity:' + (0.35 + 0.3*l) + '" title="niveau ' + l + ': ' + s + '"></i>';
+    }).join("");
+    return '<div class="catbar">' +
+      '<div class="top"><span style="color:' + c.kleur + '">' + c.nr + ' · ' + c.naam + '</span><span>' + p.score + '</span></div>' +
+      '<div class="track">' + seg + '</div>' +
+      '<div class="lvlmini">' + [1,2,3].map(l => '<span>L' + l + ': ' + (p.perNiveau[l] === null ? "—" : p.perNiveau[l]) + '</span>').join("") + '</div>' +
+      '<div style="font-size:11px;color:var(--text-faint);margin-top:3px">' + c.uitleg + '</div></div>';
+  }).join("");
+
+  $("findings").innerHTML = rap.analyse.bevindingen.map(b =>
+    '<div class="finding' + (b.soort === "goed" ? " good" : "") + '">' +
+      '<h4>' + esc(b.titel) + (b.aantal ? ' <span class="cnt">· ' + b.aantal + '× gezien</span>' : "") + '</h4>' +
+      '<p>' + esc(b.wat) + '</p><p class="fix">' + esc(b.fix) + '</p></div>').join("");
+
+  tekenRadar(rap);
+  tekenNiveauChart(rap);
+  $("radarlegend").innerHTML = Object.keys(CATS).map(k =>
+    '<span><span class="dot" style="background:' + CATS[k].kleur + '"></span>' + CATS[k].nr + ' ' + CATS[k].kort + '</span>').join("");
+}
+
+function tekenRadar(rap){
+  const cv = $("radar"), ctx = cv.getContext("2d");
+  const W = cv.width, H = cv.height, cx = W/2, cy = H/2 + 6, R = Math.min(W,H)/2 - 42;
+  ctx.clearRect(0,0,W,H);
+  const keys = Object.keys(CATS), n = keys.length;
+  const hoek = i => -Math.PI/2 + i * 2*Math.PI/n;
+  for (const ring of [0.25,0.5,0.75,1]){
+    ctx.beginPath();
+    for (let i = 0; i <= n; i++){ const a = hoek(i%n), x = cx + Math.cos(a)*R*ring, y = cy + Math.sin(a)*R*ring; i?ctx.lineTo(x,y):ctx.moveTo(x,y); }
+    ctx.closePath(); ctx.strokeStyle = ring===1 ? "#3a4049" : "#262b33"; ctx.stroke();
+  }
+  ctx.strokeStyle = "#262b33";
+  for (let i = 0; i < n; i++){ const a = hoek(i);
+    ctx.beginPath(); ctx.moveTo(cx,cy); ctx.lineTo(cx+Math.cos(a)*R, cy+Math.sin(a)*R); ctx.stroke(); }
+  ctx.beginPath();
+  keys.forEach((k,i) => { const v = rap.perCategorie[k].score/100, a = hoek(i);
+    const x = cx+Math.cos(a)*R*v, y = cy+Math.sin(a)*R*v; i?ctx.lineTo(x,y):ctx.moveTo(x,y); });
+  ctx.closePath();
+  ctx.fillStyle = "rgba(79,209,197,.16)"; ctx.fill();
+  ctx.strokeStyle = "#4fd1c5"; ctx.lineWidth = 2; ctx.stroke(); ctx.lineWidth = 1;
+  keys.forEach((k,i) => { const v = rap.perCategorie[k].score/100, a = hoek(i);
+    ctx.beginPath(); ctx.arc(cx+Math.cos(a)*R*v, cy+Math.sin(a)*R*v, 3.4, 0, 7); ctx.fillStyle = CATS[k].kleur; ctx.fill(); });
+  ctx.font = "600 11px 'IBM Plex Mono', monospace"; ctx.textAlign = "center"; ctx.textBaseline = "middle";
+  keys.forEach((k,i) => { const a = hoek(i), x = cx+Math.cos(a)*(R+22), y = cy+Math.sin(a)*(R+16);
+    ctx.fillStyle = CATS[k].kleur; ctx.fillText(CATS[k].nr + " " + CATS[k].kort, x, y);
+    ctx.fillStyle = "#5c636d"; ctx.fillText(rap.perCategorie[k].score, x, y + 12); });
+}
+
+function tekenNiveauChart(rap){
+  const cv = $("levelchart"), ctx = cv.getContext("2d");
+  const W = cv.width, H = cv.height, pad = 34, bodem = H - 26;
+  ctx.clearRect(0,0,W,H);
+  ctx.strokeStyle = "#262b33"; ctx.font = "10px 'IBM Plex Mono', monospace"; ctx.fillStyle = "#5c636d"; ctx.textAlign = "right";
+  for (const v of [0,25,50,75,100]){ const y = bodem - v/100*(bodem-14);
+    ctx.beginPath(); ctx.moveTo(pad,y); ctx.lineTo(W-8,y); ctx.stroke(); ctx.fillText(v, pad-6, y+3); }
+  const keys = Object.keys(CATS);
+  const groepB = (W - pad - 16) / 3;
+  const barB = Math.min(16, (groepB - 24) / keys.length);
+  ctx.textAlign = "center";
+  [1,2,3].forEach((l, gi) => {
+    const x0 = pad + 8 + gi*groepB;
+    keys.forEach((k, bi) => {
+      const s = rap.perCategorie[k].perNiveau[l]; if (s === null) return;
+      const h = s/100*(bodem-14), x = x0 + bi*(barB+2);
+      ctx.fillStyle = CATS[k].kleur; ctx.globalAlpha = .85;
+      ctx.fillRect(x, bodem-h, barB, h); ctx.globalAlpha = 1;
+    });
+    const gem = rap.perNiveau[l];
+    const y = bodem - gem/100*(bodem-14);
+    ctx.strokeStyle = "#e9e7e1"; ctx.setLineDash([4,3]);
+    ctx.beginPath(); ctx.moveTo(x0-4, y); ctx.lineTo(x0 + keys.length*(barB+2) + 2, y); ctx.stroke(); ctx.setLineDash([]);
+    ctx.fillStyle = "#e9e7e1"; ctx.font = "600 11px 'IBM Plex Mono', monospace";
+    ctx.fillText("niveau " + l + " · " + LEVELNAAM[l] + "  (" + gem + ")", x0 + keys.length*(barB+2)/2, H - 8);
+  });
+}
+
+/* ==========================================================================
+   Opslaan
+   ========================================================================== */
+const DIRDB_NAME = "llm-lab-dirs", DIRDB_STORE = "handles";
+function dirDbOpen(){
+  return new Promise((res, rej) => {
+    const q = indexedDB.open(DIRDB_NAME, 1);
+    q.onupgradeneeded = () => { try{ q.result.createObjectStore(DIRDB_STORE); }catch(e){} };
+    q.onsuccess = () => res(q.result); q.onerror = () => rej(q.error);
+  });
+}
+async function dirDbGet(k){
+  try{ const db = await dirDbOpen();
+    return await new Promise((res, rej) => { const tx = db.transaction(DIRDB_STORE,"readonly");
+      const q = tx.objectStore(DIRDB_STORE).get(k); q.onsuccess = () => res(q.result||null); q.onerror = () => rej(q.error); });
+  }catch(e){ return null; }
+}
+async function dirDbSet(k, h){
+  try{ const db = await dirDbOpen();
+    await new Promise((res, rej) => { const tx = db.transaction(DIRDB_STORE,"readwrite");
+      tx.objectStore(DIRDB_STORE).put(h, k); tx.oncomplete = res; tx.onerror = () => rej(tx.error); });
+  }catch(e){}
+}
+function tijdStempel(d){
+  const p = n => String(n).padStart(2,"0");
+  return d.getFullYear() + p(d.getMonth()+1) + p(d.getDate()) + "-" + p(d.getHours()) + p(d.getMinutes()) + p(d.getSeconds());
+}
+const veiligeNaam = s => String(s).replace(/[^a-zA-Z0-9._-]+/g, "_");
+
+async function bewaar(rap){
+  const st = $("savestatus");
+  const naam = "llm_" + veiligeNaam(rap.model.naam) + "_" + tijdStempel(new Date(rap.tijdstip)) + ".json";
+  if (!S.dirHandle){
+    st.textContent = "nog geen map gekozen — klik op „kies resultatenmap” (map „resultaten-llm” in deze projectmap) of gebruik de downloadknop. Bestandsnaam: " + naam;
+    return;
+  }
+  try{
+    const fh = await S.dirHandle.getFileHandle(naam, {create:true});
+    const w = await fh.createWritable();
+    await w.write(JSON.stringify(rap, null, 2));
+    await w.close();
+    st.textContent = "opgeslagen als „" + S.dirHandle.name + "/" + naam + "” — " + new Date().toLocaleTimeString("nl-NL");
+  }catch(e){ st.textContent = "opslaan mislukt: " + e.message + " — gebruik de downloadknop."; }
+}
+
+/* ==========================================================================
+   Bediening
+   ========================================================================== */
+function werkStartKnop(){
+  $("start").disabled = !(S.verbonden && S.gekozen) || S.bezig;
+}
+$("reconnect").addEventListener("click", ping);
+$("host").addEventListener("keydown", e => { if (e.key === "Enter") ping(); });
+$("modelselect").addEventListener("change", e => {
+  S.gekozen = e.target.value; S.modelinfo = null;
+  $("modelpanel").classList.add("hidden"); werkStartKnop(); werkDenkKnop();
+});
+$("loadinfo").addEventListener("click", haalModelInfo);
+$("start").addEventListener("click", startTest);
+$("pause").addEventListener("click", () => {
+  S.pauze = !S.pauze;
+  $("pause").textContent = S.pauze ? "▶ hervat" : "⏸ pauzeer";
+  if (S.pauze) $("runstatus").textContent = "gepauzeerd.";
+});
+$("stop").addEventListener("click", () => {
+  S.stoppen = true; S.pauze = false;
+  try{ S.abort && S.abort.abort(); }catch(e){}
+  if (S.klikResolver) S.klikResolver();
+});
+$("next").addEventListener("click", () => { if (S.klikResolver) S.klikResolver(); });
+$("download").addEventListener("click", () => {
+  if (!S.laatsteRapport) return;
+  const naam = "llm_" + veiligeNaam(S.laatsteRapport.model.naam) + "_" + tijdStempel(new Date(S.laatsteRapport.tijdstip)) + ".json";
+  const url = URL.createObjectURL(new Blob([JSON.stringify(S.laatsteRapport, null, 2)], {type:"application/json"}));
+  const a = document.createElement("a"); a.href = url; a.download = naam; a.click();
+  URL.revokeObjectURL(url);
+});
+$("choosedir").addEventListener("click", async () => {
+  const st = $("savestatus");
+  if (!window.showDirectoryPicker){ st.textContent = "deze browser ondersteunt geen mapkeuze (gebruik Chrome of Edge) — gebruik de downloadknop."; return; }
+  try{
+    S.dirHandle = await window.showDirectoryPicker({id:"llm-lab-llmresultaten", mode:"readwrite", startIn:"documents"});
+    await dirDbSet("llmResultsDir", S.dirHandle);
+    st.textContent = "map gekozen: „" + S.dirHandle.name + "” — elk afgerond model komt hier als eigen JSON-bestand.";
+    if (S.laatsteRapport) await bewaar(S.laatsteRapport);
+  }catch(e){}
+});
+
+/* mapkeuze herstellen na herladen */
+(async () => {
+  const h = await dirDbGet("llmResultsDir");
+  if (!h) return;
+  try{
+    const p = await h.queryPermission({mode:"readwrite"});
+    if (p === "granted"){ S.dirHandle = h; $("savestatus").textContent = "resultatenmap onthouden: „" + h.name + "”."; }
+    else $("savestatus").textContent = "resultatenmap „" + h.name + "” onthouden — klik één keer op „kies resultatenmap” om toegang te bevestigen.";
+  }catch(e){}
+})();
+
+/* start */
+bouwRail();
+ping();
+setInterval(async () => {
+  if (S.bezig) return;
+  const was = S.verbonden, wasDraaiend = S.draaiend;
+  try{
+    const r = await fetch(S.host + "/api/tags", {cache:"no-store"});
+    if (!r.ok) throw new Error();
+    const d = await r.json();
+    S.modellen = d.models || []; S.verbonden = true;
+    await lesPs();
+    if (!was || wasDraaiend !== S.draaiend){ vulModelSelect(); }
+    setLed("on", "verbonden · " + S.modellen.length + " model" + (S.modellen.length===1?"":"len"));
+    if (!was){ connstatus.textContent = "verbonden met " + S.host + (S.draaiend ? " — draaiend model: " + S.draaiend : ""); }
+    werkStartKnop();
+  }catch(e){
+    if (was){ S.verbonden = false; setLed("off", "geen verbinding"); werkStartKnop(); }
+  }
+}, 6000);
+</script>
+<style>
+  .railgroup{flex:1 1 150px;min-width:140px;}
+  .rglabel{font-family:'IBM Plex Mono',monospace;font-size:9.5px;margin-bottom:4px;
+    white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+  .rgcells{display:flex;gap:3px;}
+  #rail{gap:10px;}
+</style>
+</body>
+</html>

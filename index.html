@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lokaal model lab — hoofdmenu</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#14161a; --panel:#1b1e24; --panel-alt:#20242b; --border:#2a2f37;
+    --text:#e9e7e1; --text-dim:#9199a3; --text-faint:#5c636d;
+    --pos:#4fd1c5; --neg:#ff6b57; --warn:#ffb454; --grid:#22262d;
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    background:var(--bg); color:var(--text); font-family:'Inter',sans-serif; line-height:1.55;
+    background-image:linear-gradient(var(--grid) 1px, transparent 1px),linear-gradient(90deg, var(--grid) 1px, transparent 1px);
+    background-size:28px 28px; background-attachment:fixed; min-height:100vh;
+  }
+  h1,h2,h3{font-family:'Space Grotesk',sans-serif;margin:0;letter-spacing:.2px;}
+  .wrap{max-width:1100px;margin:0 auto;padding:56px 24px 60px;}
+  header{margin-bottom:40px;max-width:640px;}
+  header .kicker{font-family:'IBM Plex Mono',monospace;font-size:12px;color:var(--pos);margin-bottom:10px;}
+  header h1{font-size:32px;font-weight:600;}
+  header p{color:var(--text-dim);font-size:14.5px;margin-top:12px;}
+
+  .section-label{font-family:'IBM Plex Mono',monospace;font-size:11.5px;color:var(--text-faint);
+    margin:36px 0 14px;padding-bottom:8px;border-bottom:1px solid var(--border);}
+
+  .cards{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:16px;}
+  .card{background:var(--panel);border:1px solid var(--border);border-radius:4px;padding:20px;
+    text-decoration:none;color:var(--text);display:flex;flex-direction:column;gap:10px;transition:.15s;}
+  .card:hover{border-color:var(--pos);}
+  .card .tag{font-family:'IBM Plex Mono',monospace;font-size:10.5px;color:var(--pos);letter-spacing:.4px;}
+  .card h3{font-size:16.5px;font-weight:600;}
+  .card p{font-size:12.5px;color:var(--text-dim);flex:1;}
+  .card .cta{font-family:'IBM Plex Mono',monospace;font-size:11.5px;color:var(--text-faint);}
+  .card:hover .cta{color:var(--pos);}
+
+  .card.disabled{opacity:.45;cursor:default;pointer-events:none;border-style:dashed;}
+  .card.results{border-color:var(--warn);}
+  .card.results .tag{color:var(--warn);}
+  .card.results:hover{border-color:var(--warn);}
+
+  .note{font-size:12px;color:var(--text-faint);margin-top:30px;line-height:1.6;max-width:640px;}
+  .note b{color:var(--text-dim);}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header>
+    <div class="kicker">meetstation · lokaal model lab</div>
+    <h1>Lokaal model lab</h1>
+    <p>Een verzameling kleine, volledig lokale tests om te voelen wat een model dat op eigen hardware draait wel en niet kan — zonder afhankelijk te zijn van een LLM in een datacenter.</p>
+  </header>
+
+  <div class="section-label">tests</div>
+  <div class="cards">
+    <a class="card" href="nn-layer-test.html">
+      <div class="tag">test 01</div>
+      <h3>NN Layer Test</h3>
+      <p>Bouw zelf een klein neuraal netwerk (tot 5 verborgen lagen), kies een taak — koffiereviews, spam, handgeschreven cijfers of letters — en meet wanneer de prestatie goed genoeg is.</p>
+      <div class="cta">open test →</div>
+    </a>
+    <a class="card" href="ollama-test.html">
+      <div class="tag">test 02</div>
+      <h3>Ollama LLM-test</h3>
+      <p>Test een lokaal draaiend taalmodel via Ollama op 18 vaste opdrachten: schrijven, samenvatten, classificeren, redeneren, coderen en agentisch gedrag — elk op drie moeilijkheidsgraden.</p>
+      <div class="cta">open test &rarr;</div>
+    </a>
+    <div class="card disabled">
+      <div class="tag">binnenkort</div>
+      <h3>Nieuwe test</h3>
+      <p>Hier komt de volgende test bij zodra die klaar is.</p>
+      <div class="cta">nog niet beschikbaar</div>
+    </div>
+  </div>
+
+  <div class="section-label">resultaten</div>
+  <div class="cards">
+    <a class="card results" href="resultaten.html">
+      <div class="tag">viewer</div>
+      <h3>Resultaten neurale netwerken</h3>
+      <p>Vergelijk opgeslagen sessies naast elkaar: architectuur, parameters, nauwkeurigheid en trainingstijd per run.</p>
+      <div class="cta">open resultaten →</div>
+    </a>
+    <a class="card results" href="ollama-resultaten.html">
+      <div class="tag">viewer</div>
+      <h3>Resultaten LLM-modellen</h3>
+      <p>Leg geteste Ollama-modellen naast elkaar per vaardigheid, moeilijkheidsgraad en snelheid &mdash; en kies met het adviesformulier het juiste model voor een concrete taak.</p>
+      <div class="cta">open LLM-resultaten &rarr;</div>
+    </a>
+  </div>
+
+  <div class="note">
+    Elke test draait volledig in de browser, op je eigen apparaat. Resultaten die je opslaat, komen terecht in <b>resultaten/resultaten.json</b> in deze projectmap — kies die map ("resultaten") één keer per test via "kies resultatenmap", of gebruik de downloadknop en zet het bestand er zelf in. Voor taak C en D (cijfers/letters) kun je via "kies datasetmap" ook de map <b>datasets</b> in deze projectmap aanwijzen, zodat de dataset lokaal geladen wordt in plaats van via internet. Resultaten van de <b>Ollama LLM-test</b> komen als één JSON-bestand per model in de map <b>resultaten-llm</b>; die test heeft geen dataset nodig, maar wel een draaiende Ollama-server (zie het uitschuifbare vak met installatie-eisen op die pagina).
+  </div>
+
+</div>
+</body>
+</html>

@@ -1,0 +1,1272 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>NN Layer Test — lokaal model lab</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#14161a; --panel:#1b1e24; --panel-alt:#20242b; --border:#2a2f37;
+    --text:#e9e7e1; --text-dim:#9199a3; --text-faint:#5c636d;
+    --pos:#4fd1c5; --neg:#ff6b57; --warn:#ffb454; --grid:#22262d;
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    background:var(--bg); color:var(--text); font-family:'Inter',sans-serif; line-height:1.5;
+    background-image:linear-gradient(var(--grid) 1px, transparent 1px),linear-gradient(90deg, var(--grid) 1px, transparent 1px);
+    background-size:28px 28px; background-attachment:fixed;
+  }
+  h1,h2,h3{font-family:'Space Grotesk',sans-serif;margin:0;letter-spacing:.2px;}
+  .mono{font-family:'IBM Plex Mono',monospace;}
+  .wrap{max-width:1440px;margin:0 auto;padding:22px 24px 60px;}
+  a{color:var(--pos);}
+
+  .breadcrumb{font-size:12.5px;color:var(--text-dim);margin-bottom:12px;}
+  .breadcrumb a{color:var(--text-dim);text-decoration:none;border-bottom:1px dotted var(--text-faint);}
+  .breadcrumb a:hover{color:var(--pos);border-color:var(--pos);}
+
+  header{display:flex;justify-content:space-between;align-items:flex-end;flex-wrap:wrap;gap:16px;
+    padding-bottom:18px;margin-bottom:20px;border-bottom:1px solid var(--border);}
+  header h1{font-size:24px;font-weight:600;}
+  header .sub{color:var(--text-dim);font-size:13.5px;max-width:560px;margin-top:6px;}
+  .tasktabs{display:flex;gap:8px;flex-wrap:wrap;max-width:520px;}
+  .tasktabs button{background:var(--panel);border:1px solid var(--border);color:var(--text-dim);
+    padding:8px 13px;border-radius:3px;font-family:'IBM Plex Mono',monospace;font-size:11.5px;cursor:pointer;transition:.15s;}
+  .tasktabs button.active{color:var(--bg);background:var(--pos);border-color:var(--pos);font-weight:600;}
+  .tasktabs button:hover:not(.active){border-color:var(--text-dim);color:var(--text);}
+
+  .grid{display:grid;grid-template-columns:300px 1fr 320px;gap:18px;align-items:start;}
+  @media (max-width:1150px){ .grid{grid-template-columns:1fr;} }
+
+  .panel{background:var(--panel);border:1px solid var(--border);border-radius:4px;padding:18px;}
+  .panel + .panel{margin-top:18px;}
+  .panel h2{font-size:13px;color:var(--text-dim);font-weight:600;letter-spacing:.3px;
+    margin-bottom:12px;padding-bottom:10px;border-bottom:1px solid var(--border);}
+
+  .hint{font-size:11.5px;color:var(--text-faint);line-height:1.5;margin-top:4px;}
+  .hint b{color:var(--warn);}
+
+  .field{margin-bottom:16px;}
+  .field label{display:flex;justify-content:space-between;font-size:12.5px;color:var(--text-dim);margin-bottom:6px;}
+  .field label span.val{color:var(--warn);font-family:'IBM Plex Mono',monospace;}
+  input[type=range]{width:100%;accent-color:var(--pos);}
+  select{width:100%;background:var(--panel-alt);color:var(--text);border:1px solid var(--border);
+    padding:7px 8px;border-radius:3px;font-family:'IBM Plex Mono',monospace;font-size:12.5px;}
+  .hidden-layers{display:flex;flex-direction:column;gap:10px;margin-bottom:10px;}
+  .layerctl{background:var(--panel-alt);border:1px solid var(--border);border-radius:3px;padding:10px 12px;}
+  .layerctl-head{display:flex;justify-content:space-between;font-size:11.5px;color:var(--text-faint);margin-bottom:6px;}
+  .layerbtns{display:flex;gap:8px;margin-top:10px;}
+  .layerbtns button, .actionbtn{flex:1;background:var(--panel-alt);color:var(--text);border:1px solid var(--border);
+    padding:8px;border-radius:3px;font-family:'IBM Plex Mono',monospace;font-size:12px;cursor:pointer;}
+  .layerbtns button:hover, .actionbtn:hover{border-color:var(--text-dim);}
+  .actionbtn.primary{background:var(--pos);color:#0d1210;border-color:var(--pos);font-weight:600;}
+  .actionbtn.primary:hover{filter:brightness(1.08);}
+  .actionbtn.stop{background:var(--neg);color:#1a0d0a;border-color:var(--neg);font-weight:600;}
+  .actionbtn:disabled{opacity:.4;cursor:not-allowed;}
+  .row2{display:flex;gap:8px;}
+  .row2 > *{flex:1;}
+  .checkline{display:flex;align-items:center;gap:7px;font-size:12px;color:var(--text-dim);margin-top:10px;}
+  .checkline input{accent-color:var(--pos);}
+
+  #netwrap{background:var(--panel);border:1px solid var(--border);border-radius:4px;padding:14px;}
+  #netwrap .capt{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;flex-wrap:wrap;gap:8px;}
+  #netwrap .capt .legend{display:flex;gap:14px;font-size:11px;color:var(--text-faint);}
+  .swatch{display:inline-block;width:10px;height:2px;margin-right:5px;vertical-align:middle;}
+  svg#netsvg{width:100%;height:320px;display:block;}
+
+  .chartpanel{margin-top:18px;}
+  canvas#chart{width:100%;height:190px;display:block;}
+  .chart-legend{display:flex;gap:18px;font-size:11.5px;color:var(--text-dim);margin-top:8px;}
+  .satrow{display:flex;align-items:center;gap:10px;margin-top:8px;font-size:11.5px;font-family:'IBM Plex Mono',monospace;}
+  .satrow .satlabel{min-width:150px;color:var(--text-dim);flex-shrink:0;}
+  .satbar-track{flex:1;height:8px;background:var(--panel-alt);border:1px solid var(--border);border-radius:4px;overflow:hidden;}
+  .satbar-fill{height:100%;border-radius:4px;}
+  .satrow .satval{min-width:42px;text-align:right;color:var(--text-faint);}
+  .research{border-color:var(--c4,#8b7cf0);}
+  .research h3{font-size:13.5px;margin:14px 0 6px;color:var(--text);}
+  .research h3:first-child{margin-top:0;}
+  .research p{font-size:12.5px;color:var(--text-dim);line-height:1.6;margin:0 0 4px;}
+  .research a{color:var(--pos);}
+
+  .metric{display:flex;justify-content:space-between;padding:7px 0;border-bottom:1px solid var(--border);font-size:13px;}
+  .metric:last-child{border-bottom:none;}
+  .metric .k{color:var(--text-dim);}
+  .metric .v{font-family:'IBM Plex Mono',monospace;font-weight:500;}
+
+  .verdict{margin-top:6px;padding:12px 14px;border-radius:3px;font-size:13px;border:1px solid;}
+  .verdict.good{background:rgba(79,209,197,.08);border-color:var(--pos);color:var(--pos);}
+  .verdict.bad{background:rgba(255,107,87,.08);border-color:var(--neg);color:var(--neg);}
+  .verdict b{display:block;font-family:'Space Grotesk',sans-serif;font-size:14px;margin-bottom:3px;}
+
+  textarea#testsentence{width:100%;background:var(--panel-alt);border:1px solid var(--border);color:var(--text);
+    border-radius:3px;padding:9px 10px;font-family:'Inter',sans-serif;font-size:13px;resize:vertical;min-height:52px;}
+  #testresult{margin-top:10px;font-size:13px;}
+  #testresult .pred{font-family:'IBM Plex Mono',monospace;font-size:22px;font-weight:600;}
+
+  #drawcanvas{background:#000;border:1px solid var(--border);border-radius:3px;cursor:crosshair;touch-action:none;display:block;margin:0 auto;}
+  .drawwrap{display:flex;flex-direction:column;align-items:center;gap:10px;}
+
+  .lowerrow{display:grid;grid-template-columns:1fr 1fr;gap:18px;margin-top:18px;}
+  @media (max-width:1150px){ .lowerrow{grid-template-columns:1fr;} }
+  .failitem{padding:9px 0;border-bottom:1px solid var(--border);font-size:12.5px;display:flex;gap:10px;align-items:center;}
+  .failitem:last-child{border-bottom:none;}
+  .failitem .txt{color:var(--text);flex:1;}
+  .failitem .tags{margin-top:3px;font-family:'IBM Plex Mono',monospace;font-size:11px;color:var(--text-faint);}
+  .failitem .tags b{color:var(--neg);}
+  .failitem canvas{width:32px;height:32px;image-rendering:pixelated;border:1px solid var(--border);flex-shrink:0;}
+  #failempty{color:var(--text-faint);font-size:12.5px;}
+
+  table{width:100%;border-collapse:collapse;font-size:11.5px;}
+  th,td{text-align:left;padding:6px 7px;border-bottom:1px solid var(--border);white-space:nowrap;}
+  th{color:var(--text-faint);font-weight:500;font-family:'IBM Plex Mono',monospace;font-size:10px;}
+  td{font-family:'IBM Plex Mono',monospace;color:var(--text);}
+  #comparetable{max-height:230px;overflow:auto;}
+  #comparetable::-webkit-scrollbar{width:6px;} #comparetable::-webkit-scrollbar-thumb{background:var(--border);}
+  .badge{padding:1px 6px;border-radius:2px;font-size:10px;}
+  .badge.ok{background:rgba(79,209,197,.15);color:var(--pos);}
+  .badge.no{background:rgba(255,107,87,.15);color:var(--neg);}
+
+  .note{font-size:12px;color:var(--text-faint);margin-top:12px;line-height:1.55;}
+  .note b{color:var(--text-dim);}
+
+  .thumbstrip{display:flex;gap:6px;flex-wrap:wrap;margin-top:10px;}
+  .thumbstrip canvas{width:34px;height:34px;image-rendering:pixelated;border:1px solid var(--border);border-radius:2px;}
+
+  .progresswrap{background:var(--panel-alt);border:1px solid var(--border);border-radius:3px;height:8px;overflow:hidden;margin-top:8px;}
+  .progressbar{height:100%;background:var(--pos);width:0%;transition:width .2s;}
+  .loadstatus{font-size:11.5px;color:var(--text-faint);margin-top:6px;font-family:'IBM Plex Mono',monospace;}
+
+  .savebar{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-top:10px;}
+  .savestatus{font-size:11px;color:var(--text-faint);font-family:'IBM Plex Mono',monospace;}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <div class="breadcrumb"><a href="index.html">← Hoofdmenu</a></div>
+
+  <header>
+    <div>
+      <h1>NN Layer Test — lokaal model lab</h1>
+      <div class="sub">Bouw een volledig lokaal neuraal netwerk, kies een taak, en meet wanneer het genoeg presteert — en waarom het soms niet genoeg is.</div>
+    </div>
+    <div class="tasktabs">
+      <button id="tab-sentiment" class="active">A — koffiereviews</button>
+      <button id="tab-spam">B — spam herkennen</button>
+      <button id="tab-digits">C — cijfers schrijven</button>
+      <button id="tab-letters">D — alfabet schrijven</button>
+    </div>
+  </header>
+
+  <div class="grid">
+
+    <!-- LEFT: controls -->
+    <div>
+      <div class="panel">
+        <h2>Architectuur — verborgen lagen</h2>
+        <div id="layerlist" class="hidden-layers"></div>
+        <div class="layerbtns">
+          <button id="addlayer">+ laag toevoegen</button>
+          <button id="removelayer">− laag verwijderen</button>
+        </div>
+        <div class="hint" id="layerhint">Richtwaarde: <b>1-2 lagen van 8-16 nodes</b> volstaat voor tekstclassificatie. Meer lagen/nodes leren complexere patronen, maar trainen trager en overfitten sneller op kleine datasets. Max. 5 lagen.</div>
+        <div class="note">Invoer- en uitvoerlaag liggen vast door de taak. Jij bestuurt de <b>verborgen lagen</b> ertussen.</div>
+      </div>
+
+      <div class="panel">
+        <h2>Instellingen</h2>
+        <div class="field">
+          <label>Activatiefunctie (alle lagen tegelijk)</label>
+          <select id="activation">
+            <option value="relu">ReLU</option>
+            <option value="tanh">tanh</option>
+            <option value="sigmoid">sigmoid</option>
+          </select>
+          <div class="hint">Richtwaarde: <b>ReLU</b> — traint het snelst en werkt bijna altijd goed als standaard. Wil je per verborgen laag een andere activatiefunctie? Dat kan hierboven bij "Architectuur".</div>
+        </div>
+
+        <div id="text-feature-field" class="field">
+          <label>Invoer-representatie <span class="val" id="featval">telling</span></label>
+          <select id="feature">
+            <option value="binary">aanwezig / afwezig (binair)</option>
+            <option value="count" selected>woordtelling</option>
+            <option value="tfidf">gewogen naar zeldzaamheid (tf-idf)</option>
+          </select>
+          <div class="hint">Richtwaarde: begin met <b>woordtelling</b>. Zit je op de grens van "goed genoeg"? Probeer <b>tf-idf</b> — vaak een gratis nauwkeurigheidswinst zonder groter model.</div>
+        </div>
+
+        <div id="image-feature-field" style="display:none;">
+          <div class="field">
+            <label>Resolutie <span class="val" id="resval">14×14</span></label>
+            <select id="resolution">
+              <option value="10">10×10 (100 pixels) — snelst</option>
+              <option value="14" selected>14×14 (196 pixels) — balans</option>
+              <option value="20">20×20 (400 pixels)</option>
+              <option value="28">28×28 (784 pixels) — volledig, traagst</option>
+            </select>
+            <div class="hint">Richtwaarde: <b>14×14</b>. Lagere resolutie = minder invoer-nodes = minder rekenwerk, maar fijne details (bijv. verschil tussen een 4 en een 9) gaan verloren.</div>
+          </div>
+          <div class="field">
+            <label>Voorbeelden per klasse <span class="val" id="perclassval">50</span></label>
+            <input type="range" id="perclass" min="10" max="150" value="50">
+            <div class="hint">Richtwaarde: <b>40-60</b> traint snel en geeft al een bruikbaar beeld. Hoger geeft meestal hogere nauwkeurigheid, maar duurt langer om te laden en te trainen.</div>
+          </div>
+          <div class="savebar" style="margin-bottom:8px;">
+            <button class="actionbtn" id="choosedatasetdir" style="flex:1;">📁 kies datasetmap</button>
+          </div>
+          <div class="savestatus" id="datasetdirstatus" style="margin-bottom:10px;">geen lokale map gekozen — kies de map "datasets" in je projectmap, anders wordt de dataset online opgehaald</div>
+          <button class="actionbtn primary" id="loaddataset" style="width:100%;">⇩ dataset laden</button>
+          <div class="progresswrap"><div class="progressbar" id="progressbar"></div></div>
+          <div class="loadstatus" id="loadstatus">nog niet geladen</div>
+          <div class="thumbstrip" id="thumbstrip"></div>
+          <div class="hint" style="margin-top:4px;">Bovenstaande strook toont steeds één voorbeeld per klasse op vaste volgorde (0-9 / A-Z) als snelle check — dat oogt "alfabetisch", maar zegt niets over de volgorde in het brondata-bestand. Die bleek bij analyse al willekeurig geschud te zijn, en de training zelf (één gewichtsupdate per epoch over alle voorbeelden samen) is sowieso ongevoelig voor de volgorde.</div>
+        </div>
+
+        <div class="field" style="margin-top:16px;">
+          <label>Leersnelheid <span class="val" id="lrval">0.15</span></label>
+          <input type="range" id="lr" min="1" max="100" value="15">
+          <div class="hint">Richtwaarde: <b>0.10-0.30</b>. Hoger traint sneller maar kan instabiel worden (loss die op- en neer springt); lager is stabieler maar trager.</div>
+        </div>
+        <div class="field">
+          <label>Drempel "goed genoeg" <span class="val" id="threshval">85%</span></label>
+          <input type="range" id="thresh" min="50" max="99" value="85">
+          <div class="hint">Richtwaarde: <b>85%</b> voor een demo-taak. Voor iets dat echt betrouwbaar moet zijn wil je vaak 95%+.</div>
+        </div>
+        <div class="field">
+          <label>Max epochs <span class="val" id="maxepochval">600</span></label>
+          <input type="range" id="maxepoch" min="50" max="2000" step="50" value="600">
+          <div class="hint">Bepaalt hoe lang "▶ train" vanzelf doorgaat voordat het automatisch stopt. Richtwaarde: <b>400-800</b>. Je kunt ook altijd zelf op "■ stop" klikken zodra de leercurve vlak wordt.</div>
+        </div>
+        <button class="actionbtn" id="presetbtn" style="width:100%;">✨ zet aanbevolen instellingen</button>
+      </div>
+
+      <div class="panel">
+        <h2>Training</h2>
+        <div class="row2">
+          <button class="actionbtn primary" id="trainbtn">▶ train</button>
+          <button class="actionbtn stop" id="stopbtn" disabled>■ stop</button>
+        </div>
+        <div class="row2" style="margin-top:8px;">
+          <button class="actionbtn" id="resetbtn">↺ reset gewichten</button>
+          <button class="actionbtn" id="addcompare">+ vergelijking</button>
+        </div>
+        <label class="checkline"><input type="checkbox" id="autosave" checked> automatisch opslaan zodra training stopt (bereikt max epochs, of op "■ stop")</label>
+        <div class="note">Trainen loopt volledig in je browser, op je eigen apparaat — geen server, geen datacenter. De tijd die dit kost <i>is</i> de rekenkracht die dit model nodig heeft.</div>
+      </div>
+    </div>
+
+    <!-- CENTER: visualization -->
+    <div>
+      <div id="netwrap">
+        <div class="capt">
+          <h2 style="border:none;padding:0;margin:0;">Wat er door het model heen gaat</h2>
+          <div class="legend">
+            <span><span class="swatch" style="background:var(--pos);"></span>positief gewicht</span>
+            <span><span class="swatch" style="background:var(--neg);"></span>negatief gewicht</span>
+            <span><span class="swatch" style="background:var(--warn);height:8px;border-radius:50%;width:8px;display:inline-block;"></span>actieve node</span>
+          </div>
+        </div>
+        <svg id="netsvg" viewBox="0 0 1000 320"></svg>
+      </div>
+
+      <div class="panel chartpanel">
+        <h2>Verlies &amp; nauwkeurigheid tijdens training</h2>
+        <canvas id="chart" width="900" height="190"></canvas>
+        <div class="chart-legend">
+          <span style="color:var(--warn);">— verlies (loss)</span>
+          <span style="color:var(--pos);">— nauwkeurigheid train</span>
+          <span style="color:var(--neg);">— nauwkeurigheid test</span>
+        </div>
+      </div>
+
+      <div class="panel chartpanel" id="satpanel" style="display:none;">
+        <h2>Neuronverzadiging per verborgen laag</h2>
+        <div id="satmeter"></div>
+        <div class="note" style="margin-top:10px;">Percentage van de uitvoerwaarden dat in het "vlakke" deel van de activatiefunctie zit (bij ReLU: precies 0 — een "dode" node; bij sigmoid/tanh: dicht bij de uiterste waarden). Hoog percentage = die laag geeft nauwelijks nog bruikbare gradiënt door — zie de toelichting onderaan de pagina.</div>
+      </div>
+
+      <div class="lowerrow">
+        <div class="panel">
+          <h2>Waar het misgaat (testset)</h2>
+          <div id="failstats" class="note" style="margin-top:0;margin-bottom:10px;"></div>
+          <div id="faillist"><div id="failempty">Train het model om resultaten te zien.</div></div>
+        </div>
+        <div class="panel">
+          <h2 id="testpanel-title">Test een eigen zin</h2>
+          <div id="text-test-field">
+            <textarea id="testsentence" placeholder="Typ hier een zin die bij de gekozen taak past…"></textarea>
+          </div>
+          <div id="image-test-field" style="display:none;">
+            <div class="drawwrap">
+              <canvas id="drawcanvas" width="224" height="224"></canvas>
+              <div class="row2" style="width:100%;">
+                <button class="actionbtn" id="clearcanvas">✕ wis</button>
+              </div>
+            </div>
+          </div>
+          <button class="actionbtn primary" id="testbtn" style="margin-top:8px;width:100%;">voorspel</button>
+          <div id="testresult"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- RIGHT: metrics -->
+    <div>
+      <div class="panel">
+        <h2>Live meting</h2>
+        <div class="metric"><span class="k">epoch</span><span class="v" id="m-epoch">0</span></div>
+        <div class="metric"><span class="k">verlies (loss)</span><span class="v" id="m-loss">—</span></div>
+        <div class="metric"><span class="k">nauwkeurigheid train</span><span class="v" id="m-trainacc">—</span></div>
+        <div class="metric"><span class="k">nauwkeurigheid test</span><span class="v" id="m-testacc">—</span></div>
+        <div class="metric"><span class="k">parameters</span><span class="v" id="m-params">—</span></div>
+        <div class="metric"><span class="k">berekeningen / voorspelling</span><span class="v" id="m-flops">—</span></div>
+        <div class="metric"><span class="k">trainingstijd</span><span class="v" id="m-time">—</span></div>
+        <div id="verdict" class="verdict" style="display:none;"></div>
+      </div>
+
+      <div class="panel">
+        <h2>Vergelijking &amp; opslaan</h2>
+        <div id="comparetable">
+          <table>
+            <thead><tr><th>taak</th><th>lagen</th><th>features</th><th>activatie</th><th>leersnelheid</th><th>max epochs</th><th>epochs getraind</th><th>params</th><th>train-acc</th><th>test-acc</th><th>drempel</th><th>tijd</th><th>ok?</th></tr></thead>
+            <tbody id="comparebody"></tbody>
+          </table>
+        </div>
+        <div class="savebar">
+          <button class="actionbtn" id="choosedir" style="flex:1;">📁 kies resultatenmap</button>
+          <button class="actionbtn" id="downloadjson" style="flex:1;">⇩ download json</button>
+        </div>
+        <div class="savestatus" id="savestatus">nog geen map gekozen — kies de map "resultaten" in je projectmap (of gebruik de downloadknop)</div>
+        <div class="note">Klik <b>+ vergelijking</b> om de huidige run toe te voegen. Sla verschillende configuraties op om te zien of een <b>kleiner</b> model met betere invoer een <b>groter</b> model met ruwe input kan verslaan.</div>
+      </div>
+    </div>
+
+  </div>
+
+  <div class="panel" style="margin-top:18px;">
+    <h2>Wat dit wel en niet laat zien</h2>
+    <div class="note" style="font-size:12.5px;">
+      Dit is een klein, volledig doorzichtig classificatienetwerk — geen taalmodel zoals ChatGPT of Claude. Een echt taalmodel heeft miljarden parameters, genereert tekst token voor token, en is te groot om in een browser te trainen of laag voor laag te tekenen.
+      Wat hier wél tastbaar wordt, zijn de principes die ook voor grote lokale modellen gelden: meer lagen en nodes geven meer leervermogen maar kosten meer rekentijd en geheugen; te weinig capaciteit geeft een model dat blijft onderpresteren ongeacht hoe lang je traint; en de kwaliteit van de invoer (features, resolutie) kan vaak meer opleveren dan een groter model.
+      Bij taak C en D zie je dit letterlijk: een 10×10-versie van een handgeschreven cijfer traint sneller maar verwart bijvoorbeeld eerder een 4 met een 9 dan een 28×28-versie — precies de afweging tussen rekenkracht en prestatie waar dit lab om draait.
+    </div>
+  </div>
+
+  <div class="panel research" style="margin-top:18px;">
+    <h2>Inzichten uit onderzoek — en waar je ze hier kunt zien</h2>
+
+    <h3>Verzadigde activaties remmen het leren</h3>
+    <p>Glorot &amp; Bengio (2010) lieten zien dat sigmoid/tanh-lagen in diepere netwerken snel "verzadigd" raken (uitvoer tegen 0 of 1/-1 aan) — daar is de afgeleide bijna nul, dus er stroomt nauwelijks nog leersignaal terug. Dat is precies waarom ReLU tegenwoordig de standaardkeuze is. Zet bij taak C of D een paar verborgen lagen op <b>sigmoid</b> (via de nieuwe per-laag keuze hierboven bij "Architectuur") en kijk naar de <b>verzadigingsmeter</b> boven de leercurve: bij sigmoid loopt die vaak snel op, bij ReLU meestal niet.</p>
+
+    <h3>ReLU kan ook "doodgaan"</h3>
+    <p>Nair &amp; Hinton (2010) introduceerden de ReLU-activatie omdat die dit verzadigingsprobleem grotendeels oplost — maar ReLU-nodes kunnen op hun beurt permanent op 0 blijven hangen ("dying ReLU"), vooral bij een te hoge leersnelheid. De verzadigingsmeter telt dit voor ReLU-lagen als "% inactief (0)": loop je met een hoge leersnelheid en zie je dat percentage oplopen, dan is dat precies dit effect.</p>
+
+    <h3>Waarom de gewichten zó geïnitialiseerd worden</h3>
+    <p>De willekeurige startgewichten in dit lab zijn geschaald met <span class="mono">√(2/aantal-invoerwaarden)</span> — de initialisatie uit He e.a. (2015), specifiek ontworpen om het signaal door ReLU-lagen heen op peil te houden. Zonder een verstandige schaling raken netwerken met meer lagen sneller in de problemen (te grote of te kleine activaties), wat mede verklaart waarom "gewoon meer lagen toevoegen" niet altijd beter traint.</p>
+
+    <h3>Eén brede laag kan in theorie al genoeg zijn</h3>
+    <p>De universele-approximatiestelling (Cybenko 1989; Hornik 1991) zegt dat één verborgen laag met genoeg nodes vrijwel elke functie kan benaderen. In de praktijk leert een netwerk met meerdere smallere lagen zo'n functie vaak sneller en met minder nodes dan één extreem brede laag — dat is de afweging die je voelt als je met "verborgen laag toevoegen" versus "nodes per laag" speelt.</p>
+
+    <div class="note" style="margin-top:12px;">
+      Bronnen: <a href="https://proceedings.mlr.press/v9/glorot10a.html" target="_blank" rel="noopener">Glorot &amp; Bengio, 2010</a> ·
+      <a href="http://www.cs.toronto.edu/~fritz/absps/reluICML.pdf" target="_blank" rel="noopener">Nair &amp; Hinton, 2010</a> ·
+      <a href="https://arxiv.org/abs/1502.01852" target="_blank" rel="noopener">He e.a., 2015</a> ·
+      <a href="https://en.wikipedia.org/wiki/Universal_approximation_theorem" target="_blank" rel="noopener">Universal approximation theorem (Cybenko 1989 / Hornik 1991)</a>
+    </div>
+  </div>
+
+</div>
+
+<script>
+/* ======================= tekst-taken: data ======================= */
+const STOP = new Set(["de","het","een","en","van","voor","dat","is","in","te","met","op","bij","aan","deze","ik","die","wat","er","als","om","naar","nog","ook","zijn","was","heb","heeft","u","dit"]);
+
+const TASKS = {
+  sentiment: { label:"Koffiereviews", type:"text", classes:["negatief","positief"],
+    train: [
+      ["Geweldige koffie, precies wat ik nodig had",1],["Snelle levering en perfecte verpakking",1],
+      ["Heerlijke smaak, ga zeker weer bestellen",1],["Top kwaliteit voor een scherpe prijs",1],
+      ["Fantastische service, heel vriendelijk",1],["De bonen ruiken en smaken geweldig",1],
+      ["Precies de sterke smaak die ik zocht",1],["Uitstekende ervaring, alles klopte",1],
+      ["Mooie verpakking en heerlijke koffie",1],["Zeer tevreden klant, blijf bestellen",1],
+      ["Perfecte espresso elke ochtend",1],["Superieure kwaliteit tegen een eerlijke prijs",1],
+      ["Vriendelijke klantenservice, snel antwoord",1],["Heerlijk aroma bij het openen",1],
+      ["Beste koffie die ik ooit heb geproefd",1],["Razendsnelle levering, top verpakt",1],
+      ["Geweldig product, aanrader voor iedereen",1],["Rijke volle smaak, echt genieten",1],
+      ["Fijne korrel en verse geur",1],["Alles top, niets op aan te merken",1],
+      ["Zeer goede prijs kwaliteit verhouding",1],["Wat een heerlijke verrassing, top product",1],
+      ["Slechte kwaliteit voor deze prijs",0],["Trage levering en beschadigde verpakking",0],
+      ["Vieze smaak, nooit meer bestellen",0],["Waardeloze service, niemand reageerde",0],
+      ["De bonen waren muf en oud",0],["Te zwak van smaak, teleurstellend",0],
+      ["Verschrikkelijke ervaring, veel te duur",0],["Kapotte verpakking bij aankomst",0],
+      ["Onvriendelijke klantenservice, geen reactie",0],["Vieze geur bij het openen",0],
+      ["Slechtste koffie die ik ooit heb geproefd",0],["Trage verwerking, dagen te laat",0],
+      ["Slecht product, niet zoals beschreven",0],["Flauwe smaak, echt een tegenvaller",0],
+      ["Te bittere smaak, niet te drinken",0],["Dure prijs voor matige kwaliteit",0],
+      ["Beschadigd pak, koffie overal verspreid",0],["Nooit meer bestellen, echt slecht",0],
+      ["Oude bonen, muffe geur",0],["Waardeloze verpakking, alles kapot",0],
+      ["Zeer slechte prijs kwaliteit verhouding",0],["Wat een teleurstellende ervaring, slecht product",0]
+    ],
+    test: [
+      ["Heerlijke koffie, top geleverd",1],["Snelle en vriendelijke service",1],
+      ["Geweldige smaak, zeker een aanrader",1],["Prima kwaliteit voor de prijs",1],
+      ["Mooi verpakt en heerlijk vers",1],["Zeer goede ervaring met deze winkel",1],
+      ["Niet slecht, eigenlijk best lekker",1],["Kon niet beter, top product",1],
+      ["Slechte verpakking en trage levering",0],["Waardeloze smaak, echt een teleurstelling",0],
+      ["Dure prijs voor slechte kwaliteit",0],["Onvriendelijke medewerker aan de telefoon",0],
+      ["Muffe bonen, niet te genieten",0],["Kapotte doos bij aankomst",0],
+      ["Niet echt goed te noemen",0],["Zeker geen aanrader, teleurstellend",0]
+    ]
+  },
+  spam: { label:"Spam herkennen", type:"text", classes:["normaal","spam"],
+    train: [
+      ["Win nu gratis geld, klik hier direct",1],["U heeft een prijs gewonnen, claim nu",1],
+      ["Gratis iPhone, alleen vandaag klikken",1],["Verdien snel geld vanuit huis",1],
+      ["Exclusieve korting alleen voor u, nu bestellen",1],["Klik hier voor gratis geld",1],
+      ["Uw account is geblokkeerd, klik direct",1],["Gefeliciteerd, u heeft de loterij gewonnen",1],
+      ["Gratis proefperiode, nu aanmelden verplicht",1],["Laatste kans op gratis geld",1],
+      ["Urgent, uw betaling is mislukt klik hier",1],["Verdien duizenden euros per week thuis",1],
+      ["Gratis cadeau wacht op u, claim nu",1],["Exclusieve aanbieding verloopt vandaag, bestel nu",1],
+      ["Uw pakket kon niet bezorgd worden, klik hier",1],["Win een gratis vakantie, klik direct",1],
+      ["Speciale korting alleen vandaag geldig",1],["Uw account wordt verwijderd, actie vereist",1],
+      ["Ontvang gratis geld door hier te klikken",1],["Laatste waarschuwing, klik nu direct",1],
+      ["Vergadering verplaatst naar donderdag",0],["Kun je het verslag nakijken",0],
+      ["Bijgevoegd de factuur van vorige maand",0],["Lunch om twaalf uur bij de kantine",0],
+      ["Herinnering aan de teamuitje volgende week",0],["Graag je feedback op het voorstel",0],
+      ["De planning voor volgende week is klaar",0],["Kan je de presentatie doorsturen",0],
+      ["Notulen van de vergadering van gisteren",0],["Bedankt voor je snelle reactie",0],
+      ["Even een update over het project",0],["De deadline is verzet naar vrijdag",0],
+      ["Kun je dit document nalezen",0],["Nieuw rooster voor volgende maand",0],
+      ["Vraag over de facturatie van deze maand",0],["Terugkoppeling gewenst voor eind van de dag",0],
+      ["Afspraak bevestigd voor woensdagochtend",0],["Graag de contactgegevens van de klant",0],
+      ["Update over de status van het project",0],["Kort verslag van het overleg vandaag",0]
+    ],
+    test: [
+      ["Klik hier voor uw gratis prijs",1],["Exclusieve korting verloopt over een uur",1],
+      ["Win vandaag nog gratis geld",1],["Uw account vereist directe actie, klik nu",1],
+      ["Kun je de agenda voor morgen sturen",0],["Bijgevoegd het rapport van deze week",0],
+      ["Vergadering is verzet naar maandag",0],["Bedankt voor het overzicht van gisteren",0]
+    ]
+  },
+  digits: { label:"Cijfers schrijven (MNIST)", type:"image", classes:"0123456789".split(""),
+    data: {
+      localDir:"cijfers-mnist",
+      files:{ trainImages:"train-images-idx3-ubyte.gz", trainLabels:"train-labels-idx1-ubyte.gz",
+              testImages:"t10k-images-idx3-ubyte.gz", testLabels:"t10k-labels-idx1-ubyte.gz" },
+      trainImages:"https://raw.githubusercontent.com/fgnt/mnist/master/train-images-idx3-ubyte.gz",
+      trainLabels:"https://raw.githubusercontent.com/fgnt/mnist/master/train-labels-idx1-ubyte.gz",
+      testImages:"https://raw.githubusercontent.com/fgnt/mnist/master/t10k-images-idx3-ubyte.gz",
+      testLabels:"https://raw.githubusercontent.com/fgnt/mnist/master/t10k-labels-idx1-ubyte.gz",
+      classOf: (lbl)=> lbl, transpose:false
+    }
+  },
+  letters: { label:"Alfabet schrijven (EMNIST)", type:"image", classes:"ABCDEFGHIJKLMNOPQRSTUVWXYZ".split(""),
+    data: {
+      localDir:"letters-emnist",
+      files:{ trainImages:"emnist-letters-train-images-idx3-ubyte.gz", trainLabels:"emnist-letters-train-labels-idx1-ubyte.gz",
+              testImages:"emnist-letters-test-images-idx3-ubyte.gz", testLabels:"emnist-letters-test-labels-idx1-ubyte.gz" },
+      trainImages:"https://huggingface.co/datasets/Heliosoph/EMNIST/resolve/main/emnist-letters-train-images-idx3-ubyte.gz",
+      trainLabels:"https://huggingface.co/datasets/Heliosoph/EMNIST/resolve/main/emnist-letters-train-labels-idx1-ubyte.gz",
+      testImages:"https://huggingface.co/datasets/Heliosoph/EMNIST/resolve/main/emnist-letters-test-images-idx3-ubyte.gz",
+      testLabels:"https://huggingface.co/datasets/Heliosoph/EMNIST/resolve/main/emnist-letters-test-labels-idx1-ubyte.gz",
+      classOf: (lbl)=> lbl-1, transpose:true
+    }
+  }
+};
+
+const PRESETS = {
+  sentiment:{hidden:[10,6],activation:"relu",feature:"count",lr:0.20,thresh:85,maxEpoch:400},
+  spam:{hidden:[10,6],activation:"relu",feature:"count",lr:0.20,thresh:85,maxEpoch:400},
+  digits:{hidden:[24,12],activation:"relu",resolution:14,perClass:50,lr:0.30,thresh:90,maxEpoch:600},
+  letters:{hidden:[32,16],activation:"relu",resolution:20,perClass:40,lr:0.30,thresh:70,maxEpoch:800}
+};
+
+/* ======================= tekst-features ======================= */
+function tokenize(s){ return s.toLowerCase().replace(/[.,!?;:()"]/g," ").split(/\s+/).filter(w=>w.length>1 && !STOP.has(w)); }
+function buildVocab(train, size){
+  const freq={}; train.forEach(([t])=>tokenize(t).forEach(w=>freq[w]=(freq[w]||0)+1));
+  return Object.entries(freq).sort((a,b)=>b[1]-a[1]).slice(0,size).map(e=>e[0]);
+}
+function buildIdf(train, vocab){
+  const df={}; vocab.forEach(w=>df[w]=0);
+  train.forEach(([t])=>{ const set=new Set(tokenize(t)); vocab.forEach(w=>{ if(set.has(w)) df[w]++; }); });
+  const N=train.length, idf={};
+  vocab.forEach(w=>idf[w]=Math.log((N+1)/((df[w]||0)+1))+1);
+  return idf;
+}
+function encodeText(text, vocab, mode, idf){
+  const toks=tokenize(text); const counts={}; toks.forEach(w=>counts[w]=(counts[w]||0)+1);
+  return vocab.map(w=>{ const c=counts[w]||0;
+    if(mode==="binary") return c>0?1:0;
+    if(mode==="tfidf") return c>0 ? (c/Math.max(1,toks.length))*idf[w] : 0;
+    return c;
+  });
+}
+
+/* ======================= afbeelding-dataset (MNIST / EMNIST, IDX gzip) ======================= */
+/* Probeert eerst de lokaal gekozen datasetmap (File System Access API); valt terug op de online bron. */
+async function resolveDatasetDir(task){
+  const root = state.datasetsDirHandle;
+  if(!root || !task.data.localDir) return null;
+  try{ return await root.getDirectoryHandle(task.data.localDir); }catch(err){}
+  try{ await root.getFileHandle(task.data.files.trainLabels); return root; }catch(err){}
+  return null;
+}
+async function openSourceStream(task, key){
+  if(state.datasetsDirHandle && task.data.files){
+    try{
+      const dirHandle = await resolveDatasetDir(task);
+      if(dirHandle){
+        const fileHandle = await dirHandle.getFileHandle(task.data.files[key]);
+        const file = await fileHandle.getFile();
+        return { stream: file.stream(), source:"lokaal" };
+      }
+    }catch(err){ /* bestand niet gevonden in gekozen map — val terug op online */ }
+  }
+  const resp = await fetch(task.data[key]);
+  if(!resp.ok) throw new Error(key+" niet bereikbaar ("+resp.status+")");
+  return { stream: resp.body, source:"online" };
+}
+async function streamIdx(task, imagesKey, labelsKey, {numClasses, classOf, perClass, maxScan, onProgress}){
+  const labelsSrc = await openSourceStream(task, labelsKey);
+  const labelsBytes = new Uint8Array(await new Response(labelsSrc.stream.pipeThrough(new DecompressionStream('gzip'))).arrayBuffer());
+  const ldv = new DataView(labelsBytes.buffer, labelsBytes.byteOffset, labelsBytes.byteLength);
+  const labelCount = ldv.getUint32(4,false);
+  const labels = labelsBytes.slice(8, 8+labelCount);
+
+  const imgSrc = await openSourceStream(task, imagesKey);
+  const reader = imgSrc.stream.pipeThrough(new DecompressionStream('gzip')).getReader();
+  let buf = new Uint8Array(0), headerParsed=false, rows=28, cols=28;
+  let imgIndex=0, scanned=0, bytesRead=0;
+  const perClassCount = new Array(numClasses).fill(0);
+  const buckets = Array.from({length:numClasses},()=>[]);
+  while(true){
+    const {value, done} = await reader.read();
+    if(done) break;
+    bytesRead += value.length;
+    const merged = new Uint8Array(buf.length+value.length);
+    merged.set(buf,0); merged.set(value, buf.length); buf = merged;
+    let offset=0;
+    if(!headerParsed){
+      if(buf.length<16) continue;
+      const hdv = new DataView(buf.buffer, buf.byteOffset, 16);
+      rows = hdv.getUint32(8,false); cols = hdv.getUint32(12,false);
+      offset=16; headerParsed=true;
+    }
+    const imgBytes = rows*cols;
+    while(buf.length-offset>=imgBytes && imgIndex<labelCount){
+      const raw = buf.slice(offset, offset+imgBytes); offset+=imgBytes;
+      const lbl = labels[imgIndex]; imgIndex++; scanned++;
+      const cls = classOf(lbl);
+      if(cls!==null && cls>=0 && cls<numClasses && perClassCount[cls]<perClass){
+        buckets[cls].push(raw); perClassCount[cls]++;
+      }
+    }
+    buf = buf.slice(offset);
+    if(onProgress) onProgress({scanned, bytesRead, perClassCount:[...perClassCount]});
+    const full = perClassCount.every(c=>c>=perClass);
+    if(full || scanned>=maxScan){ try{ await reader.cancel(); }catch(e){} break; }
+  }
+  return {buckets, rows, cols, scanned, bytesRead, source: imgSrc.source};
+}
+function rawToGrid(raw, rows, cols, transpose){
+  const grid = new Float32Array(rows*cols);
+  if(transpose){ for(let r=0;r<rows;r++) for(let c=0;c<cols;c++) grid[r*cols+c] = raw[c*rows+r]/255; }
+  else { for(let i=0;i<raw.length;i++) grid[i] = raw[i]/255; }
+  return grid;
+}
+function downsampleGrid(grid, rows, cols, res){
+  if(res===rows && rows===cols) return grid;
+  const out = new Float32Array(res*res);
+  const boxY = rows/res, boxX = cols/res;
+  for(let oy=0;oy<res;oy++){
+    for(let ox=0;ox<res;ox++){
+      let sum=0,count=0;
+      const y0=Math.floor(oy*boxY), y1=Math.max(y0+1,Math.floor((oy+1)*boxY));
+      const x0=Math.floor(ox*boxX), x1=Math.max(x0+1,Math.floor((ox+1)*boxX));
+      for(let y=y0;y<y1 && y<rows;y++) for(let x=x0;x<x1 && x<cols;x++){ sum+=grid[y*cols+x]; count++; }
+      out[oy*res+ox] = count? sum/count : 0;
+    }
+  }
+  return out;
+}
+function drawGlyphToCanvas(canvas, grid, res){
+  canvas.width=res; canvas.height=res;
+  const ctx = canvas.getContext("2d");
+  const imgData = ctx.createImageData(res,res);
+  for(let i=0;i<res*res;i++){
+    const v = Math.round(grid[i]*255);
+    imgData.data[i*4]=v; imgData.data[i*4+1]=v; imgData.data[i*4+2]=v; imgData.data[i*4+3]=255;
+  }
+  ctx.putImageData(imgData,0,0);
+}
+
+/* ======================= tiny neuraal netwerk (handmatige backprop) ======================= */
+function randInit(rows, cols){ const scale=Math.sqrt(2/cols); const M=[];
+  for(let i=0;i<rows;i++){ const row=[]; for(let j=0;j<cols;j++) row.push((Math.random()*2-1)*scale); M.push(row); } return M; }
+function act(z, kind){ if(kind==="relu") return z.map(v=>Math.max(0,v)); if(kind==="tanh") return z.map(v=>Math.tanh(v)); return z.map(v=>1/(1+Math.exp(-v))); }
+function actDeriv(z, a, kind){ if(kind==="relu") return z.map(v=>v>0?1:0); if(kind==="tanh") return a.map(v=>1-v*v); return a.map(v=>v*(1-v)); }
+function softmax(z){ const m=Math.max(...z); const ex=z.map(v=>Math.exp(v-m)); const s=ex.reduce((a,b)=>a+b,0); return ex.map(v=>v/s); }
+function argmax(arr){ let bi=0; for(let i=1;i<arr.length;i++) if(arr[i]>arr[bi]) bi=i; return bi; }
+
+/* Verzadiging/"dood" per activatiefunctie — telt hoeveel van de uitvoerwaarden van een laag
+   in het vlakke stuk van de functie liggen (gradiënt ≈ 0 daar). Zie het onderzoekspaneel
+   onderaan de pagina voor waarom dit ertoe doet (Glorot & Bengio 2010; Nair & Hinton 2010). */
+function isSaturated(kind, v){
+  if(kind==="relu") return v<=1e-9;                 // "dode" ReLU: geen signaal, geen gradiënt
+  if(kind==="tanh") return Math.abs(v)>0.98;         // bijna -1 of 1: vlak stuk van tanh
+  return v<0.02 || v>0.98;                           // sigmoid: bijna 0 of 1
+}
+class Net{
+  constructor(sizes, activations){
+    this.sizes=sizes; this.activations=activations; this.W=[]; this.b=[];
+    for(let l=0;l<sizes.length-1;l++){ this.W.push(randInit(sizes[l+1], sizes[l])); this.b.push(new Array(sizes[l+1]).fill(0)); }
+  }
+  forward(x){
+    const as=[x], zs=[];
+    for(let l=0;l<this.W.length;l++){
+      const z = this.W[l].map((row,i)=> row.reduce((s,w,j)=>s+w*as[l][j],0) + this.b[l][i]);
+      zs.push(z);
+      const isLast = l===this.W.length-1;
+      as.push(isLast ? softmax(z) : act(z, this.activations[l]));
+    }
+    return {as, zs};
+  }
+  paramCount(){ return this.W.reduce((s,m)=>s+m.length*m[0].length,0) + this.b.reduce((s,v)=>s+v.length,0); }
+  flopsPerInference(){ return this.W.reduce((s,m)=>s+2*m.length*m[0].length,0); }
+  trainStep(batch, lr){
+    const gW = this.W.map(m=>m.map(r=>r.map(()=>0)));
+    const gB = this.b.map(v=>v.map(()=>0));
+    let totalLoss=0;
+    const L = this.W.length;
+    const satCount = new Array(L-1).fill(0);
+    batch.forEach(([x,y])=>{
+      const {as, zs} = this.forward(x);
+      const deltas = new Array(L);
+      deltas[L-1] = as[L].map((v,i)=>v-y[i]);
+      totalLoss += -y.reduce((s,yy,i)=>s + (yy? Math.log(Math.max(as[L][i],1e-9)) : 0), 0);
+      for(let l=0;l<L-1;l++){
+        const kind = this.activations[l];
+        as[l+1].forEach(v=>{ if(isSaturated(kind,v)) satCount[l]++; });
+      }
+      for(let l=L-2;l>=0;l--){
+        const dAct = actDeriv(zs[l], as[l+1], this.activations[l]);
+        const dl = new Array(this.sizes[l+1]).fill(0);
+        for(let j=0;j<this.sizes[l+1];j++){
+          let s=0; for(let k=0;k<this.sizes[l+2];k++) s += this.W[l+1][k][j]*deltas[l+1][k];
+          dl[j] = s*dAct[j];
+        }
+        deltas[l]=dl;
+      }
+      for(let l=0;l<L;l++){
+        for(let i=0;i<this.sizes[l+1];i++){
+          gB[l][i]+=deltas[l][i];
+          for(let j=0;j<this.sizes[l];j++) gW[l][i][j]+=deltas[l][i]*as[l][j];
+        }
+      }
+    });
+    const n=batch.length;
+    for(let l=0;l<this.W.length;l++){
+      for(let i=0;i<this.W[l].length;i++){
+        this.b[l][i]-=lr*gB[l][i]/n;
+        for(let j=0;j<this.W[l][i].length;j++) this.W[l][i][j]-=lr*gW[l][i][j]/n;
+      }
+    }
+    const satFrac = satCount.map((cnt,l)=> n*this.sizes[l+1]>0 ? cnt/(n*this.sizes[l+1]) : 0);
+    return {loss: totalLoss/n, satFrac};
+  }
+}
+
+/* ======================= app state ======================= */
+const VOCAB_SIZE = 22;
+let state = {
+  taskKey:"sentiment", hidden:[8,6], activation:"relu", activations:["relu","relu"], feature:"count",
+  resolution:14, perClass:50, lr:0.15, thresh:85, maxEpoch:600, autoSaveOnStop:true,
+  vocab:[], idf:{}, trainEnc:[], testEnc:[],
+  imgBuckets:null, imgRows:28, imgCols:28, imgTranspose:false,
+  net:null, epoch:0, history:[], training:false, elapsed:0,
+  compareRows:[], resultsDirHandle:null, datasetsDirHandle:null
+};
+
+/* ======================= mapkeuzes onthouden (IndexedDB) ======================= */
+/* Browsers staan geen hardcoded bestandspaden toe (beveiliging), maar een eenmaal
+   gekozen map-handle kan wél onthouden worden zodat de gebruiker 'm niet steeds
+   opnieuw hoeft aan te wijzen. */
+const DIRDB_NAME="llm-lab-dirs", DIRDB_STORE="handles";
+function dirDbOpen(){
+  return new Promise((resolve,reject)=>{
+    const req = indexedDB.open(DIRDB_NAME,1);
+    req.onupgradeneeded = ()=> req.result.createObjectStore(DIRDB_STORE);
+    req.onsuccess = ()=> resolve(req.result);
+    req.onerror = ()=> reject(req.error);
+  });
+}
+async function dirDbGet(key){
+  try{
+    const db = await dirDbOpen();
+    return await new Promise((resolve,reject)=>{
+      const tx = db.transaction(DIRDB_STORE,"readonly");
+      const req = tx.objectStore(DIRDB_STORE).get(key);
+      req.onsuccess = ()=> resolve(req.result||null);
+      req.onerror = ()=> reject(req.error);
+    });
+  }catch(err){ return null; }
+}
+async function dirDbSet(key, handle){
+  try{
+    const db = await dirDbOpen();
+    await new Promise((resolve,reject)=>{
+      const tx = db.transaction(DIRDB_STORE,"readwrite");
+      tx.objectStore(DIRDB_STORE).put(handle, key);
+      tx.oncomplete = resolve; tx.onerror = ()=>reject(tx.error);
+    });
+  }catch(err){ /* mapkeuze wordt dan gewoon niet onthouden */ }
+}
+async function restoreDir(key, mode, statusElId, onGranted, resumeLabel){
+  const saved = await dirDbGet(key);
+  if(!saved) return;
+  const statusEl = document.getElementById(statusElId);
+  try{
+    const perm = await saved.queryPermission({mode});
+    if(perm==="granted"){ onGranted(saved); return; }
+    statusEl.innerHTML = `map "${saved.name}" onthouden — <button class="actionbtn" id="resume_${key}" style="margin-left:4px;">🔓 ${resumeLabel}</button>`;
+    document.getElementById("resume_"+key).addEventListener("click", async ()=>{
+      try{
+        const perm2 = await saved.requestPermission({mode});
+        if(perm2==="granted") onGranted(saved);
+        else statusEl.textContent = "toegang geweigerd — kies de map opnieuw.";
+      }catch(err){ statusEl.textContent = "hervatten mislukt: "+err.message; }
+    });
+  }catch(err){ /* handle niet meer geldig (map verplaatst/verwijderd) — negeren */ }
+}
+(function initPersistedDirs(){
+  restoreDir("resultsDir","readwrite","savestatus", (h)=>{
+    state.resultsDirHandle = h;
+    document.getElementById("savestatus").textContent = `map "${h.name}" hervat — resultaten worden bij elke '+ vergelijking' opgeslagen`;
+  }, "hervat toegang tot resultatenmap");
+  restoreDir("datasetsDir","read","datasetdirstatus", (h)=>{
+    state.datasetsDirHandle = h;
+    document.getElementById("datasetdirstatus").textContent = `map "${h.name}" hervat — dataset wordt vanaf hier geladen (submappen cijfers-mnist / letters-emnist)`;
+  }, "hervat toegang tot datasetmap");
+})();
+function taskType(){ return TASKS[state.taskKey].type; }
+function numClasses(){ return TASKS[state.taskKey].classes.length; }
+function oneHot(y,k){ const v=new Array(k).fill(0); v[y]=1; return v; }
+
+/* ---------- tekst data prep ---------- */
+function prepTextData(){
+  const task = TASKS[state.taskKey];
+  state.vocab = buildVocab(task.train, VOCAB_SIZE);
+  state.idf = buildIdf(task.train, state.vocab);
+  const enc = (t)=>encodeText(t, state.vocab, state.feature, state.idf);
+  state.trainEnc = task.train.map(([t,y])=>[enc(t), oneHot(y, task.classes.length)]);
+  state.testEnc = task.test.map(([t,y])=>[enc(t), y, t]);
+}
+
+/* ---------- afbeelding data prep ---------- */
+async function loadImageDataset(){
+  const task = TASKS[state.taskKey];
+  const K = task.classes.length;
+  const btn = document.getElementById("loaddataset");
+  btn.disabled = true; btn.textContent = "bezig met laden…";
+  document.getElementById("progressbar").style.width="0%";
+  const statusEl = document.getElementById("loadstatus");
+  try{
+    const onProgress = (p)=>{
+      const pct = Math.min(100, Math.round(100*Math.min(...p.perClassCount)/state.perClass));
+      document.getElementById("progressbar").style.width = pct+"%";
+      statusEl.textContent = `${p.scanned} gescand · ${(p.bytesRead/1e6).toFixed(1)} MB gedownload · minste klasse ${Math.min(...p.perClassCount)}/${state.perClass}`;
+    };
+    const trainRes = await streamIdx(task, "trainImages", "trainLabels",
+      {numClasses:K, classOf:task.data.classOf, perClass:state.perClass, maxScan:200000, onProgress});
+    statusEl.textContent = `trainingsvoorbeelden geladen (${trainRes.source}), testset ophalen…`;
+    const testRes = await streamIdx(task, "testImages", "testLabels",
+      {numClasses:K, classOf:task.data.classOf, perClass:Math.max(8,Math.round(state.perClass*0.3)), maxScan:200000, onProgress:()=>{}});
+
+    state.imgRows = trainRes.rows; state.imgCols = trainRes.cols; state.imgTranspose = task.data.transpose;
+    state.imgBuckets = {train:trainRes.buckets, test:testRes.buckets};
+    document.getElementById("progressbar").style.width="100%";
+    const bronLabel = trainRes.source==="lokaal" ? "lokale map" : "internet";
+    statusEl.textContent = `klaar (bron: ${bronLabel}) — ${trainRes.buckets.reduce((s,b)=>s+b.length,0)} train / ${testRes.buckets.reduce((s,b)=>s+b.length,0)} test voorbeelden (${((trainRes.bytesRead+testRes.bytesRead)/1e6).toFixed(1)} MB verwerkt)`;
+    renderThumbStrip();
+    buildImageFeaturesAndNet();
+  }catch(err){
+    statusEl.textContent = "laden mislukt: "+err.message+" — controleer je internetverbinding of netwerkinstellingen.";
+  }finally{
+    btn.disabled=false; btn.textContent="⇩ dataset laden";
+  }
+}
+function shuffleInPlace(arr){
+  for(let i=arr.length-1;i>0;i--){ const j=Math.floor(Math.random()*(i+1)); [arr[i],arr[j]]=[arr[j],arr[i]]; }
+  return arr;
+}
+function buildImageFeaturesAndNet(){
+  if(!state.imgBuckets) return;
+  const task = TASKS[state.taskKey];
+  const K = task.classes.length;
+  const res = state.resolution;
+  state.trainEnc = [];
+  state.imgBuckets.train.forEach((bucket, cls)=>{
+    bucket.forEach(raw=>{
+      const grid = downsampleGrid(rawToGrid(raw, state.imgRows, state.imgCols, state.imgTranspose), state.imgRows, state.imgCols, res);
+      state.trainEnc.push([Array.from(grid), oneHot(cls,K)]);
+    });
+  });
+  state.testEnc = [];
+  state.imgBuckets.test.forEach((bucket, cls)=>{
+    bucket.forEach(raw=>{
+      const grid = downsampleGrid(rawToGrid(raw, state.imgRows, state.imgCols, state.imgTranspose), state.imgRows, state.imgCols, res);
+      state.testEnc.push([Array.from(grid), cls, raw]);
+    });
+  });
+  // de buckets zijn per klasse gegroepeerd (A...Z / 0...9 op rij) — husselen zodat evaluatievolgorde
+  // (o.a. de "fouten"-lijst, die de eerste N fouten toont) niet naar de eerste klassen scheeftrekt.
+  // Voor de training zelf maakt dit niets uit: trainStep is full-batch (één update over alle
+  // voorbeelden tegelijk), dus de volgorde binnen een epoch heeft geen invloed op het geleerde gewicht.
+  shuffleInPlace(state.trainEnc);
+  shuffleInPlace(state.testEnc);
+  buildNet();
+}
+function renderThumbStrip(){
+  const el = document.getElementById("thumbstrip"); el.innerHTML="";
+  if(!state.imgBuckets) return;
+  const task = TASKS[state.taskKey];
+  state.imgBuckets.train.forEach((bucket, cls)=>{
+    if(!bucket.length) return;
+    const c = document.createElement("canvas");
+    const grid = rawToGrid(bucket[0], state.imgRows, state.imgCols, state.imgTranspose);
+    drawGlyphToCanvas(c, grid, state.imgRows);
+    c.title = task.classes[cls];
+    el.appendChild(c);
+  });
+}
+
+/* ---------- net bouwen ---------- */
+function inputSize(){
+  if(taskType()==="text") return state.vocab.length;
+  return state.resolution*state.resolution;
+}
+function buildNet(){
+  const sizes = [inputSize(), ...state.hidden, numClasses()];
+  state.net = new Net(sizes, state.activations);
+  state.epoch=0; state.history=[]; state.elapsed=0;
+  updateMetrics(); drawNet(); drawChart(); renderFails(null); renderSaturation(null);
+  const canTrain = taskType()==="text" || (state.imgBuckets!==null);
+  document.getElementById("trainbtn").disabled = !canTrain;
+}
+
+function evalSet(encSet, isTest){
+  let correct=0; const fails=[];
+  encSet.forEach(item=>{
+    let x,yTrue,extra;
+    if(isTest){ [x,yTrue,extra]=item; } else { x=item[0]; yTrue=item[1].indexOf(1); }
+    const {as} = state.net.forward(x);
+    const pred = argmax(as[as.length-1]);
+    if(pred===yTrue) correct++; else if(isTest) fails.push({x, yTrue, pred, extra});
+  });
+  return {acc: encSet.length? correct/encSet.length : 0, fails};
+}
+
+/* ======================= UI: lagen ======================= */
+const ACT_OPTIONS = [["relu","ReLU"],["tanh","tanh"],["sigmoid","sigmoid"]];
+function renderLayerControls(){
+  const el = document.getElementById("layerlist"); el.innerHTML="";
+  state.hidden.forEach((n,idx)=>{
+    const div = document.createElement("div"); div.className="layerctl";
+    const actSel = ACT_OPTIONS.map(([v,l])=>`<option value="${v}" ${state.activations[idx]===v?"selected":""}>${l}</option>`).join("");
+    div.innerHTML = `<div class="layerctl-head"><span>verborgen laag ${idx+1}</span><span class="mono">${n} nodes</span></div>
+      <input type="range" min="2" max="32" value="${n}" data-idx="${idx}" data-role="nodes">
+      <select data-idx="${idx}" data-role="act" style="width:100%;margin-top:6px;">${actSel}</select>`;
+    el.appendChild(div);
+  });
+  el.querySelectorAll('input[data-role="nodes"]').forEach(inp=>{
+    inp.addEventListener("input",e=>{ state.hidden[+e.target.dataset.idx]=+e.target.value; renderLayerControls(); buildNet(); });
+  });
+  el.querySelectorAll('select[data-role="act"]').forEach(sel=>{
+    sel.addEventListener("change",e=>{ state.activations[+e.target.dataset.idx]=e.target.value; buildNet(); });
+  });
+}
+document.getElementById("addlayer").addEventListener("click",()=>{
+  if(state.hidden.length>=5) return;
+  state.hidden.push(8); state.activations.push(state.activation);
+  renderLayerControls(); buildNet();
+});
+document.getElementById("removelayer").addEventListener("click",()=>{
+  if(state.hidden.length<=1) return;
+  state.hidden.pop(); state.activations.pop();
+  renderLayerControls(); buildNet();
+});
+
+/* ======================= netwerk SVG ======================= */
+function drawNet(activations){
+  const svg = document.getElementById("netsvg");
+  const W=1000,H=320; svg.setAttribute("viewBox",`0 0 ${W} ${H}`); svg.innerHTML="";
+  const sizes = state.net.sizes;
+  const layerX = sizes.map((_,i)=> 55 + i*((W-110)/(sizes.length-1)));
+  const displayCap = 16;
+  const positions = sizes.map((n)=>{ const shown=Math.min(n,displayCap); const gap=(H-60)/(shown+1);
+    const arr=[]; for(let i=0;i<shown;i++) arr.push(30+gap*(i+1)); return arr; });
+  const ns = "http://www.w3.org/2000/svg";
+  for(let l=0;l<state.net.W.length;l++){
+    const Wm = state.net.W[l];
+    const maxAbs = Math.max(...Wm.flat().map(Math.abs), 1e-6);
+    const fromN = positions[l].length, toN = positions[l+1].length;
+    for(let i=0;i<toN;i++) for(let j=0;j<fromN;j++){
+      const w = Wm[i][j];
+      const line = document.createElementNS(ns,"line");
+      line.setAttribute("x1",layerX[l]); line.setAttribute("y1",positions[l][j]);
+      line.setAttribute("x2",layerX[l+1]); line.setAttribute("y2",positions[l+1][i]);
+      const op = Math.min(0.85, Math.abs(w)/maxAbs*0.85+0.04);
+      line.setAttribute("stroke", w>=0 ? "#4fd1c5" : "#ff6b57");
+      line.setAttribute("stroke-opacity", op.toFixed(2));
+      line.setAttribute("stroke-width", (0.5+Math.abs(w)/maxAbs*1.6).toFixed(2));
+      svg.appendChild(line);
+    }
+  }
+  sizes.forEach((n,li)=>{
+    positions[li].forEach((y,i)=>{
+      const c = document.createElementNS(ns,"circle");
+      c.setAttribute("cx",layerX[li]); c.setAttribute("cy",y); c.setAttribute("r",7);
+      let fillOp=0.18;
+      if(activations && activations[li] && activations[li][i]!==undefined) fillOp = 0.18 + Math.min(0.8, Math.abs(activations[li][i]))*0.75;
+      c.setAttribute("fill","#ffb454"); c.setAttribute("fill-opacity",fillOp.toFixed(2));
+      c.setAttribute("stroke","#3a4048"); c.setAttribute("stroke-width","1");
+      svg.appendChild(c);
+    });
+    if(n>displayCap){
+      const t = document.createElementNS(ns,"text"); t.setAttribute("x",layerX[li]); t.setAttribute("y",H-12);
+      t.setAttribute("fill","#5c636d"); t.setAttribute("font-size","10"); t.setAttribute("text-anchor","middle");
+      t.setAttribute("font-family","IBM Plex Mono, monospace"); t.textContent=`+${n-displayCap} meer`; svg.appendChild(t);
+    }
+    const lab = document.createElementNS(ns,"text"); lab.setAttribute("x",layerX[li]); lab.setAttribute("y",15);
+    lab.setAttribute("fill","#9199a3"); lab.setAttribute("font-size","10"); lab.setAttribute("text-anchor","middle");
+    lab.setAttribute("font-family","IBM Plex Mono, monospace");
+    lab.textContent = li===0?`invoer (${n})`: li===sizes.length-1?`uitvoer (${n})`:`laag ${li} (${n})`;
+    svg.appendChild(lab);
+  });
+}
+
+/* ======================= neuronverzadiging ======================= */
+function renderSaturation(satFrac){
+  const panel = document.getElementById("satpanel");
+  if(!satFrac || !satFrac.length){ panel.style.display="none"; return; }
+  panel.style.display="block";
+  const el = document.getElementById("satmeter"); el.innerHTML="";
+  satFrac.forEach((frac,l)=>{
+    const pct = Math.round(frac*100);
+    const color = pct<30 ? "#4fd1c5" : pct<70 ? "#ffb454" : "#ff6b57";
+    const kind = state.activations[l];
+    const row = document.createElement("div"); row.className="satrow";
+    const woord = kind==="relu" ? "inactief (0)" : "verzadigd";
+    row.innerHTML = `<span class="satlabel">laag ${l+1} (${kind})</span>
+      <span class="satbar-track"><span class="satbar-fill" style="width:${pct}%;background:${color};"></span></span>
+      <span class="satval">${pct}% ${woord}</span>`;
+    el.appendChild(row);
+  });
+}
+
+/* ======================= chart ======================= */
+function drawChart(){
+  const cvs = document.getElementById("chart"); const ctx=cvs.getContext("2d"); const W=cvs.width,H=cvs.height;
+  ctx.clearRect(0,0,W,H); ctx.strokeStyle="#2a2f37"; ctx.lineWidth=1;
+  for(let i=0;i<=4;i++){ const y=10+((H-24)/4)*i; ctx.beginPath(); ctx.moveTo(30,y); ctx.lineTo(W-10,y); ctx.stroke(); }
+  const hist = state.history; if(hist.length<2) return;
+  const maxLoss = Math.max(...hist.map(h=>h.loss), 0.1);
+  const plot = (getter, color)=>{ ctx.strokeStyle=color; ctx.lineWidth=2; ctx.beginPath();
+    hist.forEach((h,i)=>{ const x=30+(W-40)*(i/(hist.length-1)); const val=getter(h); const y=10+(H-24)*(1-val); i===0?ctx.moveTo(x,y):ctx.lineTo(x,y); });
+    ctx.stroke(); };
+  plot(h=>Math.min(1,h.loss/maxLoss), "#ffb454");
+  plot(h=>h.trainAcc, "#4fd1c5");
+  plot(h=>h.testAcc, "#ff6b57");
+}
+
+/* ======================= metrics / verdict / fails ======================= */
+function updateMetrics(trainAcc, testAcc, loss){
+  document.getElementById("m-epoch").textContent = state.epoch;
+  document.getElementById("m-loss").textContent = loss!==undefined? loss.toFixed(3) : "—";
+  document.getElementById("m-trainacc").textContent = trainAcc!==undefined? (trainAcc*100).toFixed(1)+"%" : "—";
+  document.getElementById("m-testacc").textContent = testAcc!==undefined? (testAcc*100).toFixed(1)+"%" : "—";
+  document.getElementById("m-params").textContent = state.net.paramCount().toLocaleString("nl-NL");
+  document.getElementById("m-flops").textContent = state.net.flopsPerInference().toLocaleString("nl-NL");
+  document.getElementById("m-time").textContent = state.elapsed>0 ? (state.elapsed/1000).toFixed(2)+" s" : "—";
+  const vEl = document.getElementById("verdict");
+  if(testAcc===undefined){ vEl.style.display="none"; return; }
+  vEl.style.display="block";
+  const thresh = state.thresh/100; const gap = trainAcc-testAcc;
+  if(testAcc>=thresh){
+    vEl.className="verdict good";
+    vEl.innerHTML = `<b>Voldoende voor deze taak</b>${(testAcc*100).toFixed(0)}% op ongeziene voorbeelden, boven de drempel van ${state.thresh}%.`;
+  } else {
+    vEl.className="verdict bad";
+    const reason = gap>0.15
+      ? "Het model onthoudt de trainingsvoorbeelden beter dan het generaliseert (overfitting) — meer of gevarieerdere voorbeelden helpen waarschijnlijk meer dan een groter model."
+      : "Het model presteert op train én test zwak — het heeft te weinig capaciteit, te weinig resolutie/features, of te weinig voorbeelden om dit patroon te leren.";
+    vEl.innerHTML = `<b>Nog niet voldoende</b>${(testAcc*100).toFixed(0)}% op ongeziene voorbeelden, onder de drempel van ${state.thresh}%. ${reason}`;
+  }
+}
+function renderFails(fails){
+  const list = document.getElementById("faillist"); const stats = document.getElementById("failstats");
+  if(!fails){ list.innerHTML=`<div id="failempty">Train het model om resultaten te zien.</div>`; stats.textContent=""; return; }
+  const task = TASKS[state.taskKey];
+  stats.textContent = fails.length===0 ? "Alle testvoorbeelden correct geclassificeerd." : `${fails.length} van ${state.testEnc.length} testvoorbeelden fout.`;
+  list.innerHTML="";
+  if(fails.length===0) return;
+  fails.slice(0,30).forEach(f=>{
+    const row = document.createElement("div"); row.className="failitem";
+    if(taskType()==="image"){
+      const c = document.createElement("canvas");
+      const grid = rawToGrid(f.extra, state.imgRows, state.imgCols, state.imgTranspose);
+      drawGlyphToCanvas(c, grid, state.imgRows);
+      row.appendChild(c);
+      const txt = document.createElement("div"); txt.className="tags";
+      txt.innerHTML = `werkelijk: ${task.classes[f.yTrue]} — voorspeld: <b>${task.classes[f.pred]}</b>`;
+      row.appendChild(txt);
+    } else {
+      row.innerHTML = `<div class="txt">"${f.extra}"<div class="tags">werkelijk: ${task.classes[f.yTrue]} — voorspeld: <b>${task.classes[f.pred]}</b></div></div>`;
+    }
+    list.appendChild(row);
+  });
+}
+
+/* ======================= training ======================= */
+function trainTick(){
+  if(!state.training) return;
+  const t0 = performance.now();
+  const {loss, satFrac} = state.net.trainStep(state.trainEnc, state.lr);
+  state.elapsed += performance.now()-t0;
+  state.epoch++;
+  const {acc:trainAcc} = evalSet(state.trainEnc,false);
+  const {acc:testAcc, fails} = evalSet(state.testEnc,true);
+  state.history.push({loss, trainAcc, testAcc}); if(state.history.length>300) state.history.shift();
+  updateMetrics(trainAcc, testAcc, loss); drawChart(); renderSaturation(satFrac);
+  if(state.epoch%4===0) drawNet();
+  renderFails(fails);
+  if(state.epoch<state.maxEpoch) requestAnimationFrame(trainTick); else stopTraining();
+}
+function stopTraining(offerSave=true){
+  const wasTraining = state.training;
+  state.training=false;
+  document.getElementById("trainbtn").disabled = !(taskType()==="text"||state.imgBuckets!==null);
+  document.getElementById("stopbtn").disabled=true;
+  if(offerSave && wasTraining && state.autoSaveOnStop && state.epoch>0 && state.net) recordResult();
+}
+document.getElementById("trainbtn").addEventListener("click",()=>{
+  state.training=true; document.getElementById("trainbtn").disabled=true; document.getElementById("stopbtn").disabled=false;
+  requestAnimationFrame(trainTick);
+});
+document.getElementById("stopbtn").addEventListener("click",()=>stopTraining());
+document.getElementById("resetbtn").addEventListener("click",()=>{ stopTraining(false); buildNet(); });
+document.getElementById("autosave").addEventListener("change",e=>{ state.autoSaveOnStop = e.target.checked; });
+
+/* ======================= test: tekst of tekening ======================= */
+document.getElementById("testbtn").addEventListener("click",()=>{
+  const task = TASKS[state.taskKey];
+  let x;
+  if(taskType()==="text"){
+    const text = document.getElementById("testsentence").value.trim();
+    if(!text) return;
+    x = encodeText(text, state.vocab, state.feature, state.idf);
+  } else {
+    const cvs = document.getElementById("drawcanvas");
+    const tmp = document.createElement("canvas"); tmp.width=28; tmp.height=28;
+    const tctx = tmp.getContext("2d"); tctx.imageSmoothingEnabled=true;
+    tctx.drawImage(cvs,0,0,224,224,0,0,28,28);
+    const data = tctx.getImageData(0,0,28,28).data;
+    const grid = new Float32Array(784);
+    for(let i=0;i<784;i++) grid[i]=data[i*4]/255;
+    x = Array.from(downsampleGrid(grid,28,28,state.resolution));
+  }
+  const {as} = state.net.forward(x);
+  const probs = as[as.length-1]; const pred = argmax(probs);
+  const sorted = probs.map((p,i)=>[i,p]).sort((a,b)=>b[1]-a[1]).slice(0,3);
+  document.getElementById("testresult").innerHTML =
+    `<div class="pred" style="color:var(--pos)">${task.classes[pred]}</div>
+     <div class="mono" style="color:var(--text-faint);font-size:11.5px;margin-top:4px;">
+       ${sorted.map(([i,p])=>`${task.classes[i]}: ${(p*100).toFixed(1)}%`).join(" · ")}
+     </div>`;
+  drawNet(as);
+});
+
+/* drawing canvas */
+(function initDraw(){
+  const cvs = document.getElementById("drawcanvas"); const ctx = cvs.getContext("2d");
+  ctx.fillStyle="#000"; ctx.fillRect(0,0,224,224);
+  ctx.strokeStyle="#fff"; ctx.lineWidth=16; ctx.lineCap="round"; ctx.lineJoin="round";
+  let drawing=false, last=null;
+  function pos(e){ const r=cvs.getBoundingClientRect(); const p = e.touches? e.touches[0]:e;
+    return {x:(p.clientX-r.left)*(224/r.width), y:(p.clientY-r.top)*(224/r.height)}; }
+  function start(e){ drawing=true; last=pos(e); e.preventDefault(); }
+  function move(e){ if(!drawing) return; const p=pos(e); ctx.beginPath(); ctx.moveTo(last.x,last.y); ctx.lineTo(p.x,p.y); ctx.stroke(); last=p; e.preventDefault(); }
+  function end(){ drawing=false; }
+  cvs.addEventListener("mousedown",start); cvs.addEventListener("mousemove",move); window.addEventListener("mouseup",end);
+  cvs.addEventListener("touchstart",start); cvs.addEventListener("touchmove",move); cvs.addEventListener("touchend",end);
+  document.getElementById("clearcanvas").addEventListener("click",()=>{ ctx.fillStyle="#000"; ctx.fillRect(0,0,224,224); document.getElementById("testresult").innerHTML=""; });
+})();
+
+/* ======================= vergelijking + opslaan naar bestand ======================= */
+function renderCompareTable(){
+  const body = document.getElementById("comparebody"); body.innerHTML="";
+  state.compareRows.forEach(r=>{
+    const tr = document.createElement("tr");
+    tr.innerHTML = `<td>${r.taak}</td><td>${r.architectuur}</td><td>${r.features}</td>
+      <td>${r.activatie}</td><td>${r.leersnelheid}</td><td>${r.maxEpoch}</td><td>${r.epochsGetraind}</td><td>${r.params}</td>
+      <td>${(r.trainAcc*100).toFixed(0)}%</td><td>${(r.testAcc*100).toFixed(0)}%</td><td>${r.drempel}%</td>
+      <td>${(r.trainTijdMs/1000).toFixed(2)}s</td>
+      <td><span class="badge ${r.voldaan?'ok':'no'}">${r.voldaan?'ja':'nee'}</span></td>`;
+    body.appendChild(tr);
+  });
+}
+async function recordResult(){
+  const {acc:trainAcc} = evalSet(state.trainEnc,false);
+  const {acc:testAcc} = evalSet(state.testEnc,true);
+  const task = TASKS[state.taskKey];
+  const row = {
+    tijdstip: new Date().toISOString(),
+    taak: task.label, taakType: task.type, taakKey: state.taskKey,
+    architectuur: `${inputSize()}→${state.hidden.join("→")}→${numClasses()}`,
+    features: taskType()==="text" ? state.feature : `resolutie ${state.resolution}×${state.resolution}, ${state.perClass}/klasse`,
+    activatie: state.activations.every(a=>a===state.activations[0]) ? state.activations[0] : state.activations.join("→"),
+    activatiesPerLaag: [...state.activations],
+    leersnelheid: state.lr, maxEpoch: state.maxEpoch,
+    epochsGetraind: state.epoch,
+    params: state.net.paramCount(), flops: state.net.flopsPerInference(),
+    trainAcc, testAcc, trainTijdMs: Math.round(state.elapsed), drempel: state.thresh,
+    voldaan: testAcc >= state.thresh/100,
+    history: state.history.map(h=>({loss:h.loss, trainAcc:h.trainAcc, testAcc:h.testAcc}))
+  };
+  state.compareRows.push(row);
+  renderCompareTable();
+  await persistResults(row);
+}
+document.getElementById("addcompare").addEventListener("click", recordResult);
+
+function fileTimestamp(d){
+  const p = n => String(n).padStart(2,"0");
+  return `${d.getFullYear()}${p(d.getMonth()+1)}${p(d.getDate())}-${p(d.getHours())}${p(d.getMinutes())}${p(d.getSeconds())}`;
+}
+async function persistResults(row){
+  const statusEl = document.getElementById("savestatus");
+  if(!state.resultsDirHandle){ statusEl.textContent = "nog geen map gekozen — kies de map \"resultaten\" in je projectmap (of gebruik de downloadknop)"; return; }
+  try{
+    const naam = `resultaten_${row.taakKey}_${fileTimestamp(new Date(row.tijdstip))}.json`;
+    const fh = await state.resultsDirHandle.getFileHandle(naam, {create:true});
+    const writable = await fh.createWritable();
+    await writable.write(JSON.stringify([row], null, 2));
+    await writable.close();
+    row.__saved = true;
+    statusEl.textContent = `opgeslagen als "${state.resultsDirHandle.name}/${naam}" — ${new Date().toLocaleTimeString("nl-NL")}`;
+  }catch(err){ statusEl.textContent = "opslaan mislukt: "+err.message; }
+}
+async function persistPendingResults(){
+  for(const row of state.compareRows){ if(!row.__saved) await persistResults(row); }
+}
+document.getElementById("choosedir").addEventListener("click", async ()=>{
+  const statusEl = document.getElementById("savestatus");
+  if(!window.showDirectoryPicker){ statusEl.textContent = "je browser ondersteunt geen mapkeuze (probeer Chrome, Edge of een recente Firefox/Safari) — gebruik de downloadknop."; return; }
+  try{
+    state.resultsDirHandle = await window.showDirectoryPicker({ id:"llm-lab-resultaten", mode:"readwrite", startIn:"documents" });
+    await dirDbSet("resultsDir", state.resultsDirHandle);
+    statusEl.textContent = `map gekozen: "${state.resultsDirHandle.name}" — elke '+ vergelijking' wordt hier opgeslagen als eigen bestand (naam met tijdstip + taak)`;
+    await persistPendingResults();
+  }catch(err){ /* geannuleerd door gebruiker */ }
+});
+document.getElementById("downloadjson").addEventListener("click",()=>{
+  const blob = new Blob([JSON.stringify(state.compareRows, null, 2)], {type:"application/json"});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a"); a.href=url; a.download=`resultaten_alle_${fileTimestamp(new Date())}.json`; a.click();
+  URL.revokeObjectURL(url);
+});
+
+/* ======================= instellingen wiring ======================= */
+document.getElementById("activation").addEventListener("change",e=>{
+  state.activation=e.target.value;
+  state.activations = state.activations.map(()=>e.target.value);
+  renderLayerControls(); buildNet();
+});
+document.getElementById("feature").addEventListener("change",e=>{
+  state.feature=e.target.value;
+  document.getElementById("featval").textContent = e.target.options[e.target.selectedIndex].text;
+  prepTextData(); buildNet();
+});
+document.getElementById("resolution").addEventListener("change",e=>{
+  state.resolution = +e.target.value;
+  document.getElementById("resval").textContent = state.resolution+"×"+state.resolution;
+  if(state.imgBuckets) buildImageFeaturesAndNet();
+});
+document.getElementById("perclass").addEventListener("input",e=>{
+  state.perClass = +e.target.value; document.getElementById("perclassval").textContent = state.perClass;
+});
+document.getElementById("lr").addEventListener("input",e=>{ state.lr=(+e.target.value)/100; document.getElementById("lrval").textContent=state.lr.toFixed(2); });
+document.getElementById("thresh").addEventListener("input",e=>{
+  state.thresh=+e.target.value; document.getElementById("threshval").textContent=state.thresh+"%";
+  if(state.history.length){ const h=state.history.at(-1); updateMetrics(h.trainAcc,h.testAcc,h.loss); }
+});
+document.getElementById("maxepoch").addEventListener("input",e=>{
+  state.maxEpoch = +e.target.value; document.getElementById("maxepochval").textContent = state.maxEpoch;
+});
+document.getElementById("choosedatasetdir").addEventListener("click", async ()=>{
+  const statusEl = document.getElementById("datasetdirstatus");
+  if(!window.showDirectoryPicker){ statusEl.textContent = "je browser ondersteunt geen mapkeuze — dataset wordt online opgehaald."; return; }
+  try{
+    state.datasetsDirHandle = await window.showDirectoryPicker({ id:"llm-lab-datasets", mode:"read", startIn:"documents" });
+    await dirDbSet("datasetsDir", state.datasetsDirHandle);
+    statusEl.textContent = `map gekozen: "${state.datasetsDirHandle.name}" — dataset wordt vanaf hier geladen (submappen cijfers-mnist / letters-emnist)`;
+  }catch(err){ /* geannuleerd door gebruiker */ }
+});
+document.getElementById("loaddataset").addEventListener("click", loadImageDataset);
+document.getElementById("presetbtn").addEventListener("click",()=>{
+  const p = PRESETS[state.taskKey];
+  state.hidden=[...p.hidden]; state.activation=p.activation; state.activations=new Array(p.hidden.length).fill(p.activation);
+  state.lr=p.lr; state.thresh=p.thresh; state.maxEpoch=p.maxEpoch;
+  document.getElementById("activation").value=p.activation;
+  document.getElementById("lr").value=Math.round(p.lr*100); document.getElementById("lrval").textContent=p.lr.toFixed(2);
+  document.getElementById("thresh").value=p.thresh; document.getElementById("threshval").textContent=p.thresh+"%";
+  document.getElementById("maxepoch").value=p.maxEpoch; document.getElementById("maxepochval").textContent=p.maxEpoch;
+  renderLayerControls();
+  if(taskType()==="text"){
+    state.feature=p.feature; document.getElementById("feature").value=p.feature;
+    document.getElementById("featval").textContent = document.getElementById("feature").options[document.getElementById("feature").selectedIndex].text;
+    prepTextData(); buildNet();
+  } else {
+    state.resolution=p.resolution; state.perClass=p.perClass;
+    document.getElementById("resolution").value=p.resolution; document.getElementById("resval").textContent=p.resolution+"×"+p.resolution;
+    document.getElementById("perclass").value=p.perClass; document.getElementById("perclassval").textContent=p.perClass;
+    loadImageDataset();
+  }
+});
+
+/* ======================= taak-tabs ======================= */
+function selectTask(key){
+  stopTraining(false); state.taskKey=key; state.imgBuckets=null;
+  document.querySelectorAll(".tasktabs button").forEach(b=>b.classList.remove("active"));
+  document.getElementById("tab-"+key).classList.add("active");
+  const isImg = taskType()==="image";
+  document.getElementById("text-feature-field").style.display = isImg?"none":"block";
+  document.getElementById("image-feature-field").style.display = isImg?"block":"none";
+  document.getElementById("text-test-field").style.display = isImg?"none":"block";
+  document.getElementById("image-test-field").style.display = isImg?"block":"none";
+  document.getElementById("testpanel-title").textContent = isImg ? "Teken zelf een teken" : "Test een eigen zin";
+  document.getElementById("layerhint").innerHTML = isImg
+    ? `Richtwaarde: <b>2 lagen van 16-32 nodes</b> voor handschrift. Meer nodes helpen bij fijnere details, maar trainen trager. Max. 5 lagen.`
+    : `Richtwaarde: <b>1-2 lagen van 8-16 nodes</b> volstaat voor tekstclassificatie. Max. 5 lagen.`;
+  document.getElementById("testsentence").value=""; document.getElementById("testresult").innerHTML="";
+  document.getElementById("thumbstrip").innerHTML=""; document.getElementById("loadstatus").textContent="nog niet geladen";
+  document.getElementById("progressbar").style.width="0%";
+  if(isImg){ document.getElementById("trainbtn").disabled=true; buildNet(); }
+  else { prepTextData(); buildNet(); }
+}
+document.getElementById("tab-sentiment").addEventListener("click",()=>selectTask("sentiment"));
+document.getElementById("tab-spam").addEventListener("click",()=>selectTask("spam"));
+document.getElementById("tab-digits").addEventListener("click",()=>selectTask("digits"));
+document.getElementById("tab-letters").addEventListener("click",()=>selectTask("letters"));
+
+/* ======================= init ======================= */
+renderLayerControls();
+prepTextData();
+buildNet();
+</script>
+</body>
+</html>

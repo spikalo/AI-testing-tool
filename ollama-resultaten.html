@@ -1,0 +1,648 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>LLM-resultaten — lokaal model lab</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#14161a; --panel:#1b1e24; --panel-alt:#20242b; --border:#2a2f37;
+    --text:#e9e7e1; --text-dim:#9199a3; --text-faint:#5c636d;
+    --pos:#4fd1c5; --neg:#ff6b57; --warn:#ffb454; --grid:#22262d;
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    background:var(--bg); color:var(--text); font-family:'Inter',sans-serif; line-height:1.5;
+    background-image:linear-gradient(var(--grid) 1px, transparent 1px),linear-gradient(90deg, var(--grid) 1px, transparent 1px);
+    background-size:28px 28px; background-attachment:fixed;
+  }
+  h1,h2,h3{font-family:'Space Grotesk',sans-serif;margin:0;letter-spacing:.2px;}
+  .mono{font-family:'IBM Plex Mono',monospace;}
+  .wrap{max-width:1300px;margin:0 auto;padding:22px 24px 70px;}
+  a{color:var(--pos);}
+  .breadcrumb{font-size:12.5px;color:var(--text-dim);margin-bottom:12px;}
+  .breadcrumb a{color:var(--text-dim);text-decoration:none;border-bottom:1px dotted var(--text-faint);}
+  .breadcrumb a:hover{color:var(--pos);border-color:var(--pos);}
+  header.page{padding-bottom:18px;margin-bottom:20px;border-bottom:1px solid var(--border);}
+  header.page h1{font-size:24px;font-weight:600;}
+  header.page .sub{color:var(--text-dim);font-size:13.5px;max-width:700px;margin-top:6px;}
+
+  .panel{background:var(--panel);border:1px solid var(--border);border-radius:4px;padding:18px;}
+  .panel + .panel{margin-top:16px;}
+  .panel > h2{font-size:13px;color:var(--text-dim);font-weight:600;letter-spacing:.3px;
+    margin-bottom:12px;padding-bottom:10px;border-bottom:1px solid var(--border);}
+  .bar{display:flex;gap:10px;flex-wrap:wrap;align-items:center;}
+  .actionbtn{background:var(--panel-alt);color:var(--text);border:1px solid var(--border);
+    padding:9px 14px;border-radius:3px;font-family:'IBM Plex Mono',monospace;font-size:12px;cursor:pointer;}
+  .actionbtn:hover{border-color:var(--text-dim);}
+  .actionbtn.primary{background:var(--pos);color:#0d1210;border-color:var(--pos);font-weight:600;}
+  input[type=file]{display:none;}
+  select,input[type=range]{background:var(--panel-alt);color:var(--text);border:1px solid var(--border);
+    padding:7px 8px;border-radius:3px;font-family:'IBM Plex Mono',monospace;font-size:12.5px;}
+  input[type=range]{padding:0;}
+  .status{font-size:11.5px;color:var(--text-faint);font-family:'IBM Plex Mono',monospace;margin-top:10px;}
+
+  table{width:100%;border-collapse:collapse;font-size:11.5px;}
+  th,td{text-align:left;padding:7px 8px;border-bottom:1px solid var(--border);white-space:nowrap;}
+  th{color:var(--text-faint);font-weight:500;font-family:'IBM Plex Mono',monospace;font-size:10px;cursor:pointer;}
+  th:hover{color:var(--text);}
+  td{font-family:'IBM Plex Mono',monospace;}
+  tr.sel{background:rgba(79,209,197,.07);}
+  .tblwrap{overflow:auto;max-height:520px;}
+  .cellscore{display:inline-block;min-width:30px;text-align:right;}
+  .mini{display:inline-block;height:5px;border-radius:2px;vertical-align:middle;margin-left:6px;}
+
+  .grid2{display:grid;grid-template-columns:1fr 1fr;gap:16px;align-items:start;}
+  @media (max-width:1000px){ .grid2{grid-template-columns:1fr;} }
+  canvas{display:block;max-width:100%;}
+  .legend{display:flex;gap:14px;flex-wrap:wrap;font-size:11px;color:var(--text-dim);margin-top:10px;}
+  .legend span{display:flex;align-items:center;gap:5px;}
+  .dot{width:8px;height:8px;border-radius:50%;display:inline-block;flex:none;}
+  .subhead{font-family:'IBM Plex Mono',monospace;font-size:10px;color:var(--text-faint);
+    text-transform:uppercase;letter-spacing:.35px;margin:0 0 8px;}
+
+  .empty{color:var(--text-faint);font-size:13px;padding:30px 0;text-align:center;}
+  .note{font-size:12px;color:var(--text-faint);line-height:1.6;margin-top:12px;}
+  .note b{color:var(--text-dim);}
+  .hidden{display:none!important;}
+
+  /* keuzeformulier */
+  .form{display:grid;grid-template-columns:repeat(auto-fit,minmax(215px,1fr));gap:16px;}
+  .field label{display:block;font-family:'IBM Plex Mono',monospace;font-size:10px;color:var(--text-faint);
+    text-transform:uppercase;letter-spacing:.35px;margin-bottom:6px;}
+  .field select{width:100%;}
+  .catchecks{display:flex;flex-direction:column;gap:4px;}
+  .catchecks label{display:flex;align-items:center;gap:7px;font-size:12px;color:var(--text-dim);
+    text-transform:none;letter-spacing:0;font-family:'Inter',sans-serif;cursor:pointer;margin:0;}
+  .rangerow{display:flex;align-items:center;gap:10px;}
+  .rangerow input{flex:1;}
+  .rangerow span{font-family:'IBM Plex Mono',monospace;font-size:11px;color:var(--text-dim);min-width:74px;}
+
+  .advies{display:flex;flex-direction:column;gap:12px;margin-top:18px;}
+  .adv{border:1px solid var(--border);border-left:3px solid var(--pos);border-radius:3px;padding:14px 16px;background:var(--panel-alt);}
+  .adv.n2{border-left-color:var(--warn);} .adv.n3{border-left-color:var(--text-faint);}
+  .adv .rank{font-family:'IBM Plex Mono',monospace;font-size:10.5px;color:var(--text-faint);}
+  .adv h3{font-size:16px;margin:2px 0 6px;}
+  .adv .fit{font-family:'IBM Plex Mono',monospace;font-size:12px;color:var(--pos);}
+  .adv ul{margin:8px 0 0;padding-left:18px;font-size:12.5px;color:var(--text-dim);}
+  .adv ul li{margin-bottom:3px;}
+  .adv .warn{color:var(--warn);}
+  .adv .bad{color:var(--neg);}
+  .track{height:7px;background:#101216;border-radius:2px;overflow:hidden;margin-top:8px;}
+  .track i{display:block;height:100%;background:var(--pos);}
+
+  /* detailkaarten */
+  #detaillist{display:flex;flex-direction:column;gap:12px;}
+  .dcard{border:1px solid var(--border);border-radius:4px;background:var(--panel-alt);overflow:hidden;}
+  .dcard .dh{display:flex;gap:12px;align-items:center;flex-wrap:wrap;padding:11px 14px;cursor:pointer;
+    font-family:'IBM Plex Mono',monospace;font-size:12px;}
+  .dcard .dh .nm{flex:1;font-family:'Space Grotesk',sans-serif;font-size:14px;font-weight:600;}
+  .dcard .db{display:none;padding:0 14px 14px;}
+  .dcard.open .db{display:block;}
+  .finding{border:1px solid var(--border);border-left:3px solid var(--warn);border-radius:3px;
+    padding:10px 12px;background:var(--panel);margin-bottom:8px;}
+  .finding.good{border-left-color:var(--pos);}
+  .finding h4{font-family:'Space Grotesk',sans-serif;font-size:13px;margin:0 0 3px;}
+  .finding p{margin:4px 0 0;font-size:12.5px;color:var(--text-dim);}
+  .finding p.fix{color:var(--pos);} .finding p.fix::before{content:"→ ";}
+  .testgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:6px;margin-bottom:12px;}
+  .tg{border:1px solid var(--border);border-radius:2px;padding:6px 8px;font-family:'IBM Plex Mono',monospace;font-size:10.5px;
+    display:flex;justify-content:space-between;gap:8px;background:var(--panel);}
+  .flagline{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:10px;}
+  .flag{font-family:'IBM Plex Mono',monospace;font-size:10px;padding:2px 7px;border-radius:2px;
+    background:rgba(255,107,87,.13);color:var(--neg);border:1px solid rgba(255,107,87,.25);}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <div class="breadcrumb"><a href="index.html">← Hoofdmenu</a> · <a href="ollama-test.html">Ollama LLM-test →</a></div>
+
+  <header class="page">
+    <h1>LLM-resultaten</h1>
+    <div class="sub">Leg geteste lokale modellen naast elkaar: per vaardigheid, per moeilijkheidsgraad, met snelheid en faalpatronen. Onderaan kies je op basis van een concrete taak het model dat daar het beste bij past.</div>
+  </header>
+
+  <div class="panel">
+    <h2>Resultaten laden</h2>
+    <div class="bar">
+      <button class="actionbtn primary" id="choosedir">📁 kies map „resultaten-llm”</button>
+      <button class="actionbtn" id="chooseupload">⇧ of upload JSON-bestanden</button>
+      <input type="file" id="fileinput" accept="application/json" multiple>
+      <button class="actionbtn" id="clearall">✕ wis geladen resultaten</button>
+      <span style="flex:1"></span>
+      <select id="dedup">
+        <option value="laatste">alleen de laatste run per model</option>
+        <option value="alle">alle runs tonen</option>
+      </select>
+    </div>
+    <div class="status" id="status">nog niets geladen — kies de map waarin de testpagina de JSON-bestanden opslaat.</div>
+  </div>
+
+  <div id="content" class="hidden">
+
+    <div class="panel">
+      <h2>Modellen naast elkaar <span class="mono" style="font-weight:400;color:var(--text-faint)"> — klik op een rij om die in de grafieken te tonen (max 5)</span></h2>
+      <div class="tblwrap">
+        <table>
+          <thead><tr id="thead"></tr></thead>
+          <tbody id="tbody"></tbody>
+        </table>
+      </div>
+      <div class="note">Kolommen 1 t/m 6 zijn de vaardigheden uit de testbatterij. <b>fmt</b> = hoe betrouwbaar het model het gevraagde formaat aanhoudt, <b>cons</b> = of het bij herhaling hetzelfde antwoord geeft, <b>tok/s</b> = generatiesnelheid op jouw hardware.</div>
+    </div>
+
+    <div class="grid2">
+      <div class="panel">
+        <h2>Profiel per vaardigheid</h2>
+        <canvas id="radar" width="520" height="420"></canvas>
+        <div class="legend" id="radarlegend"></div>
+      </div>
+      <div class="panel">
+        <h2>Waar valt elk model om</h2>
+        <canvas id="levels" width="520" height="260"></canvas>
+        <div class="note">Elke lijn is één model: de score per moeilijkheidsgraad. Een steile knik laat zien bij welke complexiteit dat model onbruikbaar wordt — dát is het punt waarop je moet opsplitsen of doorschakelen naar een groter model.</div>
+        <div class="subhead" style="margin-top:18px;">faalpatronen — hoe vaak gezien per model</div>
+        <div class="tblwrap" style="max-height:260px;">
+          <table><thead><tr id="fthead"></tr></thead><tbody id="ftbody"></tbody></table>
+        </div>
+      </div>
+    </div>
+
+    <div class="panel">
+      <h2>Welk model voor mijn taak?</h2>
+      <div class="form">
+        <div class="field">
+          <label>wat voor werk is het</label>
+          <div class="catchecks" id="catchecks"></div>
+        </div>
+        <div class="field">
+          <label>hoe zwaar is de taak</label>
+          <select id="niveau">
+            <option value="1">niveau 1 — enkelvoudig, korte invoer</option>
+            <option value="2" selected>niveau 2 — meerdere eisen tegelijk</option>
+            <option value="3">niveau 3 — lange invoer, veel randgevallen</option>
+          </select>
+          <div class="note" style="margin-top:8px">Twijfel je? Kies één niveau hoger dan je denkt. Modellen vallen bijna altijd eerder om dan verwacht.</div>
+        </div>
+        <div class="field">
+          <label>wat weegt zwaarder</label>
+          <div class="rangerow">
+            <input type="range" id="snelheid" min="0" max="100" value="25">
+            <span id="snelheidval">25% snelheid</span>
+          </div>
+          <label style="margin-top:14px">harde eis: gestructureerde uitvoer (JSON, vast formaat)</label>
+          <select id="formaateis">
+            <option value="nee">niet nodig — vrije tekst is prima</option>
+            <option value="ja">ja — de output gaat rechtstreeks een systeem in</option>
+          </select>
+        </div>
+        <div class="field">
+          <label>hardwarelimiet</label>
+          <select id="grootte">
+            <option value="0">geen limiet</option>
+            <option value="4">maximaal ~4B parameters</option>
+            <option value="8">maximaal ~8B parameters</option>
+            <option value="15">maximaal ~15B parameters</option>
+          </select>
+          <label style="margin-top:14px">minimale snelheid</label>
+          <select id="minsnel">
+            <option value="0">maakt niet uit</option>
+            <option value="10">minstens 10 tok/s</option>
+            <option value="25">minstens 25 tok/s</option>
+            <option value="50">minstens 50 tok/s</option>
+          </select>
+        </div>
+      </div>
+      <div class="bar" style="margin-top:16px">
+        <button class="actionbtn primary" id="adviseer">→ geef advies</button>
+        <span class="status" style="margin:0" id="advstatus"></span>
+      </div>
+      <div class="advies" id="advies"></div>
+    </div>
+
+    <div class="panel">
+      <h2>Details en analyse per run</h2>
+      <div id="detaillist"></div>
+    </div>
+  </div>
+
+  <div id="emptystate" class="panel"><div class="empty">Nog geen resultaten geladen. Draai eerst een test op de <a href="ollama-test.html">Ollama LLM-test</a>-pagina, of kies hierboven de map met opgeslagen JSON-bestanden.</div></div>
+
+  <div class="note">Alleen bestanden met schema <b class="mono">ollama-llm-test/v1</b> worden ingelezen. Runs met verschillende testset-versies worden apart gemarkeerd, omdat de scores dan niet één-op-één vergelijkbaar zijn.</div>
+</div>
+
+<script>
+"use strict";
+const CATS = {
+  gen:    {nr:1, naam:"Generatief & creatief",     kort:"gen",    kleur:"#4fd1c5"},
+  struct: {nr:2, naam:"Structuur & transformatie", kort:"struct", kleur:"#5c9eff"},
+  klas:   {nr:3, naam:"Analyse & classificatie",   kort:"klas",   kleur:"#ffb454"},
+  logic:  {nr:4, naam:"Logica & redeneren",        kort:"logic",  kleur:"#8b7cf0"},
+  code:   {nr:5, naam:"Techniek & code",           kort:"code",   kleur:"#e879c1"},
+  agent:  {nr:6, naam:"Agentisch gedrag",          kort:"agent",  kleur:"#ff6b57"}
+};
+const CATKEYS = Object.keys(CATS);
+const REEKS = ["#4fd1c5","#ffb454","#8b7cf0","#e879c1","#5c9eff"];
+const VLAGNAAM = {
+  formaat:"formaatafwijking", lengte:"telinstructies", verbod:"verbod genegeerd", meta:"praat eromheen",
+  feit:"feit kwijt/verzonnen", reken:"reken- of redeneerfout", afleiding:"afgeleid door ruis",
+  code:"code fout", tool:"verkeerde tool", herstel:"geen herstel", consistentie:"inconsistent",
+  herhaling:"herhaling/loop", taal:"taalwissel", afgekapt:"afgekapt"
+};
+
+let runs = [], gekozen = new Set(), sortKey = "totaal", sortDir = -1;
+const $ = id => document.getElementById(id);
+const esc = s => String(s).replace(/[&<>"]/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+const scoreKleur = s => s >= 80 ? "#4fd1c5" : s >= 55 ? "#ffb454" : "#ff6b57";
+
+/* ---------- inlezen en afleiden ---------- */
+function parseParams(m){
+  if (m.parameterAantal) return m.parameterAantal / 1e9;
+  const s = String(m.parameterGrootte || "");
+  const mm = s.match(/([\d.]+)\s*([BM])/i);
+  if (!mm) return null;
+  return parseFloat(mm[1]) * (mm[2].toUpperCase() === "M" ? 0.001 : 1);
+}
+function checkGem(rap, flag){
+  let w = 0, h = 0;
+  for (const t of rap.tests || []) for (const c of t.checks || []){
+    if (c.flag === flag){ w += c.weight; h += c.weight * c.score; }
+  }
+  return w ? Math.round(h / w * 100) : null;
+}
+function consistentieScore(rap){
+  for (const t of rap.tests || []) for (const c of t.checks || [])
+    if (c.flag === "consistentie") return Math.round(c.score * 100);
+  return null;
+}
+function afgeleid(rap, bestand){
+  const m = rap.model || {};
+  return {
+    rap, bestand,
+    naam: m.naam || "onbekend",
+    params: parseParams(m),
+    paramsTekst: m.parameterGrootte || "—",
+    quant: m.quantisatie || "—",
+    tijdstip: rap.tijdstip,
+    versie: rap.testsetVersie,
+    totaal: rap.totaal ? rap.totaal.score : 0,
+    perCat: rap.perCategorie || {},
+    perNiveau: rap.perNiveau || {},
+    tps: rap.snelheid ? rap.snelheid.gemTokensPerSec : null,
+    vlaggen: rap.vlaggen || {},
+    formaat: checkGem(rap, "formaat"),
+    consistentie: consistentieScore(rap),
+    feiten: checkGem(rap, "feit"),
+    tools: checkGem(rap, "tool")
+  };
+}
+function laadJSON(tekst, bestand){
+  let d; try { d = JSON.parse(tekst); } catch(e){ return 0; }
+  const lijst = Array.isArray(d) ? d : [d];
+  let n = 0;
+  for (const r of lijst){
+    if (!r || r.schema !== "ollama-llm-test/v1") continue;
+    const a = afgeleid(r, bestand);
+    if (runs.some(x => x.naam === a.naam && x.tijdstip === a.tijdstip)) continue;
+    runs.push(a); n++;
+  }
+  return n;
+}
+function zichtbaar(){
+  let lijst = runs.slice();
+  if ($("dedup").value === "laatste"){
+    const per = new Map();
+    for (const r of lijst){
+      const b = per.get(r.naam);
+      if (!b || String(r.tijdstip) > String(b.tijdstip)) per.set(r.naam, r);
+    }
+    lijst = [...per.values()];
+  }
+  const k = sortKey;
+  lijst.sort((a,b) => {
+    const va = k in CATS ? (a.perCat[k] ? a.perCat[k].score : 0) : a[k];
+    const vb = k in CATS ? (b.perCat[k] ? b.perCat[k].score : 0) : b[k];
+    if (typeof va === "string" || typeof vb === "string") return String(va).localeCompare(String(vb)) * sortDir;
+    return ((va||0) - (vb||0)) * sortDir;
+  });
+  return lijst;
+}
+
+/* ---------- tabel ---------- */
+const KOLOMMEN = [
+  ["naam","model"], ["paramsTekst","params"], ["quant","quant"], ["totaal","totaal"],
+  ...CATKEYS.map(k => [k, CATS[k].nr + " " + CATS[k].kort]),
+  ["formaat","fmt"], ["consistentie","cons"], ["tps","tok/s"], ["tijdstip","wanneer"]
+];
+function tekenTabel(){
+  $("thead").innerHTML = KOLOMMEN.map(([k,l]) => '<th data-k="' + k + '">' + l + '</th>').join("");
+  $("thead").querySelectorAll("th").forEach(th => th.addEventListener("click", () => {
+    const k = th.dataset.k;
+    if (sortKey === k) sortDir *= -1; else { sortKey = k; sortDir = (k === "naam" || k === "quant") ? 1 : -1; }
+    tekenAlles();
+  }));
+  const lijst = zichtbaar();
+  $("tbody").innerHTML = lijst.map((r,i) => {
+    const id = r.naam + "|" + r.tijdstip;
+    const cel = v => v === null || v === undefined ? '<span style="color:var(--text-faint)">—</span>'
+      : '<span class="cellscore" style="color:' + scoreKleur(v) + '">' + v + '</span>' +
+        '<span class="mini" style="width:' + (v/3) + 'px;background:' + scoreKleur(v) + '"></span>';
+    return '<tr data-id="' + esc(id) + '" class="' + (gekozen.has(id) ? "sel" : "") + '">' +
+      '<td style="color:' + (gekozen.has(id) ? kleurVan(id) : "var(--text)") + '">' +
+        (gekozen.has(id) ? "● " : "") + esc(r.naam) + (r.versie !== "ollama-suite-v1" ? ' <span style="color:var(--warn)">⚠ ' + esc(r.versie||"?") + '</span>' : "") + '</td>' +
+      '<td>' + esc(r.paramsTekst) + '</td><td>' + esc(r.quant) + '</td>' +
+      '<td>' + cel(r.totaal) + '</td>' +
+      CATKEYS.map(k => '<td>' + cel(r.perCat[k] ? r.perCat[k].score : null) + '</td>').join("") +
+      '<td>' + cel(r.formaat) + '</td><td>' + cel(r.consistentie) + '</td>' +
+      '<td>' + (r.tps === null ? "—" : r.tps) + '</td>' +
+      '<td style="color:var(--text-faint)">' + new Date(r.tijdstip).toLocaleString("nl-NL") + '</td></tr>';
+  }).join("");
+  $("tbody").querySelectorAll("tr").forEach(tr => tr.addEventListener("click", () => {
+    const id = tr.dataset.id;
+    if (gekozen.has(id)) gekozen.delete(id);
+    else { if (gekozen.size >= 5) return; gekozen.add(id); }
+    tekenAlles();
+  }));
+}
+function kleurVan(id){
+  const i = [...gekozen].indexOf(id);
+  return i < 0 ? "var(--text)" : REEKS[i % REEKS.length];
+}
+const selectie = () => zichtbaar().filter(r => gekozen.has(r.naam + "|" + r.tijdstip));
+
+/* ---------- grafieken ---------- */
+function tekenRadar(){
+  const cv = $("radar"), ctx = cv.getContext("2d");
+  const W = cv.width, H = cv.height, cx = W/2, cy = H/2 + 4, R = Math.min(W,H)/2 - 58;
+  ctx.clearRect(0,0,W,H);
+  const n = CATKEYS.length, hoek = i => -Math.PI/2 + i * 2*Math.PI/n;
+  for (const ring of [0.25,0.5,0.75,1]){
+    ctx.beginPath();
+    for (let i = 0; i <= n; i++){ const a = hoek(i%n), x = cx+Math.cos(a)*R*ring, y = cy+Math.sin(a)*R*ring; i?ctx.lineTo(x,y):ctx.moveTo(x,y); }
+    ctx.closePath(); ctx.strokeStyle = ring===1 ? "#3a4049" : "#262b33"; ctx.stroke();
+  }
+  ctx.strokeStyle = "#262b33";
+  for (let i = 0; i < n; i++){ const a = hoek(i); ctx.beginPath(); ctx.moveTo(cx,cy); ctx.lineTo(cx+Math.cos(a)*R, cy+Math.sin(a)*R); ctx.stroke(); }
+  const sel = selectie();
+  sel.forEach((r,si) => {
+    const kleur = REEKS[si % REEKS.length];
+    ctx.beginPath();
+    CATKEYS.forEach((k,i) => { const v = (r.perCat[k] ? r.perCat[k].score : 0)/100, a = hoek(i);
+      const x = cx+Math.cos(a)*R*v, y = cy+Math.sin(a)*R*v; i?ctx.lineTo(x,y):ctx.moveTo(x,y); });
+    ctx.closePath();
+    ctx.fillStyle = kleur + "20"; ctx.fill();
+    ctx.strokeStyle = kleur; ctx.lineWidth = 2; ctx.stroke(); ctx.lineWidth = 1;
+    CATKEYS.forEach((k,i) => { const v = (r.perCat[k] ? r.perCat[k].score : 0)/100, a = hoek(i);
+      ctx.beginPath(); ctx.arc(cx+Math.cos(a)*R*v, cy+Math.sin(a)*R*v, 3, 0, 7); ctx.fillStyle = kleur; ctx.fill(); });
+  });
+  ctx.font = "600 11px 'IBM Plex Mono', monospace"; ctx.textAlign = "center"; ctx.textBaseline = "middle";
+  CATKEYS.forEach((k,i) => { const a = hoek(i), x = cx+Math.cos(a)*(R+30), y = cy+Math.sin(a)*(R+22);
+    ctx.fillStyle = CATS[k].kleur; ctx.fillText(CATS[k].nr + " " + CATS[k].kort, x, y); });
+  if (!sel.length){ ctx.fillStyle = "#5c636d"; ctx.font = "12px Inter, sans-serif";
+    ctx.fillText("selecteer modellen in de tabel hierboven", cx, cy); }
+  $("radarlegend").innerHTML = sel.map((r,i) =>
+    '<span><span class="dot" style="background:' + REEKS[i%REEKS.length] + '"></span>' + esc(r.naam) + '</span>').join("");
+}
+function tekenNiveaus(){
+  const cv = $("levels"), ctx = cv.getContext("2d");
+  const W = cv.width, H = cv.height, L = 44, Rr = 14, T = 14, B = H - 30;
+  ctx.clearRect(0,0,W,H);
+  ctx.strokeStyle = "#262b33"; ctx.fillStyle = "#5c636d";
+  ctx.font = "10px 'IBM Plex Mono', monospace"; ctx.textAlign = "right";
+  for (const v of [0,25,50,75,100]){ const y = B - v/100*(B-T);
+    ctx.beginPath(); ctx.moveTo(L,y); ctx.lineTo(W-Rr,y); ctx.stroke(); ctx.fillText(v, L-6, y+3); }
+  const xs = [1,2,3].map(l => L + (l-1)/2 * (W-L-Rr));
+  ctx.textAlign = "center";
+  [1,2,3].forEach((l,i) => { ctx.fillStyle = "#9199a3"; ctx.fillText("niveau " + l, xs[i], H - 10); });
+  const sel = selectie();
+  sel.forEach((r,si) => {
+    const kleur = REEKS[si % REEKS.length];
+    ctx.beginPath(); ctx.strokeStyle = kleur; ctx.lineWidth = 2;
+    [1,2,3].forEach((l,i) => { const v = r.perNiveau[l] || 0, y = B - v/100*(B-T);
+      i ? ctx.lineTo(xs[i], y) : ctx.moveTo(xs[i], y); });
+    ctx.stroke(); ctx.lineWidth = 1;
+    [1,2,3].forEach((l,i) => { const v = r.perNiveau[l] || 0, y = B - v/100*(B-T);
+      ctx.beginPath(); ctx.arc(xs[i], y, 4, 0, 7); ctx.fillStyle = kleur; ctx.fill();
+      ctx.fillStyle = kleur; ctx.font = "9px 'IBM Plex Mono', monospace"; ctx.fillText(v, xs[i], y - 9); });
+  });
+  if (!sel.length){ ctx.fillStyle = "#5c636d"; ctx.font = "12px Inter, sans-serif"; ctx.textAlign = "center";
+    ctx.fillText("selecteer modellen in de tabel hierboven", W/2, H/2); }
+}
+function tekenVlaggen(){
+  const sel = selectie().length ? selectie() : zichtbaar();
+  const alle = [...new Set(sel.flatMap(r => Object.keys(r.vlaggen)))]
+    .sort((a,b) => sel.reduce((s,r)=>s+(r.vlaggen[b]||0),0) - sel.reduce((s,r)=>s+(r.vlaggen[a]||0),0));
+  $("fthead").innerHTML = '<th style="cursor:default">faalpatroon</th>' +
+    sel.map(r => '<th style="cursor:default">' + esc(r.naam.split(":")[0]) + '</th>').join("");
+  $("ftbody").innerHTML = alle.length ? alle.map(f =>
+    '<tr><td style="color:var(--text-dim)">' + esc(VLAGNAAM[f] || f) + '</td>' +
+    sel.map(r => { const n = r.vlaggen[f] || 0;
+      return '<td style="color:' + (n === 0 ? "var(--text-faint)" : n >= 4 ? "var(--neg)" : "var(--warn)") + '">' + (n || "·") + '</td>';
+    }).join("") + '</tr>').join("")
+    : '<tr><td colspan="9" style="color:var(--text-faint)">geen faalpatronen gevonden — netjes.</td></tr>';
+}
+
+/* ---------- detailkaarten ---------- */
+function tekenDetails(){
+  const lijst = zichtbaar();
+  $("detaillist").innerHTML = lijst.map((r,i) => {
+    const rap = r.rap, an = rap.analyse || {};
+    const id = r.naam + "|" + r.tijdstip;
+    return '<div class="dcard" data-id="' + esc(id) + '">' +
+      '<div class="dh"><span style="color:' + scoreKleur(r.totaal) + ';font-weight:600">' + r.totaal + '</span>' +
+        '<span class="nm">' + esc(r.naam) + '</span>' +
+        '<span style="color:var(--text-faint)">' + esc(r.paramsTekst) + ' · ' + esc(r.quant) + ' · ' + (r.tps === null ? "—" : r.tps + " tok/s") + '</span>' +
+        '<span style="color:var(--text-faint)">' + new Date(r.tijdstip).toLocaleString("nl-NL") + '</span>' +
+        '<span style="color:var(--text-dim)">▾</span></div>' +
+      '<div class="db">' +
+        '<div class="flagline">' + Object.entries(r.vlaggen).sort((a,b)=>b[1]-a[1]).map(([f,n]) =>
+          '<span class="flag">' + esc(VLAGNAAM[f]||f) + ' ×' + n + '</span>').join("") + '</div>' +
+        '<div class="testgrid">' + (rap.tests||[]).map(t =>
+          '<div class="tg" title="' + esc(t.titel) + '"><span style="color:' + CATS[t.cat].kleur + '">' + CATS[t.cat].nr + '.' + t.level + '</span>' +
+          '<span style="color:' + scoreKleur(t.score) + '">' + t.score + '</span></div>').join("") + '</div>' +
+        (an.oordeel ? '<div style="font-size:13px;color:var(--text-dim);margin-bottom:10px">' + an.oordeel + '</div>' : "") +
+        (an.bevindingen||[]).map(b =>
+          '<div class="finding' + (b.soort === "goed" ? " good" : "") + '"><h4>' + esc(b.titel) +
+          (b.aantal ? ' <span style="color:var(--neg);font-family:\'IBM Plex Mono\',monospace;font-size:10.5px">· ' + b.aantal + '×</span>' : "") +
+          '</h4><p>' + esc(b.wat) + '</p><p class="fix">' + esc(b.fix) + '</p></div>').join("") +
+      '</div></div>';
+  }).join("");
+  $("detaillist").querySelectorAll(".dcard .dh").forEach(h =>
+    h.addEventListener("click", () => h.parentElement.classList.toggle("open")));
+}
+
+function tekenAlles(){
+  const heeft = runs.length > 0;
+  $("content").classList.toggle("hidden", !heeft);
+  $("emptystate").classList.toggle("hidden", heeft);
+  if (!heeft) return;
+  tekenTabel(); tekenRadar(); tekenNiveaus(); tekenVlaggen(); tekenDetails();
+}
+
+/* ==========================================================================
+   Modelkeuze-advies
+   ========================================================================== */
+$("catchecks").innerHTML = CATKEYS.map((k,i) =>
+  '<label><input type="checkbox" value="' + k + '"' + (i===1?" checked":"") + '> <span style="color:' + CATS[k].kleur + '">' + CATS[k].nr + '</span> ' + CATS[k].naam + '</label>').join("");
+$("snelheid").addEventListener("input", e => {
+  const v = +e.target.value;
+  $("snelheidval").textContent = v <= 20 ? "kwaliteit voorop" : v >= 70 ? "snelheid voorop" : v + "% snelheid";
+});
+$("adviseer").addEventListener("click", geefAdvies);
+
+function geefAdvies(){
+  const cats = [...$("catchecks").querySelectorAll("input:checked")].map(i => i.value);
+  const niveau = +$("niveau").value;
+  const wSnel = (+$("snelheid").value) / 100;
+  const formaatEis = $("formaateis").value === "ja";
+  const maxParams = +$("grootte").value;
+  const minTps = +$("minsnel").value;
+  const st = $("advstatus");
+  if (!cats.length){ st.textContent = "kies minstens één soort werk."; $("advies").innerHTML = ""; return; }
+
+  const lijst = zichtbaar();
+  const maxTps = Math.max(1, ...lijst.map(r => r.tps || 0));
+  const kandidaten = lijst.map(r => {
+    const perCat = cats.map(k => {
+      const p = r.perCat[k];
+      if (!p) return 0;
+      const opNiveau = p.perNiveau && p.perNiveau[niveau] !== null && p.perNiveau[niveau] !== undefined ? p.perNiveau[niveau] : p.score;
+      /* een model moet ook de makkelijkere niveaus aankunnen */
+      const eronder = [];
+      for (let l = 1; l < niveau; l++) if (p.perNiveau && typeof p.perNiveau[l] === "number") eronder.push(p.perNiveau[l]);
+      const basis = eronder.length ? (opNiveau * 0.7 + (eronder.reduce((a,b)=>a+b,0)/eronder.length) * 0.3) : opNiveau;
+      return basis;
+    });
+    const gemCat = perCat.reduce((a,b)=>a+b,0) / perCat.length;
+    const zwakste = Math.min(...perCat);
+    let kwaliteit = gemCat * 0.6 + zwakste * 0.4;
+    const redenen = [], bezwaren = [];
+    if (formaatEis){
+      const f = r.formaat === null ? 60 : r.formaat;
+      kwaliteit = kwaliteit * 0.65 + f * 0.35;
+      if (f < 70) bezwaren.push("houdt het gevraagde formaat maar in " + f + "% van de gevallen aan — dwing JSON af met format:\"json\" of een schema");
+      else redenen.push("formaatbetrouwbaarheid " + f + "%");
+    }
+    const snelheidScore = (r.tps || 0) / maxTps * 100;
+    const eind = kwaliteit * (1 - wSnel) + snelheidScore * wSnel;
+
+    let uit = null;
+    if (maxParams && r.params && r.params > maxParams + 0.5) uit = "groter dan de gekozen hardwarelimiet (" + r.paramsTekst + ")";
+    if (minTps && (r.tps || 0) < minTps) uit = "haalt maar " + (r.tps || 0) + " tok/s, onder de gevraagde " + minTps;
+
+    cats.forEach((k,i) => {
+      const s = Math.round(perCat[i]);
+      (s >= 75 ? redenen : bezwaren).push(CATS[k].naam.toLowerCase() + " op niveau " + niveau + ": " + s + "/100");
+    });
+    if (r.consistentie !== null && r.consistentie < 100) bezwaren.push("geeft bij herhaling niet altijd hetzelfde antwoord");
+    if (r.tps) redenen.push(r.tps + " tok/s op jouw hardware");
+    const grootste = Object.entries(r.vlaggen).sort((a,b)=>b[1]-a[1])[0];
+    if (grootste && grootste[1] >= 3) bezwaren.push("meest voorkomende faalpatroon: " + (VLAGNAAM[grootste[0]]||grootste[0]) + " (" + grootste[1] + "×)");
+
+    return {r, eind: Math.round(eind), kwaliteit: Math.round(kwaliteit), redenen, bezwaren, uit};
+  });
+
+  const bruikbaar = kandidaten.filter(k => !k.uit).sort((a,b) => b.eind - a.eind);
+  const afgevallen = kandidaten.filter(k => k.uit);
+
+  if (!bruikbaar.length){
+    $("advies").innerHTML = '<div class="adv n3"><h3>Geen model voldoet aan je randvoorwaarden</h3>' +
+      '<ul>' + afgevallen.map(k => '<li>' + esc(k.r.naam) + ' — ' + esc(k.uit) + '</li>').join("") + '</ul>' +
+      '<p style="font-size:12.5px;color:var(--text-dim);margin-top:8px">Versoepel de hardwarelimiet of de snelheidseis, of test eerst een model dat er wél binnen past.</p></div>';
+    st.textContent = ""; return;
+  }
+
+  $("advies").innerHTML = bruikbaar.slice(0,3).map((k,i) => {
+    const goed = k.eind >= 70, matig = k.eind >= 50;
+    return '<div class="adv n' + (i+1) + '">' +
+      '<div class="rank">' + (i === 0 ? "beste keuze" : i === 1 ? "alternatief" : "derde optie") + '</div>' +
+      '<h3>' + esc(k.r.naam) + ' <span style="font-size:12px;color:var(--text-faint);font-family:\'IBM Plex Mono\',monospace">' + esc(k.r.paramsTekst) + ' · ' + esc(k.r.quant) + '</span></h3>' +
+      '<div class="fit" style="color:' + scoreKleur(k.eind) + '">geschiktheid ' + k.eind + '/100 ' +
+        (goed ? "— kan dit aan" : matig ? "— alleen met extra vangnetten in je code" : "— eigenlijk te zwak hiervoor") + '</div>' +
+      '<div class="track"><i style="width:' + k.eind + '%;background:' + scoreKleur(k.eind) + '"></i></div>' +
+      '<ul>' + k.redenen.slice(0,4).map(x => '<li>' + esc(x) + '</li>').join("") +
+        k.bezwaren.slice(0,4).map(x => '<li class="' + (k.eind < 50 ? "bad" : "warn") + '">' + esc(x) + '</li>').join("") + '</ul>' +
+    '</div>';
+  }).join("") + (afgevallen.length
+    ? '<div class="note">Buiten beschouwing gelaten: ' + afgevallen.map(k => esc(k.r.naam) + " (" + esc(k.uit) + ")").join(" · ") + '</div>' : "");
+  st.textContent = bruikbaar.length + " model(len) beoordeeld voor niveau " + niveau + ".";
+}
+
+/* ==========================================================================
+   Laden van bestanden
+   ========================================================================== */
+const DIRDB_NAME = "llm-lab-dirs", DIRDB_STORE = "handles";
+function dirDbOpen(){
+  return new Promise((res, rej) => {
+    const q = indexedDB.open(DIRDB_NAME, 1);
+    q.onupgradeneeded = () => { try{ q.result.createObjectStore(DIRDB_STORE); }catch(e){} };
+    q.onsuccess = () => res(q.result); q.onerror = () => rej(q.error);
+  });
+}
+async function dirDbGet(k){
+  try{ const db = await dirDbOpen();
+    return await new Promise((res, rej) => { const tx = db.transaction(DIRDB_STORE,"readonly");
+      const q = tx.objectStore(DIRDB_STORE).get(k); q.onsuccess = () => res(q.result||null); q.onerror = () => rej(q.error); });
+  }catch(e){ return null; }
+}
+async function dirDbSet(k,h){
+  try{ const db = await dirDbOpen();
+    await new Promise((res,rej) => { const tx = db.transaction(DIRDB_STORE,"readwrite");
+      tx.objectStore(DIRDB_STORE).put(h,k); tx.oncomplete = res; tx.onerror = () => rej(tx.error); });
+  }catch(e){}
+}
+async function leesMap(dir){
+  let n = 0, bestanden = 0;
+  for await (const [naam, h] of dir.entries()){
+    if (h.kind !== "file" || !/\.json$/i.test(naam)) continue;
+    bestanden++;
+    try{ const f = await h.getFile(); n += laadJSON(await f.text(), naam); }catch(e){}
+  }
+  $("status").textContent = bestanden + " JSON-bestand(en) gelezen in „" + dir.name + "” — " + n + " bruikbare run(s) geladen, " + runs.length + " in totaal.";
+  if (gekozen.size === 0) autoSelectie();
+  tekenAlles();
+}
+function autoSelectie(){
+  zichtbaar().slice(0, Math.min(4, runs.length)).forEach(r => gekozen.add(r.naam + "|" + r.tijdstip));
+}
+$("choosedir").addEventListener("click", async () => {
+  if (!window.showDirectoryPicker){ $("status").textContent = "deze browser ondersteunt geen mapkeuze (gebruik Chrome of Edge) — gebruik de uploadknop."; return; }
+  try{
+    const dir = await window.showDirectoryPicker({id:"llm-lab-llmresultaten", mode:"read", startIn:"documents"});
+    await dirDbSet("llmResultsDirRead", dir);
+    await leesMap(dir);
+  }catch(e){}
+});
+$("chooseupload").addEventListener("click", () => $("fileinput").click());
+$("fileinput").addEventListener("change", async e => {
+  let n = 0;
+  for (const f of e.target.files) n += laadJSON(await f.text(), f.name);
+  $("status").textContent = e.target.files.length + " bestand(en) gelezen — " + n + " bruikbare run(s), " + runs.length + " in totaal.";
+  if (gekozen.size === 0) autoSelectie();
+  tekenAlles(); e.target.value = "";
+});
+$("clearall").addEventListener("click", () => {
+  runs = []; gekozen.clear();
+  $("status").textContent = "geladen resultaten gewist.";
+  tekenAlles();
+});
+$("dedup").addEventListener("change", tekenAlles);
+
+/* eerder gekozen map opnieuw proberen */
+(async () => {
+  const h = await dirDbGet("llmResultsDirRead") || await dirDbGet("llmResultsDir");
+  if (!h) return;
+  try{
+    if (await h.queryPermission({mode:"read"}) === "granted") await leesMap(h);
+    else $("status").textContent = "map „" + h.name + "” onthouden — klik één keer op „kies map” om toegang te bevestigen.";
+  }catch(e){}
+})();
+
+tekenAlles();
+</script>
+</body>
+</html>

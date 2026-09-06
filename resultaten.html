@@ -1,0 +1,422 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Resultaten — lokaal model lab</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#14161a; --panel:#1b1e24; --panel-alt:#20242b; --border:#2a2f37;
+    --text:#e9e7e1; --text-dim:#9199a3; --text-faint:#5c636d;
+    --pos:#4fd1c5; --neg:#ff6b57; --warn:#ffb454; --grid:#22262d;
+    --c1:#4fd1c5; --c2:#ffb454; --c3:#ff6b57; --c4:#8b7cf0;
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    background:var(--bg); color:var(--text); font-family:'Inter',sans-serif; line-height:1.5;
+    background-image:linear-gradient(var(--grid) 1px, transparent 1px),linear-gradient(90deg, var(--grid) 1px, transparent 1px);
+    background-size:28px 28px; background-attachment:fixed;
+  }
+  h1,h2,h3{font-family:'Space Grotesk',sans-serif;margin:0;letter-spacing:.2px;}
+  .mono{font-family:'IBM Plex Mono',monospace;}
+  .wrap{max-width:1300px;margin:0 auto;padding:22px 24px 60px;}
+  a{color:var(--pos);}
+  .breadcrumb{font-size:12.5px;color:var(--text-dim);margin-bottom:12px;}
+  .breadcrumb a{color:var(--text-dim);text-decoration:none;border-bottom:1px dotted var(--text-faint);}
+  .breadcrumb a:hover{color:var(--pos);border-color:var(--pos);}
+
+  header{padding-bottom:18px;margin-bottom:20px;border-bottom:1px solid var(--border);}
+  header h1{font-size:24px;font-weight:600;}
+  header .sub{color:var(--text-dim);font-size:13.5px;max-width:640px;margin-top:6px;}
+
+  .panel{background:var(--panel);border:1px solid var(--border);border-radius:4px;padding:18px;}
+  .panel + .panel{margin-top:18px;}
+  .panel h2{font-size:13px;color:var(--text-dim);font-weight:600;letter-spacing:.3px;
+    margin-bottom:12px;padding-bottom:10px;border-bottom:1px solid var(--border);}
+
+  .loadbar{display:flex;gap:10px;flex-wrap:wrap;align-items:center;}
+  .actionbtn{background:var(--panel-alt);color:var(--text);border:1px solid var(--border);
+    padding:9px 14px;border-radius:3px;font-family:'IBM Plex Mono',monospace;font-size:12px;cursor:pointer;}
+  .actionbtn:hover{border-color:var(--text-dim);}
+  .actionbtn.primary{background:var(--pos);color:#0d1210;border-color:var(--pos);font-weight:600;}
+  input[type=file]{display:none;}
+  .status{font-size:11.5px;color:var(--text-faint);font-family:'IBM Plex Mono',monospace;margin-top:10px;}
+
+  select{background:var(--panel-alt);color:var(--text);border:1px solid var(--border);
+    padding:7px 8px;border-radius:3px;font-family:'IBM Plex Mono',monospace;font-size:12.5px;}
+
+  .grid2{display:grid;grid-template-columns:1.3fr 1fr;gap:18px;align-items:start;margin-top:18px;}
+  @media (max-width:1000px){ .grid2{grid-template-columns:1fr;} }
+
+  table{width:100%;border-collapse:collapse;font-size:11.5px;}
+  th,td{text-align:left;padding:7px 8px;border-bottom:1px solid var(--border);white-space:nowrap;}
+  th{color:var(--text-faint);font-weight:500;font-family:'IBM Plex Mono',monospace;font-size:10px;cursor:pointer;}
+  th:hover{color:var(--text);}
+  td{font-family:'IBM Plex Mono',monospace;color:var(--text);}
+  #tablewrap{max-height:480px;overflow:auto;}
+  #tablewrap::-webkit-scrollbar{width:6px;} #tablewrap::-webkit-scrollbar-thumb{background:var(--border);}
+  .badge{padding:1px 6px;border-radius:2px;font-size:10px;}
+  .badge.ok{background:rgba(79,209,197,.15);color:var(--pos);}
+  .badge.no{background:rgba(255,107,87,.15);color:var(--neg);}
+
+  canvas#scatter, canvas#bars{width:100%;display:block;}
+  .legend{display:flex;gap:14px;flex-wrap:wrap;font-size:11px;color:var(--text-dim);margin-top:10px;}
+  .legend span{display:flex;align-items:center;gap:5px;}
+  .dot{width:8px;height:8px;border-radius:50%;display:inline-block;}
+
+  .empty{color:var(--text-faint);font-size:13px;padding:30px 0;text-align:center;}
+  .note{font-size:12px;color:var(--text-faint);margin-top:12px;line-height:1.55;}
+  .note b{color:var(--text-dim);}
+
+  #resultslist{display:flex;flex-direction:column;gap:14px;}
+  .resultcard{border:1px solid var(--border);border-radius:4px;padding:14px 16px;background:var(--panel-alt);}
+  .resultcard-header{display:flex;gap:14px;align-items:center;flex-wrap:wrap;font-family:'IBM Plex Mono',monospace;
+    font-size:12px;margin-bottom:12px;padding-bottom:10px;border-bottom:1px solid var(--border);}
+  .resultcard-header .rc-time{color:var(--text-faint);}
+  .resultcard-header .rc-task{flex:1;color:var(--text);font-weight:600;}
+  .resultcard-header .rc-acc{color:var(--pos);}
+  .detailgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(190px,1fr));gap:10px 20px;margin-bottom:10px;}
+  .detailgrid .k{display:block;font-size:10px;color:var(--text-faint);text-transform:uppercase;letter-spacing:.3px;margin-bottom:3px;font-family:'IBM Plex Mono',monospace;}
+  .detailgrid .v{color:var(--text);font-family:'IBM Plex Mono',monospace;font-size:13px;}
+  canvas.cardchart{width:100%;height:130px;display:block;border:1px solid var(--border);border-radius:3px;}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <div class="breadcrumb"><a href="index.html">← Hoofdmenu</a></div>
+
+  <header>
+    <h1>Resultaten</h1>
+    <div class="sub">Bekijk en vergelijk opgeslagen runs uit de tests — architectuur, features, parameters, nauwkeurigheid en trainingstijd naast elkaar.</div>
+  </header>
+
+  <div class="panel">
+    <h2>Resultaten laden</h2>
+    <div class="loadbar">
+      <button class="actionbtn primary" id="choosedir">📁 kies resultatenmap</button>
+      <button class="actionbtn" id="chooseupload">⇧ of upload resultaten.json</button>
+      <input type="file" id="fileinput" accept="application/json" multiple>
+      <select id="taskfilter"><option value="">alle taken</option></select>
+      <button class="actionbtn" id="clearall">✕ wis geladen resultaten</button>
+    </div>
+    <div class="status" id="status">nog geen resultaten geladen — kies de map "resultaten" in je projectmap.</div>
+  </div>
+
+  <div class="panel" id="resultslist-panel" style="display:none;">
+    <h2>Beschikbare resultaten</h2>
+    <div class="note" style="margin-top:0;margin-bottom:12px;">Alle gevonden resultaten met hun volledige instellingen en leercurve, nieuwste eerst — gebruik het taakfilter hieronder bij "Alle runs" om te beperken tot één taak.</div>
+    <div class="legend" style="margin-bottom:14px;">
+      <span><span class="dot" style="background:#ffb454"></span>verlies (genormaliseerd)</span>
+      <span><span class="dot" style="background:#4fd1c5"></span>train-acc</span>
+      <span><span class="dot" style="background:#ff6b57"></span>test-acc</span>
+    </div>
+    <div id="resultslist"></div>
+  </div>
+
+  <div id="content" style="display:none;">
+    <div class="grid2">
+      <div class="panel">
+        <h2>Alle runs</h2>
+        <div id="tablewrap">
+          <table>
+            <thead>
+              <tr>
+                <th data-k="tijdstip">tijdstip</th><th data-k="taak">taak</th><th data-k="architectuur">architectuur</th>
+                <th data-k="features">features</th><th data-k="activatie">activatie</th>
+                <th data-k="params">params</th><th data-k="trainAcc">train-acc</th><th data-k="testAcc">test-acc</th>
+                <th data-k="trainTijdMs">tijd</th><th data-k="voldaan">ok?</th>
+              </tr>
+            </thead>
+            <tbody id="tbody"></tbody>
+          </table>
+        </div>
+      </div>
+      <div>
+        <div class="panel">
+          <h2>Test-nauwkeurigheid per run</h2>
+          <canvas id="bars" width="500" height="220"></canvas>
+        </div>
+        <div class="panel">
+          <h2>Parameters vs. nauwkeurigheid</h2>
+          <canvas id="scatter" width="500" height="260"></canvas>
+          <div class="legend" id="scatterlegend"></div>
+          <div class="note">Punten linksboven zijn het interessantst: <b>weinig parameters, hoge nauwkeurigheid</b> — dat is "goed presteren met weinig rekenkracht". Punten rechtsonder laten zien waar meer rekenkracht níet tot betere resultaten leidde.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div id="emptystate" class="panel"><div class="empty">Nog geen resultaten om te tonen. Kies de map waarin je resultaten.json hebt opgeslagen, of upload het bestand handmatig.</div></div>
+
+</div>
+
+<script>
+let rows = [];
+let sortKey = "tijdstip", sortDir = -1;
+const COLORS = ["#4fd1c5","#ffb454","#ff6b57","#8b7cf0","#5c9eff","#e879c1"];
+
+/* ---- IndexedDB: onthoud de gekozen resultatenmap tussen bezoeken ---- */
+const DIRDB_NAME="llm-lab-dirs", DIRDB_STORE="handles";
+function dirDbOpen(){
+  return new Promise((resolve,reject)=>{
+    const req = indexedDB.open(DIRDB_NAME,1);
+    req.onupgradeneeded = ()=> req.result.createObjectStore(DIRDB_STORE);
+    req.onsuccess = ()=> resolve(req.result);
+    req.onerror = ()=> reject(req.error);
+  });
+}
+async function dirDbGet(key){
+  try{
+    const db = await dirDbOpen();
+    return await new Promise((resolve,reject)=>{
+      const tx = db.transaction(DIRDB_STORE,"readonly");
+      const req = tx.objectStore(DIRDB_STORE).get(key);
+      req.onsuccess = ()=> resolve(req.result||null);
+      req.onerror = ()=> reject(req.error);
+    });
+  }catch(err){ return null; }
+}
+async function dirDbSet(key, handle){
+  try{
+    const db = await dirDbOpen();
+    await new Promise((resolve,reject)=>{
+      const tx = db.transaction(DIRDB_STORE,"readwrite");
+      tx.objectStore(DIRDB_STORE).put(handle, key);
+      tx.oncomplete = resolve; tx.onerror = ()=>reject(tx.error);
+    });
+  }catch(err){ /* mapkeuze wordt dan gewoon niet onthouden */ }
+}
+async function loadDirHandle(dir){
+  const statusEl = document.getElementById("status");
+  let found = [];
+  for await (const [name, handle] of dir.entries()){
+    if(handle.kind==="file" && name.toLowerCase().endsWith(".json")){
+      try{
+        const file = await handle.getFile();
+        const text = await file.text();
+        const parsed = JSON.parse(text);
+        if(Array.isArray(parsed)) found = found.concat(parsed);
+      }catch(e){ /* negeer onleesbare/ongeldige bestanden */ }
+    }
+  }
+  mergeRows(found);
+  statusEl.textContent = `${found.length} runs geladen uit map "${dir.name}" (bestanden eindigend op .json).`;
+}
+async function loadFromDir(){
+  const statusEl = document.getElementById("status");
+  if(!window.showDirectoryPicker){ statusEl.textContent="je browser ondersteunt geen mapkeuze — gebruik de uploadknop."; return; }
+  try{
+    const dir = await window.showDirectoryPicker({ id:"llm-lab-resultaten", mode:"read", startIn:"documents" });
+    await dirDbSet("resultsDir", dir);
+    await loadDirHandle(dir);
+  }catch(e){ /* geannuleerd */ }
+}
+document.getElementById("choosedir").addEventListener("click", loadFromDir);
+(async function initAutoLoad(){
+  const saved = await dirDbGet("resultsDir");
+  if(!saved) return;
+  const statusEl = document.getElementById("status");
+  try{
+    const perm = await saved.queryPermission({mode:"read"});
+    if(perm==="granted"){ await loadDirHandle(saved); return; }
+    statusEl.innerHTML = `map "${saved.name}" onthouden — <button class="actionbtn" id="resume_resultsDir">🔓 hervat toegang</button>`;
+    document.getElementById("resume_resultsDir").addEventListener("click", async ()=>{
+      try{
+        const perm2 = await saved.requestPermission({mode:"read"});
+        if(perm2==="granted") await loadDirHandle(saved);
+        else statusEl.textContent = "toegang geweigerd — kies de map opnieuw.";
+      }catch(err){ statusEl.textContent = "hervatten mislukt: "+err.message; }
+    });
+  }catch(err){ /* handle niet meer geldig (map verplaatst/verwijderd) — negeren */ }
+})();
+document.getElementById("chooseupload").addEventListener("click",()=>document.getElementById("fileinput").click());
+document.getElementById("fileinput").addEventListener("change", async (e)=>{
+  let found = [];
+  for(const file of e.target.files){
+    try{ const text = await file.text(); const parsed = JSON.parse(text); if(Array.isArray(parsed)) found = found.concat(parsed); }catch(err){}
+  }
+  mergeRows(found);
+  document.getElementById("status").textContent = `${found.length} runs geladen uit ${e.target.files.length} bestand(en).`;
+});
+document.getElementById("clearall").addEventListener("click",()=>{ rows=[]; render(); document.getElementById("status").textContent="resultaten gewist."; });
+
+function mergeRows(newRows){
+  rows = rows.concat(newRows.filter(r=>r && typeof r.testAcc==="number"));
+  refreshTaskFilter();
+  render();
+}
+function refreshTaskFilter(){
+  const sel = document.getElementById("taskfilter");
+  const current = sel.value;
+  const taken = [...new Set(rows.map(r=>r.taak))];
+  sel.innerHTML = `<option value="">alle taken</option>` + taken.map(t=>`<option value="${t}">${t}</option>`).join("");
+  sel.value = taken.includes(current) ? current : "";
+}
+document.getElementById("taskfilter").addEventListener("change", render);
+
+function filteredRows(){
+  const f = document.getElementById("taskfilter").value;
+  let r = f ? rows.filter(x=>x.taak===f) : rows.slice();
+  r.sort((a,b)=>{
+    let av=a[sortKey], bv=b[sortKey];
+    if(typeof av==="boolean"){ av=av?1:0; bv=bv?1:0; }
+    if(av<bv) return -1*sortDir; if(av>bv) return 1*sortDir; return 0;
+  });
+  return r;
+}
+
+function render(){
+  const has = rows.length>0;
+  document.getElementById("content").style.display = has?"block":"none";
+  document.getElementById("emptystate").style.display = has?"none":"block";
+  document.getElementById("resultslist-panel").style.display = has?"block":"none";
+  if(!has) return;
+  const r = filteredRows();
+  renderTable(r);
+  renderBars(r);
+  renderScatter(r);
+  renderResultsList(r);
+}
+
+/* ======================= lijst met beschikbare resultaten, direct met alle instellingen + leercurve ======================= */
+function renderResultsList(r){
+  const listEl = document.getElementById("resultslist");
+  listEl.innerHTML = "";
+  const item = (k,v)=> `<div><span class="k">${k}</span><span class="v">${v}</span></div>`;
+  r.forEach(row=>{
+    const card = document.createElement("div"); card.className="resultcard";
+    const t = row.tijdstip ? new Date(row.tijdstip).toLocaleString("nl-NL",{dateStyle:"short",timeStyle:"short"}) : "—";
+    card.innerHTML = `
+      <div class="resultcard-header">
+        <span class="rc-time">${t}</span>
+        <span class="rc-task">${row.taak||"—"}</span>
+        <span class="rc-acc">${row.testAcc!==undefined?(row.testAcc*100).toFixed(1)+"% test-acc":"—"}</span>
+        <span class="badge ${row.voldaan?'ok':'no'}">${row.voldaan?'ja':'nee'}</span>
+      </div>
+      <div class="detailgrid">
+        ${item("architectuur", row.architectuur||"—")}
+        ${item("features", row.features||"—")}
+        ${item("activatiefunctie", row.activatie||"—")}
+        ${row.activatiesPerLaag ? item("activaties per laag", row.activatiesPerLaag.join(" → ")) : ""}
+        ${item("leersnelheid", row.leersnelheid!==undefined?row.leersnelheid:"—")}
+        ${item("max epochs", row.maxEpoch!==undefined?row.maxEpoch:"—")}
+        ${item("epochs getraind", row.epochsGetraind!==undefined?row.epochsGetraind:"—")}
+        ${item("parameters", row.params!==undefined?row.params.toLocaleString("nl-NL"):"—")}
+        ${item("berekeningen / voorspelling", row.flops!==undefined?row.flops.toLocaleString("nl-NL"):"—")}
+        ${item("train-acc", row.trainAcc!==undefined?(row.trainAcc*100).toFixed(1)+"%":"—")}
+        ${item('drempel "goed genoeg"', row.drempel!==undefined?row.drempel+"%":"—")}
+        ${item("trainingstijd", row.trainTijdMs!==undefined?(row.trainTijdMs/1000).toFixed(2)+" s":"—")}
+      </div>`;
+    if(row.history && row.history.length>=2){
+      const cvs = document.createElement("canvas"); cvs.className="cardchart"; cvs.width=900; cvs.height=130;
+      card.appendChild(cvs);
+      drawHistoryChart(cvs, row.history);
+    } else {
+      const note = document.createElement("div"); note.className="note"; note.style.margin="0";
+      note.textContent = "Voor dit resultaat is geen leercurve opgeslagen (bewaard vóór deze update, of geladen uit een oud resultaten.json-bestand).";
+      card.appendChild(note);
+    }
+    listEl.appendChild(card);
+  });
+}
+function drawHistoryChart(cvs, hist){
+  const ctx=cvs.getContext("2d"); const W=cvs.width,H=cvs.height;
+  ctx.clearRect(0,0,W,H);
+  ctx.strokeStyle="#2a2f37"; ctx.lineWidth=1;
+  for(let i=0;i<=3;i++){ const y=8+((H-20)/3)*i; ctx.beginPath(); ctx.moveTo(30,y); ctx.lineTo(W-10,y); ctx.stroke(); }
+  const maxLoss = Math.max(...hist.map(h=>h.loss||0), 0.1);
+  const plot = (getter, color)=>{ ctx.strokeStyle=color; ctx.lineWidth=2; ctx.beginPath();
+    hist.forEach((h,i)=>{ const x=30+(W-40)*(i/(hist.length-1)); const val=Math.max(0,Math.min(1,getter(h)));
+      const y=8+(H-20)*(1-val); i===0?ctx.moveTo(x,y):ctx.lineTo(x,y); });
+    ctx.stroke(); };
+  plot(h=>Math.min(1,(h.loss||0)/maxLoss), "#ffb454");
+  plot(h=>h.trainAcc||0, "#4fd1c5");
+  plot(h=>h.testAcc||0, "#ff6b57");
+}
+
+function renderTable(r){
+  const tbody = document.getElementById("tbody"); tbody.innerHTML="";
+  r.forEach(row=>{
+    const tr = document.createElement("tr");
+    const t = row.tijdstip ? new Date(row.tijdstip).toLocaleString("nl-NL",{dateStyle:"short",timeStyle:"short"}) : "—";
+    tr.innerHTML = `<td>${t}</td><td>${row.taak||"—"}</td><td>${row.architectuur||"—"}</td><td>${row.features||"—"}</td>
+      <td>${row.activatie||"—"}</td><td>${row.params!==undefined?row.params.toLocaleString("nl-NL"):"—"}</td>
+      <td>${row.trainAcc!==undefined?(row.trainAcc*100).toFixed(1)+"%":"—"}</td>
+      <td>${row.testAcc!==undefined?(row.testAcc*100).toFixed(1)+"%":"—"}</td>
+      <td>${row.trainTijdMs!==undefined?(row.trainTijdMs/1000).toFixed(2)+"s":"—"}</td>
+      <td><span class="badge ${row.voldaan?'ok':'no'}">${row.voldaan?'ja':'nee'}</span></td>`;
+    tbody.appendChild(tr);
+  });
+}
+document.querySelectorAll("th[data-k]").forEach(th=>{
+  th.addEventListener("click",()=>{
+    const k = th.dataset.k;
+    if(sortKey===k) sortDir*=-1; else { sortKey=k; sortDir=1; }
+    render();
+  });
+});
+
+function taskColorMap(r){
+  const taken = [...new Set(r.map(x=>x.taak))];
+  const map={}; taken.forEach((t,i)=>map[t]=COLORS[i%COLORS.length]); return map;
+}
+
+function renderBars(r){
+  const cvs = document.getElementById("bars"); const ctx = cvs.getContext("2d");
+  const W=cvs.width,H=cvs.height; ctx.clearRect(0,0,W,H);
+  if(r.length===0) return;
+  const cmap = taskColorMap(r);
+  const barW = Math.max(4,(W-40)/r.length - 4);
+  ctx.strokeStyle="#2a2f37"; ctx.lineWidth=1;
+  for(let i=0;i<=4;i++){ const y=10+((H-30)/4)*i; ctx.beginPath(); ctx.moveTo(30,y); ctx.lineTo(W-10,y); ctx.stroke(); }
+  r.forEach((row,i)=>{
+    const x = 30 + i*((W-40)/r.length);
+    const h = (row.testAcc||0)*(H-30);
+    ctx.fillStyle = cmap[row.taak] || "#4fd1c5";
+    ctx.fillRect(x, H-20-h, barW, h);
+  });
+  // drempellijn (gebruik hoogste drempel in de set als referentie)
+  const thresholds = r.map(x=>x.drempel).filter(x=>x!==undefined);
+  if(thresholds.length){
+    const t = Math.max(...thresholds)/100;
+    const y = H-20-t*(H-30);
+    ctx.strokeStyle="#ffb454"; ctx.setLineDash([4,3]); ctx.beginPath(); ctx.moveTo(30,y); ctx.lineTo(W-10,y); ctx.stroke(); ctx.setLineDash([]);
+  }
+}
+
+function renderScatter(r){
+  const cvs = document.getElementById("scatter"); const ctx = cvs.getContext("2d");
+  const W=cvs.width,H=cvs.height; ctx.clearRect(0,0,W,H);
+  const legendEl = document.getElementById("scatterlegend"); legendEl.innerHTML="";
+  if(r.length===0) return;
+  const cmap = taskColorMap(r);
+  Object.entries(cmap).forEach(([t,c])=>{
+    legendEl.innerHTML += `<span><span class="dot" style="background:${c}"></span>${t}</span>`;
+  });
+  const params = r.map(x=>Math.max(1,x.params||1));
+  const minP = Math.log10(Math.min(...params)), maxP = Math.log10(Math.max(...params,10));
+  const pad=36;
+  ctx.strokeStyle="#2a2f37"; ctx.lineWidth=1;
+  for(let i=0;i<=4;i++){ const y=10+((H-pad-10)/4)*i; ctx.beginPath(); ctx.moveTo(pad,y); ctx.lineTo(W-10,y); ctx.stroke(); }
+  ctx.fillStyle="#5c636d"; ctx.font="10px IBM Plex Mono, monospace"; ctx.textAlign="left";
+  ctx.fillText("100%", 4, 14); ctx.fillText("0%", 4, H-pad+4);
+  ctx.textAlign="center"; ctx.fillText("parameters (log)", W/2, H-8);
+  r.forEach(row=>{
+    const px = Math.log10(Math.max(1,row.params||1));
+    const nx = maxP>minP ? (px-minP)/(maxP-minP) : 0.5;
+    const x = pad + nx*(W-pad-20);
+    const y = 10 + (1-(row.testAcc||0))*(H-pad-10);
+    ctx.fillStyle = cmap[row.taak]||"#4fd1c5";
+    ctx.beginPath(); ctx.arc(x,y,5,0,Math.PI*2); ctx.fill();
+    ctx.strokeStyle="#14161a"; ctx.lineWidth=1; ctx.stroke();
+  });
+}
+
+render();
+</script>
+</body>
+</html>
