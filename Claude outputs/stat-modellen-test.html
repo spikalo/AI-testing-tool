@@ -1,0 +1,1551 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Statistische modellen — lokaal model lab</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#14161a; --panel:#1b1e24; --panel-alt:#20242b; --border:#2a2f37;
+    --text:#e9e7e1; --text-dim:#9199a3; --text-faint:#5c636d;
+    --pos:#4fd1c5; --neg:#ff6b57; --warn:#ffb454; --grid:#22262d;
+    --c3:#5aa9e6; --c4:#8b7cf0; --c5:#e07be0;
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    background:var(--bg); color:var(--text); font-family:'Inter',sans-serif; line-height:1.5;
+    background-image:linear-gradient(var(--grid) 1px, transparent 1px),linear-gradient(90deg, var(--grid) 1px, transparent 1px);
+    background-size:28px 28px; background-attachment:fixed;
+  }
+  h1,h2,h3{font-family:'Space Grotesk',sans-serif;margin:0;letter-spacing:.2px;}
+  .mono{font-family:'IBM Plex Mono',monospace;}
+  .wrap{max-width:1500px;margin:0 auto;padding:22px 24px 60px;}
+  a{color:var(--pos);}
+
+  .breadcrumb{font-size:12.5px;color:var(--text-dim);margin-bottom:12px;}
+  .breadcrumb a{color:var(--text-dim);text-decoration:none;border-bottom:1px dotted var(--text-faint);}
+  .breadcrumb a:hover{color:var(--pos);border-color:var(--pos);}
+
+  header{padding-bottom:18px;margin-bottom:18px;border-bottom:1px solid var(--border);}
+  header h1{font-size:24px;font-weight:600;}
+  header .sub{color:var(--text-dim);font-size:13.5px;max-width:760px;margin-top:6px;}
+
+  .modelbar{margin-top:16px;display:flex;flex-direction:column;gap:9px;}
+  .mgroup{display:flex;align-items:center;gap:9px;flex-wrap:wrap;}
+  .mgroup .glabel{font-family:'IBM Plex Mono',monospace;font-size:10.5px;color:var(--text-faint);
+    min-width:96px;text-transform:lowercase;letter-spacing:.3px;}
+  .mgroup button{background:var(--panel);border:1px solid var(--border);color:var(--text-dim);
+    padding:7px 12px;border-radius:3px;font-family:'IBM Plex Mono',monospace;font-size:11.5px;cursor:pointer;transition:.15s;}
+  .mgroup button:hover:not(.active){border-color:var(--text-dim);color:var(--text);}
+  .mgroup button.active{color:var(--bg);font-weight:600;}
+  .g-reg button.active{background:var(--pos);border-color:var(--pos);}
+  .g-cls button.active{background:var(--c3);border-color:var(--c3);}
+  .g-clu button.active{background:var(--c4);border-color:var(--c4);}
+
+  .grid{display:grid;grid-template-columns:320px 1fr 340px;gap:18px;align-items:start;margin-top:20px;}
+  @media (max-width:1250px){ .grid{grid-template-columns:1fr;} }
+
+  .panel{background:var(--panel);border:1px solid var(--border);border-radius:4px;padding:18px;}
+  .panel + .panel{margin-top:18px;}
+  .panel h2{font-size:13px;color:var(--text-dim);font-weight:600;letter-spacing:.3px;
+    margin-bottom:12px;padding-bottom:10px;border-bottom:1px solid var(--border);
+    display:flex;justify-content:space-between;align-items:center;gap:8px;}
+  .panel h2 .pill{font-family:'IBM Plex Mono',monospace;font-size:10px;color:var(--text-faint);font-weight:400;}
+
+  .hint{font-size:11.5px;color:var(--text-faint);line-height:1.5;margin-top:5px;}
+  .hint b{color:var(--warn);}
+
+  .field{margin-bottom:15px;}
+  .field:last-child{margin-bottom:0;}
+  .field label{display:flex;justify-content:space-between;gap:10px;font-size:12.5px;color:var(--text-dim);margin-bottom:6px;}
+  .field label span.val{color:var(--warn);font-family:'IBM Plex Mono',monospace;flex-shrink:0;}
+  input[type=range]{width:100%;accent-color:var(--pos);}
+  select,input[type=number],input[type=text]{width:100%;background:var(--panel-alt);color:var(--text);border:1px solid var(--border);
+    padding:7px 8px;border-radius:3px;font-family:'IBM Plex Mono',monospace;font-size:12.5px;}
+  .checkline{display:flex;align-items:flex-start;gap:8px;font-size:12.5px;color:var(--text-dim);margin-bottom:12px;cursor:pointer;}
+  .checkline:last-child{margin-bottom:0;}
+  .checkline input{accent-color:var(--pos);margin-top:3px;flex-shrink:0;}
+  .checkline .cl-txt b{color:var(--text);font-weight:600;}
+  .checkline .cl-sub{display:block;font-size:11px;color:var(--text-faint);line-height:1.45;margin-top:1px;}
+
+  .actionbtn{background:var(--panel-alt);color:var(--text);border:1px solid var(--border);
+    padding:8px;border-radius:3px;font-family:'IBM Plex Mono',monospace;font-size:12px;cursor:pointer;}
+  .actionbtn:hover{border-color:var(--text-dim);}
+  .actionbtn.primary{background:var(--pos);color:#0d1210;border-color:var(--pos);font-weight:600;}
+  .actionbtn.primary:hover{filter:brightness(1.08);}
+  .row2{display:flex;gap:8px;}
+  .row2 > *{flex:1;}
+
+  .canvaswrap{background:var(--panel);border:1px solid var(--border);border-radius:4px;padding:14px;}
+  .canvaswrap + .canvaswrap{margin-top:18px;}
+  .capt{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;flex-wrap:wrap;gap:8px;}
+  .capt h3{font-size:14px;font-weight:600;}
+  .capt .legend{display:flex;gap:14px;font-size:11px;color:var(--text-faint);flex-wrap:wrap;}
+  .swatch{display:inline-block;width:10px;height:10px;border-radius:2px;margin-right:5px;vertical-align:-1px;}
+  .swatch.line{height:2px;border-radius:0;width:12px;vertical-align:3px;}
+  canvas.plot{width:100%;display:block;border-radius:3px;}
+  .lowerrow{display:grid;grid-template-columns:1fr 1fr;gap:18px;margin-top:18px;}
+  @media (max-width:900px){ .lowerrow{grid-template-columns:1fr;} }
+
+  .metric{display:flex;justify-content:space-between;gap:10px;padding:7px 0;border-bottom:1px solid var(--border);font-size:12.5px;}
+  .metric:last-child{border-bottom:none;}
+  .metric .k{color:var(--text-dim);}
+  .metric .v{font-family:'IBM Plex Mono',monospace;font-weight:500;text-align:right;}
+  .metric .v.good{color:var(--pos);} .metric .v.bad{color:var(--neg);} .metric .v.mid{color:var(--warn);}
+  .metric .k .q{color:var(--text-faint);font-size:11px;display:block;line-height:1.35;}
+
+  .verdict{margin-top:12px;padding:12px 14px;border-radius:3px;font-size:12.5px;border:1px solid;line-height:1.55;}
+  .verdict.good{background:rgba(79,209,197,.08);border-color:var(--pos);color:var(--pos);}
+  .verdict.mid{background:rgba(255,180,84,.08);border-color:var(--warn);color:var(--warn);}
+  .verdict.bad{background:rgba(255,107,87,.08);border-color:var(--neg);color:var(--neg);}
+  .verdict b{display:block;font-family:'Space Grotesk',sans-serif;font-size:13.5px;margin-bottom:3px;}
+
+  .prose{font-size:12.5px;color:var(--text-dim);line-height:1.65;}
+  .prose p{margin:0 0 9px;}
+  .prose p:last-child{margin-bottom:0;}
+  .prose b{color:var(--text);}
+  .prose .lead{color:var(--text);font-size:13px;}
+  .prose ul{margin:0 0 9px;padding-left:17px;}
+  .prose li{margin-bottom:4px;}
+
+  table{width:100%;border-collapse:collapse;font-size:11.5px;}
+  th,td{text-align:left;padding:6px 7px;border-bottom:1px solid var(--border);}
+  th{color:var(--text-faint);font-weight:500;font-family:'IBM Plex Mono',monospace;font-size:10px;}
+  td{font-family:'IBM Plex Mono',monospace;color:var(--text);}
+  .cm{display:grid;grid-template-columns:auto 1fr 1fr;gap:4px;font-family:'IBM Plex Mono',monospace;font-size:11.5px;margin-top:4px;}
+  .cm div{padding:9px 6px;text-align:center;border-radius:3px;background:var(--panel-alt);}
+  .cm .hd{background:transparent;color:var(--text-faint);font-size:10px;padding:4px;display:flex;align-items:center;justify-content:center;}
+  .cm .tp{background:rgba(79,209,197,.16);color:var(--pos);}
+  .cm .tn{background:rgba(79,209,197,.10);color:var(--pos);}
+  .cm .fp,.cm .fn{background:rgba(255,107,87,.14);color:var(--neg);}
+  .cm .cell b{display:block;font-size:16px;font-weight:600;}
+  .cm .cell span{font-size:9.5px;color:var(--text-faint);}
+
+  .dsbox{background:var(--panel-alt);border:1px solid var(--border);border-radius:3px;padding:11px 12px;margin-top:10px;font-size:11.5px;color:var(--text-dim);line-height:1.55;}
+  .dsbox .dsname{font-family:'IBM Plex Mono',monospace;color:var(--text);font-size:12px;margin-bottom:3px;}
+  .dsbox a{word-break:break-all;}
+
+  details.tricks{border:1px solid var(--border);border-radius:3px;background:var(--panel-alt);margin-top:12px;}
+  details.tricks summary{cursor:pointer;padding:10px 12px;font-family:'IBM Plex Mono',monospace;font-size:11.5px;color:var(--warn);list-style:none;}
+  details.tricks summary::-webkit-details-marker{display:none;}
+  details.tricks summary::before{content:"▸ ";}
+  details.tricks[open] summary::before{content:"▾ ";}
+  details.tricks .body{padding:0 12px 12px;font-size:12px;color:var(--text-dim);line-height:1.6;}
+  details.tricks .body ol{margin:0;padding-left:18px;}
+  details.tricks .body li{margin-bottom:6px;}
+  details.tricks .body b{color:var(--text);}
+
+  .note{font-size:11.5px;color:var(--text-faint);margin-top:14px;line-height:1.55;}
+  .note b{color:var(--text-dim);}
+  .badge{padding:1px 6px;border-radius:2px;font-size:10px;font-family:'IBM Plex Mono',monospace;}
+  .badge.ok{background:rgba(79,209,197,.15);color:var(--pos);}
+  .badge.no{background:rgba(255,107,87,.15);color:var(--neg);}
+  .badge.warn{background:rgba(255,180,84,.15);color:var(--warn);}
+  .timing{font-family:'IBM Plex Mono',monospace;font-size:10.5px;color:var(--text-faint);}
+  .predbox{background:var(--panel-alt);border:1px solid var(--border);border-radius:3px;padding:12px;margin-top:12px;}
+  .predbox .out{font-family:'IBM Plex Mono',monospace;font-size:19px;color:var(--pos);font-weight:600;margin-top:8px;}
+  .predbox .out small{font-size:11px;color:var(--text-faint);display:block;font-weight:400;margin-top:2px;}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="breadcrumb"><a href="index.html">&larr; Hoofdmenu</a></div>
+
+  <header>
+    <h1>Statistische modellen &mdash; lokaal model lab</h1>
+    <div class="sub">Acht klassieke, niet-neurale modellen op echte datasets. Alles rekent live in je browser, zonder server en zonder LLM &mdash; de vraag die deze pagina wil beantwoorden is: <b>hoe ver kom je met een gewoon script?</b> Draai aan de knoppen, zie de prestatiecijfers meteen meebewegen, en probeer per model de bijbehorende trucs om er meer uit te halen.</div>
+    <div class="modelbar" id="modelbar"></div>
+  </header>
+
+  <div class="grid">
+    <div id="leftcol">
+      <div class="panel">
+        <h2>Dataset <span class="pill" id="dspill"></span></h2>
+        <div class="field" id="dsfield"></div>
+        <div class="dsbox" id="dsbox"></div>
+      </div>
+      <div class="panel">
+        <h2>Instellingen <span class="pill">live</span></h2>
+        <div id="controls"></div>
+      </div>
+      <div class="panel" id="trickspanel">
+        <h2>Trucjes om te proberen</h2>
+        <div id="tricks"></div>
+      </div>
+    </div>
+
+    <div id="midcol">
+      <div class="canvaswrap">
+        <div class="capt">
+          <h3 id="mainTitle">&nbsp;</h3>
+          <div class="legend" id="mainLegend"></div>
+        </div>
+        <canvas class="plot" id="mainCanvas" height="460"></canvas>
+        <div class="hint" id="mainHint"></div>
+      </div>
+      <div class="lowerrow">
+        <div class="canvaswrap">
+          <div class="capt"><h3 id="subTitle">&nbsp;</h3><div class="legend" id="subLegend"></div></div>
+          <canvas class="plot" id="subCanvas" height="240"></canvas>
+          <div class="hint" id="subHint"></div>
+        </div>
+        <div class="canvaswrap">
+          <div class="capt"><h3 id="sub2Title">&nbsp;</h3><div class="legend" id="sub2Legend"></div></div>
+          <div id="sub2Slot"><canvas class="plot" id="sub2Canvas" height="240"></canvas></div>
+          <div class="hint" id="sub2Hint"></div>
+        </div>
+      </div>
+    </div>
+
+    <div id="rightcol">
+      <div class="panel">
+        <h2>Prestatie <span class="pill timing" id="timing"></span></h2>
+        <div id="metrics"></div>
+        <div id="verdict"></div>
+      </div>
+      <div class="panel" id="predpanel" style="display:none;">
+        <h2>Zelf voorspellen</h2>
+        <div id="predbody"></div>
+      </div>
+      <div class="panel">
+        <h2>Waar wordt dit voor gebruikt?</h2>
+        <div class="prose" id="about"></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="note" id="footnote"></div>
+</div>
+<script>
+/* ============================ DATA ============================ */
+// Salary_Data.csv — [YearsExperience, Salary]  n=30
+const DS_SALARY=[[1.1,39343],[1.3,46205],[1.5,37731],[2.0,43525],[2.2,39891],[2.9,56642],[3.0,60150],[3.2,54445],[3.2,64445],[3.7,57189],[3.9,63218],[4.0,55794],[4.0,56957],[4.1,57081],[4.5,61111],[4.9,67938],[5.1,66029],[5.3,83088],[5.9,81363],[6.0,93940],[6.8,91738],[7.1,98273],[7.9,101302],[8.2,113812],[8.7,109431],[9.0,105582],[9.5,116969],[9.6,112635],[10.3,122391],[10.5,121872]];
+// Position_Salaries.csv — [Level, Salary]  n=10
+const DS_POSITION=[[1,45000],[2,50000],[3,60000],[4,80000],[5,110000],[6,150000],[7,200000],[8,300000],[9,500000],[10,1000000]];
+// Social_Network_Ads.csv — [isMale, Age, EstimatedSalary, Purchased]  n=400
+const DS_ADS=[[1,19,19000,0],[1,35,20000,0],[0,26,43000,0],[0,27,57000,0],[1,19,76000,0],[1,27,58000,0],[0,27,84000,0],[0,32,150000,1],[1,25,33000,0],[0,35,65000,0],[0,26,80000,0],[0,26,52000,0],[1,20,86000,0],[1,32,18000,0],[1,18,82000,0],[1,29,80000,0],[1,47,25000,1],[1,45,26000,1],[1,46,28000,1],[0,48,29000,1],[1,45,22000,1],[0,47,49000,1],[1,48,41000,1],[0,45,22000,1],[1,46,23000,1],[1,47,20000,1],[1,49,28000,1],[0,47,30000,1],[1,29,43000,0],[1,31,18000,0],[1,31,74000,0],[0,27,137000,1],[0,21,16000,0],[0,28,44000,0],[1,27,90000,0],[1,35,27000,0],[0,33,28000,0],[1,30,49000,0],[0,26,72000,0],[0,27,31000,0],[0,27,17000,0],[0,33,51000,0],[1,35,108000,0],[1,30,15000,0],[0,28,84000,0],[1,23,20000,0],[1,25,79000,0],[0,27,54000,0],[1,30,135000,1],[0,31,89000,0],[0,24,32000,0],[0,18,44000,0],[0,29,83000,0],[0,35,23000,0],[0,27,58000,0],[0,24,55000,0],[0,23,48000,0],[1,28,79000,0],[1,22,18000,0],[0,32,117000,0],[1,27,20000,0],[1,25,87000,0],[0,23,66000,0],[1,32,120000,1],[0,59,83000,0],[1,24,58000,0],[1,24,19000,0],[0,23,82000,0],[0,22,63000,0],[0,31,68000,0],[1,25,80000,0],[0,24,27000,0],[0,20,23000,0],[0,33,113000,0],[1,32,18000,0],[1,34,112000,1],[1,18,52000,0],[0,22,27000,0],[0,28,87000,0],[0,26,17000,0],[1,30,80000,0],[1,39,42000,0],[1,20,49000,0],[1,35,88000,0],[0,30,62000,0],[0,31,118000,1],[1,24,55000,0],[0,28,85000,0],[1,26,81000,0],[1,35,50000,0],[1,22,81000,0],[0,30,116000,0],[1,26,15000,0],[0,29,28000,0],[0,29,83000,0],[0,35,44000,0],[0,35,25000,0],[1,28,123000,1],[1,35,73000,0],[0,28,37000,0],[1,27,88000,0],[1,28,59000,0],[0,32,86000,0],[0,33,149000,1],[0,19,21000,0],[1,21,72000,0],[0,26,35000,0],[1,27,89000,0],[1,26,86000,0],[0,38,80000,0],[0,39,71000,0],[0,37,71000,0],[1,38,61000,0],[1,37,55000,0],[1,42,80000,0],[1,40,57000,0],[1,35,75000,0],[1,36,52000,0],[1,40,59000,0],[1,41,59000,0],[0,36,75000,0],[1,37,72000,0],[0,40,75000,0],[1,35,53000,0],[0,41,51000,0],[0,39,61000,0],[1,42,65000,0],[1,26,32000,0],[1,30,17000,0],[0,26,84000,0],[1,31,58000,0],[1,33,31000,0],[1,30,87000,0],[0,21,68000,0],[0,28,55000,0],[1,23,63000,0],[0,20,82000,0],[1,30,107000,1],[0,28,59000,0],[1,19,25000,0],[1,19,85000,0],[0,18,68000,0],[1,35,59000,0],[1,30,89000,0],[0,34,25000,0],[0,24,89000,0],[0,27,96000,1],[0,41,30000,0],[1,29,61000,0],[1,20,74000,0],[0,26,15000,0],[1,41,45000,0],[1,31,76000,0],[0,36,50000,0],[1,40,47000,0],[0,31,15000,0],[1,46,59000,0],[1,29,75000,0],[1,26,30000,0],[0,32,135000,1],[1,32,100000,1],[1,25,90000,0],[0,37,33000,0],[1,35,38000,0],[0,33,69000,0],[0,18,86000,0],[0,22,55000,0],[0,35,71000,0],[1,29,148000,1],[0,29,47000,0],[1,21,88000,0],[1,34,115000,0],[0,26,118000,0],[0,34,43000,0],[0,34,72000,0],[0,23,28000,0],[0,35,47000,0],[1,25,22000,0],[1,24,23000,0],[0,31,34000,0],[1,26,16000,0],[0,31,71000,0],[0,32,117000,1],[1,33,43000,0],[0,33,60000,0],[1,31,66000,0],[0,20,82000,0],[0,33,41000,0],[1,35,72000,0],[1,28,32000,0],[1,24,84000,0],[0,19,26000,0],[1,29,43000,0],[1,19,70000,0],[1,28,89000,0],[1,34,43000,0],[0,30,79000,0],[0,20,36000,0],[1,26,80000,0],[1,35,22000,0],[1,35,39000,0],[1,49,74000,0],[0,39,134000,1],[0,41,71000,0],[0,58,101000,1],[0,47,47000,0],[0,55,130000,1],[0,52,114000,0],[0,40,142000,1],[0,46,22000,0],[0,48,96000,1],[1,52,150000,1],[0,59,42000,0],[1,35,58000,0],[1,47,43000,0],[0,60,108000,1],[1,49,65000,0],[1,40,78000,0],[0,46,96000,0],[1,59,143000,1],[0,41,80000,0],[1,35,91000,1],[1,37,144000,1],[1,60,102000,1],[0,35,60000,0],[1,37,53000,0],[0,36,126000,1],[1,56,133000,1],[0,40,72000,0],[0,42,80000,1],[0,35,147000,1],[1,39,42000,0],[1,40,107000,1],[1,49,86000,1],[0,38,112000,0],[1,46,79000,1],[1,40,57000,0],[0,37,80000,0],[0,46,82000,0],[0,53,143000,1],[1,42,149000,1],[1,38,59000,0],[0,50,88000,1],[0,56,104000,1],[0,41,72000,0],[0,51,146000,1],[0,35,50000,0],[0,57,122000,1],[1,41,52000,0],[0,35,97000,1],[0,44,39000,0],[1,37,52000,0],[0,48,134000,1],[0,37,146000,1],[0,50,44000,0],[0,52,90000,1],[0,41,72000,0],[1,40,57000,0],[0,58,95000,1],[0,45,131000,1],[0,35,77000,0],[1,36,144000,1],[0,55,125000,1],[0,35,72000,0],[1,48,90000,1],[0,42,108000,1],[1,40,75000,0],[1,37,74000,0],[0,47,144000,1],[1,40,61000,0],[0,43,133000,0],[0,59,76000,1],[1,60,42000,1],[1,39,106000,1],[0,57,26000,1],[1,57,74000,1],[1,38,71000,0],[1,49,88000,1],[0,52,38000,1],[0,50,36000,1],[0,59,88000,1],[1,35,61000,0],[1,37,70000,1],[0,52,21000,1],[1,48,141000,0],[0,37,93000,1],[0,37,62000,0],[0,48,138000,1],[1,41,79000,0],[0,37,78000,1],[1,39,134000,1],[1,49,89000,1],[1,55,39000,1],[1,37,77000,0],[0,35,57000,0],[0,36,63000,0],[1,42,73000,1],[0,43,112000,1],[1,45,79000,0],[1,46,117000,1],[0,58,38000,1],[1,48,74000,1],[0,37,137000,1],[1,37,79000,1],[0,40,60000,0],[1,42,54000,0],[0,51,134000,0],[0,47,113000,1],[1,36,125000,1],[0,38,50000,0],[0,42,70000,0],[1,39,96000,1],[0,38,50000,0],[0,49,141000,1],[0,39,79000,0],[0,39,75000,1],[0,54,104000,1],[1,35,55000,0],[1,45,32000,1],[1,36,60000,0],[0,52,138000,1],[0,53,82000,1],[1,41,52000,0],[0,48,30000,1],[0,48,131000,1],[0,41,60000,0],[1,41,72000,0],[0,42,75000,0],[1,36,118000,1],[0,47,107000,1],[1,38,51000,0],[0,48,119000,1],[1,42,65000,0],[1,40,65000,0],[1,57,60000,1],[0,36,54000,0],[1,58,144000,1],[1,35,79000,0],[0,38,55000,0],[1,39,122000,1],[0,53,104000,1],[1,35,75000,0],[0,38,65000,0],[0,47,51000,1],[1,47,105000,1],[0,41,63000,0],[1,53,72000,1],[0,54,108000,1],[1,39,77000,0],[1,38,61000,0],[0,38,113000,1],[1,37,75000,0],[0,42,90000,1],[0,37,57000,0],[1,36,99000,1],[1,60,34000,1],[1,54,70000,1],[0,41,72000,0],[1,40,71000,1],[1,42,54000,0],[1,43,129000,1],[0,53,34000,1],[0,47,50000,1],[0,42,79000,0],[1,42,104000,1],[0,59,29000,1],[0,58,47000,1],[1,46,88000,1],[1,38,71000,0],[0,54,26000,1],[0,60,46000,1],[1,60,83000,1],[0,39,73000,0],[1,59,130000,1],[0,37,80000,0],[0,46,32000,1],[0,46,74000,0],[0,42,53000,0],[1,41,87000,1],[0,58,23000,1],[1,42,64000,0],[1,48,33000,1],[0,44,139000,1],[1,49,28000,1],[0,57,33000,1],[1,56,60000,1],[0,49,39000,1],[1,39,71000,0],[1,47,34000,1],[0,48,35000,1],[1,48,33000,1],[1,47,23000,1],[0,45,45000,1],[1,60,42000,1],[0,39,59000,0],[0,46,41000,1],[1,51,23000,1],[0,50,20000,1],[1,36,33000,0],[0,49,36000,1]];
+// Mall_Customers.csv — [isMale, Age, AnnualIncome_k, SpendingScore]  n=200
+const DS_MALL=[[1,19,15,39],[1,21,15,81],[0,20,16,6],[0,23,16,77],[0,31,17,40],[0,22,17,76],[0,35,18,6],[0,23,18,94],[1,64,19,3],[0,30,19,72],[1,67,19,14],[0,35,19,99],[0,58,20,15],[0,24,20,77],[1,37,20,13],[1,22,20,79],[0,35,21,35],[1,20,21,66],[1,52,23,29],[0,35,23,98],[1,35,24,35],[1,25,24,73],[0,46,25,5],[1,31,25,73],[0,54,28,14],[1,29,28,82],[0,45,28,32],[1,35,28,61],[0,40,29,31],[0,23,29,87],[1,60,30,4],[0,21,30,73],[1,53,33,4],[1,18,33,92],[0,49,33,14],[0,21,33,81],[0,42,34,17],[0,30,34,73],[0,36,37,26],[0,20,37,75],[0,65,38,35],[1,24,38,92],[1,48,39,36],[0,31,39,61],[0,49,39,28],[0,24,39,65],[0,50,40,55],[0,27,40,47],[0,29,40,42],[0,31,40,42],[0,49,42,52],[1,33,42,60],[0,31,43,54],[1,59,43,60],[0,50,43,45],[1,47,43,41],[0,51,44,50],[1,69,44,46],[0,27,46,51],[1,53,46,46],[1,70,46,56],[1,19,46,55],[0,67,47,52],[0,54,47,59],[1,63,48,51],[1,18,48,59],[0,43,48,50],[0,68,48,48],[1,19,48,59],[0,32,48,47],[1,70,49,55],[0,47,49,42],[0,60,50,49],[0,60,50,56],[1,59,54,47],[1,26,54,54],[0,45,54,53],[1,40,54,48],[0,23,54,52],[0,49,54,42],[1,57,54,51],[1,38,54,55],[1,67,54,41],[0,46,54,44],[0,21,54,57],[1,48,54,46],[0,55,57,58],[0,22,57,55],[0,34,58,60],[0,50,58,46],[0,68,59,55],[1,18,59,41],[1,48,60,49],[0,40,60,40],[0,32,60,42],[1,24,60,52],[0,47,60,47],[0,27,60,50],[1,48,61,42],[1,20,61,49],[0,23,62,41],[0,49,62,48],[1,67,62,59],[1,26,62,55],[1,49,62,56],[0,21,62,42],[0,66,63,50],[1,54,63,46],[1,68,63,43],[1,66,63,48],[1,65,63,52],[0,19,63,54],[0,38,64,42],[1,19,64,46],[0,18,65,48],[0,19,65,50],[0,63,65,43],[0,49,65,59],[0,51,67,43],[0,50,67,57],[1,27,67,56],[0,38,67,40],[0,40,69,58],[1,39,69,91],[0,23,70,29],[0,31,70,77],[1,43,71,35],[1,40,71,95],[1,59,71,11],[1,38,71,75],[1,47,71,9],[1,39,71,75],[0,25,72,34],[0,31,72,71],[1,20,73,5],[0,29,73,88],[0,44,73,7],[1,32,73,73],[1,19,74,10],[0,35,74,72],[0,57,75,5],[1,32,75,93],[0,28,76,40],[0,32,76,87],[1,25,77,12],[1,28,77,97],[1,48,77,36],[0,32,77,74],[0,34,78,22],[1,34,78,90],[1,43,78,17],[1,39,78,88],[0,44,78,20],[0,38,78,76],[0,47,78,16],[0,27,78,89],[1,37,78,1],[0,30,78,78],[1,34,78,1],[0,30,78,73],[0,56,79,35],[0,29,79,83],[1,19,81,5],[0,31,81,93],[1,50,85,26],[0,36,85,75],[1,42,86,20],[0,33,86,95],[0,36,87,27],[1,32,87,63],[1,40,87,13],[1,28,87,75],[1,36,87,10],[1,36,87,92],[0,52,88,13],[0,30,88,86],[1,58,88,15],[1,27,88,69],[1,59,93,14],[1,35,93,90],[0,37,97,32],[0,32,97,86],[1,46,98,15],[0,29,98,88],[0,41,99,39],[1,30,99,97],[0,54,101,24],[1,28,101,68],[0,41,103,17],[0,36,103,85],[0,34,103,23],[0,32,103,69],[1,33,113,8],[0,38,113,91],[0,47,120,16],[0,35,120,79],[0,45,126,28],[1,32,126,74],[1,32,137,18],[1,30,137,83]];
+
+/* ========================= HULPFUNCTIES ========================= */
+const $ = id => document.getElementById(id);
+const fmt = (v,d=2) => (v===null||v===undefined||!isFinite(v)) ? '—' : Number(v).toLocaleString('nl-NL',{minimumFractionDigits:d,maximumFractionDigits:d});
+const eur = v => !isFinite(v) ? '—' : '€ ' + Math.round(v).toLocaleString('nl-NL');
+const pct = v => !isFinite(v) ? '—' : (100*v).toFixed(1).replace('.',',') + '%';
+
+function mulberry32(a){return function(){a|=0;a=a+0x6D2B79F5|0;var t=Math.imul(a^a>>>15,1|a);t=t+Math.imul(t^t>>>7,61|t)^t;return((t^t>>>14)>>>0)/4294967296;};}
+function shuffled(n, seed){const idx=[...Array(n).keys()],r=mulberry32(seed);for(let i=n-1;i>0;i--){const j=Math.floor(r()*(i+1));[idx[i],idx[j]]=[idx[j],idx[i]];}return idx;}
+function splitIdx(n, testRatio, seed){
+  if(testRatio<=0) {const a=[...Array(n).keys()]; return {tr:a, te:[]};}
+  const idx=shuffled(n,seed), nTe=Math.max(1,Math.round(n*testRatio));
+  return {te:idx.slice(0,nTe), tr:idx.slice(nTe)};
+}
+function stratSplit(y, testRatio, seed){
+  if(testRatio<=0){const a=[...Array(y.length).keys()]; return {tr:a, te:[]};}
+  const byC={}; y.forEach((c,i)=>{(byC[c]=byC[c]||[]).push(i);});
+  const tr=[],te=[]; let s=seed;
+  for(const c in byC){const g=byC[c], o=shuffled(g.length,s++), nTe=Math.max(1,Math.round(g.length*testRatio));
+    o.forEach((p,k)=> (k<nTe?te:tr).push(g[p]));}
+  return {tr,te};
+}
+const mean = a => a.reduce((s,v)=>s+v,0)/a.length;
+function stdev(a){const m=mean(a); return Math.sqrt(a.reduce((s,v)=>s+(v-m)*(v-m),0)/Math.max(1,a.length-1));}
+function colStats(X){const p=X[0].length,mu=[],sd=[];for(let j=0;j<p;j++){const c=X.map(r=>r[j]);mu.push(mean(c));sd.push(stdev(c)||1);}return{mu,sd};}
+function applyScale(X,st){return X.map(r=>r.map((v,j)=>(v-st.mu[j])/st.sd[j]));}
+
+/* Gauss-Jordan oplossing van (A + lambda I) b = c ; intercept-kolom niet regulariseren */
+function ridgeFit(X, y, lambda){
+  const n=X.length, p=X[0].length;
+  const A=Array.from({length:p},()=>new Float64Array(p+1));
+  for(let i=0;i<p;i++){
+    for(let j=0;j<p;j++){let s=0;for(let k=0;k<n;k++)s+=X[k][i]*X[k][j];A[i][j]=s;}
+    let s=0;for(let k=0;k<n;k++)s+=X[k][i]*y[k];A[i][p]=s;
+    if(i>0)A[i][i]+=lambda;
+  }
+  for(let c=0;c<p;c++){
+    let piv=c;for(let r=c+1;r<p;r++)if(Math.abs(A[r][c])>Math.abs(A[piv][c]))piv=r;
+    if(Math.abs(A[piv][c])<1e-12){A[c][c]+=1e-8;piv=c;}
+    [A[c],A[piv]]=[A[piv],A[c]];
+    const d=A[c][c];for(let j=c;j<=p;j++)A[c][j]/=d;
+    for(let r=0;r<p;r++){if(r===c)continue;const f=A[r][c];if(!f)continue;for(let j=c;j<=p;j++)A[r][j]-=f*A[c][j];}
+  }
+  return Array.from({length:p},(_,i)=>A[i][p]);
+}
+const dot=(b,x)=>b.reduce((s,v,i)=>s+v*x[i],0);
+
+/* ---------- regressie-metrieken ---------- */
+function regMetrics(yTrue,yPred){
+  const n=yTrue.length; if(!n) return {r2:NaN,rmse:NaN,mae:NaN,mape:NaN,n:0};
+  const m=mean(yTrue); let ssr=0,sst=0,ae=0,ape=0;
+  for(let i=0;i<n;i++){const e=yTrue[i]-yPred[i];ssr+=e*e;sst+=(yTrue[i]-m)*(yTrue[i]-m);ae+=Math.abs(e);ape+=Math.abs(e/(yTrue[i]||1));}
+  return {r2: sst>0?1-ssr/sst:NaN, rmse:Math.sqrt(ssr/n), mae:ae/n, mape:ape/n, n};
+}
+/* ---------- classificatie-metrieken ---------- */
+function clsMetrics(yTrue,yPred,scores){
+  let tp=0,tn=0,fp=0,fn=0;
+  for(let i=0;i<yTrue.length;i++){
+    if(yTrue[i]===1) (yPred[i]===1?tp++:fn++); else (yPred[i]===1?fp++:tn++);
+  }
+  const acc=(tp+tn)/Math.max(1,yTrue.length);
+  const prec=tp+fp>0?tp/(tp+fp):NaN, rec=tp+fn>0?tp/(tp+fn):NaN;
+  const spec=tn+fp>0?tn/(tn+fp):NaN;
+  const f1=(prec+rec)>0?2*prec*rec/(prec+rec):NaN;
+  const bal=(rec+spec)/2;
+  const mccD=Math.sqrt((tp+fp)*(tp+fn)*(tn+fp)*(tn+fn));
+  const mcc=mccD>0?(tp*tn-fp*fn)/mccD:NaN;
+  let auc=NaN;
+  if(scores){
+    const pos=[],neg=[];
+    for(let i=0;i<yTrue.length;i++)(yTrue[i]===1?pos:neg).push(scores[i]);
+    if(pos.length&&neg.length){
+      const all=scores.map((s,i)=>({s,y:yTrue[i]})).sort((a,b)=>a.s-b.s);
+      let r=1,i=0,sumR=0;
+      while(i<all.length){let j=i;while(j+1<all.length&&all[j+1].s===all[i].s)j++;
+        const avg=(i+j+2)/2; for(let k=i;k<=j;k++) if(all[k].y===1) sumR+=avg; i=j+1;}
+      auc=(sumR-pos.length*(pos.length+1)/2)/(pos.length*neg.length);
+    }
+  }
+  return {tp,tn,fp,fn,acc,prec,rec,spec,f1,bal,mcc,auc,n:yTrue.length};
+}
+function rocPoints(yTrue,scores){
+  const a=scores.map((s,i)=>({s,y:yTrue[i]})).sort((p,q)=>q.s-p.s);
+  const P=yTrue.filter(v=>v===1).length, N=yTrue.length-P;
+  const pts=[[0,0]]; let tp=0,fp=0;
+  for(const o of a){ if(o.y===1)tp++; else fp++; pts.push([N?fp/N:0, P?tp/P:0]); }
+  pts.push([1,1]); return pts;
+}
+
+/* ============================ CART ============================ */
+function buildTree(X,y,opt,depth=0){
+  const n=y.length;
+  const leaf=()=>{
+    if(opt.cls){ let c0=0,c1=0; for(const v of y) v===1?c1++:c0++;
+      return {leaf:true,val:c1>=c0?1:0,p:c1/n,n}; }
+    return {leaf:true,val:mean(y),n};
+  };
+  if(depth>=opt.maxDepth || n<Math.max(2,opt.minSplit) || n<=opt.minLeaf) return leaf();
+  const imp = ys => { if(opt.cls){let c1=0;for(const v of ys)if(v===1)c1++;const p=c1/ys.length;return 2*p*(1-p);}
+    const m=mean(ys); return ys.reduce((s,v)=>s+(v-m)*(v-m),0)/ys.length; };
+  const parentImp=imp(y); if(parentImp<=1e-12) return leaf();
+  const p=X[0].length;
+  let feats=[...Array(p).keys()];
+  if(opt.mtry && opt.mtry<p){ const o=shuffled(p, (opt.rngSeed||1)+depth*97+n); feats=o.slice(0,opt.mtry).map(i=>i); }
+  let best=null;
+  for(const f of feats){
+    const order=[...Array(n).keys()].sort((a,b)=>X[a][f]-X[b][f]);
+    const sv=order.map(i=>X[i][f]), sy=order.map(i=>y[i]);
+    for(let i=opt.minLeaf-1;i<n-opt.minLeaf;i++){
+      if(sv[i]===sv[i+1])continue;
+      const L=sy.slice(0,i+1), R=sy.slice(i+1);
+      const g=parentImp - (L.length*imp(L)+R.length*imp(R))/n;
+      if(!best||g>best.gain) best={gain:g,f,thr:(sv[i]+sv[i+1])/2};
+    }
+  }
+  if(!best||best.gain<=1e-12) return leaf();
+  const Li=[],Ri=[];
+  for(let i=0;i<n;i++)(X[i][best.f]<=best.thr?Li:Ri).push(i);
+  if(!Li.length||!Ri.length) return leaf();
+  return {leaf:false,f:best.f,thr:best.thr,gain:best.gain,n,
+    L:buildTree(Li.map(i=>X[i]),Li.map(i=>y[i]),opt,depth+1),
+    R:buildTree(Ri.map(i=>X[i]),Ri.map(i=>y[i]),opt,depth+1)};
+}
+function predTree(t,x){ while(!t.leaf) t = x[t.f]<=t.thr ? t.L : t.R; return t; }
+function treeLeaves(t){ return t.leaf?1:treeLeaves(t.L)+treeLeaves(t.R); }
+function treeDepth(t){ return t.leaf?0:1+Math.max(treeDepth(t.L),treeDepth(t.R)); }
+
+function buildForest(X,y,opt){
+  const n=y.length, trees=[], oobIdx=[];
+  for(let b=0;b<opt.nTrees;b++){
+    const r=mulberry32(opt.seed*7919+b*104729), bag=[], inBag=new Uint8Array(n);
+    const take = opt.bootstrap? n : n;
+    for(let i=0;i<take;i++){const j=Math.floor(r()*n);bag.push(j);inBag[j]=1;}
+    const bx=bag.map(i=>X[i]), by=bag.map(i=>y[i]);
+    trees.push(buildTree(bx,by,{...opt,rngSeed:opt.seed*13+b*31}));
+    oobIdx.push(inBag);
+  }
+  return {trees,oobIdx};
+}
+function predForest(F,x,cls){
+  if(cls){let s=0;for(const t of F.trees)s+=predTree(t,x).p;return s/F.trees.length;}
+  let s=0;for(const t of F.trees)s+=predTree(t,x).val;return s/F.trees.length;
+}
+
+/* ==================== LOGISTISCHE REGRESSIE ==================== */
+const sigm = z => 1/(1+Math.exp(-Math.max(-40,Math.min(40,z))));
+function logregFit(X,y,{lr=0.5,iters=600,l2=0}={}){
+  const n=X.length,p=X[0].length; let w=new Array(p).fill(0); const hist=[];
+  for(let it=0;it<iters;it++){
+    const g=new Array(p).fill(0); let loss=0;
+    for(let i=0;i<n;i++){
+      const z=dot(w,X[i]), h=sigm(z), e=h-y[i];
+      for(let j=0;j<p;j++)g[j]+=e*X[i][j];
+      loss += -(y[i]*Math.log(h+1e-12)+(1-y[i])*Math.log(1-h+1e-12));
+    }
+    for(let j=1;j<p;j++) g[j]+=l2*w[j];
+    for(let j=0;j<p;j++) w[j]-=lr*g[j]/n;
+    hist.push(loss/n+ (l2/(2*n))*w.slice(1).reduce((s,v)=>s+v*v,0));
+  }
+  return {w,hist};
+}
+
+/* ============================ k-NN ============================ */
+function knnDist(a,x,metric){
+  let s=0;
+  if(metric==='manhattan'){for(let j=0;j<x.length;j++)s+=Math.abs(a[j]-x[j]);return s;}
+  if(metric==='cheb'){for(let j=0;j<x.length;j++)s=Math.max(s,Math.abs(a[j]-x[j]));return s;}
+  for(let j=0;j<x.length;j++){const d=a[j]-x[j];s+=d*d;} return Math.sqrt(s);
+}
+/* houdt alleen de k dichtstbijzijnde bij -> veel sneller dan alles sorteren */
+function knnPredict(Xtr,ytr,x,{k=5,metric='euclid',weighted=false}={}){
+  const n=Xtr.length, K=Math.min(k,n);
+  const bd=new Float64Array(K).fill(Infinity), by=new Int8Array(K); let filled=0;
+  for(let i=0;i<n;i++){
+    const d=knnDist(Xtr[i],x,metric);
+    if(filled===K && d>=bd[K-1]) continue;
+    let p=Math.min(filled,K-1);
+    while(p>0 && bd[p-1]>d){bd[p]=bd[p-1];by[p]=by[p-1];p--;}
+    bd[p]=d; by[p]=ytr[i]; if(filled<K)filled++;
+  }
+  let w1=0,w0=0;
+  for(let i=0;i<filled;i++){const w=weighted?1/(bd[i]+1e-9):1; by[i]===1?w1+=w:w0+=w;}
+  return w1/(w1+w0);
+}
+/* gesorteerde burenlijst: één keer sorteren, daarna elke k gratis */
+function knnNeighbours(Xtr,ytr,x,metric,skipIdx){
+  const d=[];
+  for(let i=0;i<Xtr.length;i++){ if(i===skipIdx)continue; d.push([knnDist(Xtr[i],x,metric),ytr[i]]); }
+  d.sort((a,b)=>a[0]-b[0]); return d;
+}
+function knnFromNeighbours(d,k,weighted){
+  let w1=0,w0=0;
+  for(let i=0;i<Math.min(k,d.length);i++){const w=weighted?1/(d[i][0]+1e-9):1; d[i][1]===1?w1+=w:w0+=w;}
+  return w1/(w1+w0);
+}
+
+/* ===================== KERNEL SVM (SMO) ======================== */
+function makeKernel(kind,gamma,degree,coef0){
+  if(kind==='linear') return (a,b)=>{let s=0;for(let i=0;i<a.length;i++)s+=a[i]*b[i];return s;};
+  if(kind==='poly')   return (a,b)=>{let s=0;for(let i=0;i<a.length;i++)s+=a[i]*b[i];return Math.pow(gamma*s+coef0,degree);};
+  if(kind==='sigmoid')return (a,b)=>{let s=0;for(let i=0;i<a.length;i++)s+=a[i]*b[i];return Math.tanh(gamma*s+coef0);};
+  return (a,b)=>{let s=0;for(let i=0;i<a.length;i++){const d=a[i]-b[i];s+=d*d;}return Math.exp(-gamma*s);};
+}
+function smoTrain(X,yPM,K,C,{tol=1e-3,maxPasses=8,maxIter=1200}={}){
+  const n=X.length, a=new Float64Array(n); let b=0, passes=0, iter=0;
+  const rnd=mulberry32(12345);
+  const f=i=>{let s=b;for(let j=0;j<n;j++) if(a[j]) s+=a[j]*yPM[j]*K[i][j]; return s;};
+  while(passes<maxPasses && iter<maxIter){
+    let changed=0;
+    for(let i=0;i<n;i++){
+      const Ei=f(i)-yPM[i];
+      if((yPM[i]*Ei<-tol && a[i]<C)||(yPM[i]*Ei>tol && a[i]>0)){
+        let j=Math.floor(rnd()*(n-1)); if(j>=i)j++;
+        const Ej=f(j)-yPM[j], ai=a[i], aj=a[j];
+        let L,H;
+        if(yPM[i]!==yPM[j]){L=Math.max(0,aj-ai);H=Math.min(C,C+aj-ai);}
+        else {L=Math.max(0,ai+aj-C);H=Math.min(C,ai+aj);}
+        if(L>=H)continue;
+        const eta=2*K[i][j]-K[i][i]-K[j][j];
+        if(eta>=-1e-12)continue;
+        let ajn=aj-yPM[j]*(Ei-Ej)/eta;
+        ajn=Math.min(H,Math.max(L,ajn));
+        if(Math.abs(ajn-aj)<1e-6)continue;
+        const ain=ai+yPM[i]*yPM[j]*(aj-ajn);
+        const b1=b-Ei-yPM[i]*(ain-ai)*K[i][i]-yPM[j]*(ajn-aj)*K[i][j];
+        const b2=b-Ej-yPM[i]*(ain-ai)*K[i][j]-yPM[j]*(ajn-aj)*K[j][j];
+        a[i]=ain;a[j]=ajn;
+        b = (ain>0&&ain<C)?b1 : (ajn>0&&ajn<C)?b2 : (b1+b2)/2;
+        changed++;
+      }
+      iter++;
+      if(iter>maxIter)break;
+    }
+    passes = changed===0 ? passes+1 : 0;
+  }
+  const sv=[]; for(let i=0;i<n;i++) if(a[i]>1e-6) sv.push(i);
+  return {a,b,sv};
+}
+
+/* ========================= K-MEANS ============================= */
+function kmeansPP(X,k,rand){
+  const n=X.length, C=[X[Math.floor(rand()*n)].slice()];
+  const d2=new Float64Array(n).fill(Infinity);
+  while(C.length<k){
+    let tot=0;
+    for(let i=0;i<n;i++){
+      let s=0;const c=C[C.length-1];for(let j=0;j<X[i].length;j++){const dd=X[i][j]-c[j];s+=dd*dd;}
+      if(s<d2[i])d2[i]=s; tot+=d2[i];
+    }
+    let r=rand()*tot,acc=0,pick=n-1;
+    for(let i=0;i<n;i++){acc+=d2[i];if(acc>=r){pick=i;break;}}
+    C.push(X[pick].slice());
+  }
+  return C;
+}
+function kmeansRun(X,k,{seed=1,init='pp',nInit=10,maxIter=120}={}){
+  let best=null;
+  for(let t=0;t<nInit;t++){
+    const rand=mulberry32(seed*7919+t*613);
+    let C = init==='pp' ? kmeansPP(X,k,rand)
+      : shuffled(X.length,seed*31+t).slice(0,k).map(i=>X[i].slice());
+    let lab=new Int32Array(X.length).fill(-1), iters=0;
+    for(let it=0;it<maxIter;it++){
+      iters=it+1; let moved=false;
+      for(let i=0;i<X.length;i++){
+        let bi=0,bd=Infinity;
+        for(let c=0;c<k;c++){let s=0;for(let j=0;j<X[i].length;j++){const d=X[i][j]-C[c][j];s+=d*d;}
+          if(s<bd){bd=s;bi=c;}}
+        if(lab[i]!==bi){lab[i]=bi;moved=true;}
+      }
+      const sum=Array.from({length:k},()=>new Float64Array(X[0].length)),cnt=new Int32Array(k);
+      for(let i=0;i<X.length;i++){cnt[lab[i]]++;for(let j=0;j<X[0].length;j++)sum[lab[i]][j]+=X[i][j];}
+      for(let c=0;c<k;c++) if(cnt[c]) for(let j=0;j<X[0].length;j++) C[c][j]=sum[c][j]/cnt[c];
+      if(!moved)break;
+    }
+    let wcss=0;
+    for(let i=0;i<X.length;i++){let s=0;for(let j=0;j<X[0].length;j++){const d=X[i][j]-C[lab[i]][j];s+=d*d;}wcss+=s;}
+    if(!best||wcss<best.wcss) best={C,lab:Array.from(lab),wcss,iters};
+  }
+  return best;
+}
+function silhouette(X,lab,k){
+  const n=X.length; if(k<2) return NaN;
+  const dist=(a,b)=>{let s=0;for(let j=0;j<a.length;j++){const d=a[j]-b[j];s+=d*d;}return Math.sqrt(s);};
+  const groups=Array.from({length:k},()=>[]);
+  lab.forEach((c,i)=>groups[c].push(i));
+  let tot=0;
+  for(let i=0;i<n;i++){
+    const own=groups[lab[i]];
+    if(own.length<=1){continue;}
+    let a=0;for(const j of own) if(j!==i) a+=dist(X[i],X[j]); a/=(own.length-1);
+    let b=Infinity;
+    for(let c=0;c<k;c++){ if(c===lab[i]||!groups[c].length)continue;
+      let s=0;for(const j of groups[c])s+=dist(X[i],X[j]); s/=groups[c].length; if(s<b)b=s; }
+    tot += (b-a)/Math.max(a,b);
+  }
+  return tot/n;
+}
+
+/* ========================= TEKENEN ============================= */
+const CSSV = n => getComputedStyle(document.documentElement).getPropertyValue(n).trim();
+const COL = {};
+function loadCols(){['bg','panel','panel-alt','border','text','text-dim','text-faint','pos','neg','warn','c3','c4','c5']
+  .forEach(n=>COL[n]=CSSV('--'+n));}
+const CLUSTERCOLS = ()=>[COL.pos,COL.warn,COL.c3,COL.c4,COL.neg,COL.c5,'#7ed957','#e6b0aa','#00b8a9','#f4a261'];
+
+class Plot{
+  constructor(cv,{ml=58,mr=14,mt=12,mb=40}={}){
+    this.cv=cv; this.ctx=cv.getContext('2d');
+    const dpr=window.devicePixelRatio||1;
+    const w=cv.clientWidth||600, h=parseInt(cv.getAttribute('height'))||300;
+    cv.width=w*dpr; cv.height=h*dpr; cv.style.height=h+'px';
+    this.ctx.setTransform(dpr,0,0,dpr,0,0);
+    this.w=w; this.h=h; this.m={ml,mr,mt,mb};
+    this.pw=w-ml-mr; this.ph=h-mt-mb;
+    this.ctx.clearRect(0,0,w,h);
+  }
+  scale(x0,x1,y0,y1){this.x0=x0;this.x1=x1;this.y0=y0;this.y1=y1;return this;}
+  padScale(xs,ys,padX=0.06,padY=0.10){
+    let x0=Math.min(...xs),x1=Math.max(...xs),y0=Math.min(...ys),y1=Math.max(...ys);
+    const dx=(x1-x0)||1, dy=(y1-y0)||1;
+    return this.scale(x0-dx*padX,x1+dx*padX,y0-dy*padY,y1+dy*padY);
+  }
+  px(x){return this.m.ml + (x-this.x0)/(this.x1-this.x0)*this.pw;}
+  py(y){return this.m.mt + this.ph - (y-this.y0)/(this.y1-this.y0)*this.ph;}
+  ux(p){return this.x0 + (p-this.m.ml)/this.pw*(this.x1-this.x0);}
+  uy(p){return this.y0 + (this.m.mt+this.ph-p)/this.ph*(this.y1-this.y0);}
+  ticks(v0,v1,n=5){
+    const span=v1-v0, raw=span/n, mag=Math.pow(10,Math.floor(Math.log10(raw)));
+    const norm=raw/mag, step=(norm<1.5?1:norm<3?2:norm<7?5:10)*mag;
+    const out=[]; for(let t=Math.ceil(v0/step)*step;t<=v1+1e-9;t+=step) out.push(t); return out;
+  }
+  axes(xlab,ylab,fx=v=>fmt(v,0),fy=v=>fmt(v,0)){
+    const c=this.ctx;
+    c.save(); c.font='10px "IBM Plex Mono",monospace'; c.strokeStyle=COL.border; c.lineWidth=1;
+    for(const t of this.ticks(this.x0,this.x1)){
+      const X=Math.round(this.px(t))+.5;
+      c.beginPath();c.moveTo(X,this.m.mt);c.lineTo(X,this.m.mt+this.ph);c.stroke();
+      c.fillStyle=COL['text-faint'];c.textAlign='center';c.fillText(fx(t),X,this.h-this.m.mb+14);
+    }
+    for(const t of this.ticks(this.y0,this.y1)){
+      const Y=Math.round(this.py(t))+.5;
+      c.beginPath();c.moveTo(this.m.ml,Y);c.lineTo(this.m.ml+this.pw,Y);c.stroke();
+      c.fillStyle=COL['text-faint'];c.textAlign='right';c.fillText(fy(t),this.m.ml-7,Y+3);
+    }
+    c.strokeStyle=COL['text-faint'];c.beginPath();
+    c.moveTo(this.m.ml+.5,this.m.mt);c.lineTo(this.m.ml+.5,this.m.mt+this.ph+.5);c.lineTo(this.m.ml+this.pw,this.m.mt+this.ph+.5);c.stroke();
+    c.fillStyle=COL['text-dim'];c.font='11px Inter,sans-serif';
+    c.textAlign='center';c.fillText(xlab,this.m.ml+this.pw/2,this.h-4);
+    c.save();c.translate(11,this.m.mt+this.ph/2);c.rotate(-Math.PI/2);c.textAlign='center';c.fillText(ylab,0,0);c.restore();
+    c.restore(); return this;
+  }
+  dots(xs,ys,{r=3.4,fill=COL.pos,stroke=null,alpha=1}={}){
+    const c=this.ctx;c.save();c.globalAlpha=alpha;
+    for(let i=0;i<xs.length;i++){
+      c.beginPath();c.arc(this.px(xs[i]),this.py(ys[i]),r,0,7);
+      c.fillStyle=typeof fill==='function'?fill(i):fill;c.fill();
+      if(stroke){c.strokeStyle=typeof stroke==='function'?stroke(i):stroke;c.lineWidth=1.4;c.stroke();}
+    }
+    c.restore();return this;
+  }
+  line(xs,ys,{color=COL.warn,width=2,dash=null,alpha=1}={}){
+    const c=this.ctx;c.save();c.globalAlpha=alpha;c.strokeStyle=color;c.lineWidth=width;
+    if(dash)c.setLineDash(dash);
+    c.beginPath();
+    let started=false;
+    for(let i=0;i<xs.length;i++){ if(!isFinite(ys[i]))  {started=false;continue;}
+      const X=this.px(xs[i]),Y=this.py(ys[i]); started?c.lineTo(X,Y):c.moveTo(X,Y); started=true;}
+    c.stroke();c.restore();return this;
+  }
+  segs(pairs,{color=COL.neg,width=1,alpha=.55}={}){
+    const c=this.ctx;c.save();c.globalAlpha=alpha;c.strokeStyle=color;c.lineWidth=width;c.beginPath();
+    for(const[x1,y1,x2,y2]of pairs){c.moveTo(this.px(x1),this.py(y1));c.lineTo(this.px(x2),this.py(y2));}
+    c.stroke();c.restore();return this;
+  }
+  heat(fn,step=4,colors=[COL.neg,COL.pos]){
+    const c=this.ctx, img=c.createImageData(Math.ceil(this.pw),Math.ceil(this.ph));
+    const hex=h=>[parseInt(h.slice(1,3),16),parseInt(h.slice(3,5),16),parseInt(h.slice(5,7),16)];
+    const A=hex(colors[0]),B=hex(colors[1]);
+    const W=img.width,H=img.height;
+    for(let py=0;py<H;py+=step){
+      for(let px=0;px<W;px+=step){
+        const ux=this.ux(this.m.ml+px), uy=this.uy(this.m.mt+py);
+        const v=Math.max(0,Math.min(1,fn(ux,uy)));
+        const r=A[0]+(B[0]-A[0])*v,g=A[1]+(B[1]-A[1])*v,b=A[2]+(B[2]-A[2])*v;
+        for(let dy=0;dy<step&&py+dy<H;dy++)for(let dx=0;dx<step&&px+dx<W;dx++){
+          const o=((py+dy)*W+(px+dx))*4; img.data[o]=r;img.data[o+1]=g;img.data[o+2]=b;img.data[o+3]=70;
+        }
+      }
+    }
+    c.putImageData(img,this.m.ml,this.m.mt);
+    return this;
+  }
+  bars(labels,vals,{color=COL.pos,fmtv=v=>fmt(v,2)}={}){
+    const c=this.ctx,n=labels.length,bw=this.pw/n*0.66;
+    const mx=Math.max(...vals.map(Math.abs))||1;
+    for(let i=0;i<n;i++){
+      const cx=this.m.ml+this.pw*(i+0.5)/n, hgt=Math.abs(vals[i])/mx*(this.ph-16);
+      const y0=this.m.mt+this.ph;
+      c.fillStyle=typeof color==='function'?color(i):color;
+      c.fillRect(cx-bw/2, y0-hgt, bw, hgt);
+      c.fillStyle=COL['text-faint'];c.font='9.5px "IBM Plex Mono",monospace';c.textAlign='center';
+      c.fillText(labels[i],cx,y0+13);
+      c.fillStyle=COL['text-dim'];c.fillText(fmtv(vals[i]),cx,y0-hgt-4);
+    }
+    c.strokeStyle=COL.border;c.beginPath();c.moveTo(this.m.ml,this.m.mt+this.ph+.5);c.lineTo(this.m.ml+this.pw,this.m.mt+this.ph+.5);c.stroke();
+    return this;
+  }
+  text(t,x,y,{color=COL['text-faint'],size=10.5,align='left',mono=true}={}){
+    const c=this.ctx;c.save();c.fillStyle=color;c.textAlign=align;
+    c.font=size+'px '+(mono?'"IBM Plex Mono",monospace':'Inter,sans-serif');c.fillText(t,x,y);c.restore();return this;
+  }
+  empty(msg){this.text(msg,this.w/2,this.h/2,{align:'center',color:COL['text-faint'],size:12});return this;}
+}
+function legend(el,items){ el.innerHTML=items.map(([c,t,ln])=>
+  '<span><span class="swatch'+(ln?' line':'')+'" style="background:'+c+'"></span>'+t+'</span>').join(''); }
+
+/* ========================= DATASETS ============================ */
+const DATASETS={
+  salary:{ name:'Salary_Data.csv', n:30, title:'Salaris vs. werkervaring',
+    desc:'30 medewerkers: jaren werkervaring &rarr; jaarsalaris. Eén verklarende variabele, bijna perfect lineair verband — de standaarddataset om te zien hoe goed een rechte lijn kan zijn.',
+    link:'https://www.kaggle.com/datasets/abhishek14398/salary-dataset-simple-linear-regression',
+    raw:'https://raw.githubusercontent.com/SteffiPeTaffy/machineLearningAZ/master/Machine%20Learning%20A-Z%20Template%20Folder/Part%202%20-%20Regression/Section%204%20-%20Simple%20Linear%20Regression/Salary_Data.csv',
+    xlab:'jaren ervaring', ylab:'salaris (€)', fx:v=>fmt(v,1), fy:v=>Math.round(v/1000)+'k',
+    X:()=>DS_SALARY.map(r=>[r[0]]), y:()=>DS_SALARY.map(r=>r[1]), unit:'€' },
+  position:{ name:'Position_Salaries.csv', n:10, title:'Functieniveau vs. salaris',
+    desc:'10 functieniveaus binnen één bedrijf (analist &rarr; CEO) met het bijbehorende salaris. Sterk niet-lineair (exponentieel) en piepklein — ideaal om overfitting zichtbaar te maken.',
+    link:'https://www.kaggle.com/datasets/farhanmd29/position-salaries',
+    raw:'https://raw.githubusercontent.com/SteffiPeTaffy/machineLearningAZ/master/Machine%20Learning%20A-Z%20Template%20Folder/Part%202%20-%20Regression/Section%206%20-%20Polynomial%20Regression/Position_Salaries.csv',
+    xlab:'functieniveau', ylab:'salaris (€)', fx:v=>fmt(v,0), fy:v=>Math.round(v/1000)+'k',
+    X:()=>DS_POSITION.map(r=>[r[0]]), y:()=>DS_POSITION.map(r=>r[1]), unit:'€',
+    labels:['Business Analyst','Junior Consultant','Senior Consultant','Manager','Country Manager','Region Manager','Partner','Senior Partner','C-level','CEO'] },
+  ads:{ name:'Social_Network_Ads.csv', n:400, title:'Wie klikt op de advertentie?',
+    desc:'400 gebruikers van een sociaal netwerk: leeftijd en geschat inkomen &rarr; heeft het product wél/niet gekocht (143 van de 400). De twee groepen liggen niet met een rechte lijn te scheiden — precies waarom dit dé dataset is om classificatiemodellen te vergelijken.',
+    link:'https://www.kaggle.com/datasets/rakeshrau/social-network-ads',
+    raw:'https://raw.githubusercontent.com/SteffiPeTaffy/machineLearningAZ/master/Machine%20Learning%20A-Z%20Template%20Folder/Part%203%20-%20Classification/Section%2014%20-%20Logistic%20Regression/Social_Network_Ads.csv',
+    xlab:'leeftijd (jaar)', ylab:'geschat inkomen (€)', fx:v=>fmt(v,0), fy:v=>Math.round(v/1000)+'k',
+    X:()=>DS_ADS.map(r=>[r[1],r[2]]), y:()=>DS_ADS.map(r=>r[3]) },
+  mall:{ name:'Mall_Customers.csv', n:200, title:'Klanten van een winkelcentrum',
+    desc:'200 klanten met leeftijd, jaarinkomen en een "spending score" (1-100) die het winkelcentrum zelf toekent. Er is géén doelkolom — het model moet zélf groepen vinden. Klassiek voorbeeld van klantsegmentatie.',
+    link:'https://www.kaggle.com/datasets/vjchoudhary7/customer-segmentation-tutorial-in-python',
+    raw:'https://raw.githubusercontent.com/SteffiPeTaffy/machineLearningAZ/master/Machine%20Learning%20A-Z%20Template%20Folder/Part%204%20-%20Clustering/Section%2024%20-%20K-Means%20Clustering/Mall_Customers.csv',
+    cols:[['leeftijd (jaar)',1],['jaarinkomen (k€)',2],['spending score (1-100)',3]],
+    X:()=>DS_MALL, y:()=>null }
+};
+
+/* ====================== UI-FRAMEWORK =========================== */
+const state={}, CTRLS={};
+let current='simplelin', raf=null;
+
+function ctrlVal(id){ return state[current][id]; }
+function buildControls(){
+  const M=MODELS[current], box=$('controls'); box.innerHTML='';
+  for(const c of M.controls){
+    if(c.when && !c.when(state[current])) continue;
+    const d=document.createElement('div');
+    if(c.type==='check'){
+      d.className='checkline';
+      d.innerHTML='<input type="checkbox" id="c_'+c.id+'"'+(state[current][c.id]?' checked':'')+
+        '><span class="cl-txt"><b>'+c.label+'</b>'+(c.sub?'<span class="cl-sub">'+c.sub+'</span>':'')+'</span>';
+      box.appendChild(d);
+      d.querySelector('input').addEventListener('change',e=>{state[current][c.id]=e.target.checked;buildControls();schedule();});
+      continue;
+    }
+    d.className='field';
+    if(c.type==='range'){
+      const disp=c.disp?c.disp(state[current][c.id]):state[current][c.id];
+      d.innerHTML='<label>'+c.label+'<span class="val" id="v_'+c.id+'">'+disp+'</span></label>'+
+        '<input type="range" id="c_'+c.id+'" min="'+c.min+'" max="'+c.max+'" step="'+(c.step||1)+'" value="'+state[current][c.id]+'">'+
+        (c.hint?'<div class="hint">'+c.hint+'</div>':'');
+      box.appendChild(d);
+      d.querySelector('input').addEventListener('input',e=>{
+        state[current][c.id]=parseFloat(e.target.value);
+        $('v_'+c.id).textContent=c.disp?c.disp(state[current][c.id]):e.target.value;
+        if(c.rebuild) buildControls(); schedule();
+      });
+    } else if(c.type==='select'){
+      d.innerHTML='<label>'+c.label+'</label><select id="c_'+c.id+'">'+
+        c.options.map(o=>'<option value="'+o[0]+'"'+(String(state[current][c.id])===String(o[0])?' selected':'')+'>'+o[1]+'</option>').join('')+
+        '</select>'+(c.hint?'<div class="hint">'+c.hint+'</div>':'');
+      box.appendChild(d);
+      d.querySelector('select').addEventListener('change',e=>{
+        state[current][c.id]=c.num?parseFloat(e.target.value):e.target.value;
+        buildControls(); schedule();
+      });
+    }
+  }
+}
+function buildDatasetPicker(){
+  const M=MODELS[current], f=$('dsfield');
+  if(M.datasets.length>1){
+    f.style.display='';
+    f.innerHTML='<label>Kies dataset</label><select id="c_ds">'+
+      M.datasets.map(k=>'<option value="'+k+'"'+(state[current].ds===k?' selected':'')+'>'+DATASETS[k].title+' ('+DATASETS[k].n+' rijen)</option>').join('')+'</select>';
+    f.querySelector('select').addEventListener('change',e=>{state[current].ds=e.target.value;buildControls();schedule();});
+  } else { f.style.display='none'; }
+  const D=DATASETS[state[current].ds];
+  $('dspill').textContent='n = '+D.n;
+  $('dsbox').innerHTML='<div class="dsname">'+D.name+'</div>'+D.desc+
+    '<div style="margin-top:7px;">Bron: <a href="'+D.link+'" target="_blank" rel="noopener">Kaggle &nearr;</a> &middot; <a href="'+D.raw+'" target="_blank" rel="noopener">ruwe CSV &nearr;</a></div>';
+}
+function setMetrics(rows){
+  $('metrics').innerHTML=rows.map(r=> r.sep ? '<div style="height:9px"></div>' :
+    '<div class="metric"><span class="k">'+r.k+(r.q?'<span class="q">'+r.q+'</span>':'')+'</span><span class="v '+(r.cls||'')+'">'+r.v+'</span></div>').join('');
+}
+function setVerdict(cls,title,txt){ $('verdict').innerHTML='<div class="verdict '+cls+'"><b>'+title+'</b>'+txt+'</div>'; }
+function capt(which,title,legendItems,hint){
+  $(which+'Title').innerHTML=title;
+  legend($(which+'Legend'), legendItems||[]);
+  $(which+'Hint').innerHTML=hint||'';
+}
+function newPlot(id,opts){ return new Plot($(id),opts); }
+function schedule(){ if(raf)cancelAnimationFrame(raf); raf=requestAnimationFrame(()=>{raf=null;runCurrent();}); }
+function runCurrent(){
+  const M=MODELS[current];
+  $('sub2Slot').innerHTML='<canvas class="plot" id="sub2Canvas" height="240"></canvas>';
+  $('predpanel').style.display='none'; $('predbody').innerHTML='';
+  const t0=performance.now();
+  try{ M.run(state[current]); }catch(e){ console.error(e); setVerdict('bad','Fout tijdens rekenen',String(e.message||e)); }
+  $('timing').textContent=(performance.now()-t0).toFixed(0)+' ms';
+}
+function selectModel(id){
+  current=id;
+  document.querySelectorAll('#modelbar button').forEach(b=>b.classList.toggle('active',b.dataset.m===id));
+  const M=MODELS[id];
+  $('about').innerHTML=M.about;
+  $('tricks').innerHTML=M.tricks;
+  buildDatasetPicker(); buildControls(); schedule();
+  history.replaceState(null,'','#'+id);
+}
+
+/* ======================== MODELLEN ============================= */
+const MODELS={};
+
+function regSplit(s,D){
+  let X=D.X(), y=D.y();
+  const idx=[...Array(y.length).keys()];
+  const sp=splitIdx(y.length, (s.split||0)/100, s.seed||1);
+  return {X,y,tr:sp.tr,te:sp.te};
+}
+function verdictR2(r2,extra){
+  if(!isFinite(r2)) return setVerdict('bad','Geen zinnig resultaat','Te weinig punten of een ontaarde fit.'+(extra||''));
+  if(r2>=0.9) setVerdict('good','Sterk verband','Het model verklaart '+pct(r2)+' van de spreiding. Voor deze taak heb je echt geen neuraal netwerk nodig.'+(extra||''));
+  else if(r2>=0.7) setVerdict('mid','Redelijk, maar niet af','Het model verklaart '+pct(r2)+'. Bruikbaar als grove schatting; probeer de trucjes links.'+(extra||''));
+  else setVerdict('bad','Model past niet bij de data','Slechts '+pct(r2)+' verklaard. De vorm van het verband klopt waarschijnlijk niet.'+(extra||''));
+}
+
+/* ---------- 1. Simple Linear Regression ---------- */
+MODELS.simplelin={
+  group:'reg', label:'Simple linear', name:'Simple Linear Regression',
+  datasets:['salary','position'], def:{ds:'salary',split:20,seed:7,outl:false,resid:true},
+  controls:[
+    {type:'range',id:'split',label:'Testset',min:0,max:40,step:5,disp:v=>v+'%',
+     hint:'De rijen die het model <b>niet</b> mag zien tijdens het fitten. Zonder testset (0%) meet je alleen hoe goed het model zijn eigen huiswerk kent.'},
+    {type:'range',id:'seed',label:'Split-seed',min:1,max:40,step:1,
+     hint:'Andere seed = andere toevallige verdeling. Springt R² op de testset hard heen en weer? Dan is je dataset te klein om één getal te vertrouwen.'},
+    {type:'check',id:'outl',label:'Uitbijters weglaten',sub:'Verwijdert punten waarvan het residu groter is dan 2× de standaardafwijking, en fit daarna opnieuw.'},
+    {type:'check',id:'resid',label:'Residuen tekenen',sub:'Verticale streepjes van elk punt naar de lijn: dat is precies de fout die het model maakt.'}
+  ],
+  about:`<p class="lead">Eén verklarende variabele, één rechte lijn: <span class="mono">y = b₀ + b₁·x</span>.</p>
+  <p>Gebruikt voor <b>het schatten van een getal</b> waarvan je vermoedt dat het min of meer evenredig meebeweegt met één andere grootheid: salaris naar ervaring, omzet naar advertentiebudget, verbruik naar buitentemperatuur, levertijd naar afstand.</p>
+  <p>De kracht zit niet in de nauwkeurigheid maar in de <b>uitlegbaarheid</b>: de helling is letterlijk "per extra jaar ervaring verdien je € X meer". Dat kun je aan een directie vertellen; de gewichten van een neuraal netwerk niet.</p>
+  <p>Kost microseconden, heeft een exacte oplossing (geen training, geen willekeur) en werkt vanaf een handvol rijen. Faalt zodra het verband krom is of er meerdere oorzaken door elkaar lopen.</p>`,
+  tricks:`<div class="prose"><ol style="padding-left:17px;margin:0;">
+    <li>Zet de <b>testset op 0%</b> en kijk hoe R² omhoog springt. Dat is precies de zelfoverschatting waar je op moet letten.</li>
+    <li>Draai aan de <b>seed</b>: bij n=30 schommelt de test-R² makkelijk 0,10. Eén meting zegt niets.</li>
+    <li>Zet <b>uitbijters weglaten</b> aan. Wordt het model beter of ben je alleen de lastige gevallen aan het wegpoetsen?</li>
+    <li>Kies bovenin de dataset <b>functieniveau &rarr; salaris</b>. Zelfde model, kromme werkelijkheid: de residuen krijgen een duidelijke <b>U-vorm</b>. Dat patroon in de residugrafiek is hét signaal "gebruik een ander model" — ga daarna naar polynomiale regressie.</li>
+  </ol></div>`,
+  run(s){
+    const D=DATASETS[s.ds]; let {X,y,tr,te}=regSplit(s,D);
+    let trIdx=tr.slice();
+    let Xd=trIdx.map(i=>[1,X[i][0]]), yd=trIdx.map(i=>y[i]);
+    let b=ridgeFit(Xd,yd,0);
+    if(s.outl){
+      const res=trIdx.map((i,k)=>y[i]-dot(b,[1,X[i][0]]));
+      const sd=stdev(res)||1;
+      const keep=trIdx.filter((i,k)=>Math.abs(res[k])<=2*sd);
+      if(keep.length>=3){ trIdx=keep; Xd=trIdx.map(i=>[1,X[i][0]]); yd=trIdx.map(i=>y[i]); b=ridgeFit(Xd,yd,0); }
+    }
+    const pred=i=>b[0]+b[1]*X[i][0];
+    const mTr=regMetrics(trIdx.map(i=>y[i]),trIdx.map(pred));
+    const mTe=te.length?regMetrics(te.map(i=>y[i]),te.map(pred)):null;
+    const nOut=tr.length-trIdx.length;
+
+    /* hoofdgrafiek */
+    const xs=X.map(r=>r[0]);
+    const P=newPlot('mainCanvas').padScale(xs,y).axes(D.xlab,D.ylab,D.fx,D.fy);
+    if(s.resid) P.segs(trIdx.map(i=>[X[i][0],y[i],X[i][0],pred(i)]),{color:COL.neg});
+    const x0=P.x0,x1=P.x1;
+    P.line([x0,x1],[b[0]+b[1]*x0,b[0]+b[1]*x1],{color:COL.warn,width:2.4});
+    P.dots(trIdx.map(i=>X[i][0]),trIdx.map(i=>y[i]),{fill:COL.pos});
+    if(te.length)P.dots(te.map(i=>X[i][0]),te.map(i=>y[i]),{fill:'transparent',stroke:COL.c3,r:4.2});
+    capt('main','<span class="mono">y = '+fmt(b[0],0)+' + '+fmt(b[1],0)+' · x</span>',
+      [[COL.pos,'trainingspunt'],[COL.c3,'testpunt'],[COL.warn,'regressielijn',1],[COL.neg,'residu',1]],
+      'Elke stap van 1 op de x-as verandert de voorspelling met <b>'+(D.unit==='€'?eur(b[1]):fmt(b[1],2))+'</b>.');
+
+    /* residuen vs voorspelling */
+    const rp=trIdx.map(i=>[pred(i),y[i]-pred(i)]);
+    const Q=newPlot('subCanvas',{mb:34}).padScale(rp.map(r=>r[0]),rp.map(r=>r[1]).concat([0]))
+      .axes('voorspelde waarde','residu',D.fy,v=>fmt(v/1000,0)+'k');
+    Q.line([Q.x0,Q.x1],[0,0],{color:COL['text-faint'],width:1,dash:[4,4]});
+    Q.dots(rp.map(r=>r[0]),rp.map(r=>r[1]),{fill:COL.neg,r:3.2});
+    capt('sub','Residuen','',
+      'Willekeurige wolk rond nul = de rechte lijn klopt. Zie je een <b>boog of trechter</b>, dan mist het model structuur.');
+
+    /* voorspeld vs werkelijk */
+    const all=trIdx.concat(te);
+    const R=newPlot('sub2Canvas',{mb:34}).padScale(all.map(i=>y[i]),all.map(pred))
+      .axes('werkelijk','voorspeld',D.fy,D.fy);
+    const lo=Math.min(R.x0,R.y0),hi=Math.max(R.x1,R.y1);
+    R.scale(lo,hi,lo,hi); R.line([lo,hi],[lo,hi],{color:COL['text-faint'],width:1,dash:[4,4]});
+    R.dots(trIdx.map(i=>y[i]),trIdx.map(pred),{fill:COL.pos,r:3.2});
+    if(te.length)R.dots(te.map(i=>y[i]),te.map(pred),{fill:'transparent',stroke:COL.c3,r:4});
+    capt('sub2','Voorspeld vs. werkelijk','','Hoe dichter op de stippellijn, hoe beter. Systematisch onder de lijn = het model onderschat structureel.');
+
+    setMetrics([
+      {k:'R² (train)',q:'aandeel spreiding dat het model verklaart',v:fmt(mTr.r2,3),cls:mTr.r2>.9?'good':mTr.r2>.7?'mid':'bad'},
+      {k:'RMSE (train)',q:'typische fout, in dezelfde eenheid als y',v:D.unit==='€'?eur(mTr.rmse):fmt(mTr.rmse,2)},
+      {k:'MAE (train)',q:'gemiddelde absolute fout',v:D.unit==='€'?eur(mTr.mae):fmt(mTr.mae,2)},
+      {k:'MAPE (train)',q:'gemiddelde procentuele fout',v:pct(mTr.mape)},
+      {sep:1},
+      {k:'R² (test)',q:mTe?'op '+mTe.n+' ongeziene rijen':'geen testset gekozen',v:mTe?fmt(mTe.r2,3):'—',cls:mTe?(mTe.r2>.9?'good':mTe.r2>.7?'mid':'bad'):''},
+      {k:'RMSE (test)',v:mTe?(D.unit==='€'?eur(mTe.rmse):fmt(mTe.rmse,2)):'—'},
+      {sep:1},
+      {k:'Helling b₁',q:'effect van +1 x-eenheid',v:D.unit==='€'?eur(b[1]):fmt(b[1],3)},
+      {k:'Intercept b₀',v:D.unit==='€'?eur(b[0]):fmt(b[0],3)},
+      {k:'Rijen gebruikt',v:trIdx.length+(nOut?' (−'+nOut+' uitbijters)':'')}
+    ]);
+    const gap=mTe?mTr.r2-mTe.r2:0;
+    verdictR2(mTe?mTe.r2:mTr.r2, mTe&&gap>0.12?' <br><br>Let op: R² zakt '+fmt(gap,2)+' van train naar test — het model kent zijn trainingsrijen beter dan de wereld.':'');
+
+    $('predpanel').style.display='';
+    $('predbody').innerHTML='<div class="predbox"><label style="font-size:12.5px;color:var(--text-dim);display:block;margin-bottom:6px;">'+
+      D.xlab+'</label><input type="number" id="pin" step="0.1" value="'+fmt(mean(xs),1).replace(',','.')+'">'+
+      '<div class="out" id="pout"></div></div>';
+    const upd=()=>{const v=parseFloat($('pin').value); $('pout').innerHTML=isFinite(v)?
+      (D.unit==='€'?eur(b[0]+b[1]*v):fmt(b[0]+b[1]*v,2))+'<small>voorspelling van het model bij '+fmt(v,1)+'</small>':'—';};
+    $('pin').addEventListener('input',upd); upd();
+  }
+};
+
+/* ---------- 2. Polynomial Regression ---------- */
+const LAMS=[0,1e-6,1e-5,1e-4,1e-3,1e-2,0.1,1,10,100];
+function fitPoly(xs,ys,deg,lam,scale){
+  const mu=scale?mean(xs):0, sd=scale?(stdev(xs)||1):1;
+  const F=xs.map(x=>{const z=(x-mu)/sd,r=[1];for(let d=1;d<=deg;d++)r.push(Math.pow(z,d));return r;});
+  const b=ridgeFit(F,ys,lam);
+  return {b,predict:x=>{const z=(x-mu)/sd;let s=b[0];for(let d=1;d<=deg;d++)s+=b[d]*Math.pow(z,d);return s;}};
+}
+MODELS.poly={
+  group:'reg', label:'Polynomial', name:'Polynomial Regression',
+  datasets:['position','salary'], def:{ds:'position',deg:4,lam:0,scale:true,split:0,seed:7},
+  controls:[
+    {type:'range',id:'deg',label:'Graad van de veelterm',min:1,max:9,step:1,
+     hint:'Graad 1 = rechte lijn, 2 = parabool, 9 = een curve die door bijna elk punt kan slingeren. Richtwaarde: <b>2 tot 4</b>.'},
+    {type:'range',id:'lam',label:'Regularisatie (ridge λ)',min:0,max:9,step:1,disp:v=>LAMS[v]===0?'uit':LAMS[v].toExponential(0),
+     hint:'Straft grote coëfficiënten af. Dit is de rem die een te hoge graad alsnog netjes houdt. Kijk naar de coëfficiëntgrafiek rechtsonder.'},
+    {type:'check',id:'scale',label:'Invoer standaardiseren vóór machtsverheffen',
+     sub:'Zonder dit wordt x⁹ astronomisch groot en wordt de vergelijking numeriek onbetrouwbaar. Zet het uit bij graad 8-9 en zie de fit ontsporen.'},
+    {type:'range',id:'split',label:'Testset',min:0,max:40,step:5,disp:v=>v+'%',
+     hint:'Op de dataset met 10 functieniveaus is elke testset piepklein — zet hem daar op 0% en gebruik in plaats daarvan de LOOCV-grafiek hieronder.'},
+    {type:'range',id:'seed',label:'Split-seed',min:1,max:40,step:1}
+  ],
+  about:`<p class="lead">Nog steeds lineaire regressie, maar dan op x, x², x³ … als extra kolommen.</p>
+  <p>Gebruikt wanneer je <b>weet dat het verband krom is</b> maar wel glad: het salarisverloop van analist naar CEO, het rendement van een machine bij oplopende belasting, de opbrengst van een gewas bij toenemende bemesting (eerst omhoog, dan omlaag).</p>
+  <p>Het blijft een <b>gesloten formule</b> die je kunt opschrijven en aan iemand kunt uitleggen, en hij traint in milliseconden. Daarmee is dit vaak het eerste échte alternatief voor "we gooien er maar een netwerk tegenaan".</p>
+  <p>Het gevaar is berucht: bij een hoge graad gaat de curve door élk trainingspunt en slingert daartussen volstrekt onzinnig. Buiten het bereik van je data is een veelterm bovendien levensgevaarlijk — hij schiet naar plus of min oneindig.</p>`,
+  tricks:`<div class="prose"><ol style="padding-left:17px;margin:0;">
+    <li>Schuif de <b>graad</b> van 1 naar 9 en kijk mee in de LOOCV-grafiek: de blauwe lijn (train) blijft stijgen, de oranje (eerlijk getest) knikt op een gegeven moment omlaag. <b>Dat knikpunt is je beste graad.</b></li>
+    <li>Zet de graad op 8 en de <b>standaardisatie uit</b>. De curve blijft er nog aardig uitzien, maar kijk naar de coëfficiënten: die worden een stuk groter (op deze dataset ruim vijf keer). In de vergelijking staan dan getallen van 10⁰ naast 10⁸ door elkaar — op deze mini-dataset houdt de oplosser dat net vol, op echte data leidt precies dit tot nonsens-uitkomsten. En de ridge-rem hieronder werkt niet meer, want λ straft coëfficiënten van totaal verschillende schaal even hard af.</li>
+    <li>Zet de graad op <b>8</b> met standaardisatie aan en draai de <b>ridge λ</b> op naar 1e-2. De LOOCV-score springt van ongeveer 0,36 naar 0,96 terwijl het model even groot blijft. Dat is de kern van regularisatie: je hoeft een te groot model niet weg te gooien, je moet het afremmen.</li>
+    <li>Voorspel rechts een niveau van <b>12</b> (buiten de data). Elk model geeft een getal; alleen dit soort modellen laat je meteen zien dat het onzin is.</li>
+  </ol></div>`,
+  run(s){
+    const D=DATASETS[s.ds]; const X=D.X(), y=D.y(), xs=X.map(r=>r[0]);
+    const sp=splitIdx(y.length,s.split/100,s.seed);
+    const trX=sp.tr.map(i=>xs[i]), trY=sp.tr.map(i=>y[i]);
+    const lam=LAMS[s.lam];
+    const M=fitPoly(trX,trY,s.deg,lam,s.scale);
+    const mTr=regMetrics(trY,trX.map(M.predict));
+    const mTe=sp.te.length?regMetrics(sp.te.map(i=>y[i]),sp.te.map(i=>M.predict(xs[i]))):null;
+
+    /* hoofdgrafiek */
+    const P=newPlot('mainCanvas').padScale(xs,y.concat(trX.map(M.predict)),0.08,0.12).axes(D.xlab,D.ylab,D.fx,D.fy);
+    const gx=[],gy=[]; for(let i=0;i<=300;i++){const x=P.x0+(P.x1-P.x0)*i/300;gx.push(x);gy.push(M.predict(x));}
+    P.line(gx,gy,{color:COL.warn,width:2.4});
+    P.dots(trX,trY,{fill:COL.pos});
+    if(sp.te.length)P.dots(sp.te.map(i=>xs[i]),sp.te.map(i=>y[i]),{fill:'transparent',stroke:COL.c3,r:4.2});
+    capt('main','Veelterm van graad '+s.deg,[[COL.pos,'trainingspunt'],[COL.c3,'testpunt'],[COL.warn,'gefitte curve',1]],
+      'Let op wat de curve doet <b>tussen</b> de punten en aan de randen — daar zie je overfitting eerder dan in R².');
+
+    /* LOOCV per graad */
+    const maxD=Math.max(1,Math.min(9,xs.length-1)), degs=[],trR=[],cvR=[];
+    for(let d=1;d<=maxD;d++){
+      const full=fitPoly(xs,y,d,lam,s.scale);
+      degs.push(d); trR.push(regMetrics(y,xs.map(full.predict)).r2);
+      const pr=[];
+      for(let i=0;i<xs.length;i++){
+        const ox=xs.filter((_,k)=>k!==i), oy=y.filter((_,k)=>k!==i);
+        pr.push(fitPoly(ox,oy,d,lam,s.scale).predict(xs[i]));
+      }
+      cvR.push(regMetrics(y,pr).r2);
+    }
+    const lo=Math.max(-0.5,Math.min(...cvR,0)), Q=newPlot('subCanvas',{mb:34,ml:44})
+      .scale(0.6,maxD+0.4,lo,1.05).axes('graad','R²',v=>fmt(v,0),v=>fmt(v,1));
+    Q.line(degs,trR,{color:COL.c3,width:2}); Q.dots(degs,trR,{fill:COL.c3,r:3});
+    Q.line(degs,cvR,{color:COL.warn,width:2}); Q.dots(degs,cvR,{fill:COL.warn,r:3});
+    let bestD=degs[0],bestV=-1e9; cvR.forEach((v,i)=>{if(v>bestV){bestV=v;bestD=degs[i];}});
+    capt('sub','R² per graad — train vs. leave-one-out',[[COL.c3,'train',1],[COL.warn,'LOOCV (eerlijk)',1]],
+      'Beste graad volgens LOOCV: <b>'+bestD+'</b> (R² = '+fmt(bestV,3)+'). Alles rechts daarvan is het model dat zijn huiswerk uit zijn hoofd leert.');
+
+    /* coëfficiënten */
+    const labs=M.b.map((_,i)=>i===0?'b₀':'x'+(i>1?'^'+i:''));
+    const R=newPlot('sub2Canvas',{mb:30,ml:10,mr:10}).scale(0,1,0,1);
+    R.bars(labs,M.b,{color:i=>i===0?COL['text-faint']:COL.c4,fmtv:v=>Math.abs(v)>=1e4?v.toExponential(0):fmt(v,1)});
+    const maxAbs=M.b.length>1?Math.max(...M.b.slice(1).map(Math.abs)):0;
+    capt('sub2','Gewicht per macht van x','',
+      'Hoeveel elke term bijdraagt. Grootste gewicht (zonder b₀): <b>'+(maxAbs>1e5?maxAbs.toExponential(1):fmt(maxAbs,0))+'</b>. Zet standaardisatie uit en zie de getallen onvergelijkbaar worden; verhoog de graad en zie de tekens om en om wisselen — dat wiebelen ís de overfitting.');
+
+    setMetrics([
+      {k:'R² (train)',v:fmt(mTr.r2,3),cls:mTr.r2>.9?'good':mTr.r2>.7?'mid':'bad'},
+      {k:'RMSE (train)',v:D.unit==='€'?eur(mTr.rmse):fmt(mTr.rmse,2)},
+      {k:'MAE (train)',v:D.unit==='€'?eur(mTr.mae):fmt(mTr.mae,2)},
+      {sep:1},
+      {k:'R² (LOOCV)',q:'eerlijkste schatting bij weinig data',v:fmt(cvR[Math.min(s.deg,maxD)-1],3),cls:cvR[Math.min(s.deg,maxD)-1]>.9?'good':cvR[Math.min(s.deg,maxD)-1]>.7?'mid':'bad'},
+      {k:'R² (test)',v:mTe?fmt(mTe.r2,3):'—'},
+      {k:'RMSE (test)',v:mTe?(D.unit==='€'?eur(mTe.rmse):fmt(mTe.rmse,2)):'—'},
+      {sep:1},
+      {k:'Parameters',q:'graad + 1',v:(s.deg+1)+''},
+      {k:'Grootste coëfficiënt',q:'grootste gewicht, b₀ niet meegeteld',v:maxAbs>1e5?maxAbs.toExponential(1):fmt(maxAbs,1)},
+      {k:'Beste graad (LOOCV)',v:bestD+''}
+    ]);
+    const cv=cvR[Math.min(s.deg,maxD)-1];
+    if(cv<0) setVerdict('bad','Slechter dan het gemiddelde','Bij leave-one-out haalt dit model een negatieve R². Je bent ruis aan het modelleren, geen verband. Verlaag de graad of zet ridge λ aan.');
+    else if(s.deg>bestD) setVerdict('mid','Te hoge graad','LOOCV zegt dat graad '+bestD+' beter generaliseert. Alles daarboven is passen op toeval — herkenbaar aan de opgeblazen coëfficiënten.');
+    else verdictR2(cv);
+
+    $('predpanel').style.display='';
+    $('predbody').innerHTML='<div class="predbox"><label style="font-size:12.5px;color:var(--text-dim);display:block;margin-bottom:6px;">'+
+      D.xlab+'</label><input type="number" id="pin" step="0.5" value="6.5"><div class="out" id="pout"></div></div>';
+    const upd=()=>{const v=parseFloat($('pin').value);const inR=v>=Math.min(...xs)&&v<=Math.max(...xs);
+      $('pout').innerHTML=isFinite(v)?(D.unit==='€'?eur(M.predict(v)):fmt(M.predict(v),2))+
+      '<small>'+(inR?'binnen het bereik van de data':'⚠ buiten het bereik — extrapolatie met een veelterm is onbetrouwbaar')+'</small>':'—';};
+    $('pin').addEventListener('input',upd); upd();
+  }
+};
+
+/* ---------- gedeeld: boom als tekst ---------- */
+function treeHtml(t,featNames,fmtv,depth=0){
+  const pad='style="padding-left:'+(depth*14)+'px"';
+  if(t.leaf) return '<div '+pad+'><span style="color:var(--pos)">&rarr; '+fmtv(t.val)+'</span> <span style="color:var(--text-faint)">(n='+t.n+')</span></div>';
+  if(depth>3) return '<div '+pad+'><span style="color:var(--text-faint)">… (nog '+(treeLeaves(t))+' bladeren)</span></div>';
+  return '<div '+pad+'><span style="color:var(--text-dim)">als</span> <b>'+featNames[t.f]+'</b> &le; '+fmt(t.thr,2)+'</div>'
+    + treeHtml(t.L,featNames,fmtv,depth+1)
+    + '<div '+pad+'><span style="color:var(--text-dim)">anders</span></div>'
+    + treeHtml(t.R,featNames,fmtv,depth+1);
+}
+function staircase(P,predFn,steps=600){
+  const gx=[],gy=[]; for(let i=0;i<=steps;i++){const x=P.x0+(P.x1-P.x0)*i/steps;gx.push(x);gy.push(predFn(x));}
+  return [gx,gy];
+}
+
+/* ---------- 3. Decision Tree Regression ---------- */
+MODELS.dtreg={
+  group:'reg', label:'Decision tree (reg)', name:'Decision Tree Regression',
+  datasets:['position','salary'], def:{ds:'salary',depth:3,leaf:2,split:20,seed:7},
+  controls:[
+    {type:'range',id:'depth',label:'Maximale diepte',min:1,max:8,step:1,
+     hint:'Aantal ja/nee-vragen achter elkaar. Diepte 1 = één splitsing = twee vlakke stukken. Richtwaarde: <b>2 tot 4</b>; daarboven onthoudt de boom individuele rijen.'},
+    {type:'range',id:'leaf',label:'Minimaal aantal rijen per blad',min:1,max:8,step:1,
+     hint:'De sterkste rem tegen overfitting. Op 1 mag elk blad uit één rij bestaan — dan is de "voorspelling" gewoon die ene rij terugvertellen.'},
+    {type:'range',id:'split',label:'Testset',min:0,max:40,step:5,disp:v=>v+'%'},
+    {type:'range',id:'seed',label:'Split-seed',min:1,max:40,step:1}
+  ],
+  about:`<p class="lead">Een reeks ja/nee-vragen; elk eindpunt geeft het gemiddelde van de rijen die daar terechtkomen.</p>
+  <p>Gebruikt waar het verband <b>sprongen</b> maakt in plaats van glad te lopen: prijs per staffel, doorlooptijd per afdeling, verbruik per apparaatcategorie, risico-inschatting op basis van drempels ("ouder dan 45 én meer dan 3 jaar in dienst").</p>
+  <p>Het grote voordeel is dat je het model <b>letterlijk kunt uitschrijven als bedrijfsregels</b> — zie het kader rechtsonder. Geen schaling nodig, gemengde eenheden geen probleem, en uitbijters raken maar één blad.</p>
+  <p>De keerzijde zie je meteen in de grafiek: de voorspelling is een <b>trap</b>. Tussen de treden zit geen enkele nuance, en buiten het bereik van de data blijft de laatste trede eeuwig vlak. Één boom is bovendien wispelturig — verander een paar rijen en de splitsingen verspringen.</p>`,
+  tricks:`<div class="prose"><ol style="padding-left:17px;margin:0;">
+    <li>Zet <b>diepte op 8 en blad op 1</b>: R² op train springt naar 1,000 — perfect. Kijk dan naar R² op test. Dit is de duidelijkste demonstratie van overfitting die er is.</li>
+    <li>Verhoog <b>rijen per blad</b> naar 4-5. De trap wordt grover maar de testscore vaak béter: minder onthouden, meer generaliseren.</li>
+    <li>Kijk in de diepte-grafiek waar de oranje testlijn afbuigt en <b>snoei</b> daarop terug (dat is wat "pruning" in de praktijk doet).</li>
+    <li>Vergelijk met dezelfde dataset onder <b>Random forest</b>: honderd van deze wispelturige bomen middelen de trap glad.</li>
+  </ol></div>`,
+  run(s){
+    const D=DATASETS[s.ds]; const X=D.X(), y=D.y(), xs=X.map(r=>r[0]);
+    const sp=splitIdx(y.length,s.split/100,s.seed);
+    const opt={maxDepth:s.depth,minLeaf:s.leaf,minSplit:2*s.leaf,cls:false};
+    const T=buildTree(sp.tr.map(i=>X[i]),sp.tr.map(i=>y[i]),opt);
+    const pf=x=>predTree(T,[x]).val;
+    const mTr=regMetrics(sp.tr.map(i=>y[i]),sp.tr.map(i=>pf(xs[i])));
+    const mTe=sp.te.length?regMetrics(sp.te.map(i=>y[i]),sp.te.map(i=>pf(xs[i]))):null;
+
+    const P=newPlot('mainCanvas').padScale(xs,y).axes(D.xlab,D.ylab,D.fx,D.fy);
+    const [gx,gy]=staircase(P,pf);
+    P.line(gx,gy,{color:COL.warn,width:2.2});
+    P.dots(sp.tr.map(i=>xs[i]),sp.tr.map(i=>y[i]),{fill:COL.pos});
+    if(sp.te.length)P.dots(sp.te.map(i=>xs[i]),sp.te.map(i=>y[i]),{fill:'transparent',stroke:COL.c3,r:4.2});
+    capt('main','Beslisboom, diepte '+treeDepth(T)+' &middot; '+treeLeaves(T)+' bladeren',
+      [[COL.pos,'trainingspunt'],[COL.c3,'testpunt'],[COL.warn,'voorspelling',1]],
+      'Elke horizontale trede is één blad van de boom: alle x-waarden binnen die trede krijgen exact dezelfde voorspelling.');
+
+    /* diepte-sweep */
+    const ds=[],trR=[],teR=[];
+    for(let d=1;d<=8;d++){
+      const t=buildTree(sp.tr.map(i=>X[i]),sp.tr.map(i=>y[i]),{maxDepth:d,minLeaf:s.leaf,minSplit:2*s.leaf,cls:false});
+      const p=x=>predTree(t,[x]).val;
+      ds.push(d); trR.push(regMetrics(sp.tr.map(i=>y[i]),sp.tr.map(i=>p(xs[i]))).r2);
+      if(sp.te.length) teR.push(regMetrics(sp.te.map(i=>y[i]),sp.te.map(i=>p(xs[i]))).r2);
+      else { const pr=[]; for(let i=0;i<xs.length;i++){
+          const oi=[...Array(xs.length).keys()].filter(k=>k!==i);
+          const tt=buildTree(oi.map(k=>X[k]),oi.map(k=>y[k]),{maxDepth:d,minLeaf:s.leaf,minSplit:2*s.leaf,cls:false});
+          pr.push(predTree(tt,[xs[i]]).val);} teR.push(regMetrics(y,pr).r2); }
+    }
+    const lo=Math.max(-0.6,Math.min(0,...teR));
+    const Q=newPlot('subCanvas',{mb:34,ml:44}).scale(0.7,8.3,lo,1.05).axes('maximale diepte','R²',v=>fmt(v,0),v=>fmt(v,1));
+    Q.line(ds,trR,{color:COL.c3,width:2}); Q.dots(ds,trR,{fill:COL.c3,r:3});
+    Q.line(ds,teR,{color:COL.warn,width:2}); Q.dots(ds,teR,{fill:COL.warn,r:3});
+    let bd=1,bv=-1e9; teR.forEach((v,i)=>{if(v>bv){bv=v;bd=ds[i];}});
+    capt('sub','R² per diepte',[[COL.c3,'train',1],[COL.warn,sp.te.length?'test':'LOOCV',1]],
+      'Beste diepte: <b>'+bd+'</b>. De blauwe lijn stijgt altijd — dat is precies waarom je hem nooit als bewijs mag gebruiken.');
+
+    const fv=D.unit==='€'?eur:(v=>fmt(v,2));
+    $('sub2Slot').innerHTML='<div class="mono" style="font-size:11.5px;line-height:1.7;max-height:210px;overflow:auto;">'+
+      treeHtml(T,[D.xlab],fv)+'</div>';
+    capt('sub2','De boom als regels','','Dit is het hele model. Je kunt dit overtypen in een script, een spreadsheet of een werkinstructie.');
+
+    setMetrics([
+      {k:'R² (train)',v:fmt(mTr.r2,3),cls:mTr.r2>.9?'good':mTr.r2>.7?'mid':'bad'},
+      {k:'RMSE (train)',v:fv(mTr.rmse)},
+      {k:'MAE (train)',v:fv(mTr.mae)},
+      {sep:1},
+      {k:'R² ('+(sp.te.length?'test':'LOOCV')+')',v:fmt(teR[s.depth-1],3),cls:teR[s.depth-1]>.9?'good':teR[s.depth-1]>.7?'mid':'bad'},
+      {k:'RMSE (test)',v:mTe?fv(mTe.rmse):'—'},
+      {sep:1},
+      {k:'Bladeren',q:'aantal verschillende uitkomsten',v:treeLeaves(T)+''},
+      {k:'Werkelijke diepte',v:treeDepth(T)+''},
+      {k:'Rijen per blad (min)',v:s.leaf+''}
+    ]);
+    if(mTr.r2>0.999&&treeLeaves(T)>=sp.tr.length*0.8)
+      setVerdict('bad','De boom leert de rijen uit zijn hoofd','Bijna elk trainingspunt heeft zijn eigen blad. R² van 1,000 op train betekent hier niets — kijk naar de testlijn en snoei terug.');
+    else if(s.depth>bd) setVerdict('mid','Iets te diep','Diepte '+bd+' scoort beter op ongeziene data. Snoeien kost je nauwelijks nauwkeurigheid en levert een simpeler, uitlegbaarder model op.');
+    else verdictR2(teR[s.depth-1]);
+  }
+};
+
+/* ---------- 4. Random Forest Regression ---------- */
+MODELS.rfreg={
+  group:'reg', label:'Random forest (reg)', name:'Random Forest Regression',
+  datasets:['salary','position'], def:{ds:'salary',trees:40,depth:4,leaf:2,boot:true,split:20,seed:7},
+  controls:[
+    {type:'range',id:'trees',label:'Aantal bomen',min:1,max:120,step:1,
+     hint:'Elke boom ziet een andere toevallige greep uit de data; het gemiddelde is stabieler dan één boom. Richtwaarde: <b>50-100</b>. Meer schaadt nooit, kost alleen tijd.'},
+    {type:'range',id:'depth',label:'Maximale diepte per boom',min:1,max:8,step:1,
+     hint:'Bomen in een forest mogen dieper zijn dan een losse boom — het middelen vangt de overfitting grotendeels op.'},
+    {type:'range',id:'leaf',label:'Minimaal aantal rijen per blad',min:1,max:8,step:1},
+    {type:'check',id:'boot',label:'Bootstrap-steekproef per boom',
+     sub:'Elke boom traint op een willekeurige greep mét teruglegging. Zet dit uit en alle bomen worden identiek — dan is het forest niets meer dan één boom.'},
+    {type:'range',id:'split',label:'Testset',min:0,max:40,step:5,disp:v=>v+'%'},
+    {type:'range',id:'seed',label:'Seed',min:1,max:40,step:1}
+  ],
+  about:`<p class="lead">Honderd verschillende beslisbomen, elk op een andere toevallige greep uit de data — en het gemiddelde van hun antwoorden.</p>
+  <p>Dit is in de praktijk het <b>meest gebruikte niet-neurale model voor tabeldata</b>: prijsvoorspelling, vraagvoorspelling, restwaarde, doorlooptijd, risicoscores. Op nette rijen-en-kolommen data verslaat een random forest een neuraal netwerk vaak gewoon — en traint duizend keer sneller.</p>
+  <p>Het werkt omdat de fouten van individuele bomen verschillende kanten op wijzen en dus tegen elkaar wegvallen. Je hoeft niets te schalen, er zijn nauwelijks knoppen die je kúnt verpesten, en je krijgt gratis een eerlijke foutschatting mee (<b>OOB</b>: elke rij wordt beoordeeld door de bomen die hem niet gezien hebben).</p>
+  <p>Wat je inlevert is uitlegbaarheid: honderd bomen schrijf je niet meer op een A4. En de trap blijft — extrapoleren buiten je databereik kan dit model niet.</p>`,
+  tricks:`<div class="prose"><ol style="padding-left:17px;margin:0;">
+    <li>Schuif <b>bomen van 1 naar 120</b> en kijk naar de grafiek eronder: de winst is enorm tot ongeveer 20-30 bomen en daarna vlak. Dat is het antwoord op "hoeveel bomen heb ik nodig".</li>
+    <li>Zet <b>bootstrap uit</b>. Alle bomen worden identiek en de winst verdwijnt volledig — bewijs dat de toevalligheid het werkende bestanddeel is.</li>
+    <li>Vergelijk met <b>Decision tree</b> op dezelfde dataset en dezelfde diepte: zelfde bouwstenen, merkbaar minder wild.</li>
+    <li>Gebruik de <b>OOB-RMSE</b> in plaats van een testset. Dat is gratis en je houdt al je rijen voor de training — bij kleine datasets scheelt dat echt.</li>
+  </ol></div>`,
+  run(s){
+    const D=DATASETS[s.ds]; const X=D.X(), y=D.y(), xs=X.map(r=>r[0]);
+    const sp=splitIdx(y.length,s.split/100,s.seed);
+    const trX=sp.tr.map(i=>X[i]), trY=sp.tr.map(i=>y[i]);
+    const opt={nTrees:s.trees,maxDepth:s.depth,minLeaf:s.leaf,minSplit:2*s.leaf,cls:false,seed:s.seed,bootstrap:s.boot};
+    const F=s.boot?buildForest(trX,trY,opt):
+      {trees:Array.from({length:s.trees},(_,b)=>buildTree(trX,trY,{...opt,rngSeed:1})),oobIdx:[]};
+    const pf=x=>predForest(F,[x],false);
+    const mTr=regMetrics(trY,trX.map(r=>pf(r[0])));
+    const mTe=sp.te.length?regMetrics(sp.te.map(i=>y[i]),sp.te.map(i=>pf(xs[i]))):null;
+    /* OOB */
+    let oob=null;
+    if(s.boot&&F.oobIdx.length){
+      const yy=[],pp=[];
+      for(let i=0;i<trX.length;i++){ let s2=0,c=0;
+        for(let b=0;b<F.trees.length;b++) if(!F.oobIdx[b][i]){s2+=predTree(F.trees[b],trX[i]).val;c++;}
+        if(c){yy.push(trY[i]);pp.push(s2/c);} }
+      if(yy.length>2) oob=regMetrics(yy,pp);
+    }
+
+    const P=newPlot('mainCanvas').padScale(xs,y).axes(D.xlab,D.ylab,D.fx,D.fy);
+    for(let b=0;b<Math.min(14,F.trees.length);b++){
+      const [ax,ay]=staircase(P,x=>predTree(F.trees[b],[x]).val,240);
+      P.line(ax,ay,{color:COL.c4,width:1,alpha:.28});
+    }
+    const [gx,gy]=staircase(P,pf,600);
+    P.line(gx,gy,{color:COL.warn,width:2.4});
+    P.dots(sp.tr.map(i=>xs[i]),sp.tr.map(i=>y[i]),{fill:COL.pos});
+    if(sp.te.length)P.dots(sp.te.map(i=>xs[i]),sp.te.map(i=>y[i]),{fill:'transparent',stroke:COL.c3,r:4.2});
+    capt('main',s.trees+' bomen, gemiddelde voorspelling',
+      [[COL.pos,'trainingspunt'],[COL.c3,'testpunt'],[COL.c4,'losse boom',1],[COL.warn,'forest-gemiddelde',1]],
+      'De paarse trappen zijn losse bomen; ze spreken elkaar tegen. Het oranje gemiddelde is daardoor veel gladder dan elke boom afzonderlijk.');
+
+    /* R² vs aantal bomen (cumulatief) */
+    const evalSet = sp.te.length?sp.te:sp.tr, evalY=evalSet.map(i=>y[i]);
+    const acc=new Float64Array(evalSet.length); const ks=[],rr=[];
+    for(let b=0;b<F.trees.length;b++){
+      evalSet.forEach((i,k)=>{acc[k]+=predTree(F.trees[b],X[i]).val;});
+      if(b<3||(b+1)%Math.max(1,Math.round(F.trees.length/40))===0||b===F.trees.length-1){
+        ks.push(b+1); rr.push(regMetrics(evalY,Array.from(acc).map(v=>v/(b+1))).r2);
+      }
+    }
+    const lo=Math.max(-0.5,Math.min(...rr,0.4));
+    const Q=newPlot('subCanvas',{mb:34,ml:44}).scale(0.5,Math.max(2,s.trees)+0.5,lo,1.02)
+      .axes('aantal bomen','R² '+(sp.te.length?'(test)':'(train)'),v=>fmt(v,0),v=>fmt(v,2));
+    Q.line(ks,rr,{color:COL.warn,width:2}); Q.dots(ks,rr,{fill:COL.warn,r:2.4});
+    capt('sub','Winst per extra boom','','Zoek de knik: daarna kost elke extra boom rekentijd zonder dat de score nog meebeweegt.');
+
+    const all=sp.tr.concat(sp.te);
+    const R=newPlot('sub2Canvas',{mb:34}).padScale(all.map(i=>y[i]),all.map(i=>pf(xs[i]))).axes('werkelijk','voorspeld',D.fy,D.fy);
+    const l2=Math.min(R.x0,R.y0),h2=Math.max(R.x1,R.y1); R.scale(l2,h2,l2,h2);
+    R.line([l2,h2],[l2,h2],{color:COL['text-faint'],width:1,dash:[4,4]});
+    R.dots(sp.tr.map(i=>y[i]),sp.tr.map(i=>pf(xs[i])),{fill:COL.pos,r:3.2});
+    if(sp.te.length)R.dots(sp.te.map(i=>y[i]),sp.te.map(i=>pf(xs[i])),{fill:'transparent',stroke:COL.c3,r:4});
+    capt('sub2','Voorspeld vs. werkelijk','','Aan de uiteinden buigt de wolk naar binnen: een forest voorspelt nooit hoger of lager dan wat het gezien heeft.');
+
+    const fv=D.unit==='€'?eur:(v=>fmt(v,2));
+    setMetrics([
+      {k:'R² (train)',v:fmt(mTr.r2,3),cls:mTr.r2>.9?'good':mTr.r2>.7?'mid':'bad'},
+      {k:'RMSE (train)',v:fv(mTr.rmse)},
+      {sep:1},
+      {k:'R² (test)',v:mTe?fmt(mTe.r2,3):'—',cls:mTe?(mTe.r2>.9?'good':mTe.r2>.7?'mid':'bad'):''},
+      {k:'RMSE (test)',v:mTe?fv(mTe.rmse):'—'},
+      {k:'MAE (test)',v:mTe?fv(mTe.mae):'—'},
+      {sep:1},
+      {k:'OOB R²',q:'gratis eerlijke schatting, zonder testset',v:oob?fmt(oob.r2,3):'—',cls:oob?(oob.r2>.9?'good':oob.r2>.7?'mid':'bad'):''},
+      {k:'OOB RMSE',v:oob?fv(oob.rmse):'—'},
+      {sep:1},
+      {k:'Bomen',v:F.trees.length+''},
+      {k:'Bladeren totaal',v:F.trees.reduce((a,t)=>a+treeLeaves(t),0)+''}
+    ]);
+    if(!s.boot) setVerdict('bad','Zonder bootstrap is dit geen forest','Alle '+s.trees+' bomen zijn identiek, dus het gemiddelde is één boom. Zet bootstrap aan om te zien wat de toevalligheid oplevert.');
+    else if(s.trees<10) setVerdict('mid','Te weinig bomen','Met '+s.trees+' bomen middelt er nog niets uit. Schuif naar 50 en kijk hoe de score stabiliseert.');
+    else verdictR2(mTe?mTe.r2:(oob?oob.r2:mTr.r2));
+  }
+};
+
+/* ============== GEDEELD: CLASSIFICATIE-RAPPORTAGE ============== */
+function cmHtml(m){
+  return '<div class="cm">'+
+   '<div class="hd"></div><div class="hd">voorspeld: nee</div><div class="hd">voorspeld: ja</div>'+
+   '<div class="hd">echt nee</div><div class="cell tn"><b>'+m.tn+'</b><span>terecht afgewezen</span></div><div class="cell fp"><b>'+m.fp+'</b><span>vals alarm</span></div>'+
+   '<div class="hd">echt ja</div><div class="cell fn"><b>'+m.fn+'</b><span>gemist</span></div><div class="cell tp"><b>'+m.tp+'</b><span>terecht gevonden</span></div>'+
+   '</div>';
+}
+function classReport(s,D,X,y,tr,te,scoreFn,opts){
+  const thr = (s.thr!==undefined? s.thr : 0.5);
+  const P=newPlot('mainCanvas').padScale(X.map(r=>r[0]),X.map(r=>r[1]),0.03,0.05)
+    .heat((a,b)=>scoreFn([a,b]),opts.grid||4,[COL.neg,COL.pos]);
+  P.axes(D.xlab,D.ylab,D.fx,D.fy);
+  /* contour op de drempel */
+  const cs=[],cy=[];
+  const N=180;
+  for(let i=0;i<=N;i++){
+    const a=P.x0+(P.x1-P.x0)*i/N;
+    let lo=P.y0,hi=P.y1,f0=scoreFn([a,lo])-thr,f1=scoreFn([a,hi])-thr;
+    if(f0*f1>0){cs.push(a);cy.push(NaN);continue;}
+    for(let k=0;k<26;k++){const mid=(lo+hi)/2;((scoreFn([a,mid])-thr)*f0>0)?(lo=mid,f0=scoreFn([a,mid])-thr):(hi=mid);}
+    cs.push(a);cy.push((lo+hi)/2);
+  }
+  P.line(cs,cy,{color:COL.text,width:1.8,alpha:.85});
+  if(opts.svIdx&&opts.svIdx.length)
+    P.dots(opts.svIdx.map(i=>X[i][0]),opts.svIdx.map(i=>X[i][1]),{fill:'transparent',stroke:COL.warn,r:6.5});
+  const pos=tr.filter(i=>y[i]===1), neg=tr.filter(i=>y[i]===0);
+  P.dots(neg.map(i=>X[i][0]),neg.map(i=>X[i][1]),{fill:COL.neg,r:3.2,alpha:.85});
+  P.dots(pos.map(i=>X[i][0]),pos.map(i=>X[i][1]),{fill:COL.pos,r:3.2,alpha:.85});
+  if(te.length){
+    P.dots(te.map(i=>X[i][0]),te.map(i=>X[i][1]),{fill:'transparent',r:4.6,
+      stroke:k=>y[te[k]]===1?COL.pos:COL.neg});
+  }
+  const leg=[[COL.pos,'kocht wel'],[COL.neg,'kocht niet'],[COL.text,'beslisgrens',1]];
+  if(opts.svIdx&&opts.svIdx.length)leg.push([COL.warn,'support vector']);
+  capt('main',opts.title,leg,opts.mainHint);
+
+  const evalIdx = te.length?te:tr;
+  const sc = evalIdx.map(i=>scoreFn(X[i]));
+  const yy = evalIdx.map(i=>y[i]);
+  const pr = sc.map(v=>v>=thr?1:0);
+  const m = clsMetrics(yy,pr,sc);
+  const scT = tr.map(i=>scoreFn(X[i])), mT = clsMetrics(tr.map(i=>y[i]),scT.map(v=>v>=thr?1:0),scT);
+
+  /* ROC */
+  const R=newPlot('subCanvas',{mb:34,ml:44}).scale(-0.02,1.02,-0.02,1.02)
+    .axes('vals-alarmratio','gevonden-ratio',v=>fmt(v,1),v=>fmt(v,1));
+  R.line([0,1],[0,1],{color:COL['text-faint'],width:1,dash:[4,4]});
+  const rp=rocPoints(yy,sc);
+  R.line(rp.map(p=>p[0]),rp.map(p=>p[1]),{color:COL.c3,width:2});
+  R.dots([m.fp/Math.max(1,m.fp+m.tn)],[m.rec],{fill:COL.warn,r:4.5});
+  capt('sub','ROC-curve &middot; AUC = '+fmt(m.auc,3),[[COL.c3,'ROC',1],[COL.warn,'huidige drempel']],
+    'AUC is de kans dat een willekeurige koper een hogere score krijgt dan een willekeurige niet-koper. 0,5 = muntje opgooien.');
+
+  $('sub2Slot').innerHTML=cmHtml(m)+
+    '<div class="hint" style="margin-top:9px;">Op de '+(te.length?'testset':'trainingsset')+' ('+m.n+' rijen), drempel '+fmt(thr,2)+'.</div>';
+  capt('sub2','Verwarringsmatrix','','Niet elke fout is even erg: een gemiste koper kost omzet, een vals alarm kost advertentiebudget. Draai aan de drempel om te kiezen welke fout je liever maakt.');
+
+  const base=Math.max(yy.filter(v=>v===1).length,yy.filter(v=>v===0).length)/Math.max(1,yy.length);
+  setMetrics([
+    {k:'Accuracy',q:'aandeel goed geclassificeerd ('+(te.length?'test':'train')+')',v:pct(m.acc),cls:m.acc>.88?'good':m.acc>.78?'mid':'bad'},
+    {k:'Basislijn',q:'altijd de grootste klasse gokken',v:pct(base)},
+    {sep:1},
+    {k:'Precisie',q:'van de "ja"-voorspellingen: hoeveel klopten er',v:pct(m.prec)},
+    {k:'Recall',q:'van de echte kopers: hoeveel gevonden',v:pct(m.rec)},
+    {k:'F1',q:'harmonisch gemiddelde van beide',v:pct(m.f1),cls:m.f1>.85?'good':m.f1>.7?'mid':'bad'},
+    {k:'Specificiteit',q:'van de niet-kopers: hoeveel terecht afgewezen',v:pct(m.spec)},
+    {k:'Gebalanceerde accuracy',v:pct(m.bal)},
+    {k:'MCC',q:'−1 tot 1; robuust bij scheve klassen',v:fmt(m.mcc,3)},
+    {k:'ROC-AUC',v:fmt(m.auc,3),cls:m.auc>.9?'good':m.auc>.8?'mid':'bad'},
+    {sep:1},
+    {k:'Accuracy (train)',v:pct(mT.acc)},
+    {k:'Verschil train − '+(te.length?'test':'train'),q:'groot verschil = het model onthoudt',v:fmt(100*(mT.acc-m.acc),1)+' pt',
+     cls:(mT.acc-m.acc)>0.08?'bad':(mT.acc-m.acc)>0.04?'mid':'good'}
+  ]);
+  const gap=mT.acc-m.acc;
+  if(m.acc<=base+0.02) setVerdict('bad','Niet beter dan gokken','Het model haalt '+pct(m.acc)+' terwijl simpelweg altijd de grootste klasse kiezen al '+pct(base)+' oplevert.');
+  else if(gap>0.10) setVerdict('mid','Het model onthoudt te veel','Op de trainingsrijen '+pct(mT.acc)+', op ongeziene rijen '+pct(m.acc)+'. Vereenvoudig het model of geef het meer regularisatie.');
+  else if(m.acc>=0.9) setVerdict('good','Sterk, en volledig zonder LLM','Accuracy '+pct(m.acc)+' met AUC '+fmt(m.auc,3)+'. Dit is een paar regels rekenwerk, geen model van gigabytes.');
+  else setVerdict('mid','Bruikbaar, nog niet af','Accuracy '+pct(m.acc)+'. Probeer de trucjes links — schaling en de juiste knoppen leveren hier vaak nog 5-10 punten op.');
+  return m;
+}
+
+/* ---------- 5. Logistic Regression ---------- */
+const LRS=[0.001,0.003,0.01,0.03,0.1,0.3,1,3];
+function polyExp2(z,deg){const f=[1];for(let d=1;d<=deg;d++)for(let a=d;a>=0;a--)f.push(Math.pow(z[0],a)*Math.pow(z[1],d-a));return f;}
+MODELS.logreg={
+  group:'cls', label:'Logistic', name:'Logistic Regression',
+  datasets:['ads'], def:{ds:'ads',scale:true,lr:5,iters:600,l2:0,deg:1,thr:0.5,split:25,seed:7},
+  controls:[
+    {type:'check',id:'scale',label:'Kenmerken standaardiseren',
+     sub:'Leeftijd loopt van 18 tot 60, inkomen van 15.000 tot 150.000. Zonder schalen domineert inkomen de gradiënt volledig en leert het model niets. Zet het uit — dit is de duidelijkste "waarom preprocessing ertoe doet" van de hele pagina.'},
+    {type:'range',id:'deg',label:'Graad van de kenmerken',min:1,max:3,step:1,
+     hint:'Graad 1 geeft een rechte beslisgrens. Vanaf 2 mag de grens krommen — hetzelfde model, alleen slimmere invoer.'},
+    {type:'range',id:'lr',label:'Leersnelheid',min:0,max:7,step:1,disp:v=>LRS[v],
+     hint:'Te klein en het model is na 600 stappen nog niet klaar; te groot en het schiet door. Richtwaarde met schaling: <b>0,3</b>.'},
+    {type:'range',id:'iters',label:'Aantal iteraties',min:50,max:2000,step:50,
+     hint:'Gradient descent doet dit aantal stappen. Kijk of de score nog stijgt als je hem verhoogt — zo niet, dan is het model uitgeconvergeerd.'},
+    {type:'range',id:'l2',label:'L2-regularisatie',min:0,max:50,step:1,disp:v=>fmt(v/10,1),
+     hint:'Houdt de gewichten klein. Vooral nuttig bij graad 2-3, waar de grens anders om losse punten heen kronkelt.'},
+    {type:'range',id:'thr',label:'Beslisdrempel',min:0.05,max:0.95,step:0.05,disp:v=>fmt(v,2),
+     hint:'Boven welke kans noem je het "ja"? Verlagen vindt meer kopers maar geeft meer vals alarm.'},
+    {type:'range',id:'split',label:'Testset',min:10,max:40,step:5,disp:v=>v+'%'},
+    {type:'range',id:'seed',label:'Split-seed',min:1,max:40,step:1}
+  ],
+  about:`<p class="lead">Lineaire regressie op de <b>kans</b> in plaats van op een getal, door de uitkomst door een S-curve te duwen.</p>
+  <p>Het werkpaard van de statistiek voor <b>ja/nee-vragen</b>: koopt deze klant, valt deze machine uit, is deze transactie frauduleus, blijft deze patiënt weg bij de afspraak. In de medische wereld en bij kredietbeoordeling is dit vaak het enige model dat een toezichthouder accepteert — juist omdat elk gewicht een uitlegbare betekenis heeft ("elk extra jaar leeftijd vermenigvuldigt de kans-verhouding met 1,4").</p>
+  <p>Het geeft geen kaal label maar een <b>kans</b>, en dat is precies wat je nodig hebt om zelf te kiezen hoe voorzichtig je wilt zijn. Traint in milliseconden en heeft weinig data nodig.</p>
+  <p>Beperking: de beslisgrens is een rechte lijn. Kromt de werkelijkheid, dan moet jij die kromming zelf aandragen (graad 2 of 3) — het model verzint hem niet.</p>`,
+  tricks:`<div class="prose"><ol style="padding-left:17px;margin:0;">
+    <li><b>Zet schaling uit.</b> De accuracy stort in en de grens verdwijnt half uit beeld. Dit is geen fout van het model maar van de voorbereiding — en het is de meest gemaakte fout in de praktijk.</li>
+    <li>Zet de <b>graad op 2</b>. De grens gaat krommen en pakt de hoek rechtsonder mee. Zelfde model, betere invoer: dat is feature engineering.</li>
+    <li>Zet graad 3 en <b>L2 op 0</b>, kijk naar de grillige grens, en draai L2 daarna op naar 2-3. De grens wordt weer rustig zonder dat je het model kleiner maakt.</li>
+    <li>Schuif de <b>drempel</b> naar 0,30 en kijk in de verwarringsmatrix wat er gebeurt: minder gemiste kopers, meer vals alarm. Welke van de twee duurder is, bepaalt jouw drempel — niet het model.</li>
+    <li>Zet de <b>leersnelheid op 0,001</b> met 200 iteraties. De accuracy blijft verrassend goed, maar de achtergrondkleur wordt één vlakke waas: het model weet al wél welke kant het op moet, maar zijn <b>kansen kloppen niet</b> — alles blijft rond 0,50 hangen. Accuracy is niet hetzelfde als een bruikbare kans.</li>
+  </ol></div>`,
+  run(s){
+    const D=DATASETS.ads, X=D.X(), y=D.y();
+    const sp=stratSplit(y,s.split/100,s.seed);
+    const st=s.scale?colStats(sp.tr.map(i=>X[i])):{mu:[0,0],sd:[1,1]};
+    const tf=x=>polyExp2([(x[0]-st.mu[0])/st.sd[0],(x[1]-st.mu[1])/st.sd[1]],s.deg);
+    const F=sp.tr.map(i=>tf(X[i])), Y=sp.tr.map(i=>y[i]);
+    const {w,hist}=logregFit(F,Y,{lr:LRS[s.lr],iters:s.iters,l2:s.l2/10});
+    const score=x=>sigm(dot(w,tf(x)));
+    classReport(s,D,X,y,sp.tr,sp.te,score,{
+      title:'Logistische regressie &middot; graad '+s.deg+(s.scale?'':' &middot; <span style="color:var(--neg)">ongeschaald</span>'),
+      mainHint:'De achtergrondkleur is de voorspelde kans; de witte lijn is de drempel van '+fmt(s.thr,2)+'. Alle gewichten samen: <span class="mono">'+w.map(v=>fmt(v,2)).join(', ')+'</span>'
+    });
+    const badLoss=!isFinite(hist[hist.length-1]);
+    if(badLoss) setVerdict('bad','De training is ontspoord','De verliesfunctie is oneindig geworden — bijna altijd een te hoge leersnelheid of ongeschaalde kenmerken.');
+  }
+};
+
+/* ---------- 6. k-Nearest Neighbours ---------- */
+MODELS.knn={
+  group:'cls', label:'k-NN', name:'K-Nearest Neighbours',
+  datasets:['ads'], def:{ds:'ads',k:5,metric:'euclid',weighted:false,scale:true,thr:0.5,split:25,seed:7},
+  controls:[
+    {type:'range',id:'k',label:'Aantal buren (k)',min:1,max:60,step:1,
+     hint:'k=1 volgt elk punt slaafs (ruis wordt regel), hoge k maakt de grens glad maar bot. Vuistregel: begin rond <b>√n</b>, hier ongeveer 17.'},
+    {type:'check',id:'scale',label:'Kenmerken standaardiseren',
+     sub:'k-NN meet afstand. Ongeschaald is een verschil van € 1.000 in inkomen duizend keer zwaarder dan een verschil van 1 jaar leeftijd — dan telt leeftijd feitelijk niet mee.'},
+    {type:'select',id:'metric',label:'Afstandsmaat',options:[['euclid','Euclidisch (hemelsbreed)'],['manhattan','Manhattan (langs de assen)'],['cheb','Chebyshev (grootste verschil)']],
+     hint:'Manhattan is minder gevoelig voor uitschieters in één kenmerk; Euclidisch is de standaard.'},
+    {type:'check',id:'weighted',label:'Dichtbije buren zwaarder laten wegen',
+     sub:'In plaats van "elke buur één stem" telt een stem mee met 1/afstand. Maakt hoge k weer scherper.'},
+    {type:'range',id:'thr',label:'Beslisdrempel',min:0.05,max:0.95,step:0.05,disp:v=>fmt(v,2)},
+    {type:'range',id:'split',label:'Testset',min:10,max:40,step:5,disp:v=>v+'%'},
+    {type:'range',id:'seed',label:'Split-seed',min:1,max:40,step:1}
+  ],
+  about:`<p class="lead">Geen model, maar een geheugen: kijk naar de k meest vergelijkbare gevallen uit het verleden en neem hun meerderheid over.</p>
+  <p>Gebruikt waar "wat deden vergelijkbare gevallen?" een goed antwoord is: <b>aanbevelingen</b> ("klanten zoals jij kochten ook"), het invullen van ontbrekende waarden, afwijkingsdetectie, en als snelle referentie waar elk ander model minstens overheen moet.</p>
+  <p>Er is letterlijk geen trainingsfase — de data ís het model. Daardoor pikt het elke vorm van grens op, hoe grillig ook, zonder dat jij iets hoeft aan te dragen.</p>
+  <p>De prijs betaal je bij het voorspellen: elke vraag kost een vergelijking met álle rijen. Bij honderdduizenden rijen wordt dat traag, en bij veel kolommen wordt "afstand" betekenisloos (de vloek van de dimensionaliteit). Schalen is hier niet optioneel maar noodzakelijk.</p>`,
+  tricks:`<div class="prose"><ol style="padding-left:17px;margin:0;">
+    <li><b>Zet schaling uit.</b> De grens wordt bijna horizontaal: alleen inkomen telt nog mee. Voor een afstandsmodel is dit dodelijk.</li>
+    <li>Zet <b>k op 1</b> en kijk naar het verschil tussen train- en testscore: op train perfect, op test duidelijk minder. k=1 onthoudt, het generaliseert niet.</li>
+    <li>Gebruik de grafiek <b>accuracy per k</b> hieronder om k te kiezen in plaats van te gokken. De piek is meestal breed — kies dan de hoogste k in dat gebied, die is stabieler.</li>
+    <li>Zet een hoge k (30+) en zet daarna <b>afstandsweging</b> aan: je krijgt de gladheid van hoge k terug mét gevoel voor detail.</li>
+  </ol></div>`,
+  run(s){
+    const D=DATASETS.ads, X=D.X(), y=D.y();
+    const sp=stratSplit(y,s.split/100,s.seed);
+    const st=s.scale?colStats(sp.tr.map(i=>X[i])):{mu:[0,0],sd:[1,1]};
+    const sc=x=>[(x[0]-st.mu[0])/st.sd[0],(x[1]-st.mu[1])/st.sd[1]];
+    const Xtr=sp.tr.map(i=>sc(X[i])), Ytr=sp.tr.map(i=>y[i]);
+    const opts={k:s.k,metric:s.metric,weighted:s.weighted};
+    const score=x=>knnPredict(Xtr,Ytr,sc(x),opts);
+    classReport(s,D,X,y,sp.tr,sp.te,score,{grid:5,
+      title:'k-NN &middot; k = '+s.k+' &middot; '+s.metric+(s.scale?'':' &middot; <span style="color:var(--neg)">ongeschaald</span>'),
+      mainHint:'De grens is een mozaïek: elk vlakje krijgt de meerderheid van zijn '+s.k+' dichtstbijzijnde buren uit de trainingsset.'});
+    /* accuracy per k vervangt de ROC — burenlijsten één keer sorteren */
+    const evalIdx=sp.te.length?sp.te:sp.tr, yy=evalIdx.map(i=>y[i]);
+    const nbTe=evalIdx.map(i=>knnNeighbours(Xtr,Ytr,sc(X[i]),s.metric,-1));
+    const nbTr=Xtr.map((v,i)=>knnNeighbours(Xtr,Ytr,v,s.metric,-1));
+    const ks=[],ac=[],at=[];
+    for(let k=1;k<=Math.min(60,Xtr.length-1);k+=(k<12?1:3)){
+      ac.push(clsMetrics(yy,nbTe.map(d=>knnFromNeighbours(d,k,s.weighted)>=s.thr?1:0)).acc);
+      at.push(clsMetrics(Ytr,nbTr.map(d=>knnFromNeighbours(d,k,s.weighted)>=s.thr?1:0)).acc);
+      ks.push(k);
+    }
+    const lo=Math.min(...ac,...at)-0.03;
+    const Q=newPlot('subCanvas',{mb:34,ml:44}).scale(0,Math.max(...ks)+1,lo,1.01).axes('k','accuracy',v=>fmt(v,0),v=>fmt(v,2));
+    Q.line(ks,at,{color:COL.c3,width:2}); Q.line(ks,ac,{color:COL.warn,width:2}); Q.dots(ks,ac,{fill:COL.warn,r:2.6});
+    let bk=1,bv=-1; ac.forEach((v,i)=>{if(v>bv){bv=v;bk=ks[i];}});
+    let near=0; ks.forEach((v,i)=>{if(Math.abs(v-s.k)<Math.abs(ks[near]-s.k))near=i;});
+    Q.dots([ks[near]],[ac[near]],{fill:'transparent',stroke:COL.text,r:5.5});
+    capt('sub','Accuracy per k',[[COL.c3,'train',1],[COL.warn,'test',1]],
+      'Beste k op de testset: <b>'+bk+'</b> ('+pct(bv)+'). Zie hoe train bij k=1 op 100% staat en test niet — dat gat ís overfitting.');
+  }
+};
+
+/* ---------- 7. Kernel SVM ---------- */
+const CS=[0.01,0.1,0.5,1,3,10,30,100], GS=[0.01,0.03,0.1,0.3,0.5,1,2,5,10];
+MODELS.ksvm={
+  group:'cls', label:'Kernel SVM', name:'Kernel SVM',
+  datasets:['ads'], def:{ds:'ads',kernel:'rbf',C:3,gamma:4,degree:3,scale:true,thr:0.5,split:25,seed:7},
+  controls:[
+    {type:'select',id:'kernel',label:'Kernel',options:[['rbf','RBF / gaussisch'],['linear','Lineair'],['poly','Polynomiaal'],['sigmoid','Sigmoid']],
+     hint:'De kernel bepaalt de <b>vorm</b> van de grens. Lineair = rechte lijn; RBF = vloeiende bellen om groepen heen.'},
+    {type:'range',id:'C',label:'C (strengheid)',min:0,max:7,step:1,disp:v=>CS[v],
+     hint:'Hoe zwaar fouten meetellen. Lage C = brede marge, wat fouten toegestaan, gladde grens. Hoge C = elke trainingsrij moet kloppen, grillige grens. Richtwaarde: <b>1 tot 10</b>.'},
+    {type:'range',id:'gamma',label:'gamma (reikwijdte)',min:0,max:8,step:1,disp:v=>GS[v],when:s=>s.kernel!=='linear',
+     hint:'Hoe ver de invloed van één punt reikt. Hoge gamma = elk punt trekt alleen zijn directe omgeving naar zich toe: eilandjes in plaats van gebieden. Richtwaarde bij 2 geschaalde kenmerken: <b>0,5</b>.'},
+    {type:'range',id:'degree',label:'Graad (alleen polynomiaal)',min:2,max:5,step:1,when:s=>s.kernel==='poly'},
+    {type:'check',id:'scale',label:'Kenmerken standaardiseren',
+     sub:'Een kernel rekent met afstanden; zonder schaling ziet de RBF-kernel alleen inkomen. Verplicht bij SVM.'},
+    {type:'range',id:'thr',label:'Beslisdrempel',min:0.05,max:0.95,step:0.05,disp:v=>fmt(v,2)},
+    {type:'range',id:'split',label:'Testset',min:10,max:40,step:5,disp:v=>v+'%'},
+    {type:'range',id:'seed',label:'Split-seed',min:1,max:40,step:1}
+  ],
+  about:`<p class="lead">Trek de grens die zo ver mogelijk van beide groepen af ligt — en laat een "kernel" die grens krommen zonder ooit extra kolommen uit te rekenen.</p>
+  <p>De klassieke keuze bij <b>weinig rijen en veel kolommen</b>: tekstclassificatie, spamfilters, gezichts- en handschriftherkenning vóór het deep-learning-tijdperk, medische datasets met 80 patiënten en 300 metingen. Waar een neuraal netwerk verhongert, doet een SVM het vaak nog uitstekend.</p>
+  <p>Alleen de punten op de rand van de marge — de <b>support vectors</b>, met oranje ringen in de grafiek — bepalen het model. Alle andere rijen mag je weggooien; het resultaat verandert niet. Dat maakt het model compact en verrassend stabiel.</p>
+  <p>Nadelen: het schaalt slecht naar honderdduizenden rijen, het geeft van zichzelf geen kans maar een afstand, en de uitkomst hangt sterk af van C en gamma — zonder die twee goed te zetten oogt een SVM al snel waardeloos.</p>`,
+  tricks:`<div class="prose"><ol style="padding-left:17px;margin:0;">
+    <li>Zet de kernel op <b>lineair</b> en daarna op <b>RBF</b>. Zelfde data, zelfde code: de rechte lijn kan de hoek rechtsonder niet pakken, de RBF wel.</li>
+    <li>Draai <b>gamma naar 10</b>. De grens valt uiteen in eilandjes rond individuele punten — leerboekvoorbeeld van overfitting. Terug naar 0,5.</li>
+    <li>Zet <b>C op 0,01</b>: bijna iedereen wordt "nee". Zet C op 100: de grens kronkelt om elk trainingspunt. Ergens ertussen ligt je model.</li>
+    <li>Kijk hoeveel <b>support vectors</b> er zijn. Zijn dat er bijna evenveel als je trainingsrijen, dan doet het model niets anders dan onthouden — verlaag C of gamma.</li>
+    <li>Zet <b>schaling uit</b> bij RBF: de accuracy zakt naar de basislijn. De kernel ziet dan alleen nog inkomen.</li>
+  </ol></div>`,
+  run(s){
+    const D=DATASETS.ads, X=D.X(), y=D.y();
+    const sp=stratSplit(y,s.split/100,s.seed);
+    const st=s.scale?colStats(sp.tr.map(i=>X[i])):{mu:[0,0],sd:[1,1]};
+    const sc=x=>[(x[0]-st.mu[0])/st.sd[0],(x[1]-st.mu[1])/st.sd[1]];
+    const Xtr=sp.tr.map(i=>sc(X[i])), yPM=sp.tr.map(i=>y[i]===1?1:-1);
+    const kf=makeKernel(s.kernel,GS[s.gamma],s.degree,1);
+    const n=Xtr.length, K=Array.from({length:n},()=>new Float64Array(n));
+    for(let i=0;i<n;i++)for(let j=i;j<n;j++){const v=kf(Xtr[i],Xtr[j]);K[i][j]=v;K[j][i]=v;}
+    const M=smoTrain(Xtr,yPM,K,CS[s.C],{maxPasses:5,maxIter:6000});
+    const svs=M.sv;
+    const f=x=>{const z=sc(x);let s2=M.b;for(const i of svs)s2+=M.a[i]*yPM[i]*kf(Xtr[i],z);return s2;};
+    const score=x=>sigm(2*f(x));
+    classReport(s,D,X,y,sp.tr,sp.te,score,{grid:5,svIdx:svs.map(i=>sp.tr[i]),
+      title:s.kernel.toUpperCase()+'-kernel &middot; C = '+CS[s.C]+(s.kernel!=='linear'?' &middot; γ = '+GS[s.gamma]:'')+(s.scale?'':' &middot; <span style="color:var(--neg)">ongeschaald</span>'),
+      mainHint:'<b>'+svs.length+'</b> van de '+n+' trainingsrijen zijn support vector ('+pct(svs.length/n)+'). Alleen die punten bepalen de grens.'});
+    const el=document.createElement('div'); el.className='metric';
+    el.innerHTML='<span class="k">Support vectors<span class="q">rijen die het model écht nodig heeft</span></span><span class="v '+
+      (svs.length/n<0.4?'good':svs.length/n<0.7?'mid':'bad')+'">'+svs.length+' / '+n+'</span>';
+    $('metrics').appendChild(el);
+  }
+};
+
+/* ---------- 8. K-Means Clustering ---------- */
+const PAIRS={ 'inc_sco':[2,3], 'age_sco':[1,3], 'age_inc':[1,2] };
+const MALLNAMES={1:'leeftijd (jaar)',2:'jaarinkomen (k€)',3:'spending score (1-100)'};
+MODELS.kmeans={
+  group:'clu', label:'K-means', name:'K-Means Clustering',
+  datasets:['mall'], def:{ds:'mall',k:5,pair:'inc_sco',init:'pp',nInit:10,scale:false,seed:3},
+  controls:[
+    {type:'range',id:'k',label:'Aantal clusters (k)',min:2,max:10,step:1,
+     hint:'Dit moet jij vooraf kiezen — het model vindt het niet zelf. Gebruik de elleboog- en silhouetgrafiek hieronder om te bepalen welke k verdedigbaar is.'},
+    {type:'select',id:'pair',label:'Welke twee kenmerken',options:[['inc_sco','inkomen × spending score'],['age_sco','leeftijd × spending score'],['age_inc','leeftijd × inkomen']],
+     hint:'Klassieke keuze is inkomen × spending score: daar vallen de groepen er als vijf duidelijke wolken uit.'},
+    {type:'select',id:'init',label:'Startpunten',options:[['pp','k-means++ (slim gespreid)'],['random','willekeurige rijen']],
+     hint:'Slechte startpunten geven een slecht eindresultaat. k-means++ zet de startpunten bewust ver uit elkaar — bijna altijd de betere keuze.'},
+    {type:'range',id:'nInit',label:'Aantal herstarts',min:1,max:20,step:1,
+     hint:'Het algoritme wordt zo vaak opnieuw gestart met andere startpunten; de beste run wint. Op 1 zie je hoe wisselvallig één run is.'},
+    {type:'check',id:'scale',label:'Kenmerken standaardiseren',
+     sub:'Inkomen loopt van 15 tot 137, de score van 1 tot 99 — die zijn hier toevallig vergelijkbaar. Kies leeftijd × inkomen en zet dit aan/uit om te zien waarom het bij andere schalen wél uitmaakt.'},
+    {type:'range',id:'seed',label:'Seed',min:1,max:40,step:1}
+  ],
+  about:`<p class="lead">Verdeel de rijen in k groepen zodat elke rij zo dicht mogelijk bij het middelpunt van zijn eigen groep ligt. Er is geen goed antwoord om van te leren — het model zoekt zelf structuur.</p>
+  <p>Het standaardgereedschap voor <b>segmentatie</b>: klantgroepen voor gerichte marketing, het samenvoegen van vestigingen tot regio's, het groeperen van sensoren met vergelijkbaar gedrag, kleurreductie in afbeeldingen, en het indelen van artikelen in voorraadcategorieën.</p>
+  <p>Het is snel, schaalt naar miljoenen rijen en het resultaat is direct te lezen: je krijgt per groep een profiel ("hoog inkomen, lage besteding") waar een mens meteen beleid op kan maken.</p>
+  <p>Wat je moet weten: <b>k kies jij</b>, niet het model. Het vindt altijd k groepen — ook in data die helemaal geen groepen heeft. De clusters worden bolvormig verondersteld, en de uitkomst hangt af van de startpunten. Daarom herstarts en daarom altijd een silhouetscore erbij.</p>`,
+  tricks:`<div class="prose"><ol style="padding-left:17px;margin:0;">
+    <li>Schuif <b>k van 2 naar 10</b> en volg de elleboogcurve. Bij inkomen × spending score zit de knik onmiskenbaar bij <b>k = 5</b> — en de silhouetscore piekt daar ook. Twee onafhankelijke aanwijzingen die hetzelfde zeggen: dat is je antwoord.</li>
+    <li>Zet <b>herstarts op 1</b> en draai aan de seed. De clusters verspringen zichtbaar. Op 10 herstarts staat het resultaat vast — voor een paar milliseconden extra.</li>
+    <li>Zet de startpunten op <b>willekeurig</b> met 1 herstart: af en toe klapt er een cluster in elkaar. Precies daarvoor bestaat k-means++.</li>
+    <li>Kies <b>leeftijd × inkomen</b>: nu is er nauwelijks structuur, de silhouetscore zakt onder 0,4 en de elleboog verdwijnt. Het model geeft je nog steeds keurig k groepen — dat is de valkuil van clustering.</li>
+    <li>Lees de <b>clusterprofielen</b> rechtsonder. Dat is het echte product: "hoog inkomen, lage besteding" is een doelgroep, "cluster 3" niet.</li>
+  </ol></div>`,
+  run(s){
+    const [ia,ib]=PAIRS[s.pair], raw=DS_MALL.map(r=>[r[ia],r[ib]]);
+    const st=s.scale?colStats(raw):{mu:[0,0],sd:[1,1]};
+    const Z=raw.map(r=>[(r[0]-st.mu[0])/st.sd[0],(r[1]-st.mu[1])/st.sd[1]]);
+    const res=kmeansRun(Z,s.k,{seed:s.seed,init:s.init,nInit:s.nInit});
+    const sil=silhouette(Z,res.lab,s.k);
+    const cols=CLUSTERCOLS();
+    const cx=res.C.map(c=>c[0]*st.sd[0]+st.mu[0]), cy=res.C.map(c=>c[1]*st.sd[1]+st.mu[1]);
+
+    const P=newPlot('mainCanvas').padScale(raw.map(r=>r[0]),raw.map(r=>r[1]),0.05,0.07)
+      .axes(MALLNAMES[ia],MALLNAMES[ib],v=>fmt(v,0),v=>fmt(v,0));
+    P.dots(raw.map(r=>r[0]),raw.map(r=>r[1]),{r:4,fill:i=>cols[res.lab[i]%cols.length],alpha:.9});
+    for(let c=0;c<s.k;c++){
+      const px=P.px(cx[c]),py=P.py(cy[c]),ctx=P.ctx;
+      ctx.save();ctx.strokeStyle='#fff';ctx.lineWidth=2.4;ctx.beginPath();
+      ctx.moveTo(px-7,py-7);ctx.lineTo(px+7,py+7);ctx.moveTo(px+7,py-7);ctx.lineTo(px-7,py+7);ctx.stroke();
+      ctx.strokeStyle=cols[c%cols.length];ctx.lineWidth=1.2;ctx.stroke();ctx.restore();
+    }
+    capt('main',s.k+' clusters &middot; '+(s.init==='pp'?'k-means++':'willekeurige start')+' &middot; '+s.nInit+' herstarts',
+      Array.from({length:s.k},(_,c)=>[cols[c%cols.length],'cluster '+(c+1)]).concat([['#fff','middelpunt',1]]),
+      'De kruisjes zijn de middelpunten. Een punt hoort bij het middelpunt waar het het dichtst bij ligt — daarom zijn de grenzen altijd recht.');
+
+    /* elleboog + silhouet */
+    const ks=[],wc=[],si=[];
+    for(let k=1;k<=10;k++){
+      const r=kmeansRun(Z,k,{seed:s.seed,init:s.init,nInit:Math.min(6,s.nInit)});
+      ks.push(k); wc.push(r.wcss); si.push(k>1?silhouette(Z,r.lab,k):0);
+    }
+    const Q=newPlot('subCanvas',{mb:34,ml:52,mr:34}).scale(0.7,10.3,0,Math.max(...wc)*1.06)
+      .axes('aantal clusters (k)','WCSS',v=>fmt(v,0),v=>v>=1000?Math.round(v/1000)+'k':fmt(v,0));
+    Q.line(ks,wc,{color:COL.warn,width:2}); Q.dots(ks,wc,{fill:COL.warn,r:3.4});
+    const mx=Math.max(...wc);
+    Q.line(ks,si.map(v=>v*mx*0.95),{color:COL.c3,width:2,dash:[5,3]});
+    Q.dots(ks,si.map(v=>v*mx*0.95),{fill:COL.c3,r:2.6});
+    Q.dots([s.k],[wc[s.k-1]],{fill:'transparent',stroke:COL.text,r:6});
+    let bs=2,bv=-2; si.forEach((v,i)=>{if(ks[i]>1&&v>bv){bv=v;bs=ks[i];}});
+    capt('sub','Elleboog & silhouet',[[COL.warn,'WCSS (lager = strakker)',1],[COL.c3,'silhouet (hoger = beter gescheiden)',1]],
+      'Beste k volgens silhouet: <b>'+bs+'</b> (score '+fmt(bv,3)+'). De elleboog is de knik in de oranje lijn; kies waar beide het eens zijn.');
+
+    /* profielen */
+    const cnt=new Array(s.k).fill(0), sums=Array.from({length:s.k},()=>[0,0,0]);
+    res.lab.forEach((c,i)=>{cnt[c]++;sums[c][0]+=DS_MALL[i][1];sums[c][1]+=DS_MALL[i][2];sums[c][2]+=DS_MALL[i][3];});
+    const order=[...Array(s.k).keys()].sort((a,b)=>cnt[b]-cnt[a]);
+    let html='<table><tr><th>cluster</th><th>n</th><th>leeftijd</th><th>inkomen</th><th>score</th><th>profiel</th></tr>';
+    for(const c of order){
+      if(!cnt[c])continue;
+      const a=sums[c][0]/cnt[c],inc=sums[c][1]/cnt[c],sco=sums[c][2]/cnt[c];
+      const p=(inc>70?'hoog inkomen':inc<40?'laag inkomen':'middeninkomen')+', '+(sco>60?'besteedt veel':sco<40?'besteedt weinig':'gemiddelde besteding');
+      html+='<tr><td><span class="swatch" style="background:'+cols[c%cols.length]+'"></span>'+(c+1)+'</td><td>'+cnt[c]+'</td><td>'+fmt(a,0)+
+        '</td><td>'+fmt(inc,0)+'k</td><td>'+fmt(sco,0)+'</td><td style="font-family:Inter,sans-serif;color:var(--text-dim);white-space:normal;">'+p+'</td></tr>';
+    }
+    html+='</table>';
+    $('sub2Slot').innerHTML='<div style="max-height:210px;overflow:auto;">'+html+'</div>';
+    capt('sub2','Clusterprofielen','','Dit is waarom je clustert: niet de kleurtjes, maar de omschrijving per groep waar marketing of beleid iets mee kan.');
+
+    setMetrics([
+      {k:'Silhouetscore',q:'−1 tot 1; boven 0,5 = duidelijk gescheiden groepen',v:fmt(sil,3),cls:sil>0.5?'good':sil>0.35?'mid':'bad'},
+      {k:'WCSS (inertia)',q:'som van kwadratische afstanden tot het eigen middelpunt',v:fmt(res.wcss,0)},
+      {k:'WCSS per punt',v:fmt(res.wcss/Z.length,2)},
+      {sep:1},
+      {k:'Beste k (silhouet)',v:bs+'',cls:bs===s.k?'good':'mid'},
+      {k:'Iteraties tot stabiel',v:res.iters+''},
+      {k:'Herstarts',v:s.nInit+''},
+      {sep:1},
+      {k:'Kleinste cluster',v:Math.min(...cnt)+' rijen',cls:Math.min(...cnt)<5?'bad':''},
+      {k:'Grootste cluster',v:Math.max(...cnt)+' rijen'},
+      {k:'Rijen totaal',v:Z.length+''}
+    ]);
+    if(Math.min(...cnt)<3) setVerdict('bad','Een cluster is leeggelopen','Minstens één groep heeft bijna geen leden. Verlaag k, of gebruik k-means++ met meer herstarts.');
+    else if(sil<0.35) setVerdict('bad','Nauwelijks echte groepen','Silhouet '+fmt(sil,3)+': de "clusters" overlappen sterk. Het model geeft je altijd k groepen — of ze bestaan is een andere vraag. Probeer andere kenmerken.');
+    else if(s.k!==bs) setVerdict('mid','Andere k is beter verdedigbaar','Bij k = '+bs+' is de silhouetscore hoger ('+fmt(bv,3)+' tegen '+fmt(sil,3)+'). Kijk of dat ook een logisch verhaal oplevert in de profieltabel.');
+    else setVerdict('good','Duidelijk gescheiden groepen','Silhouet '+fmt(sil,3)+' bij k = '+s.k+', en dat is ook wat elleboog en silhouet aanraden. Deze segmentatie kun je verdedigen.');
+  }
+};
+
+/* ============================ START ============================ */
+const GROUPS=[['reg','regressie','g-reg'],['cls','classificatie','g-cls'],['clu','clustering','g-clu']];
+function boot(){
+  loadCols();
+  for(const id in MODELS) state[id]={...MODELS[id].def};
+  const bar=$('modelbar');
+  bar.innerHTML=GROUPS.map(([g,lab,cls])=>
+    '<div class="mgroup '+cls+'"><span class="glabel">'+lab+'</span>'+
+    Object.keys(MODELS).filter(k=>MODELS[k].group===g)
+      .map(k=>'<button data-m="'+k+'">'+MODELS[k].label+'</button>').join('')+'</div>').join('');
+  bar.querySelectorAll('button').forEach(b=>b.addEventListener('click',()=>selectModel(b.dataset.m)));
+  $('footnote').innerHTML='Alles op deze pagina rekent <b>in je browser</b>, in gewoon JavaScript: kleinste-kwadraten, beslisbomen, gradient descent, SMO en Lloyd\'s algoritme zijn hier met de hand geïmplementeerd. Geen server, geen internet, geen taalmodel &mdash; en er wordt niets opgeslagen. De vier datasets zitten in dit bestand ingebakken zodat de pagina ook werkt als je hem gewoon vanaf schijf opent; de bronlinks staan bij elke dataset. Wil je zien wanneer een klein <b>taalmodel</b> juist wél of niet voldoet, ga dan naar de <a href="ollama-test.html">Ollama LLM-test</a>; voor neurale netwerken naar de <a href="nn-layer-test.html">NN Layer Test</a>.';
+  const h=location.hash.replace('#','');
+  selectModel(MODELS[h]?h:'simplelin');
+  let rt=null;
+  window.addEventListener('resize',()=>{clearTimeout(rt);rt=setTimeout(schedule,180);});
+}
+document.addEventListener('DOMContentLoaded',boot);
+</script>
+</body>
+</html>
