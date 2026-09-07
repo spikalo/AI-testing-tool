@@ -1,62 +1,65 @@
 # AI Testing Tool — lokaal model lab
 
+![Lokaal model lab](front_img.png)
+
 Een verzameling losse HTML-pagina's waarmee je **op je eigen hardware** kunt meten
-wanneer een klein of slecht getraind model onderuit gaat, hoe zich dat uit, en wat
-je eraan kunt doen. Geen server, geen build, geen dependencies: open een bestand in
-Chrome of Edge en het draait.
+wanneer een klein of slecht getraind model onderuit gaat, hoe zich dat uit, en wat je
+eraan kunt doen. Geen server nodig, geen build, geen dependencies, geen `npm install`:
+open een bestand in Chrome of Edge en het draait.
 
 De centrale vraag achter dit project:
 
-> Wanneer, hoe en waardoor gaat een te klein of slecht getraind (LLM-)netwerk slecht
-> presteren, hoe herken je dat, en welke methodes kun je toepassen om de resultaten
-> te verbeteren?
+> Wanneer, hoe en waardoor gaat een te klein of slecht getraind netwerk slecht
+> presteren, hoe herken je dat, en welke methodes kun je toepassen om de resultaten te
+> verbeteren?
+
+Er zitten inmiddels vier tests in, van "een gewoon statistisch script zonder AI" tot
+een zelfstructurerend neuraal netwerk zonder lagen en zonder backpropagation.
 
 ## Snelstart
 
 1. Clone of download deze map.
-2. Start **`start-server.cmd`** (Windows). Dat serveert deze map op
+2. Start **`start-server.cmd`** (Windows). Dat serveert de map op
    `http://localhost:8080` en opent het hoofdmenu. Handmatig kan ook, vanuit deze map:
    `python -m http.server 8080`.
-3. Kies een test:
-   - **NN Layer Test** — bouw zelf een klein neuraal netwerk en zie waar het omslaat.
-   - **Ollama LLM-test** — test een lokaal draaiend taalmodel op 18 vaste opdrachten.
+3. Kies een test in `index.html`.
 
-> **Waarom niet gewoon dubbelklikken?** Voor de NN-test kan dat prima. Maar een pagina
-> die je rechtstreeks vanaf schijf opent (`file://`) stuurt `Origin: null` mee, en dat
-> weigert Ollama standaard — de LLM-test krijgt dan geen verbinding. Via `localhost`
-> speelt dat niet. Wil je toch vanaf schijf werken, zet dan `OLLAMA_ORIGINS` op `*` en
-> herstart Ollama.
+Alleen de **Ollama LLM-test** heeft die webserver echt nodig. De andere drie werken ook
+als je het bestand rechtstreeks vanaf schijf opent.
+
+> **Waarom niet gewoon dubbelklikken?** Een pagina die je vanaf schijf opent (`file://`)
+> stuurt `Origin: null` mee, en dat weigert Ollama standaard — de LLM-test krijgt dan
+> geen verbinding. Via `localhost` speelt dat niet. Wil je toch vanaf schijf werken, zet
+> dan `OLLAMA_ORIGINS` op `*` en herstart Ollama.
 
 Voor de LLM-test heb je [Ollama](https://ollama.com/download) nodig met minstens één
-model. De pagina zelf bevat een uitschuifbaar vak met alle installatiestappen en een
-statusbolletje: groen = verbonden, oranje = Ollama draait wel maar blokkeert de pagina
-(CORS), rood = niet bereikbaar.
+model:
 
 ```bash
 ollama pull llama3.2:3b
 ollama run llama3.2:3b
 ```
 
-## Inhoud
+De pagina bevat een uitschuifbaar vak met alle installatiestappen en een statusbolletje:
+groen = verbonden, oranje = Ollama draait wel maar blokkeert de pagina (CORS), rood =
+niet bereikbaar.
 
-| Bestand | Wat het is |
-|---|---|
-| `index.html` | Hoofdmenu |
-| `nn-layer-test.html` | Neuraal netwerk trainen in de browser (koffiereviews, spam, MNIST-cijfers, EMNIST-letters) |
-| `resultaten.html` | Runs van de NN-test vergelijken |
-| `ollama-test.html` | Testbatterij voor lokale LLM's via de Ollama-API |
-| `start-server.cmd` | Start een lokale webserver op poort 8080 en opent het hoofdmenu |
-| `ollama-resultaten.html` | LLM's naast elkaar leggen + adviesformulier "welk model voor mijn taak" |
-| `resultaten/` | Opgeslagen runs van de NN-test (JSON) |
-| `resultaten-llm/` | Opgeslagen runs van de LLM-test (JSON, één bestand per model) |
-| `datasets/` | MNIST/EMNIST — **niet in git**, zie `datasets/README.md` |
-| `DOCUMENTATIE.md` | De volledige documentatie: alle opdrachten, scoring, faalpatronen, remedies en het logboek |
+## De vier tests
 
-## De LLM-testbatterij in het kort
+| # | Test | Wat je meet | Nodig |
+|---|---|---|---|
+| 01 | **NN Layer Test** | Bouw zelf een klein neuraal netwerk (tot 5 verborgen lagen) op koffiereviews, spam, MNIST-cijfers of EMNIST-letters, en zoek de omslag tussen "te klein" en "goed genoeg". | dataset voor taak C/D |
+| 02 | **Ollama LLM-test** | 18 vaste opdrachten voor een lokaal draaiend taalmodel: 6 vaardigheden × 3 moeilijkheidsgraden, met faalpatronen en remedies. | Ollama + webserver |
+| 03 | **Statistische modellen** | Acht klassieke modellen zonder AI — van rechte lijn tot random forest, kernel-SVM en k-means — live op echte datasets. Laat zien hoe ver je komt met een gewoon script. | niets |
+| 04 | **Basic Brain Test** | Een neuraal netwerk zónder lagen dat al spelend leert een doel te bereiken. Zie hieronder. | niets |
 
-18 vaste opdrachten = **6 vaardigheden × 3 moeilijkheidsgraden**, altijd exact
-dezelfde vragen, met `temperature 0` en `seed 42`, zodat verschillen door het model
-komen en niet door toeval.
+Bij elke test hoort een resultatenpagina waarmee je runs naast elkaar legt.
+
+### Test 02 — de LLM-testbatterij in het kort
+
+18 vaste opdrachten = **6 vaardigheden × 3 moeilijkheidsgraden**, altijd exact dezelfde
+vragen, met `temperature 0` en `seed 42`, zodat verschillen door het model komen en niet
+door toeval.
 
 | # | Vaardigheid | Waar je het aan ziet als het misgaat |
 |---|---|---|
@@ -68,15 +71,113 @@ komen en niet door toeval.
 | 6 | Agentisch gedrag | verkeerde of verzonnen tool, geen herstel na een fout |
 
 De code-opdrachten worden **echt uitgevoerd** in een sandbox met time-out, en de
-zwaarste agent-opdracht is een echte tweetraps-loop waarin de eerste tool-aanroep
-faalt en het model zelf een alternatief moet kiezen.
+zwaarste agent-opdracht is een tweetraps-loop waarin de eerste tool-aanroep faalt en het
+model zelf een alternatief moet kiezen. Per model krijg je een totaalscore, een
+radarprofiel per vaardigheid, een "waar valt het om"-grafiek per moeilijkheidsgraad, en
+per gevonden faalpatroon een uitleg plus een concrete remedie.
 
-Aan het eind krijg je per model een totaalscore, een radarprofiel per vaardigheid,
-een "waar valt het om"-grafiek per moeilijkheidsgraad, en per gevonden faalpatroon
-een uitleg plus een concrete remedie. Alles wordt weggeschreven als één JSON-bestand
-per model in `resultaten-llm/`.
+Volledige details in [DOCUMENTATIE.md](DOCUMENTATIE.md).
 
-Volledige details staan in [DOCUMENTATIE.md](DOCUMENTATIE.md).
+### Test 03 — statistische modellen
+
+Acht modellen, met de hand geïmplementeerd, zonder enige bibliotheek: kleinste kwadraten
+met ridge, polynomiale regressie met LOOCV, CART, random forest met OOB-score,
+logistische regressie, k-NN, kernel-SVM via vereenvoudigde SMO, en k-means met
+k-means++ en silhouetscore. Vier echte datasets zitten in het bestand ingebakken.
+
+Je kunt er de klassieke lessen mee laten zien, en ze kloppen ook echt: schaling
+uitzetten bij logistische regressie laat de score van 89% naar 36% zakken — onder de
+basislijn; een beslisboom met diepte 8 haalt R² = 1,000 op de trainingsset terwijl de
+testset instort; en polynomiaal graad 8 gaat van LOOCV 0,36 naar 0,96 door ridge.
+
+## Test 04 — Adaptive Neural Graph (ANG)
+
+De nieuwste en eigenzinnigste test. Een brein dat **geen lagen** heeft maar een gerichte
+graaf is die zichzelf tijdens het leren herbouwt, en dat een klein 2D-spel speelt: een
+karakter moet een doel bereiken zonder tegen obstakels te botsen.
+
+![Het netwerk en de wereld](docs/ang-brein.png)
+
+**Invoer en uitvoer liggen vast.** Zestien invoer-nodes: acht raycast-sensoren voor de
+nabijheid van obstakels in acht windrichtingen, en acht die het doel als
+richting-met-nabijheid coderen. Vier uitvoer-nodes: omhoog, omlaag, links, rechts — elk
+een *kans* waaruit de actie geloot wordt.
+
+**De wolk ertussen bepaal je zelf.** Je kiest hoeveel neuronen er zijn en van welke
+soort, en elke soort heeft eigen regels over wat hij mag verbinden:
+
+| soort | ingang | uitgang |
+|---|---|---|
+| invoer-neuron | uitsluitend invoer-nodes | vrij |
+| worker | vrij | vrij — moet altijd de meerderheid zijn |
+| reflex / instinct | uitsluitend invoer-neuronen | uitsluitend uitvoer-nodes |
+| geheugen | vrij | altijd eerst zichzelf (lekkende integrator), daarna vrij |
+| neutraal | vrij | vrij — tijdelijk, tot het systeem een soort toewijst |
+
+De enige harde eis aan de bedrading is dat elke invoer-node ergens naartoe gaat en elke
+uitvoer-node ergens vandaan komt. Er is geen minimum of maximum aantal verbindingen per
+neuron.
+
+**Leren zonder backpropagation.** De graaf zit vol lussen en verandert bovendien van
+vorm, dus een vaste rekengrafiek bestaat niet. In plaats daarvan:
+
+```
+elke tik twee keer doorrekenen: één keer schoon, één keer met ruis
+    δ = x_ruis − x_schoon                       de duw die exploratie gaf
+    voor de vier knoppen exacter:  δ = geloten actie − kans
+spoor bijhouden per verbinding:
+    e ← λ·e + (1−λ)·x_pre·δ_post
+en bijstellen naar de afwijking van een lopende basislijn:
+    Δw = η · (r − r̄) · e
+```
+
+Drie remmen houden dat stabiel: de stap per keer is begrensd (*niet abrupt*), de
+aanpassing wordt gedempt naarmate een gewicht zijn plafond nadert (*niet oneindig
+versterken*), en alles zakt per poging een beetje terug naar nul (*vervagen*).
+
+**De structuur verandert mee.** Verbindingen die te lang te zwak zijn worden gesnoeid en
+er groeien nieuwe bij. Loopt het leren vast, dan komen er neuronen bij — die zijn
+*neutraal* en krijgen bij de volgende opruimronde de soort die het beste past bij de
+bedrading die ze inmiddels hebben. Een neuron dat al zijn verbindingen kwijtraakt wordt
+weer neutraal en kan opnieuw worden ingezet.
+
+**Wat je eraan afleest.** Naast de score: het kortste pad van zintuig naar knop, het
+aantal werkende reflexbogen, het aantal terugkoppellussen, hoeveel neuronen er
+werkelijk meedoen, en welke van de zestien sensoren het brein feitelijk negeert. Elke
+run wordt met alle instellingen én de volledige eindstructuur weggeschreven, zodat
+`brein-resultaten.html` het netwerk opnieuw kan tekenen zonder de training over te doen.
+
+Met de standaardinstellingen (60 neuronen, 500 pogingen, 7 obstakels) haalt zo'n brein
+ongeveer **85% van de doelen aan het eind van de training en 75% op twintig werelden die
+het nooit gezien heeft**, in ongeveer 20 seconden. Ter vergelijking: een zuiver
+reactieve agent die recht op het doel af loopt en langs obstakels glijdt, haalt op
+diezelfde werelden 57%.
+
+## Inhoud
+
+| Bestand | Wat het is |
+|---|---|
+| `index.html` | Hoofdmenu |
+| `nn-layer-test.html` | Test 01 — neuraal netwerk trainen in de browser |
+| `resultaten.html` | Runs van test 01 vergelijken |
+| `ollama-test.html` | Test 02 — testbatterij voor lokale LLM's via de Ollama-API |
+| `ollama-resultaten.html` | LLM's naast elkaar leggen + adviesformulier "welk model voor mijn taak" |
+| `stat-modellen-test.html` | Test 03 — acht klassieke modellen, alles met de hand geïmplementeerd |
+| `brein-test.html` | Test 04 — Adaptive Neural Graph |
+| `brein-resultaten.html` | Getrainde breinen vergelijken en hun netwerk opnieuw tekenen |
+| `start-server.cmd` | Start een lokale webserver op poort 8080 en opent het hoofdmenu |
+| `resultaten/` | Opgeslagen runs van test 01 (JSON) |
+| `resultaten-llm/` | Opgeslagen runs van test 02 (JSON, één bestand per model) |
+| `resultaten-brein/` | Opgeslagen runs van test 04 (JSON, één bestand per brein) |
+| `datasets/` | MNIST/EMNIST — **niet in git**, zie `datasets/README.md` |
+| `DOCUMENTATIE.md` | Volledige documentatie van test 01 en 02: opdrachten, scoring, faalpatronen, remedies en het logboek |
+
+## Resultaten opslaan
+
+De tests schrijven hun resultaten weg als JSON in de bijbehorende map. Dat gaat via de
+File System Access API: je kiest die map één keer met de knop "kies resultatenmap" en
+Chrome of Edge onthoudt hem daarna. Werkt dat niet, of gebruik je een andere browser,
+dan is er altijd de downloadknop en zet je het bestand er zelf neer.
 
 ## Privacy
 

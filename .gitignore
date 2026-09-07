@@ -35,3 +35,10 @@ desktop.ini
 node_modules/
 .venv/
 __pycache__/
+
+# ---------------------------------------------------------------------------
+# Papers en interne documenten (niet in de repo)
+# ---------------------------------------------------------------------------
+ANG-paper*.docx
+ANG-paper*.pdf
+~$*.docx

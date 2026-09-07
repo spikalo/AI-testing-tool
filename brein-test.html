@@ -235,12 +235,14 @@
           </div>
         </div>
 
+        <div class="checkline"><input type="checkbox" id="inputonlysens"> streng: invoer-nodes mogen <i>alleen</i> aan invoer-neuronen hangen</div>
+        <div class="hint">Uit (standaard) mogen worker- en geheugen-neuronen ook rechtstreeks aan een invoer-node hangen; het kortste pad is dan twee bogen en een reflexboog (drie bogen) is juist de langere weg. Aan loopt <b>élk</b> signaal via een invoer-neuron en is de reflexboog wél het kortste pad dat bestaat.</div>
         <div class="validate ok" id="typevalidate">…</div>
 
         <div class="field" style="margin-top:12px;">
-          <label>Startdichtheid verbindingen <span class="val" id="densval">25.0</span></label>
-          <input type="range" id="density" min="5" max="400" step="1" value="250">
-          <div class="hint">Gemiddeld aantal uitgaande verbindingen per neuron bij de start. <b>Dit is veruit de belangrijkste knop</b>: uitgemeten haalt een dun bedrade wolk (3–8) het doel nauwelijks vaker dan toeval, terwijl dezelfde wolk bij 25 boven de 70% uitkomt. Meer paden van zintuig naar knop betekent meer waar de beloning iets aan kan toeschrijven. Alle 16 invoer-nodes en alle 4 uitvoer-nodes worden hoe dan ook aangesloten — dat is de enige harde eis.</div>
+          <label>Startdichtheid verbindingen <span class="val" id="densval">35.0</span></label>
+          <input type="range" id="density" min="5" max="800" step="1" value="350">
+          <div class="hint">Gemiddeld aantal uitgaande verbindingen per neuron bij de start. <b>Dit is veruit de belangrijkste knop.</b> Uitgemeten met 60 neuronen: bij dichtheid 15 haalt het brein ongeveer 40% van de doelen, bij 25 zo'n 70%, en bij <b>35</b> ruim 80% — daarboven stijgt de trainingsscore nog wel, maar de score op onbekende werelden niet meer. Meer paden van zintuig naar knop betekent meer waar de beloning iets aan kan toeschrijven. Alle 16 invoer-nodes en alle 4 uitvoer-nodes worden hoe dan ook aangesloten — dat is de enige harde eis.</div>
         </div>
 
         <div class="field">
@@ -267,8 +269,8 @@
           <div class="hint">Hoe lang een verbinding "onthoudt" dat hij net actief was. Hoog = beloning wordt ver terug uitgesmeerd, maar ook over stappen die er niets mee te maken hadden.</div>
         </div>
         <div class="field">
-          <label>Vervaging per poging <span class="val" id="decval">0.0005</span></label>
-          <input type="range" id="dec" min="0" max="100" step="1" value="5">
+          <label>Vervaging per poging <span class="val" id="decval">0.0001</span></label>
+          <input type="range" id="dec" min="0" max="100" step="1" value="1">
           <div class="hint">Na elke poging zakt elk gewicht een klein beetje naar nul. Wat niets bijdraagt, <b>vervaagt vanzelf</b> en wordt uiteindelijk gesnoeid.</div>
         </div>
         <div class="field">
@@ -282,14 +284,14 @@
           <div class="hint"><b>Niet abrupt</b>: geen enkele verbinding mag in één stap meer dan dit verschuiven.</div>
         </div>
         <div class="field">
-          <label>Geheugenlek α <span class="val" id="memleakval">0.35</span></label>
-          <input type="range" id="memleak" min="1" max="100" step="1" value="35">
-          <div class="hint">Alleen voor geheugen-neuronen: hoe snel hun inhoud ververst. Laag = houdt lang vast.</div>
+          <label>Geheugenlek α <span class="val" id="memleakval">0.15</span></label>
+          <input type="range" id="memleak" min="1" max="100" step="1" value="15">
+          <div class="hint">Alleen voor geheugen-neuronen: hoe snel hun inhoud ververst. Laag = houdt lang vast, en dat werkt beter — bij <b>0.15</b> blijft ongeveer 85% van de vorige toestand staan.</div>
         </div>
         <div class="field">
-          <label>Propagatiestappen per tik <span class="val" id="propval">2</span></label>
-          <input type="range" id="prop" min="1" max="8" step="1" value="2">
-          <div class="hint">Hoe ver een signaal binnen één spelstap door de wolk reist. Bij <b>1</b> kost elke verbinding een tijdstap — reflexbogen zijn dan echt sneller dan lange omwegen.</div>
+          <label>Propagatiestappen per tik <span class="val" id="propval">1</span></label>
+          <input type="range" id="prop" min="1" max="8" step="1" value="1">
+          <div class="hint">Hoe ver een signaal binnen één spelstap door de wolk reist. Bij <b>1</b> kost elke verbinding een tijdstap, zodat een kort pad ook echt sneller reageert dan een lange omweg; dat blijkt ook het best te werken. Hoger maakt het brein sneller van begrip maar vlakt het verschil tussen kort en lang uit.</div>
         </div>
         <div class="field">
           <label>Exploratie start → eind <span class="val" id="noiseval">0.30 → 0.09</span></label>
@@ -363,7 +365,8 @@
           <button class="actionbtn" id="btnwatch">👁 kijk één poging</button>
         </div>
         <div class="checkline"><input type="checkbox" id="autosave" checked> automatisch opslaan zodra de training klaar is</div>
-        <div class="checkline"><input type="checkbox" id="evalon" checked> elke 20 pogingen toetsen op 10 <i>onbekende</i> werelden (zonder leren én zonder loting)</div>
+        <div class="checkline"><input type="checkbox" id="evalon" checked> elke 20 pogingen toetsen op 20 <i>onbekende</i> werelden (zonder leren)</div>
+        <div class="checkline"><input type="checkbox" id="evalstrict"> streng toetsen: altijd de waarschijnlijkste knop in plaats van het geleerde beleid</div>
       </div>
 
     </div>
@@ -391,7 +394,7 @@
           <span>neuronen <b id="n-neurons">0</b></span>
           <span>verbindingen <b id="n-conns">0</b></span>
           <span>gem. |w| <b id="n-meanw">0.00</b></span>
-          <span>sterk (&gt;50%) <b id="n-strong">0</b></span>
+          <span>sterk (&gt;50% van de zwaarste) <b id="n-strong">0</b></span>
           <span>gesnoeid <b id="n-pruned">0</b></span>
           <span>nieuw <b id="n-sprouted">0</b></span>
           <span>neuronen bij <b id="n-born">0</b></span>
@@ -477,8 +480,8 @@
 <div class="panel">
         <h2>Wereld &amp; spel</h2>
         <div class="field">
-          <label>Aantal obstakels <span class="val" id="nobsval">5</span></label>
-          <input type="range" id="nobs" min="0" max="26" step="1" value="5">
+          <label>Aantal obstakels <span class="val" id="nobsval">7</span></label>
+          <input type="range" id="nobs" min="0" max="26" step="1" value="7">
         </div>
         <div class="field">
           <label>Stappen per poging <span class="val" id="maxstepsval">320</span></label>
@@ -655,6 +658,9 @@ const KIND_NAME=["invoer-node","invoer-neuron","worker","reflex","geheugen","neu
 const KIND_COL=["#4fd1c5","#59c2ff","#8b7cf0","#ff6b57","#f78fb3","#7c8794","#ffb454"];
 const KIND_KEY=["in","sens","work","refl","mem","neut","out"];
 const TYPES=["sens","work","refl","mem"];
+/* Aan: invoer-nodes mogen uitsluitend aan invoer-neuronen hangen. Dan loopt élk
+   signaal via een invoer-neuron en is de reflexboog het kortste pad dat er is. */
+let INPUT_ONLY_SENS=false;
 const KIND_OF={sens:K_SENS,work:K_WORK,refl:K_REFL,mem:K_MEM};
 
 function rectHit(x,y,o,pad){ return x> o.x-pad && x< o.x+o.w+pad && y> o.y-pad && y< o.y+o.h+pad; }
@@ -779,7 +785,7 @@ function canConnect(kinds,a,b){
   if(kb===K_SENS) return ka===K_IN;
   if(kb===K_REFL) return ka===K_SENS;
   if(ka===K_REFL) return kb===K_OUT;
-  if(ka===K_IN)  return kb!==K_OUT;
+  if(ka===K_IN)  return INPUT_ONLY_SENS ? kb===K_SENS : kb!==K_OUT;
   return true;
 }
 function composeTypes(cfg,rnd){
@@ -818,6 +824,7 @@ const PREFIX={[K_SENS]:"S",[K_WORK]:"W",[K_REFL]:"R",[K_MEM]:"M",[K_NEUT]:"N"};
 function createBrain(cfg,seed){
   const rnd=mulberry32(seed*104729+7);
   const comp=composeTypes(cfg,rnd);
+  if(INPUT_ONLY_SENS && comp.sens===0) INPUT_ONLY_SENS=false;   // anders is er geen enkele legale invoerverbinding
   const kinds=[], labels=[];
   for(let i=0;i<8;i++){ kinds.push(K_IN); labels.push("obst "+DIRNAME[i]); }
   for(let i=0;i<8;i++){ kinds.push(K_IN); labels.push("doel "+DIRNAME[i]); }
@@ -895,9 +902,8 @@ function resetBrainState(B){
 }
 const hiddenNoiseOf = expl => 0.35*expl;
 const tempOf = expl => 0.40+2.0*expl;
-function propagate(B,inp,cfg,expl,state,rnd){
+function propagate(B,inp,cfg,hn,tp,state,rnd){
   const n=B.n, next=B.next, sum=B.sum;
-  const hn=hiddenNoiseOf(expl), tp=tempOf(expl);
   for(let i=0;i<N_IN;i++) state[i]=inp[i];
   for(let s=0;s<cfg.prop;s++){
     sum.fill(0);
@@ -918,17 +924,24 @@ function propagate(B,inp,cfg,expl,state,rnd){
    met ruis in de wolk. Het verschil is precies de duw die de exploratie gaf — en dat
    is het enige waar beloning aan toegeschreven mag worden. Voor de vier knoppen is
    het exacter: die worden echt geloot uit hun eigen kans, en dan is "wat ik deed min
-   wat ik gemiddeld zou doen" precies de goede maat. */
+   wat ik gemiddeld zou doen" precies de goede maat.
+   Bij een toets (expl = 0) bepaalt S.evalMode of de knoppen nog steeds geloot worden
+   — dat is het geleerde beleid zoals het is — of dat altijd de waarschijnlijkste knop
+   genomen wordt. */
 function brainStep(B,inp,cfg,expl,rnd){
   B.prev.set(B.act);
   const learn=expl>0;
-  if(learn){ B.clean.set(B.prev); propagate(B,inp,cfg,0,B.clean,rnd); }
-  propagate(B,inp,cfg,expl,B.act,rnd);
+  const hn=learn? hiddenNoiseOf(expl) : 0;
+  const tp=learn? tempOf(expl) : (S.evalTemp!==undefined? S.evalTemp : tempOf(0));
+  const sample=learn || S.evalSample;
+  const r=learn? rnd : (S.evalRnd||rnd);
+  if(learn){ B.clean.set(B.prev); propagate(B,inp,cfg,0,tp,B.clean,r); }
+  propagate(B,inp,cfg,hn,tp,B.act,r);
   B.dev.fill(0);
   if(learn) for(let j=HID0;j<B.n;j++) B.dev[j]=B.act[j]-B.clean[j];
   for(let j=OUT0;j<HID0;j++){
     const pr=B.act[j];
-    const a=learn ? (rnd()<pr?1:0) : (pr>0.5?1:0);
+    const a=sample ? (r()<pr?1:0) : (pr>0.5?1:0);
     B.press[j-OUT0]=a;
     B.dev[j]=a-pr;
   }
@@ -980,8 +993,12 @@ function typeCost(B,i,t){
   B.kinds[i]=old;
   return cost;
 }
+/* Hoe specifiek is een soort? Hoe strenger de regels, hoe hoger de bonus. Zonder deze
+   bonus wint "worker" altijd — omschakelen naar de soort die alles toestaat kost per
+   definitie niets, en dan verdwijnen de gespecialiseerde soorten vanzelf. */
+const SPEC={[K_REFL]:0.10,[K_SENS]:0.07,[K_MEM]:0.05,[K_WORK]:0};
 function typeAllowed(cfg,cnt,from,to){
-  if(from===to) return false;
+  if(from===to) return true;                       // blijven mag altijd
   const kf=KIND_KEY[from], kt=KIND_KEY[to];
   if(kt!=="neut"){
     if(!cfg.types[kt] || (kt!=="work" && !cfg.types[kt].on)) return false;
@@ -995,19 +1012,27 @@ function typeAllowed(cfg,cnt,from,to){
     -((kf==="sens"||kf==="refl"||kf==="mem")?1:0);
   return w>others;
 }
-/* Geef neuron i de soort die het al feitelijk is: de soort waarvan de regels het
-   minst gewicht kosten. Verboden verbindingen verdwijnen daarna. */
+/* Geef neuron i de meest specifieke soort waarvan de regels bij zijn eigen bedrading
+   passen. Blijven kost niets, dus een neuron wisselt alleen als een strengere soort
+   duidelijk beter past — met een marge, zodat er geen heen-en-weergeschuif ontstaat. */
 function retypeNeuron(B,cfg,i,cnt,rnd){
   const cands=[K_WORK,K_SENS,K_REFL,K_MEM];
-  let best=-1, bestCost=Infinity;
+  const cur=B.kinds[i];
+  const curScore = cur===K_NEUT ? Infinity : -SPEC[cur];
+  let best=-1, bestScore=Infinity, bestCost=0;
   for(const t of cands){
-    if(!typeAllowed(cfg,cnt,B.kinds[i],t)) continue;
-    const c=typeCost(B,i,t)+ (t===K_WORK?0:0.05);
-    if(c<bestCost){ bestCost=c; best=t; }
+    if(t===cur) continue;
+    if(!typeAllowed(cfg,cnt,cur,t)) continue;
+    const cost=typeCost(B,i,t);
+    const sc=cost-SPEC[t];
+    if(sc<bestScore){ bestScore=sc; bestCost=cost; best=t; }
   }
   if(best<0) return null;
-  const old=B.kinds[i];
-  if(old!==K_NEUT && bestCost>cfg.retypeCost) return null;   // alleen als het bijna gratis is
+  if(cur!==K_NEUT){
+    if(bestScore > curScore-0.02) return null;     // niet duidelijk beter
+    if(bestCost > cfg.retypeCost) return null;     // te veel gewicht kwijt
+  }
+  const old=cur;
   B.kinds[i]=best;
   B.labels[i]=PREFIX[best]+(++B.nextId);
   const kf=KIND_KEY[old], kt=KIND_KEY[best];
@@ -1028,12 +1053,12 @@ function retypeNeuron(B,cfg,i,cnt,rnd){
   B.pruned+=removed; B.retyped++;
   return best;
 }
-function addConn(B,a,b,w,have){
+function addConn(B,a,b,w,have,age){
   const key=a+"|"+b;
   if(have.has(key)) return false;
   if(!canConnect(B.kinds,a,b)) return false;
   have.add(key);
-  B.from.push(a);B.to.push(b);B.w.push(w);B.e.push(0);B.rms.push(0);B.weakAge.push(0);
+  B.from.push(a);B.to.push(b);B.w.push(w);B.e.push(0);B.rms.push(0);B.weakAge.push(age||0);
   return true;
 }
 function haveSet(B){ const h=new Set(); for(let c=0;c<B.from.length;c++) h.add(B.from[c]+"|"+B.to[c]); return h; }
@@ -1101,16 +1126,22 @@ function restructure(B,cfg,rnd,stagnating){
         B.kinds[i]=K_NEUT; B.labels[i]="N"+(++B.nextId);
         B.bias[i]=(rnd()-0.5)*0.1;
         if(B.lay){ B.lay.x[i]=LX*(0.35+rnd()*0.3); B.lay.y[i]=LY*(0.15+rnd()*0.7); }
+        /* Een nieuw neuron wordt geboren met ongeveer dezelfde graad als de rest van
+           de wolk. Met een handjevol verbindingen in een dicht netwerk doet het
+           namelijk nooit mee, en wordt het bij de eerstvolgende opruimronde weer
+           weggesnoeid voordat het zich kan bewijzen. */
+        const gem=Math.round(B.from.length/Math.max(1,B.n-HID0));
+        const wil=Math.max(cfg.newLinks, Math.min(gem, 4*cfg.newLinks));
         let made=0, guard=0;
-        while(made<cfg.newLinks && guard++<300){
+        while(made<wil && guard++<600){
           const other=HID0+Math.floor(rnd()*(B.n-HID0));
           if(other===i) continue;
-          if(rnd()<0.5){ if(addConn(B,other,i,(rnd()-0.5)*0.2,have)) made++; }
-          else { if(addConn(B,i,other,(rnd()-0.5)*0.2,have)) made++; }
+          if(rnd()<0.5){ if(addConn(B,other,i,(rnd()-0.5)*0.3,have,-2)) made++; }
+          else { if(addConn(B,i,other,(rnd()-0.5)*0.3,have,-2)) made++; }
         }
         /* altijd minstens één weg naar de uitvoer en één vanaf de invoer */
-        addConn(B,i,OUT0+Math.floor(rnd()*N_OUT),(rnd()-0.5)*0.2,have);
-        addConn(B,Math.floor(rnd()*N_IN),i,(rnd()-0.5)*0.2,have);
+        addConn(B,i,OUT0+Math.floor(rnd()*N_OUT),(rnd()-0.5)*0.3,have,-2);
+        addConn(B,Math.floor(rnd()*N_IN),i,(rnd()-0.5)*0.3,have,-2);
         grown++;
       }
       B.grown+=grown; B.born+=grown;
@@ -1152,12 +1183,16 @@ function restructure(B,cfg,rnd,stagnating){
 
 /* ---- structuuranalyse ---- */
 function analyze(B,cfg){
-  const n=B.n, thr=0.08*cfg.wmax;
+  const n=B.n;
+  /* Een verbinding telt mee als zij sterk is ten opzichte van de gewichten die er
+     werkelijk zijn, niet ten opzichte van het plafond dat zelden gehaald wordt. */
+  let wref=0; for(let c=0;c<B.nc;c++){ const a=Math.abs(B.cW[c]); if(a>wref) wref=a; }
+  const thr=Math.max(0.12*wref, 1e-4);
   const outAdj=Array.from({length:n},()=>[]);
   let sumW=0, strong=0, self=0;
   for(let c=0;c<B.nc;c++){
     const w=Math.abs(B.cW[c]); sumW+=w;
-    if(w>0.5*cfg.wmax) strong++;
+    if(w>0.5*wref) strong++;
     if(B.cFrom[c]===B.cTo[c]) { if(w>thr) self++; continue; }
     if(w>thr) outAdj[B.cFrom[c]].push(B.cTo[c]);
   }
@@ -1168,7 +1203,9 @@ function analyze(B,cfg){
   let head=0, shortest=-1;
   while(head<q.length){
     const cur=q[head++];
-    if(B.kinds[cur]===K_OUT){ shortest=dist[cur]; break; }
+    /* wél de kortste padlengte onthouden, maar NIET stoppen: de rest van deze
+       zoektocht bepaalt ook welke neuronen vanaf de invoer bereikbaar zijn. */
+    if(B.kinds[cur]===K_OUT && shortest<0) shortest=dist[cur];
     for(const nx of outAdj[cur]) if(dist[nx]<0){ dist[nx]=dist[cur]+1; q.push(nx); }
   }
   /* bereikbaar vanaf invoer, en bereikt de uitvoer */
@@ -1205,7 +1242,7 @@ function analyze(B,cfg){
       const nv=new Float32Array(n);
       for(let c=0;c<B.nc;c++){
         const f=B.cFrom[c]; if(val[f]<=1e-6) continue;
-        nv[B.cTo[c]]+=val[f]*Math.min(1,Math.abs(B.cW[c])/cfg.wmax);
+        nv[B.cTo[c]]+=val[f]*Math.min(1,Math.abs(B.cW[c])/wref);
       }
       for(let j=OUT0;j<HID0;j++){ score+=nv[j]; nv[j]=0; }
       val=nv;
@@ -1299,11 +1336,12 @@ function layoutBrain(B,iters,keep){
 
 /* ======================= configuratie uit de UI ======================= */
 function readCfg(){
+  INPUT_ONLY_SENS = $("inputonlysens") ? $("inputonlysens").checked : false;
   const t=(k)=>({on:$("en-"+k)? $("en-"+k).checked:true, min:+$("min-"+k).value, max:+$("max-"+k).value});
   return {
     nNeurons:+$("nneurons").value,
     types:{sens:t("sens"),work:t("work"),refl:t("refl"),mem:t("mem")},
-    density:+$("density").value/10,
+    density:+$("density").value/10, inputOnlySens:INPUT_ONLY_SENS,
     nObs:+$("nobs").value, maxSteps:+$("maxsteps").value, worldEvery:+$("worldevery").value,
     chSpeed:+$("chspeed").value/10, seed:+$("seed").value, stopOnCollide:$("botsstop").checked,
     lr:+$("lr").value/1000, lam:+$("elam").value/100, decay:+$("dec").value/10000,
@@ -1321,6 +1359,7 @@ function readCfg(){
   };
 }
 const SPEEDS=[1,2,4,8,20,60,"turbo"];
+const EVAL_WORLDS=20;
 
 /* ======================= toestand ======================= */
 const S={
@@ -1330,7 +1369,8 @@ const S={
   running:false, paused:false, watching:false, learn:true,
   hist:[], evalHist:[], rows:[], startTime:0, elapsed:0,
   succTotal:0, stepsSucc:[], rewards:[], collisions:0,
-  rnd:Math.random, phase:0, selected:-1, hover:-1,
+  rnd:Math.random, evalRnd:null, evalSample:false, evalTemp:undefined,
+  phase:0, selected:-1, hover:-1,
   lastRestructure:{pruned:0,sprouted:0,retyped:0,grown:0}, structLog:[],
   resultsDirHandle:null, lastResult:null, dirty:false
 };
@@ -1425,27 +1465,41 @@ function isStagnating(c){
 function meanAbsW(B){ let s=0; for(let c=0;c<B.nc;c++) s+=Math.abs(B.cW[c]); return B.nc? s/B.nc:0; }
 
 /* toets op onbekende werelden — zonder leren, zonder ruis */
-function runEval(){
+/* Toets op werelden die het brein nooit gezien heeft. Zonder leren, zonder ruis in
+   de wolk, en met een eigen toevalsgenerator zodat de toets de training niet
+   verstoort en zelf reproduceerbaar is. */
+function evalWorlds(nWorlds,mode){
   const c=S.cfg, B=S.B;
   const saveW=Float32Array.from(B.cW), saveE=Float32Array.from(B.cE), saveB=Float32Array.from(B.bias);
   const saveWorld=S.world, saveAg={x:S.ag.x,y:S.ag.y}, saveTrail=S.trail, saveStep=S.step,
-        savePrev=S.prevDist, saveR=S.epReward, saveCol=S.epCollisions, saveReach=S.reached;
-  let ok=0; const NEV=10;
-  for(let k=0;k<NEV;k++){
+        savePrev=S.prevDist, saveR=S.epReward, saveCol=S.epCollisions, saveReach=S.reached,
+        saveIdle=S.epIdle;
+  const wasSample=S.evalSample, wasTemp=S.evalTemp, wasRnd=S.evalRnd;
+  S.evalSample = (mode!=="streng");
+  S.evalTemp   = tempOf(noiseEnd(c.noise0));
+  S.evalRnd    = mulberry32(20260907);
+  let ok=0, steps=0;
+  for(let k=0;k<nWorlds;k++){
     S.world=makeWorld(900000+k*37, c.nObs);
     S.ag.x=S.world.start.x; S.ag.y=S.world.start.y; S.trail=[];
-    S.step=0; S.epReward=0; S.epCollisions=0; S.reached=false;
+    S.step=0; S.epReward=0; S.epCollisions=0; S.epIdle=0; S.reached=false;
     S.prevDist=Math.hypot(S.world.goal.x-S.ag.x,S.world.goal.y-S.ag.y);
     resetBrainState(S.B);
     let done=false;
     while(!done) done=gameTick(false,0);
-    if(S.reached) ok++;
+    if(S.reached){ ok++; steps+=S.step; }
   }
   B.cW.set(saveW); B.cE.set(saveE); B.bias.set(saveB);
-  S.world=saveWorld; S.ag=saveAg; S.trail=saveTrail; S.step=saveStep;
+  S.world=saveWorld; S.ag=saveAg; S.trail=saveTrail; S.step=saveStep; S.epIdle=saveIdle;
   S.prevDist=savePrev; S.epReward=saveR; S.epCollisions=saveCol; S.reached=saveReach;
+  S.evalSample=wasSample; S.evalTemp=wasTemp; S.evalRnd=wasRnd;
   resetBrainState(S.B);
-  S.evalHist.push({ep:S.ep,pct:ok/NEV});
+  return {pct:ok/nWorlds, gemStappen: ok? steps/ok : null};
+}
+function runEval(){
+  const mode=$("evalstrict")&&$("evalstrict").checked ? "streng" : "beleid";
+  const r=evalWorlds(EVAL_WORLDS,mode);
+  S.evalHist.push({ep:S.ep,pct:r.pct});
 }
 
 /* ======================= tekenen: wereld ======================= */
@@ -1722,8 +1776,9 @@ function updateStatus(){
     $("n-neurons").textContent=S.B.n-N_IN-N_OUT;
     $("n-conns").textContent=S.B.nc;
     $("n-meanw").textContent=fmt(meanAbsW(S.B),3);
-    let strong=0; const wm=S.cfg.wmax;
-    for(let c=0;c<S.B.nc;c++) if(Math.abs(S.B.cW[c])>0.5*wm) strong++;
+    let wref=0; for(let c=0;c<S.B.nc;c++){ const a=Math.abs(S.B.cW[c]); if(a>wref) wref=a; }
+    let strong=0;
+    for(let c=0;c<S.B.nc;c++) if(Math.abs(S.B.cW[c])>0.5*wref) strong++;
     $("n-strong").textContent=strong;
     $("n-pruned").textContent=S.B.pruned; $("n-sprouted").textContent=S.B.sprouted;
     $("n-born").textContent=S.B.born; $("n-retyped").textContent=S.B.retyped;
@@ -2069,7 +2124,7 @@ function initUI(){
   bindSlider("nep","nepval",v=>v);
   bindSlider("spd","spdval",v=>SPEEDS[v]==="turbo"?"turbo":SPEEDS[v]+"×");
 
-  ["en-sens","en-refl","en-mem"].forEach(id=>$(id).addEventListener("change",validateTypes));
+  ["en-sens","en-refl","en-mem","inputonlysens"].forEach(id=>$(id).addEventListener("change",validateTypes));
   ["min-sens","max-sens","min-work","max-work","min-refl","max-refl","min-mem","max-mem"]
     .forEach(id=>$(id).addEventListener("input",validateTypes));
 
@@ -2137,15 +2192,15 @@ function initUI(){
 }
 function applyPreset(){
   const set=(id,v)=>{ $(id).value=v; $(id).dispatchEvent(new Event("input")); };
-  set("nneurons",60); set("density",250); set("nobs",5); set("maxsteps",320); set("worldevery",5);
-  set("chspeed",11); set("lr",8); set("elam",60); set("dec",5); set("wmax",20); set("stepmax",100);
-  set("memleak",35); set("prop",2); set("noise",30); set("structevery",10); set("prune",30); set("sprout",6);
+  set("nneurons",60); set("density",350); set("nobs",7); set("maxsteps",320); set("worldevery",5);
+  set("chspeed",11); set("lr",8); set("elam",60); set("dec",1); set("wmax",20); set("stepmax",100);
+  set("memleak",15); set("prop",1); set("noise",30); set("structevery",10); set("prune",30); set("sprout",6);
   set("rgoal",100); set("rprog",100); set("rcol",30); set("rstep",10); set("ridle",150); set("nep",500); set("spd",2);
   set("growmax",140); set("grown",2); set("newlinks",4); set("retypen",3); set("retypecost",25);
   $("grow").checked=true; $("growstag").checked=true; $("retype").checked=true; $("structplast").checked=true;
   $("min-sens").value=4; $("max-sens").value=14; $("min-work").value=12; $("max-work").value=400;
   $("min-refl").value=2; $("max-refl").value=10; $("min-mem").value=2; $("max-mem").value=10;
-  $("en-sens").checked=true; $("en-refl").checked=true; $("en-mem").checked=true;
+  $("en-sens").checked=true; $("en-refl").checked=true; $("en-mem").checked=true; $("inputonlysens").checked=false;
   validateTypes();
 }
 async function restoreDir(){
@@ -2180,7 +2235,7 @@ function runHeadless(nEp,brainSeed,evalOn){
   return {succ:S.succTotal, succ20:S.hist[S.hist.length-1].succ20, evals:S.evalHist.map(e=>e.pct),
     hist:S.hist.map(h=>({ok:h.ok,reward:h.reward,steps:h.steps,idle:h.idle,maxW:h.maxW,meanW:h.meanW}))};
 }
-window.__brain={S,createBrain,analyze,makeWorld,readCfg,startTraining,stopTraining,runHeadless,genBrain,
+window.__brain={S,createBrain,analyze,makeWorld,readCfg,startTraining,stopTraining,runHeadless,genBrain,evalWorlds,
   canConnect,countKinds,restructure,K:{K_IN,K_SENS,K_WORK,K_REFL,K_MEM,K_NEUT,K_OUT,HID0,OUT0}};
 </script>
 </body>
