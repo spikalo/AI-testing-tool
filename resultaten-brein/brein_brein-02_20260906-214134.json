@@ -1,0 +1,11152 @@
+{
+  "tijdstip": "2026-09-06T19:41:34.033Z",
+  "spel": "doel bereiken (2D)",
+  "brein": "brein-02",
+  "config": {
+    "startNeuronen": 100,
+    "samenstelling": {
+      "sens": 13,
+      "work": 77,
+      "refl": 6,
+      "mem": 10,
+      "neut": 2
+    },
+    "samenstellingStart": {
+      "sens": 6,
+      "work": 47,
+      "refl": 2,
+      "mem": 5,
+      "neut": 0
+    },
+    "neuronenNu": 108,
+    "types": {
+      "sens": {
+        "aan": true,
+        "min": 8,
+        "max": 14
+      },
+      "work": {
+        "aan": true,
+        "min": 12,
+        "max": 400
+      },
+      "refl": {
+        "aan": true,
+        "min": 8,
+        "max": 10
+      },
+      "mem": {
+        "aan": true,
+        "min": 8,
+        "max": 10
+      }
+    },
+    "startdichtheid": 25,
+    "wereld": {
+      "obstakels": 5,
+      "stappenPerPoging": 1000,
+      "nieuweWereldElke": 2,
+      "seed": 1,
+      "snelheidKarakter": 1,
+      "stoptNaBotsing": false
+    },
+    "leren": {
+      "leersnelheid": 0.008,
+      "sporenVervaging": 0.5,
+      "vervagingPerPoging": 0.0002,
+      "maxGewicht": 2,
+      "maxVeranderingPerStap": 0.051,
+      "geheugenlek": 0.35,
+      "propagatiestappen": 2,
+      "exploratieStart": 0.3,
+      "exploratieEind": 0.09,
+      "leersnelheidMeeschalen": true
+    },
+    "structureel": {
+      "aan": true,
+      "herstructureerElke": 10,
+      "snoeidrempel": 0.03,
+      "nieuweVerbindingenPerRonde": 6,
+      "groeiAan": true,
+      "alleenBijStagnatie": true,
+      "maxNeuronen": 140,
+      "nieuweNeuronenPerRonde": 2,
+      "startverbindingenNieuwNeuron": 4,
+      "typeVeranderingAan": true,
+      "typeVeranderingenPerRonde": 3,
+      "maxOmschakelkosten": 0.25
+    },
+    "beloningen": {
+      "doel": 40,
+      "vooruitgang": 0.6,
+      "botsing": -0.5,
+      "perStap": -0.005,
+      "stilstaan": -0.15
+    },
+    "training": {
+      "pogingen": 1000,
+      "toetsenAan": true
+    }
+  },
+  "resultaat": {
+    "pogingen": 158,
+    "succes": 130,
+    "succesPct": 0.8227848101265823,
+    "succes20": 0.85,
+    "toetsPct": 0.2,
+    "gemStappenBijSucces": 434.6384615384615,
+    "gemBeloningLaatste20": 10.388592947607203,
+    "besteBeloning": 97.08029419961991,
+    "botsingenPerPoging": 52.734177215189874,
+    "rekentijdMs": 489158
+  },
+  "structuur": {
+    "verbindingen": 1611,
+    "actieveVerbindingen": 83,
+    "gemAbsW": 0.09003014197199612,
+    "sterkeVerbindingen": 0,
+    "kortstePad": 2,
+    "reflexbogen": 0,
+    "lussen": 10,
+    "meedoendeNeuronen": 1,
+    "losgeraakt": 107,
+    "gesnoeid": 832,
+    "bijgegroeid": 276,
+    "nieuweNeuronen": 48,
+    "typeVeranderingen": 138,
+    "neutraalNu": 2,
+    "verbindingenPerTypepaar": {
+      "in→mem": 1,
+      "sens→out": 3,
+      "work→out": 35,
+      "work→work": 1,
+      "sens→mem": 1,
+      "sens→work": 1,
+      "work→mem": 18,
+      "mem→out": 12,
+      "mem→mem": 11
+    },
+    "sensorGebruik": [
+      0.3066061695571989,
+      0.29835091484710574,
+      0.42966801673173904,
+      0.24551725760102272,
+      0.2611062042415142,
+      0.2685564630664885,
+      0.4084072979167104,
+      0.15376213262788951,
+      0.47690150793641806,
+      0.5079506523907185,
+      0.337557015940547,
+      0.524935120716691,
+      0.5621086675673723,
+      0.4249395849183202,
+      0.4283101372420788,
+      0.5306610660627484
+    ],
+    "hubs": [
+      {
+        "neuron": "M59",
+        "type": "geheugen",
+        "massa": 6.812685966491699
+      },
+      {
+        "neuron": "M61",
+        "type": "geheugen",
+        "massa": 6.318559169769287
+      },
+      {
+        "neuron": "M62",
+        "type": "geheugen",
+        "massa": 5.671820163726807
+      },
+      {
+        "neuron": "W47",
+        "type": "worker",
+        "massa": 5.535455703735352
+      },
+      {
+        "neuron": "M58",
+        "type": "geheugen",
+        "massa": 5.343638896942139
+      }
+    ]
+  },
+  "historie": [
+    {
+      "poging": 0,
+      "ok": false,
+      "beloning": -185.81003877013916,
+      "stappen": 1000,
+      "stilstaan": 0.24,
+      "verbindingen": 1683,
+      "neuronen": 90,
+      "gemW": 0.10477909541689413,
+      "succes20": 0
+    },
+    {
+      "poging": 1,
+      "ok": true,
+      "beloning": 30.7985660234384,
+      "stappen": 475,
+      "stilstaan": 0.21894736842105264,
+      "verbindingen": 1683,
+      "neuronen": 90,
+      "gemW": 0.10465233445466915,
+      "succes20": 0.5
+    },
+    {
+      "poging": 2,
+      "ok": false,
+      "beloning": -36.75292130372058,
+      "stappen": 1000,
+      "stilstaan": 0.246,
+      "verbindingen": 1683,
+      "neuronen": 90,
+      "gemW": 0.10439106928696773,
+      "succes20": 0.3333333333333333
+    },
+    {
+      "poging": 3,
+      "ok": true,
+      "beloning": 21.946955259054697,
+      "stappen": 691,
+      "stilstaan": 0.24167872648335745,
+      "verbindingen": 1683,
+      "neuronen": 90,
+      "gemW": 0.10416049201266128,
+      "succes20": 0.5
+    },
+    {
+      "poging": 4,
+      "ok": true,
+      "beloning": 83.1511817275578,
+      "stappen": 345,
+      "stilstaan": 0.21739130434782608,
+      "verbindingen": 1683,
+      "neuronen": 90,
+      "gemW": 0.10407381876777422,
+      "succes20": 0.6
+    },
+    {
+      "poging": 5,
+      "ok": true,
+      "beloning": 97.08029419961991,
+      "stappen": 262,
+      "stilstaan": 0.17557251908396945,
+      "verbindingen": 1683,
+      "neuronen": 90,
+      "gemW": 0.10396497113454757,
+      "succes20": 0.6666666666666666
+    },
+    {
+      "poging": 6,
+      "ok": true,
+      "beloning": 30.207651717675876,
+      "stappen": 620,
+      "stilstaan": 0.2161290322580645,
+      "verbindingen": 1683,
+      "neuronen": 90,
+      "gemW": 0.103668455770702,
+      "succes20": 0.7142857142857143
+    },
+    {
+      "poging": 7,
+      "ok": true,
+      "beloning": 72.29806326509042,
+      "stappen": 445,
+      "stilstaan": 0.2202247191011236,
+      "verbindingen": 1683,
+      "neuronen": 90,
+      "gemW": 0.1034982741272367,
+      "succes20": 0.75
+    },
+    {
+      "poging": 8,
+      "ok": true,
+      "beloning": 59.31457187068083,
+      "stappen": 458,
+      "stilstaan": 0.21179039301310043,
+      "verbindingen": 1683,
+      "neuronen": 90,
+      "gemW": 0.10336945557273615,
+      "succes20": 0.7777777777777778
+    },
+    {
+      "poging": 9,
+      "ok": true,
+      "beloning": 79.24367530482155,
+      "stappen": 341,
+      "stilstaan": 0.22580645161290322,
+      "verbindingen": 1683,
+      "neuronen": 90,
+      "gemW": 0.10327994076372761,
+      "succes20": 0.8
+    },
+    {
+      "poging": 10,
+      "ok": false,
+      "beloning": -43.35402222243043,
+      "stappen": 1000,
+      "stilstaan": 0.259,
+      "verbindingen": 1685,
+      "neuronen": 90,
+      "gemW": 0.1031933335176906,
+      "succes20": 0.7272727272727273
+    },
+    {
+      "poging": 11,
+      "ok": true,
+      "beloning": 59.444479781205686,
+      "stappen": 611,
+      "stilstaan": 0.24549918166939444,
+      "verbindingen": 1685,
+      "neuronen": 90,
+      "gemW": 0.10318979728968333,
+      "succes20": 0.75
+    },
+    {
+      "poging": 12,
+      "ok": true,
+      "beloning": 71.73982147305706,
+      "stappen": 478,
+      "stilstaan": 0.22594142259414227,
+      "verbindingen": 1685,
+      "neuronen": 90,
+      "gemW": 0.1031856998347488,
+      "succes20": 0.7692307692307693
+    },
+    {
+      "poging": 13,
+      "ok": true,
+      "beloning": 71.54242086694899,
+      "stappen": 375,
+      "stilstaan": 0.208,
+      "verbindingen": 1685,
+      "neuronen": 90,
+      "gemW": 0.10311100878732041,
+      "succes20": 0.7857142857142857
+    },
+    {
+      "poging": 14,
+      "ok": true,
+      "beloning": 72.63119993230738,
+      "stappen": 361,
+      "stilstaan": 0.19390581717451524,
+      "verbindingen": 1685,
+      "neuronen": 90,
+      "gemW": 0.10302163938720896,
+      "succes20": 0.8
+    },
+    {
+      "poging": 15,
+      "ok": true,
+      "beloning": 92.5840405307734,
+      "stappen": 240,
+      "stilstaan": 0.24166666666666667,
+      "verbindingen": 1685,
+      "neuronen": 90,
+      "gemW": 0.10296103340647535,
+      "succes20": 0.8125
+    },
+    {
+      "poging": 16,
+      "ok": false,
+      "beloning": -85.25309278472263,
+      "stappen": 1000,
+      "stilstaan": 0.251,
+      "verbindingen": 1685,
+      "neuronen": 90,
+      "gemW": 0.10275958159042713,
+      "succes20": 0.7647058823529411
+    },
+    {
+      "poging": 17,
+      "ok": false,
+      "beloning": -125.63558702700068,
+      "stappen": 1000,
+      "stilstaan": 0.246,
+      "verbindingen": 1685,
+      "neuronen": 90,
+      "gemW": 0.10247969410967052,
+      "succes20": 0.7222222222222222
+    },
+    {
+      "poging": 18,
+      "ok": false,
+      "beloning": -54.71589363003626,
+      "stappen": 1000,
+      "stilstaan": 0.231,
+      "verbindingen": 1685,
+      "neuronen": 90,
+      "gemW": 0.10211226387612331,
+      "succes20": 0.6842105263157895
+    },
+    {
+      "poging": 19,
+      "ok": true,
+      "beloning": 83.04572858458431,
+      "stappen": 239,
+      "stilstaan": 0.19246861924686193,
+      "verbindingen": 1685,
+      "neuronen": 90,
+      "gemW": 0.10215360189958003,
+      "succes20": 0.7
+    },
+    {
+      "poging": 20,
+      "ok": true,
+      "beloning": 83.40885865602583,
+      "stappen": 297,
+      "stilstaan": 0.2222222222222222,
+      "verbindingen": 1678,
+      "neuronen": 92,
+      "gemW": 0.10259014843500755,
+      "succes20": 0.75
+    },
+    {
+      "poging": 21,
+      "ok": true,
+      "beloning": 88.97843240711111,
+      "stappen": 273,
+      "stilstaan": 0.17582417582417584,
+      "verbindingen": 1678,
+      "neuronen": 92,
+      "gemW": 0.10253405901997464,
+      "succes20": 0.75
+    },
+    {
+      "poging": 22,
+      "ok": false,
+      "beloning": -153.85724878681623,
+      "stappen": 1000,
+      "stilstaan": 0.239,
+      "verbindingen": 1678,
+      "neuronen": 92,
+      "gemW": 0.10205115544131299,
+      "succes20": 0.75
+    },
+    {
+      "poging": 23,
+      "ok": false,
+      "beloning": -161.17898194313278,
+      "stappen": 1000,
+      "stilstaan": 0.26,
+      "verbindingen": 1678,
+      "neuronen": 92,
+      "gemW": 0.10161254649062744,
+      "succes20": 0.7
+    },
+    {
+      "poging": 24,
+      "ok": true,
+      "beloning": 76.77843245126232,
+      "stappen": 502,
+      "stilstaan": 0.24900398406374502,
+      "verbindingen": 1678,
+      "neuronen": 92,
+      "gemW": 0.10164160788721373,
+      "succes20": 0.7
+    },
+    {
+      "poging": 25,
+      "ok": true,
+      "beloning": 84.58054636622921,
+      "stappen": 278,
+      "stilstaan": 0.17985611510791366,
+      "verbindingen": 1678,
+      "neuronen": 92,
+      "gemW": 0.10159134563292833,
+      "succes20": 0.7
+    },
+    {
+      "poging": 26,
+      "ok": true,
+      "beloning": 67.96956793536765,
+      "stappen": 343,
+      "stilstaan": 0.2478134110787172,
+      "verbindingen": 1678,
+      "neuronen": 92,
+      "gemW": 0.1014893662303251,
+      "succes20": 0.7
+    },
+    {
+      "poging": 27,
+      "ok": true,
+      "beloning": 76.1304691093515,
+      "stappen": 260,
+      "stilstaan": 0.21153846153846154,
+      "verbindingen": 1678,
+      "neuronen": 92,
+      "gemW": 0.10138827569713911,
+      "succes20": 0.7
+    },
+    {
+      "poging": 28,
+      "ok": true,
+      "beloning": 83.27591692881386,
+      "stappen": 321,
+      "stilstaan": 0.21806853582554517,
+      "verbindingen": 1678,
+      "neuronen": 92,
+      "gemW": 0.10136122411811842,
+      "succes20": 0.7
+    },
+    {
+      "poging": 29,
+      "ok": true,
+      "beloning": 78.567156432636,
+      "stappen": 365,
+      "stilstaan": 0.23013698630136986,
+      "verbindingen": 1678,
+      "neuronen": 92,
+      "gemW": 0.10132727980615373,
+      "succes20": 0.7
+    },
+    {
+      "poging": 30,
+      "ok": true,
+      "beloning": 57.555017247127914,
+      "stappen": 463,
+      "stilstaan": 0.2159827213822894,
+      "verbindingen": 1672,
+      "neuronen": 92,
+      "gemW": 0.10149352639086937,
+      "succes20": 0.75
+    },
+    {
+      "poging": 31,
+      "ok": true,
+      "beloning": 59.12499304700396,
+      "stappen": 465,
+      "stilstaan": 0.21935483870967742,
+      "verbindingen": 1672,
+      "neuronen": 92,
+      "gemW": 0.10134987255854144,
+      "succes20": 0.75
+    },
+    {
+      "poging": 32,
+      "ok": false,
+      "beloning": -5.270067388286609,
+      "stappen": 1000,
+      "stilstaan": 0.236,
+      "verbindingen": 1672,
+      "neuronen": 92,
+      "gemW": 0.10121104226970676,
+      "succes20": 0.7
+    },
+    {
+      "poging": 33,
+      "ok": true,
+      "beloning": 59.778244617588456,
+      "stappen": 599,
+      "stilstaan": 0.24874791318864775,
+      "verbindingen": 1672,
+      "neuronen": 92,
+      "gemW": 0.10097404614031877,
+      "succes20": 0.7
+    },
+    {
+      "poging": 34,
+      "ok": false,
+      "beloning": -156.47824246495207,
+      "stappen": 1000,
+      "stilstaan": 0.227,
+      "verbindingen": 1672,
+      "neuronen": 92,
+      "gemW": 0.10059352241496614,
+      "succes20": 0.65
+    },
+    {
+      "poging": 35,
+      "ok": true,
+      "beloning": 6.240878908907689,
+      "stappen": 569,
+      "stilstaan": 0.22319859402460457,
+      "verbindingen": 1672,
+      "neuronen": 92,
+      "gemW": 0.10044457481906116,
+      "succes20": 0.65
+    },
+    {
+      "poging": 36,
+      "ok": true,
+      "beloning": 75.33791327361448,
+      "stappen": 285,
+      "stilstaan": 0.22105263157894736,
+      "verbindingen": 1672,
+      "neuronen": 92,
+      "gemW": 0.10048810704864682,
+      "succes20": 0.7
+    },
+    {
+      "poging": 37,
+      "ok": true,
+      "beloning": 80.2975535324464,
+      "stappen": 233,
+      "stilstaan": 0.1888412017167382,
+      "verbindingen": 1672,
+      "neuronen": 92,
+      "gemW": 0.1005143403181746,
+      "succes20": 0.75
+    },
+    {
+      "poging": 38,
+      "ok": true,
+      "beloning": 60.339512862968334,
+      "stappen": 456,
+      "stilstaan": 0.23684210526315788,
+      "verbindingen": 1672,
+      "neuronen": 92,
+      "gemW": 0.10046282694028895,
+      "succes20": 0.8
+    },
+    {
+      "poging": 39,
+      "ok": true,
+      "beloning": 56.52446804261135,
+      "stappen": 342,
+      "stilstaan": 0.2134502923976608,
+      "verbindingen": 1672,
+      "neuronen": 92,
+      "gemW": 0.10033062837607702,
+      "succes20": 0.8
+    },
+    {
+      "poging": 40,
+      "ok": false,
+      "beloning": -59.20409748858136,
+      "stappen": 1000,
+      "stilstaan": 0.235,
+      "verbindingen": 1668,
+      "neuronen": 94,
+      "gemW": 0.10023589561259535,
+      "succes20": 0.75
+    },
+    {
+      "poging": 41,
+      "ok": true,
+      "beloning": 10.756754633423498,
+      "stappen": 762,
+      "stilstaan": 0.24015748031496062,
+      "verbindingen": 1668,
+      "neuronen": 94,
+      "gemW": 0.09996808682546317,
+      "succes20": 0.75
+    },
+    {
+      "poging": 42,
+      "ok": true,
+      "beloning": -57.4549247645842,
+      "stappen": 840,
+      "stilstaan": 0.20833333333333334,
+      "verbindingen": 1668,
+      "neuronen": 94,
+      "gemW": 0.09971952060140793,
+      "succes20": 0.8
+    },
+    {
+      "poging": 43,
+      "ok": true,
+      "beloning": 56.81731966095398,
+      "stappen": 377,
+      "stilstaan": 0.27055702917771884,
+      "verbindingen": 1668,
+      "neuronen": 94,
+      "gemW": 0.0995835484499229,
+      "succes20": 0.85
+    },
+    {
+      "poging": 44,
+      "ok": true,
+      "beloning": 68.35663058755182,
+      "stappen": 235,
+      "stilstaan": 0.19148936170212766,
+      "verbindingen": 1668,
+      "neuronen": 94,
+      "gemW": 0.09945869490824477,
+      "succes20": 0.85
+    },
+    {
+      "poging": 45,
+      "ok": true,
+      "beloning": 73.24310745748306,
+      "stappen": 208,
+      "stilstaan": 0.23076923076923078,
+      "verbindingen": 1668,
+      "neuronen": 94,
+      "gemW": 0.0993406797050274,
+      "succes20": 0.85
+    },
+    {
+      "poging": 46,
+      "ok": false,
+      "beloning": -30.333014706690864,
+      "stappen": 1000,
+      "stilstaan": 0.262,
+      "verbindingen": 1668,
+      "neuronen": 94,
+      "gemW": 0.09916120611200427,
+      "succes20": 0.8
+    },
+    {
+      "poging": 47,
+      "ok": true,
+      "beloning": 73.63583178405695,
+      "stappen": 423,
+      "stilstaan": 0.2198581560283688,
+      "verbindingen": 1668,
+      "neuronen": 94,
+      "gemW": 0.09910978962166449,
+      "succes20": 0.8
+    },
+    {
+      "poging": 48,
+      "ok": true,
+      "beloning": 50.891533147457444,
+      "stappen": 676,
+      "stilstaan": 0.2529585798816568,
+      "verbindingen": 1668,
+      "neuronen": 94,
+      "gemW": 0.0989756103049756,
+      "succes20": 0.8
+    },
+    {
+      "poging": 49,
+      "ok": true,
+      "beloning": 62.19846882274276,
+      "stappen": 402,
+      "stilstaan": 0.23134328358208955,
+      "verbindingen": 1668,
+      "neuronen": 94,
+      "gemW": 0.0988563779357383,
+      "succes20": 0.8
+    },
+    {
+      "poging": 50,
+      "ok": true,
+      "beloning": 83.38534124339435,
+      "stappen": 170,
+      "stilstaan": 0.23529411764705882,
+      "verbindingen": 1671,
+      "neuronen": 96,
+      "gemW": 0.098775670730622,
+      "succes20": 0.8
+    },
+    {
+      "poging": 51,
+      "ok": true,
+      "beloning": 82.13819869982063,
+      "stappen": 221,
+      "stilstaan": 0.23076923076923078,
+      "verbindingen": 1671,
+      "neuronen": 96,
+      "gemW": 0.09867955980204349,
+      "succes20": 0.8
+    },
+    {
+      "poging": 52,
+      "ok": true,
+      "beloning": 69.32100230301931,
+      "stappen": 322,
+      "stilstaan": 0.2701863354037267,
+      "verbindingen": 1671,
+      "neuronen": 96,
+      "gemW": 0.09855288280546722,
+      "succes20": 0.85
+    },
+    {
+      "poging": 53,
+      "ok": true,
+      "beloning": 46.26465631535796,
+      "stappen": 414,
+      "stilstaan": 0.20772946859903382,
+      "verbindingen": 1671,
+      "neuronen": 96,
+      "gemW": 0.09839910450589329,
+      "succes20": 0.85
+    },
+    {
+      "poging": 54,
+      "ok": true,
+      "beloning": 81.34233242114139,
+      "stappen": 169,
+      "stilstaan": 0.22485207100591717,
+      "verbindingen": 1671,
+      "neuronen": 96,
+      "gemW": 0.09830923968904336,
+      "succes20": 0.9
+    },
+    {
+      "poging": 55,
+      "ok": true,
+      "beloning": 78.26610718153583,
+      "stappen": 183,
+      "stilstaan": 0.1912568306010929,
+      "verbindingen": 1671,
+      "neuronen": 96,
+      "gemW": 0.09828466687228571,
+      "succes20": 0.9
+    },
+    {
+      "poging": 56,
+      "ok": true,
+      "beloning": 37.954100433053505,
+      "stappen": 537,
+      "stilstaan": 0.2122905027932961,
+      "verbindingen": 1671,
+      "neuronen": 96,
+      "gemW": 0.09811907734325209,
+      "succes20": 0.9
+    },
+    {
+      "poging": 57,
+      "ok": true,
+      "beloning": 61.16861246000867,
+      "stappen": 403,
+      "stilstaan": 0.22084367245657568,
+      "verbindingen": 1671,
+      "neuronen": 96,
+      "gemW": 0.09805035099262045,
+      "succes20": 0.9
+    },
+    {
+      "poging": 58,
+      "ok": true,
+      "beloning": 84.74304620052293,
+      "stappen": 236,
+      "stilstaan": 0.2033898305084746,
+      "verbindingen": 1671,
+      "neuronen": 96,
+      "gemW": 0.09796600251036118,
+      "succes20": 0.9
+    },
+    {
+      "poging": 59,
+      "ok": true,
+      "beloning": 79.84580762092106,
+      "stappen": 215,
+      "stilstaan": 0.18604651162790697,
+      "verbindingen": 1671,
+      "neuronen": 96,
+      "gemW": 0.09783119651175314,
+      "succes20": 0.9
+    },
+    {
+      "poging": 60,
+      "ok": true,
+      "beloning": 84.63343275049846,
+      "stappen": 159,
+      "stilstaan": 0.15723270440251572,
+      "verbindingen": 1653,
+      "neuronen": 96,
+      "gemW": 0.09869259817855905,
+      "succes20": 0.95
+    },
+    {
+      "poging": 61,
+      "ok": true,
+      "beloning": 80.87701025655872,
+      "stappen": 142,
+      "stilstaan": 0.16901408450704225,
+      "verbindingen": 1653,
+      "neuronen": 96,
+      "gemW": 0.09866077363103994,
+      "succes20": 0.95
+    },
+    {
+      "poging": 62,
+      "ok": true,
+      "beloning": 69.71408348429543,
+      "stappen": 321,
+      "stilstaan": 0.18691588785046728,
+      "verbindingen": 1653,
+      "neuronen": 96,
+      "gemW": 0.09854509990960382,
+      "succes20": 0.95
+    },
+    {
+      "poging": 63,
+      "ok": true,
+      "beloning": 73.76406927129582,
+      "stappen": 277,
+      "stilstaan": 0.20577617328519857,
+      "verbindingen": 1653,
+      "neuronen": 96,
+      "gemW": 0.09846056996318199,
+      "succes20": 0.95
+    },
+    {
+      "poging": 64,
+      "ok": false,
+      "beloning": -54.07931679383399,
+      "stappen": 1000,
+      "stilstaan": 0.243,
+      "verbindingen": 1653,
+      "neuronen": 96,
+      "gemW": 0.0984662149292493,
+      "succes20": 0.9
+    },
+    {
+      "poging": 65,
+      "ok": true,
+      "beloning": 26.11667478930032,
+      "stappen": 563,
+      "stilstaan": 0.23268206039076378,
+      "verbindingen": 1653,
+      "neuronen": 96,
+      "gemW": 0.09848872099296543,
+      "succes20": 0.9
+    },
+    {
+      "poging": 66,
+      "ok": true,
+      "beloning": 46.986840905088805,
+      "stappen": 420,
+      "stilstaan": 0.20952380952380953,
+      "verbindingen": 1653,
+      "neuronen": 96,
+      "gemW": 0.09839698160489761,
+      "succes20": 0.95
+    },
+    {
+      "poging": 67,
+      "ok": true,
+      "beloning": 50.98080418297076,
+      "stappen": 428,
+      "stilstaan": 0.2219626168224299,
+      "verbindingen": 1653,
+      "neuronen": 96,
+      "gemW": 0.09835655876949877,
+      "succes20": 0.95
+    },
+    {
+      "poging": 68,
+      "ok": true,
+      "beloning": 24.874867236308113,
+      "stappen": 450,
+      "stilstaan": 0.23333333333333334,
+      "verbindingen": 1653,
+      "neuronen": 96,
+      "gemW": 0.09822418558062265,
+      "succes20": 0.95
+    },
+    {
+      "poging": 69,
+      "ok": true,
+      "beloning": 37.92939532905615,
+      "stappen": 411,
+      "stilstaan": 0.2725060827250608,
+      "verbindingen": 1653,
+      "neuronen": 96,
+      "gemW": 0.0980837347017945,
+      "succes20": 0.95
+    },
+    {
+      "poging": 70,
+      "ok": true,
+      "beloning": 56.80488322563974,
+      "stappen": 362,
+      "stilstaan": 0.26519337016574585,
+      "verbindingen": 1651,
+      "neuronen": 98,
+      "gemW": 0.09823335991950388,
+      "succes20": 0.95
+    },
+    {
+      "poging": 71,
+      "ok": true,
+      "beloning": 65.02907228589373,
+      "stappen": 307,
+      "stilstaan": 0.2280130293159609,
+      "verbindingen": 1651,
+      "neuronen": 98,
+      "gemW": 0.09808504646837199,
+      "succes20": 0.95
+    },
+    {
+      "poging": 72,
+      "ok": true,
+      "beloning": 77.02784374254303,
+      "stappen": 248,
+      "stilstaan": 0.1814516129032258,
+      "verbindingen": 1651,
+      "neuronen": 98,
+      "gemW": 0.0980420179766203,
+      "succes20": 0.95
+    },
+    {
+      "poging": 73,
+      "ok": true,
+      "beloning": 56.14474467711875,
+      "stappen": 571,
+      "stilstaan": 0.25569176882662,
+      "verbindingen": 1651,
+      "neuronen": 98,
+      "gemW": 0.09796999799498587,
+      "succes20": 0.95
+    },
+    {
+      "poging": 74,
+      "ok": true,
+      "beloning": 71.3908481224818,
+      "stappen": 567,
+      "stilstaan": 0.21693121693121692,
+      "verbindingen": 1651,
+      "neuronen": 98,
+      "gemW": 0.09782781835462388,
+      "succes20": 0.95
+    },
+    {
+      "poging": 75,
+      "ok": true,
+      "beloning": 77.75067581774573,
+      "stappen": 428,
+      "stilstaan": 0.21495327102803738,
+      "verbindingen": 1651,
+      "neuronen": 98,
+      "gemW": 0.097766318925609,
+      "succes20": 0.95
+    },
+    {
+      "poging": 76,
+      "ok": true,
+      "beloning": 21.859144493084525,
+      "stappen": 911,
+      "stilstaan": 0.2579582875960483,
+      "verbindingen": 1651,
+      "neuronen": 98,
+      "gemW": 0.09760810614518114,
+      "succes20": 0.95
+    },
+    {
+      "poging": 77,
+      "ok": true,
+      "beloning": -21.52565143642834,
+      "stappen": 940,
+      "stilstaan": 0.23085106382978723,
+      "verbindingen": 1651,
+      "neuronen": 98,
+      "gemW": 0.09734807738036973,
+      "succes20": 0.95
+    },
+    {
+      "poging": 78,
+      "ok": true,
+      "beloning": 83.34803383841452,
+      "stappen": 367,
+      "stilstaan": 0.1989100817438692,
+      "verbindingen": 1651,
+      "neuronen": 98,
+      "gemW": 0.09720332292007279,
+      "succes20": 0.95
+    },
+    {
+      "poging": 79,
+      "ok": true,
+      "beloning": 47.77788853430295,
+      "stappen": 471,
+      "stilstaan": 0.20382165605095542,
+      "verbindingen": 1651,
+      "neuronen": 98,
+      "gemW": 0.09700944640099447,
+      "succes20": 0.95
+    },
+    {
+      "poging": 80,
+      "ok": false,
+      "beloning": -69.09759839233028,
+      "stappen": 1000,
+      "stilstaan": 0.254,
+      "verbindingen": 1636,
+      "neuronen": 98,
+      "gemW": 0.09741550333121073,
+      "succes20": 0.9
+    },
+    {
+      "poging": 81,
+      "ok": false,
+      "beloning": -20.66567996493639,
+      "stappen": 1000,
+      "stilstaan": 0.233,
+      "verbindingen": 1636,
+      "neuronen": 98,
+      "gemW": 0.09724574575265005,
+      "succes20": 0.85
+    },
+    {
+      "poging": 82,
+      "ok": true,
+      "beloning": 69.08059906440087,
+      "stappen": 425,
+      "stilstaan": 0.24,
+      "verbindingen": 1636,
+      "neuronen": 98,
+      "gemW": 0.09721327629062737,
+      "succes20": 0.85
+    },
+    {
+      "poging": 83,
+      "ok": true,
+      "beloning": 83.04249954882071,
+      "stappen": 326,
+      "stilstaan": 0.23006134969325154,
+      "verbindingen": 1636,
+      "neuronen": 98,
+      "gemW": 0.09716838461242748,
+      "succes20": 0.85
+    },
+    {
+      "poging": 84,
+      "ok": true,
+      "beloning": 36.87396651440604,
+      "stappen": 905,
+      "stilstaan": 0.24530386740331492,
+      "verbindingen": 1636,
+      "neuronen": 98,
+      "gemW": 0.09701585517766428,
+      "succes20": 0.9
+    },
+    {
+      "poging": 85,
+      "ok": true,
+      "beloning": 91.162676934513,
+      "stappen": 327,
+      "stilstaan": 0.18654434250764526,
+      "verbindingen": 1636,
+      "neuronen": 98,
+      "gemW": 0.09692594272677711,
+      "succes20": 0.9
+    },
+    {
+      "poging": 86,
+      "ok": true,
+      "beloning": 69.49706735761393,
+      "stappen": 206,
+      "stilstaan": 0.21359223300970873,
+      "verbindingen": 1636,
+      "neuronen": 98,
+      "gemW": 0.09685646962120555,
+      "succes20": 0.9
+    },
+    {
+      "poging": 87,
+      "ok": true,
+      "beloning": 77.48295622467394,
+      "stappen": 209,
+      "stilstaan": 0.24401913875598086,
+      "verbindingen": 1636,
+      "neuronen": 98,
+      "gemW": 0.09682186372227475,
+      "succes20": 0.9
+    },
+    {
+      "poging": 88,
+      "ok": true,
+      "beloning": 50.45545298570265,
+      "stappen": 587,
+      "stilstaan": 0.2231686541737649,
+      "verbindingen": 1636,
+      "neuronen": 98,
+      "gemW": 0.09660645657515582,
+      "succes20": 0.9
+    },
+    {
+      "poging": 89,
+      "ok": true,
+      "beloning": 53.23269815417671,
+      "stappen": 473,
+      "stilstaan": 0.24101479915433405,
+      "verbindingen": 1636,
+      "neuronen": 98,
+      "gemW": 0.09640229875991783,
+      "succes20": 0.9
+    },
+    {
+      "poging": 90,
+      "ok": true,
+      "beloning": 80.4152174273415,
+      "stappen": 256,
+      "stilstaan": 0.171875,
+      "verbindingen": 1635,
+      "neuronen": 100,
+      "gemW": 0.09665532858717606,
+      "succes20": 0.9
+    },
+    {
+      "poging": 91,
+      "ok": true,
+      "beloning": 80.70990091657457,
+      "stappen": 282,
+      "stilstaan": 0.2198581560283688,
+      "verbindingen": 1635,
+      "neuronen": 100,
+      "gemW": 0.09660629269493237,
+      "succes20": 0.9
+    },
+    {
+      "poging": 92,
+      "ok": false,
+      "beloning": -60.18380208381573,
+      "stappen": 1000,
+      "stilstaan": 0.228,
+      "verbindingen": 1635,
+      "neuronen": 100,
+      "gemW": 0.09628941836604558,
+      "succes20": 0.85
+    },
+    {
+      "poging": 93,
+      "ok": true,
+      "beloning": 64.79727159998173,
+      "stappen": 355,
+      "stilstaan": 0.19154929577464788,
+      "verbindingen": 1635,
+      "neuronen": 100,
+      "gemW": 0.09621346659377354,
+      "succes20": 0.85
+    },
+    {
+      "poging": 94,
+      "ok": false,
+      "beloning": -92.63963518961638,
+      "stappen": 1000,
+      "stilstaan": 0.245,
+      "verbindingen": 1635,
+      "neuronen": 100,
+      "gemW": 0.09586605235666538,
+      "succes20": 0.8
+    },
+    {
+      "poging": 95,
+      "ok": true,
+      "beloning": 51.93336616888879,
+      "stappen": 621,
+      "stilstaan": 0.23993558776167473,
+      "verbindingen": 1635,
+      "neuronen": 100,
+      "gemW": 0.09572930555827688,
+      "succes20": 0.8
+    },
+    {
+      "poging": 96,
+      "ok": false,
+      "beloning": -29.84602426931735,
+      "stappen": 1000,
+      "stilstaan": 0.253,
+      "verbindingen": 1635,
+      "neuronen": 100,
+      "gemW": 0.0954786629712249,
+      "succes20": 0.75
+    },
+    {
+      "poging": 97,
+      "ok": true,
+      "beloning": 53.44089592232277,
+      "stappen": 551,
+      "stilstaan": 0.23411978221415608,
+      "verbindingen": 1635,
+      "neuronen": 100,
+      "gemW": 0.09536678103604766,
+      "succes20": 0.75
+    },
+    {
+      "poging": 98,
+      "ok": true,
+      "beloning": 25.145778754305805,
+      "stappen": 619,
+      "stilstaan": 0.20516962843295639,
+      "verbindingen": 1635,
+      "neuronen": 100,
+      "gemW": 0.09515037755410696,
+      "succes20": 0.75
+    },
+    {
+      "poging": 99,
+      "ok": false,
+      "beloning": -157.98706439887803,
+      "stappen": 1000,
+      "stilstaan": 0.219,
+      "verbindingen": 1635,
+      "neuronen": 100,
+      "gemW": 0.09475865965589471,
+      "succes20": 0.7
+    },
+    {
+      "poging": 100,
+      "ok": true,
+      "beloning": 25.810876952409867,
+      "stappen": 873,
+      "stilstaan": 0.2508591065292096,
+      "verbindingen": 1639,
+      "neuronen": 102,
+      "gemW": 0.09465320623815605,
+      "succes20": 0.75
+    },
+    {
+      "poging": 101,
+      "ok": true,
+      "beloning": 83.25808433469517,
+      "stappen": 386,
+      "stilstaan": 0.22797927461139897,
+      "verbindingen": 1639,
+      "neuronen": 102,
+      "gemW": 0.09459928309435822,
+      "succes20": 0.8
+    },
+    {
+      "poging": 102,
+      "ok": true,
+      "beloning": 56.23534042799079,
+      "stappen": 630,
+      "stilstaan": 0.22857142857142856,
+      "verbindingen": 1639,
+      "neuronen": 102,
+      "gemW": 0.09444324444626277,
+      "succes20": 0.8
+    },
+    {
+      "poging": 103,
+      "ok": true,
+      "beloning": 56.99367851998773,
+      "stappen": 483,
+      "stilstaan": 0.2153209109730849,
+      "verbindingen": 1639,
+      "neuronen": 102,
+      "gemW": 0.0942750926898898,
+      "succes20": 0.8
+    },
+    {
+      "poging": 104,
+      "ok": true,
+      "beloning": 44.958942016082005,
+      "stappen": 622,
+      "stilstaan": 0.2845659163987138,
+      "verbindingen": 1639,
+      "neuronen": 102,
+      "gemW": 0.09405102742389254,
+      "succes20": 0.8
+    },
+    {
+      "poging": 105,
+      "ok": true,
+      "beloning": 74.5787127573723,
+      "stappen": 320,
+      "stilstaan": 0.225,
+      "verbindingen": 1639,
+      "neuronen": 102,
+      "gemW": 0.09398807482010485,
+      "succes20": 0.8
+    },
+    {
+      "poging": 106,
+      "ok": true,
+      "beloning": 41.186894040364265,
+      "stappen": 628,
+      "stilstaan": 0.22452229299363058,
+      "verbindingen": 1639,
+      "neuronen": 102,
+      "gemW": 0.09401269185283921,
+      "succes20": 0.8
+    },
+    {
+      "poging": 107,
+      "ok": true,
+      "beloning": 78.50351101321938,
+      "stappen": 237,
+      "stilstaan": 0.270042194092827,
+      "verbindingen": 1639,
+      "neuronen": 102,
+      "gemW": 0.0940366084062363,
+      "succes20": 0.8
+    },
+    {
+      "poging": 108,
+      "ok": true,
+      "beloning": 66.41908078402717,
+      "stappen": 342,
+      "stilstaan": 0.2719298245614035,
+      "verbindingen": 1639,
+      "neuronen": 102,
+      "gemW": 0.09396120147365347,
+      "succes20": 0.8
+    },
+    {
+      "poging": 109,
+      "ok": true,
+      "beloning": 74.10646869430153,
+      "stappen": 231,
+      "stilstaan": 0.2554112554112554,
+      "verbindingen": 1639,
+      "neuronen": 102,
+      "gemW": 0.09394933719300484,
+      "succes20": 0.8
+    },
+    {
+      "poging": 110,
+      "ok": true,
+      "beloning": 74.21566235946969,
+      "stappen": 509,
+      "stilstaan": 0.25343811394891946,
+      "verbindingen": 1623,
+      "neuronen": 102,
+      "gemW": 0.09462681986811586,
+      "succes20": 0.8
+    },
+    {
+      "poging": 111,
+      "ok": true,
+      "beloning": 85.98132763140134,
+      "stappen": 309,
+      "stilstaan": 0.1941747572815534,
+      "verbindingen": 1623,
+      "neuronen": 102,
+      "gemW": 0.09453776980723293,
+      "succes20": 0.8
+    },
+    {
+      "poging": 112,
+      "ok": false,
+      "beloning": -59.215264263397565,
+      "stappen": 1000,
+      "stilstaan": 0.233,
+      "verbindingen": 1623,
+      "neuronen": 102,
+      "gemW": 0.09425221310179045,
+      "succes20": 0.8
+    },
+    {
+      "poging": 113,
+      "ok": true,
+      "beloning": 77.54846359018693,
+      "stappen": 502,
+      "stilstaan": 0.2250996015936255,
+      "verbindingen": 1623,
+      "neuronen": 102,
+      "gemW": 0.09423809131384768,
+      "succes20": 0.8
+    },
+    {
+      "poging": 114,
+      "ok": true,
+      "beloning": 41.91734269101039,
+      "stappen": 698,
+      "stilstaan": 0.2148997134670487,
+      "verbindingen": 1623,
+      "neuronen": 102,
+      "gemW": 0.09403266775389807,
+      "succes20": 0.85
+    },
+    {
+      "poging": 115,
+      "ok": true,
+      "beloning": 83.65660030728048,
+      "stappen": 251,
+      "stilstaan": 0.26693227091633465,
+      "verbindingen": 1623,
+      "neuronen": 102,
+      "gemW": 0.09404314059743489,
+      "succes20": 0.85
+    },
+    {
+      "poging": 116,
+      "ok": true,
+      "beloning": 69.48895196788284,
+      "stappen": 435,
+      "stilstaan": 0.22528735632183908,
+      "verbindingen": 1623,
+      "neuronen": 102,
+      "gemW": 0.0940685725276825,
+      "succes20": 0.9
+    },
+    {
+      "poging": 117,
+      "ok": true,
+      "beloning": 79.02066272284274,
+      "stappen": 288,
+      "stilstaan": 0.2013888888888889,
+      "verbindingen": 1623,
+      "neuronen": 102,
+      "gemW": 0.09406861505463711,
+      "succes20": 0.9
+    },
+    {
+      "poging": 118,
+      "ok": false,
+      "beloning": -202.9735681811319,
+      "stappen": 1000,
+      "stilstaan": 0.23,
+      "verbindingen": 1623,
+      "neuronen": 102,
+      "gemW": 0.0937826363484588,
+      "succes20": 0.85
+    },
+    {
+      "poging": 119,
+      "ok": false,
+      "beloning": -164.91346690273707,
+      "stappen": 1000,
+      "stilstaan": 0.21,
+      "verbindingen": 1623,
+      "neuronen": 102,
+      "gemW": 0.09351353627558998,
+      "succes20": 0.85
+    },
+    {
+      "poging": 120,
+      "ok": true,
+      "beloning": 51.1945107304279,
+      "stappen": 735,
+      "stilstaan": 0.24489795918367346,
+      "verbindingen": 1616,
+      "neuronen": 104,
+      "gemW": 0.09370299889102027,
+      "succes20": 0.85
+    },
+    {
+      "poging": 121,
+      "ok": false,
+      "beloning": -73.53617192193441,
+      "stappen": 1000,
+      "stilstaan": 0.262,
+      "verbindingen": 1616,
+      "neuronen": 104,
+      "gemW": 0.09341504238290156,
+      "succes20": 0.8
+    },
+    {
+      "poging": 122,
+      "ok": true,
+      "beloning": 54.150187341079466,
+      "stappen": 428,
+      "stilstaan": 0.26635514018691586,
+      "verbindingen": 1616,
+      "neuronen": 104,
+      "gemW": 0.09326470232366828,
+      "succes20": 0.8
+    },
+    {
+      "poging": 123,
+      "ok": true,
+      "beloning": 75.37848927141397,
+      "stappen": 286,
+      "stilstaan": 0.23776223776223776,
+      "verbindingen": 1616,
+      "neuronen": 104,
+      "gemW": 0.09318428239563255,
+      "succes20": 0.8
+    },
+    {
+      "poging": 124,
+      "ok": true,
+      "beloning": 77.34241880962789,
+      "stappen": 337,
+      "stilstaan": 0.2789317507418398,
+      "verbindingen": 1616,
+      "neuronen": 104,
+      "gemW": 0.0931602928645985,
+      "succes20": 0.8
+    },
+    {
+      "poging": 125,
+      "ok": true,
+      "beloning": 87.75988247216068,
+      "stappen": 181,
+      "stilstaan": 0.18232044198895028,
+      "verbindingen": 1616,
+      "neuronen": 104,
+      "gemW": 0.09312141545203781,
+      "succes20": 0.8
+    },
+    {
+      "poging": 126,
+      "ok": true,
+      "beloning": 79.01656037225163,
+      "stappen": 358,
+      "stilstaan": 0.23184357541899442,
+      "verbindingen": 1616,
+      "neuronen": 104,
+      "gemW": 0.09303569534365512,
+      "succes20": 0.8
+    },
+    {
+      "poging": 127,
+      "ok": true,
+      "beloning": 76.04723920801976,
+      "stappen": 353,
+      "stilstaan": 0.22946175637393768,
+      "verbindingen": 1616,
+      "neuronen": 104,
+      "gemW": 0.09299534025154968,
+      "succes20": 0.8
+    },
+    {
+      "poging": 128,
+      "ok": false,
+      "beloning": -40.63397667289666,
+      "stappen": 1000,
+      "stilstaan": 0.233,
+      "verbindingen": 1616,
+      "neuronen": 104,
+      "gemW": 0.09279396425145113,
+      "succes20": 0.75
+    },
+    {
+      "poging": 129,
+      "ok": true,
+      "beloning": 53.8788181369079,
+      "stappen": 641,
+      "stilstaan": 0.24336973478939158,
+      "verbindingen": 1616,
+      "neuronen": 104,
+      "gemW": 0.09279997995636763,
+      "succes20": 0.75
+    },
+    {
+      "poging": 130,
+      "ok": true,
+      "beloning": 66.73177041282916,
+      "stappen": 555,
+      "stilstaan": 0.24144144144144145,
+      "verbindingen": 1610,
+      "neuronen": 104,
+      "gemW": 0.09289161502134188,
+      "succes20": 0.75
+    },
+    {
+      "poging": 131,
+      "ok": true,
+      "beloning": 70.18561075612149,
+      "stappen": 417,
+      "stilstaan": 0.23501199040767387,
+      "verbindingen": 1610,
+      "neuronen": 104,
+      "gemW": 0.09275306677453,
+      "succes20": 0.75
+    },
+    {
+      "poging": 132,
+      "ok": true,
+      "beloning": 19.89510814063031,
+      "stappen": 584,
+      "stilstaan": 0.2071917808219178,
+      "verbindingen": 1610,
+      "neuronen": 104,
+      "gemW": 0.0925707595650633,
+      "succes20": 0.8
+    },
+    {
+      "poging": 133,
+      "ok": true,
+      "beloning": 87.52630771292864,
+      "stappen": 328,
+      "stilstaan": 0.2225609756097561,
+      "verbindingen": 1610,
+      "neuronen": 104,
+      "gemW": 0.09254269757292158,
+      "succes20": 0.8
+    },
+    {
+      "poging": 134,
+      "ok": true,
+      "beloning": 37.72951071888004,
+      "stappen": 778,
+      "stilstaan": 0.22236503856041132,
+      "verbindingen": 1610,
+      "neuronen": 104,
+      "gemW": 0.09236135521234065,
+      "succes20": 0.8
+    },
+    {
+      "poging": 135,
+      "ok": true,
+      "beloning": 76.64172088116219,
+      "stappen": 324,
+      "stilstaan": 0.2716049382716049,
+      "verbindingen": 1610,
+      "neuronen": 104,
+      "gemW": 0.09225217995699495,
+      "succes20": 0.8
+    },
+    {
+      "poging": 136,
+      "ok": true,
+      "beloning": 52.82594600525192,
+      "stappen": 657,
+      "stilstaan": 0.2846270928462709,
+      "verbindingen": 1610,
+      "neuronen": 104,
+      "gemW": 0.09234256434597087,
+      "succes20": 0.8
+    },
+    {
+      "poging": 137,
+      "ok": false,
+      "beloning": -60.12285743843468,
+      "stappen": 1000,
+      "stilstaan": 0.238,
+      "verbindingen": 1610,
+      "neuronen": 104,
+      "gemW": 0.0920631111240136,
+      "succes20": 0.75
+    },
+    {
+      "poging": 138,
+      "ok": true,
+      "beloning": 28.16279879800577,
+      "stappen": 730,
+      "stilstaan": 0.2356164383561644,
+      "verbindingen": 1610,
+      "neuronen": 104,
+      "gemW": 0.09197088469250811,
+      "succes20": 0.8
+    },
+    {
+      "poging": 139,
+      "ok": true,
+      "beloning": 44.80043568919029,
+      "stappen": 371,
+      "stilstaan": 0.22641509433962265,
+      "verbindingen": 1610,
+      "neuronen": 104,
+      "gemW": 0.09187061949813831,
+      "succes20": 0.85
+    },
+    {
+      "poging": 140,
+      "ok": false,
+      "beloning": -160.5901818235555,
+      "stappen": 1000,
+      "stilstaan": 0.238,
+      "verbindingen": 1606,
+      "neuronen": 106,
+      "gemW": 0.09188086217175648,
+      "succes20": 0.8
+    },
+    {
+      "poging": 141,
+      "ok": false,
+      "beloning": -135.4175919911926,
+      "stappen": 1000,
+      "stilstaan": 0.237,
+      "verbindingen": 1606,
+      "neuronen": 106,
+      "gemW": 0.09151691929090729,
+      "succes20": 0.8
+    },
+    {
+      "poging": 142,
+      "ok": true,
+      "beloning": 70.25682178215028,
+      "stappen": 324,
+      "stilstaan": 0.2345679012345679,
+      "verbindingen": 1606,
+      "neuronen": 106,
+      "gemW": 0.09159330166362378,
+      "succes20": 0.8
+    },
+    {
+      "poging": 143,
+      "ok": true,
+      "beloning": 75.29637183440244,
+      "stappen": 205,
+      "stilstaan": 0.2926829268292683,
+      "verbindingen": 1606,
+      "neuronen": 106,
+      "gemW": 0.09161520513281421,
+      "succes20": 0.8
+    },
+    {
+      "poging": 144,
+      "ok": true,
+      "beloning": 80.65167997979532,
+      "stappen": 441,
+      "stilstaan": 0.2585034013605442,
+      "verbindingen": 1606,
+      "neuronen": 106,
+      "gemW": 0.09179784341542466,
+      "succes20": 0.8
+    },
+    {
+      "poging": 145,
+      "ok": true,
+      "beloning": 90.25235910563666,
+      "stappen": 246,
+      "stilstaan": 0.2601626016260163,
+      "verbindingen": 1606,
+      "neuronen": 106,
+      "gemW": 0.0918049743256368,
+      "succes20": 0.8
+    },
+    {
+      "poging": 146,
+      "ok": false,
+      "beloning": -49.81304390827082,
+      "stappen": 1000,
+      "stilstaan": 0.233,
+      "verbindingen": 1606,
+      "neuronen": 106,
+      "gemW": 0.09143443262109714,
+      "succes20": 0.75
+    },
+    {
+      "poging": 147,
+      "ok": true,
+      "beloning": 65.68277576686704,
+      "stappen": 562,
+      "stilstaan": 0.20106761565836298,
+      "verbindingen": 1606,
+      "neuronen": 106,
+      "gemW": 0.09120260945441269,
+      "succes20": 0.75
+    },
+    {
+      "poging": 148,
+      "ok": true,
+      "beloning": -22.19020569392984,
+      "stappen": 679,
+      "stilstaan": 0.2341678939617084,
+      "verbindingen": 1606,
+      "neuronen": 106,
+      "gemW": 0.09106541672078684,
+      "succes20": 0.8
+    },
+    {
+      "poging": 149,
+      "ok": true,
+      "beloning": -121.24978429190168,
+      "stappen": 945,
+      "stilstaan": 0.2275132275132275,
+      "verbindingen": 1606,
+      "neuronen": 106,
+      "gemW": 0.09084744697537013,
+      "succes20": 0.8
+    },
+    {
+      "poging": 150,
+      "ok": true,
+      "beloning": -26.240606079483427,
+      "stappen": 720,
+      "stilstaan": 0.21805555555555556,
+      "verbindingen": 1611,
+      "neuronen": 108,
+      "gemW": 0.09074449560975409,
+      "succes20": 0.8
+    },
+    {
+      "poging": 151,
+      "ok": true,
+      "beloning": -132.8676556692945,
+      "stappen": 951,
+      "stilstaan": 0.2082018927444795,
+      "verbindingen": 1611,
+      "neuronen": 108,
+      "gemW": 0.09049361115944422,
+      "succes20": 0.8
+    },
+    {
+      "poging": 152,
+      "ok": true,
+      "beloning": 27.893818429038074,
+      "stappen": 839,
+      "stilstaan": 0.2550655542312277,
+      "verbindingen": 1611,
+      "neuronen": 108,
+      "gemW": 0.09033767633476615,
+      "succes20": 0.8
+    },
+    {
+      "poging": 153,
+      "ok": true,
+      "beloning": 47.35267149456167,
+      "stappen": 608,
+      "stilstaan": 0.2598684210526316,
+      "verbindingen": 1611,
+      "neuronen": 108,
+      "gemW": 0.09018301986626735,
+      "succes20": 0.8
+    },
+    {
+      "poging": 154,
+      "ok": true,
+      "beloning": 75.96065471113238,
+      "stappen": 253,
+      "stilstaan": 0.21739130434782608,
+      "verbindingen": 1611,
+      "neuronen": 108,
+      "gemW": 0.09023163583663522,
+      "succes20": 0.8
+    },
+    {
+      "poging": 155,
+      "ok": true,
+      "beloning": 82.65053484666412,
+      "stappen": 174,
+      "stilstaan": 0.16091954022988506,
+      "verbindingen": 1611,
+      "neuronen": 108,
+      "gemW": 0.09025757178838505,
+      "succes20": 0.8
+    },
+    {
+      "poging": 156,
+      "ok": true,
+      "beloning": 85.37085626054849,
+      "stappen": 238,
+      "stilstaan": 0.20588235294117646,
+      "verbindingen": 1611,
+      "neuronen": 108,
+      "gemW": 0.09022724507119297,
+      "succes20": 0.8
+    },
+    {
+      "poging": 157,
+      "ok": true,
+      "beloning": 81.8091497117799,
+      "stappen": 241,
+      "stilstaan": 0.2074688796680498,
+      "verbindingen": 1611,
+      "neuronen": 108,
+      "gemW": 0.09026345726542526,
+      "succes20": 0.85
+    }
+  ],
+  "toetsen": [
+    {
+      "poging": 20,
+      "pct": 0.1
+    },
+    {
+      "poging": 40,
+      "pct": 0.4
+    },
+    {
+      "poging": 60,
+      "pct": 0.3
+    },
+    {
+      "poging": 80,
+      "pct": 0.2
+    },
+    {
+      "poging": 100,
+      "pct": 0.3
+    },
+    {
+      "poging": 120,
+      "pct": 0.2
+    },
+    {
+      "poging": 140,
+      "pct": 0.2
+    }
+  ],
+  "herstructureringen": [
+    {
+      "ep": 10,
+      "pruned": 4,
+      "sprouted": 6,
+      "retyped": 3,
+      "grown": 0,
+      "neuronen": 90
+    },
+    {
+      "ep": 20,
+      "pruned": 24,
+      "sprouted": 6,
+      "retyped": 3,
+      "grown": 2,
+      "neuronen": 92
+    },
+    {
+      "ep": 30,
+      "pruned": 11,
+      "sprouted": 6,
+      "retyped": 3,
+      "grown": 0,
+      "neuronen": 92
+    },
+    {
+      "ep": 40,
+      "pruned": 20,
+      "sprouted": 6,
+      "retyped": 3,
+      "grown": 2,
+      "neuronen": 94
+    },
+    {
+      "ep": 50,
+      "pruned": 13,
+      "sprouted": 6,
+      "retyped": 3,
+      "grown": 2,
+      "neuronen": 96
+    },
+    {
+      "ep": 60,
+      "pruned": 24,
+      "sprouted": 6,
+      "retyped": 3,
+      "grown": 0,
+      "neuronen": 96
+    },
+    {
+      "ep": 70,
+      "pruned": 18,
+      "sprouted": 6,
+      "retyped": 3,
+      "grown": 2,
+      "neuronen": 98
+    },
+    {
+      "ep": 80,
+      "pruned": 21,
+      "sprouted": 6,
+      "retyped": 3,
+      "grown": 0,
+      "neuronen": 98
+    },
+    {
+      "ep": 90,
+      "pruned": 16,
+      "sprouted": 6,
+      "retyped": 3,
+      "grown": 2,
+      "neuronen": 100
+    },
+    {
+      "ep": 100,
+      "pruned": 14,
+      "sprouted": 6,
+      "retyped": 3,
+      "grown": 2,
+      "neuronen": 102
+    },
+    {
+      "ep": 110,
+      "pruned": 22,
+      "sprouted": 6,
+      "retyped": 3,
+      "grown": 0,
+      "neuronen": 102
+    },
+    {
+      "ep": 120,
+      "pruned": 19,
+      "sprouted": 6,
+      "retyped": 3,
+      "grown": 2,
+      "neuronen": 104
+    },
+    {
+      "ep": 130,
+      "pruned": 12,
+      "sprouted": 6,
+      "retyped": 3,
+      "grown": 0,
+      "neuronen": 104
+    },
+    {
+      "ep": 140,
+      "pruned": 18,
+      "sprouted": 6,
+      "retyped": 3,
+      "grown": 2,
+      "neuronen": 106
+    },
+    {
+      "ep": 150,
+      "pruned": 12,
+      "sprouted": 6,
+      "retyped": 3,
+      "grown": 2,
+      "neuronen": 108
+    }
+  ],
+  "netwerk": {
+    "neuronen": [
+      {
+        "i": 0,
+        "type": "in",
+        "label": "obst N",
+        "x": 58,
+        "y": 26,
+        "bias": 0.0428
+      },
+      {
+        "i": 1,
+        "type": "in",
+        "label": "obst NO",
+        "x": 58,
+        "y": 51,
+        "bias": 0.0232
+      },
+      {
+        "i": 2,
+        "type": "in",
+        "label": "obst O",
+        "x": 58,
+        "y": 75,
+        "bias": -0.0668
+      },
+      {
+        "i": 3,
+        "type": "in",
+        "label": "obst ZO",
+        "x": 58,
+        "y": 100,
+        "bias": 0.0163
+      },
+      {
+        "i": 4,
+        "type": "in",
+        "label": "obst Z",
+        "x": 58,
+        "y": 124,
+        "bias": 0.0887
+      },
+      {
+        "i": 5,
+        "type": "in",
+        "label": "obst ZW",
+        "x": 58,
+        "y": 149,
+        "bias": -0.0218
+      },
+      {
+        "i": 6,
+        "type": "in",
+        "label": "obst W",
+        "x": 58,
+        "y": 173,
+        "bias": 0.0026
+      },
+      {
+        "i": 7,
+        "type": "in",
+        "label": "obst NW",
+        "x": 58,
+        "y": 198,
+        "bias": -0.0198
+      },
+      {
+        "i": 8,
+        "type": "in",
+        "label": "doel N",
+        "x": 58,
+        "y": 222,
+        "bias": 0.0115
+      },
+      {
+        "i": 9,
+        "type": "in",
+        "label": "doel NO",
+        "x": 58,
+        "y": 247,
+        "bias": -0.0376
+      },
+      {
+        "i": 10,
+        "type": "in",
+        "label": "doel O",
+        "x": 58,
+        "y": 271,
+        "bias": -0.0012
+      },
+      {
+        "i": 11,
+        "type": "in",
+        "label": "doel ZO",
+        "x": 58,
+        "y": 296,
+        "bias": -0.0984
+      },
+      {
+        "i": 12,
+        "type": "in",
+        "label": "doel Z",
+        "x": 58,
+        "y": 320,
+        "bias": -0.0033
+      },
+      {
+        "i": 13,
+        "type": "in",
+        "label": "doel ZW",
+        "x": 58,
+        "y": 345,
+        "bias": -0.075
+      },
+      {
+        "i": 14,
+        "type": "in",
+        "label": "doel W",
+        "x": 58,
+        "y": 369,
+        "bias": -0.0189
+      },
+      {
+        "i": 15,
+        "type": "in",
+        "label": "doel NW",
+        "x": 58,
+        "y": 394,
+        "bias": -0.0492
+      },
+      {
+        "i": 16,
+        "type": "out",
+        "label": "omhoog",
+        "x": 942,
+        "y": 70,
+        "bias": -0.0178
+      },
+      {
+        "i": 17,
+        "type": "out",
+        "label": "omlaag",
+        "x": 942,
+        "y": 163,
+        "bias": -0.2169
+      },
+      {
+        "i": 18,
+        "type": "out",
+        "label": "links",
+        "x": 942,
+        "y": 257,
+        "bias": -0.0107
+      },
+      {
+        "i": 19,
+        "type": "out",
+        "label": "rechts",
+        "x": 942,
+        "y": 350,
+        "bias": 0.011
+      },
+      {
+        "i": 20,
+        "type": "sens",
+        "label": "S84",
+        "x": 203,
+        "y": 345,
+        "bias": -0.0003
+      },
+      {
+        "i": 21,
+        "type": "work",
+        "label": "W234",
+        "x": 252,
+        "y": 72,
+        "bias": 0.077
+      },
+      {
+        "i": 22,
+        "type": "work",
+        "label": "W206",
+        "x": 247,
+        "y": 18,
+        "bias": -0.0112
+      },
+      {
+        "i": 23,
+        "type": "work",
+        "label": "W227",
+        "x": 231,
+        "y": 402,
+        "bias": -0.0608
+      },
+      {
+        "i": 24,
+        "type": "sens",
+        "label": "S255",
+        "x": 177,
+        "y": 103,
+        "bias": -0.0427
+      },
+      {
+        "i": 25,
+        "type": "sens",
+        "label": "S93",
+        "x": 163,
+        "y": 18,
+        "bias": 0.0321
+      },
+      {
+        "i": 26,
+        "type": "work",
+        "label": "W7",
+        "x": 653,
+        "y": 247,
+        "bias": -0.0685
+      },
+      {
+        "i": 27,
+        "type": "work",
+        "label": "W8",
+        "x": 533,
+        "y": 18,
+        "bias": 0.0536
+      },
+      {
+        "i": 28,
+        "type": "work",
+        "label": "W9",
+        "x": 447,
+        "y": 402,
+        "bias": 0.0096
+      },
+      {
+        "i": 29,
+        "type": "work",
+        "label": "W10",
+        "x": 387,
+        "y": 18,
+        "bias": 0.0317
+      },
+      {
+        "i": 30,
+        "type": "work",
+        "label": "W11",
+        "x": 726,
+        "y": 234,
+        "bias": -0.0262
+      },
+      {
+        "i": 31,
+        "type": "work",
+        "label": "W12",
+        "x": 377,
+        "y": 402,
+        "bias": 0.1025
+      },
+      {
+        "i": 32,
+        "type": "work",
+        "label": "W13",
+        "x": 304,
+        "y": 67,
+        "bias": -0.0372
+      },
+      {
+        "i": 33,
+        "type": "work",
+        "label": "W14",
+        "x": 595,
+        "y": 18,
+        "bias": -0.0565
+      },
+      {
+        "i": 34,
+        "type": "work",
+        "label": "W15",
+        "x": 361,
+        "y": 162,
+        "bias": -0.0156
+      },
+      {
+        "i": 35,
+        "type": "work",
+        "label": "W16",
+        "x": 514,
+        "y": 161,
+        "bias": 0.0492
+      },
+      {
+        "i": 36,
+        "type": "work",
+        "label": "W17",
+        "x": 435,
+        "y": 145,
+        "bias": -0.0661
+      },
+      {
+        "i": 37,
+        "type": "work",
+        "label": "W18",
+        "x": 392,
+        "y": 204,
+        "bias": 0.0345
+      },
+      {
+        "i": 38,
+        "type": "work",
+        "label": "W19",
+        "x": 665,
+        "y": 18,
+        "bias": -0.0191
+      },
+      {
+        "i": 39,
+        "type": "work",
+        "label": "W20",
+        "x": 350,
+        "y": 304,
+        "bias": 0.0899
+      },
+      {
+        "i": 40,
+        "type": "work",
+        "label": "W21",
+        "x": 358,
+        "y": 18,
+        "bias": 0.0093
+      },
+      {
+        "i": 41,
+        "type": "work",
+        "label": "W22",
+        "x": 435,
+        "y": 229,
+        "bias": -0.0056
+      },
+      {
+        "i": 42,
+        "type": "work",
+        "label": "W23",
+        "x": 326,
+        "y": 18,
+        "bias": -0.1002
+      },
+      {
+        "i": 43,
+        "type": "work",
+        "label": "W24",
+        "x": 415,
+        "y": 18,
+        "bias": -0.0614
+      },
+      {
+        "i": 44,
+        "type": "work",
+        "label": "W25",
+        "x": 453,
+        "y": 187,
+        "bias": 0.048
+      },
+      {
+        "i": 45,
+        "type": "work",
+        "label": "W26",
+        "x": 345,
+        "y": 215,
+        "bias": 0.0033
+      },
+      {
+        "i": 46,
+        "type": "work",
+        "label": "W27",
+        "x": 454,
+        "y": 273,
+        "bias": -0.063
+      },
+      {
+        "i": 47,
+        "type": "work",
+        "label": "W28",
+        "x": 498,
+        "y": 209,
+        "bias": 0.0081
+      },
+      {
+        "i": 48,
+        "type": "work",
+        "label": "W29",
+        "x": 328,
+        "y": 119,
+        "bias": 0.074
+      },
+      {
+        "i": 49,
+        "type": "work",
+        "label": "W30",
+        "x": 281,
+        "y": 136,
+        "bias": -0.0293
+      },
+      {
+        "i": 50,
+        "type": "work",
+        "label": "W31",
+        "x": 293,
+        "y": 305,
+        "bias": 0.0184
+      },
+      {
+        "i": 51,
+        "type": "work",
+        "label": "W32",
+        "x": 565,
+        "y": 65,
+        "bias": 0.0859
+      },
+      {
+        "i": 52,
+        "type": "mem",
+        "label": "M62",
+        "x": 480,
+        "y": 129,
+        "bias": -0.0436
+      },
+      {
+        "i": 53,
+        "type": "work",
+        "label": "W34",
+        "x": 548,
+        "y": 347,
+        "bias": 0.0099
+      },
+      {
+        "i": 54,
+        "type": "work",
+        "label": "W35",
+        "x": 563,
+        "y": 18,
+        "bias": -0.065
+      },
+      {
+        "i": 55,
+        "type": "work",
+        "label": "W36",
+        "x": 350,
+        "y": 67,
+        "bias": -0.0718
+      },
+      {
+        "i": 56,
+        "type": "mem",
+        "label": "M63",
+        "x": 292,
+        "y": 18,
+        "bias": -0.0079
+      },
+      {
+        "i": 57,
+        "type": "work",
+        "label": "W38",
+        "x": 392,
+        "y": 323,
+        "bias": -0.1159
+      },
+      {
+        "i": 58,
+        "type": "mem",
+        "label": "M64",
+        "x": 346,
+        "y": 402,
+        "bias": 0.038
+      },
+      {
+        "i": 59,
+        "type": "work",
+        "label": "W40",
+        "x": 672,
+        "y": 402,
+        "bias": 0.0263
+      },
+      {
+        "i": 60,
+        "type": "work",
+        "label": "W41",
+        "x": 412,
+        "y": 402,
+        "bias": 0.0782
+      },
+      {
+        "i": 61,
+        "type": "work",
+        "label": "W42",
+        "x": 485,
+        "y": 402,
+        "bias": 0.0356
+      },
+      {
+        "i": 62,
+        "type": "work",
+        "label": "W43",
+        "x": 300,
+        "y": 191,
+        "bias": 0.1157
+      },
+      {
+        "i": 63,
+        "type": "work",
+        "label": "W44",
+        "x": 629,
+        "y": 306,
+        "bias": -0.0428
+      },
+      {
+        "i": 64,
+        "type": "work",
+        "label": "W45",
+        "x": 637,
+        "y": 402,
+        "bias": 0.0359
+      },
+      {
+        "i": 65,
+        "type": "mem",
+        "label": "M61",
+        "x": 677,
+        "y": 339,
+        "bias": 0.0703
+      },
+      {
+        "i": 66,
+        "type": "work",
+        "label": "W47",
+        "x": 688,
+        "y": 283,
+        "bias": 0.0108
+      },
+      {
+        "i": 67,
+        "type": "work",
+        "label": "W48",
+        "x": 573,
+        "y": 402,
+        "bias": -0.0094
+      },
+      {
+        "i": 68,
+        "type": "work",
+        "label": "W49",
+        "x": 519,
+        "y": 61,
+        "bias": 0.0448
+      },
+      {
+        "i": 69,
+        "type": "work",
+        "label": "W50",
+        "x": 699,
+        "y": 123,
+        "bias": -0.0086
+      },
+      {
+        "i": 70,
+        "type": "work",
+        "label": "W51",
+        "x": 393,
+        "y": 125,
+        "bias": -0.0912
+      },
+      {
+        "i": 71,
+        "type": "mem",
+        "label": "M65",
+        "x": 638,
+        "y": 122,
+        "bias": -0.0276
+      },
+      {
+        "i": 72,
+        "type": "work",
+        "label": "W53",
+        "x": 503,
+        "y": 18,
+        "bias": -0.0628
+      },
+      {
+        "i": 73,
+        "type": "refl",
+        "label": "R54",
+        "x": 868,
+        "y": 402,
+        "bias": 0.1095
+      },
+      {
+        "i": 74,
+        "type": "refl",
+        "label": "R55",
+        "x": 868,
+        "y": 18,
+        "bias": 0.0827
+      },
+      {
+        "i": 75,
+        "type": "mem",
+        "label": "M56",
+        "x": 710,
+        "y": 402,
+        "bias": -0.0205
+      },
+      {
+        "i": 76,
+        "type": "mem",
+        "label": "M57",
+        "x": 677,
+        "y": 72,
+        "bias": -0.0432
+      },
+      {
+        "i": 77,
+        "type": "mem",
+        "label": "M58",
+        "x": 765,
+        "y": 276,
+        "bias": 0.0778
+      },
+      {
+        "i": 78,
+        "type": "mem",
+        "label": "M59",
+        "x": 703,
+        "y": 18,
+        "bias": 0.0076
+      },
+      {
+        "i": 79,
+        "type": "mem",
+        "label": "M60",
+        "x": 768,
+        "y": 129,
+        "bias": 0.0125
+      },
+      {
+        "i": 80,
+        "type": "work",
+        "label": "W69",
+        "x": 733,
+        "y": 332,
+        "bias": 0.0791
+      },
+      {
+        "i": 81,
+        "type": "work",
+        "label": "W70",
+        "x": 406,
+        "y": 366,
+        "bias": -0.0887
+      },
+      {
+        "i": 82,
+        "type": "sens",
+        "label": "S240",
+        "x": 214,
+        "y": 291,
+        "bias": -0.0338
+      },
+      {
+        "i": 83,
+        "type": "refl",
+        "label": "R242",
+        "x": 521,
+        "y": 402,
+        "bias": -0.0599
+      },
+      {
+        "i": 84,
+        "type": "work",
+        "label": "W82",
+        "x": 791,
+        "y": 199,
+        "bias": -0.0091
+      },
+      {
+        "i": 85,
+        "type": "sens",
+        "label": "S181",
+        "x": 200,
+        "y": 18,
+        "bias": 0.0112
+      },
+      {
+        "i": 86,
+        "type": "sens",
+        "label": "S180",
+        "x": 602,
+        "y": 402,
+        "bias": -0.032
+      },
+      {
+        "i": 87,
+        "type": "work",
+        "label": "W250",
+        "x": 735,
+        "y": 70,
+        "bias": 0.0332
+      },
+      {
+        "i": 88,
+        "type": "sens",
+        "label": "S248",
+        "x": 543,
+        "y": 402,
+        "bias": -0.0649
+      },
+      {
+        "i": 89,
+        "type": "work",
+        "label": "W102",
+        "x": 496,
+        "y": 309,
+        "bias": 0.0009
+      },
+      {
+        "i": 90,
+        "type": "work",
+        "label": "W205",
+        "x": 474,
+        "y": 18,
+        "bias": 0.0053
+      },
+      {
+        "i": 91,
+        "type": "refl",
+        "label": "R220",
+        "x": 818,
+        "y": 18,
+        "bias": 0.0303
+      },
+      {
+        "i": 92,
+        "type": "work",
+        "label": "W199",
+        "x": 267,
+        "y": 402,
+        "bias": -0.0528
+      },
+      {
+        "i": 93,
+        "type": "work",
+        "label": "W249",
+        "x": 616,
+        "y": 358,
+        "bias": -0.0055
+      },
+      {
+        "i": 94,
+        "type": "work",
+        "label": "W221",
+        "x": 647,
+        "y": 169,
+        "bias": 0.0671
+      },
+      {
+        "i": 95,
+        "type": "sens",
+        "label": "S208",
+        "x": 158,
+        "y": 402,
+        "bias": -0.0355
+      },
+      {
+        "i": 96,
+        "type": "sens",
+        "label": "S200",
+        "x": 183,
+        "y": 257,
+        "bias": 0.0203
+      },
+      {
+        "i": 97,
+        "type": "work",
+        "label": "W171",
+        "x": 238,
+        "y": 200,
+        "bias": 0.0103
+      },
+      {
+        "i": 98,
+        "type": "sens",
+        "label": "S167",
+        "x": 630,
+        "y": 18,
+        "bias": -0.0412
+      },
+      {
+        "i": 99,
+        "type": "work",
+        "label": "W147",
+        "x": 597,
+        "y": 104,
+        "bias": 0.0351
+      },
+      {
+        "i": 100,
+        "type": "refl",
+        "label": "R228",
+        "x": 230,
+        "y": 139,
+        "bias": 0.0031
+      },
+      {
+        "i": 101,
+        "type": "work",
+        "label": "W218",
+        "x": 765,
+        "y": 402,
+        "bias": 0.0271
+      },
+      {
+        "i": 102,
+        "type": "work",
+        "label": "W158",
+        "x": 580,
+        "y": 321,
+        "bias": -0.0062
+      },
+      {
+        "i": 103,
+        "type": "work",
+        "label": "W159",
+        "x": 747,
+        "y": 18,
+        "bias": -0.0042
+      },
+      {
+        "i": 104,
+        "type": "sens",
+        "label": "S239",
+        "x": 274,
+        "y": 349,
+        "bias": 0.0378
+      },
+      {
+        "i": 105,
+        "type": "refl",
+        "label": "R197",
+        "x": 833,
+        "y": 402,
+        "bias": -0.0378
+      },
+      {
+        "i": 106,
+        "type": "sens",
+        "label": "S192",
+        "x": 438,
+        "y": 322,
+        "bias": -0.0035
+      },
+      {
+        "i": 107,
+        "type": "work",
+        "label": "W247",
+        "x": 484,
+        "y": 82,
+        "bias": -0.0149
+      },
+      {
+        "i": 108,
+        "type": "work",
+        "label": "W195",
+        "x": 391,
+        "y": 79,
+        "bias": 0.0171
+      },
+      {
+        "i": 109,
+        "type": "work",
+        "label": "W196",
+        "x": 441,
+        "y": 64,
+        "bias": -0.0153
+      },
+      {
+        "i": 110,
+        "type": "work",
+        "label": "W203",
+        "x": 305,
+        "y": 402,
+        "bias": -0.0025
+      },
+      {
+        "i": 111,
+        "type": "work",
+        "label": "W204",
+        "x": 723,
+        "y": 169,
+        "bias": 0.0331
+      },
+      {
+        "i": 112,
+        "type": "work",
+        "label": "W211",
+        "x": 558,
+        "y": 225,
+        "bias": -0.0236
+      },
+      {
+        "i": 113,
+        "type": "sens",
+        "label": "S219",
+        "x": 315,
+        "y": 260,
+        "bias": -0.0084
+      },
+      {
+        "i": 114,
+        "type": "work",
+        "label": "W216",
+        "x": 502,
+        "y": 358,
+        "bias": 0.0512
+      },
+      {
+        "i": 115,
+        "type": "work",
+        "label": "W217",
+        "x": 444,
+        "y": 18,
+        "bias": 0.0518
+      },
+      {
+        "i": 116,
+        "type": "work",
+        "label": "W224",
+        "x": 255,
+        "y": 250,
+        "bias": 0.0593
+      },
+      {
+        "i": 117,
+        "type": "work",
+        "label": "W225",
+        "x": 566,
+        "y": 277,
+        "bias": -0.0013
+      },
+      {
+        "i": 118,
+        "type": "work",
+        "label": "W232",
+        "x": 555,
+        "y": 173,
+        "bias": -0.0425
+      },
+      {
+        "i": 119,
+        "type": "work",
+        "label": "W233",
+        "x": 616,
+        "y": 252,
+        "bias": -0.061
+      },
+      {
+        "i": 120,
+        "type": "work",
+        "label": "W237",
+        "x": 678,
+        "y": 206,
+        "bias": -0.0153
+      },
+      {
+        "i": 121,
+        "type": "work",
+        "label": "W238",
+        "x": 331,
+        "y": 358,
+        "bias": 0.0228
+      },
+      {
+        "i": 122,
+        "type": "work",
+        "label": "W245",
+        "x": 514,
+        "y": 256,
+        "bias": 0.002
+      },
+      {
+        "i": 123,
+        "type": "work",
+        "label": "W246",
+        "x": 459,
+        "y": 367,
+        "bias": -0.0062
+      },
+      {
+        "i": 124,
+        "type": "work",
+        "label": "W253",
+        "x": 623,
+        "y": 68,
+        "bias": -0.0213
+      },
+      {
+        "i": 125,
+        "type": "work",
+        "label": "W254",
+        "x": 543,
+        "y": 110,
+        "bias": -0.0198
+      },
+      {
+        "i": 126,
+        "type": "neut",
+        "label": "N256",
+        "x": 602,
+        "y": 180,
+        "bias": 0.0452
+      },
+      {
+        "i": 127,
+        "type": "neut",
+        "label": "N257",
+        "x": 392,
+        "y": 266,
+        "bias": -0.0052
+      }
+    ],
+    "verbindingen": [
+      [
+        0,
+        20,
+        0.062
+      ],
+      [
+        0,
+        22,
+        -0.0632
+      ],
+      [
+        0,
+        37,
+        0.1043
+      ],
+      [
+        0,
+        45,
+        -0.0743
+      ],
+      [
+        0,
+        46,
+        0.0647
+      ],
+      [
+        0,
+        50,
+        0.0914
+      ],
+      [
+        0,
+        51,
+        -0.0855
+      ],
+      [
+        0,
+        54,
+        -0.0676
+      ],
+      [
+        0,
+        55,
+        0.0334
+      ],
+      [
+        0,
+        60,
+        -0.071
+      ],
+      [
+        0,
+        64,
+        0.0638
+      ],
+      [
+        0,
+        65,
+        -0.1067
+      ],
+      [
+        0,
+        67,
+        -0.0309
+      ],
+      [
+        0,
+        71,
+        -0.1082
+      ],
+      [
+        0,
+        72,
+        -0.0618
+      ],
+      [
+        0,
+        76,
+        0.0746
+      ],
+      [
+        0,
+        77,
+        -0.082
+      ],
+      [
+        1,
+        23,
+        -0.0311
+      ],
+      [
+        1,
+        25,
+        -0.0459
+      ],
+      [
+        1,
+        35,
+        0.0477
+      ],
+      [
+        1,
+        37,
+        0.072
+      ],
+      [
+        1,
+        41,
+        0.0328
+      ],
+      [
+        1,
+        46,
+        -0.0613
+      ],
+      [
+        1,
+        52,
+        -0.1159
+      ],
+      [
+        1,
+        54,
+        -0.0442
+      ],
+      [
+        1,
+        55,
+        -0.067
+      ],
+      [
+        1,
+        56,
+        -0.1267
+      ],
+      [
+        1,
+        58,
+        0.0913
+      ],
+      [
+        1,
+        59,
+        0.0374
+      ],
+      [
+        1,
+        71,
+        0.0534
+      ],
+      [
+        1,
+        72,
+        0.0524
+      ],
+      [
+        1,
+        75,
+        0.0895
+      ],
+      [
+        1,
+        78,
+        -0.0626
+      ],
+      [
+        2,
+        24,
+        -0.066
+      ],
+      [
+        2,
+        28,
+        -0.0623
+      ],
+      [
+        2,
+        29,
+        0.0941
+      ],
+      [
+        2,
+        36,
+        -0.1053
+      ],
+      [
+        2,
+        37,
+        -0.0708
+      ],
+      [
+        2,
+        38,
+        -0.0617
+      ],
+      [
+        2,
+        41,
+        -0.047
+      ],
+      [
+        2,
+        44,
+        0.0556
+      ],
+      [
+        2,
+        48,
+        -0.0546
+      ],
+      [
+        2,
+        50,
+        0.0387
+      ],
+      [
+        2,
+        52,
+        -0.131
+      ],
+      [
+        2,
+        53,
+        0.0661
+      ],
+      [
+        2,
+        57,
+        -0.0656
+      ],
+      [
+        2,
+        62,
+        0.0869
+      ],
+      [
+        2,
+        63,
+        -0.0377
+      ],
+      [
+        2,
+        65,
+        -0.0538
+      ],
+      [
+        2,
+        70,
+        -0.0859
+      ],
+      [
+        2,
+        77,
+        -0.0396
+      ],
+      [
+        2,
+        78,
+        -0.0465
+      ],
+      [
+        2,
+        79,
+        0.1332
+      ],
+      [
+        3,
+        24,
+        0.0247
+      ],
+      [
+        3,
+        28,
+        -0.0626
+      ],
+      [
+        3,
+        30,
+        0.0663
+      ],
+      [
+        3,
+        31,
+        0.0864
+      ],
+      [
+        3,
+        32,
+        -0.0654
+      ],
+      [
+        3,
+        39,
+        -0.0326
+      ],
+      [
+        3,
+        40,
+        -0.0545
+      ],
+      [
+        3,
+        43,
+        -0.0505
+      ],
+      [
+        3,
+        44,
+        0.0812
+      ],
+      [
+        3,
+        48,
+        -0.0486
+      ],
+      [
+        3,
+        54,
+        -0.0719
+      ],
+      [
+        3,
+        55,
+        -0.1015
+      ],
+      [
+        3,
+        65,
+        0.0766
+      ],
+      [
+        3,
+        72,
+        0.0368
+      ],
+      [
+        4,
+        25,
+        -0.0796
+      ],
+      [
+        4,
+        30,
+        0.064
+      ],
+      [
+        4,
+        33,
+        0.0747
+      ],
+      [
+        4,
+        39,
+        0.0371
+      ],
+      [
+        4,
+        41,
+        0.0526
+      ],
+      [
+        4,
+        45,
+        -0.0414
+      ],
+      [
+        4,
+        48,
+        0.0581
+      ],
+      [
+        4,
+        57,
+        -0.0749
+      ],
+      [
+        4,
+        58,
+        -0.1081
+      ],
+      [
+        4,
+        59,
+        0.0736
+      ],
+      [
+        4,
+        65,
+        -0.0902
+      ],
+      [
+        4,
+        76,
+        -0.0433
+      ],
+      [
+        5,
+        24,
+        -0.041
+      ],
+      [
+        5,
+        29,
+        0.0781
+      ],
+      [
+        5,
+        36,
+        -0.0675
+      ],
+      [
+        5,
+        37,
+        0.0423
+      ],
+      [
+        5,
+        41,
+        -0.0527
+      ],
+      [
+        5,
+        43,
+        0.0496
+      ],
+      [
+        5,
+        47,
+        0.075
+      ],
+      [
+        5,
+        49,
+        -0.049
+      ],
+      [
+        5,
+        52,
+        -0.1043
+      ],
+      [
+        5,
+        58,
+        -0.0863
+      ],
+      [
+        5,
+        67,
+        0.0807
+      ],
+      [
+        5,
+        75,
+        -0.0335
+      ],
+      [
+        5,
+        76,
+        0.0836
+      ],
+      [
+        5,
+        77,
+        0.0367
+      ],
+      [
+        5,
+        78,
+        0.0512
+      ],
+      [
+        6,
+        21,
+        0.0857
+      ],
+      [
+        6,
+        26,
+        -0.0559
+      ],
+      [
+        6,
+        29,
+        0.0902
+      ],
+      [
+        6,
+        30,
+        0.04
+      ],
+      [
+        6,
+        32,
+        -0.0596
+      ],
+      [
+        6,
+        33,
+        0.0601
+      ],
+      [
+        6,
+        37,
+        0.0609
+      ],
+      [
+        6,
+        38,
+        0.0549
+      ],
+      [
+        6,
+        43,
+        0.0472
+      ],
+      [
+        6,
+        44,
+        -0.0541
+      ],
+      [
+        6,
+        48,
+        0.1057
+      ],
+      [
+        6,
+        49,
+        0.0665
+      ],
+      [
+        6,
+        52,
+        0.1212
+      ],
+      [
+        6,
+        54,
+        0.0522
+      ],
+      [
+        6,
+        55,
+        0.0354
+      ],
+      [
+        6,
+        56,
+        0.0707
+      ],
+      [
+        6,
+        60,
+        0.0804
+      ],
+      [
+        6,
+        63,
+        0.0378
+      ],
+      [
+        6,
+        65,
+        -0.0623
+      ],
+      [
+        6,
+        66,
+        0.0409
+      ],
+      [
+        6,
+        70,
+        0.0378
+      ],
+      [
+        6,
+        71,
+        0.0815
+      ],
+      [
+        6,
+        77,
+        -0.0367
+      ],
+      [
+        6,
+        79,
+        -0.0585
+      ],
+      [
+        7,
+        23,
+        -0.051
+      ],
+      [
+        7,
+        24,
+        -0.0262
+      ],
+      [
+        7,
+        40,
+        0.0423
+      ],
+      [
+        7,
+        43,
+        -0.028
+      ],
+      [
+        7,
+        47,
+        0.0805
+      ],
+      [
+        7,
+        53,
+        0.035
+      ],
+      [
+        7,
+        65,
+        -0.0275
+      ],
+      [
+        7,
+        66,
+        0.0673
+      ],
+      [
+        7,
+        75,
+        0.0642
+      ],
+      [
+        7,
+        76,
+        -0.0351
+      ],
+      [
+        8,
+        23,
+        -0.1256
+      ],
+      [
+        8,
+        24,
+        0.1294
+      ],
+      [
+        8,
+        27,
+        0.0356
+      ],
+      [
+        8,
+        36,
+        -0.1013
+      ],
+      [
+        8,
+        38,
+        0.0784
+      ],
+      [
+        8,
+        39,
+        0.0717
+      ],
+      [
+        8,
+        40,
+        0.0856
+      ],
+      [
+        8,
+        41,
+        -0.0866
+      ],
+      [
+        8,
+        42,
+        0.0639
+      ],
+      [
+        8,
+        43,
+        0.1111
+      ],
+      [
+        8,
+        45,
+        0.0643
+      ],
+      [
+        8,
+        49,
+        0.0591
+      ],
+      [
+        8,
+        51,
+        0.1
+      ],
+      [
+        8,
+        52,
+        0.1546
+      ],
+      [
+        8,
+        55,
+        0.0768
+      ],
+      [
+        8,
+        56,
+        0.0715
+      ],
+      [
+        8,
+        61,
+        0.0959
+      ],
+      [
+        8,
+        75,
+        -0.1053
+      ],
+      [
+        9,
+        21,
+        0.0319
+      ],
+      [
+        9,
+        24,
+        -0.1246
+      ],
+      [
+        9,
+        26,
+        -0.0476
+      ],
+      [
+        9,
+        27,
+        0.1151
+      ],
+      [
+        9,
+        36,
+        -0.0736
+      ],
+      [
+        9,
+        39,
+        0.0887
+      ],
+      [
+        9,
+        40,
+        -0.0642
+      ],
+      [
+        9,
+        48,
+        -0.0756
+      ],
+      [
+        9,
+        61,
+        -0.1082
+      ],
+      [
+        9,
+        63,
+        0.092
+      ],
+      [
+        9,
+        65,
+        -0.0346
+      ],
+      [
+        9,
+        66,
+        0.0557
+      ],
+      [
+        9,
+        67,
+        -0.0698
+      ],
+      [
+        9,
+        72,
+        0.0792
+      ],
+      [
+        9,
+        75,
+        -0.0749
+      ],
+      [
+        9,
+        77,
+        0.1633
+      ],
+      [
+        9,
+        78,
+        0.0906
+      ],
+      [
+        10,
+        20,
+        -0.0349
+      ],
+      [
+        10,
+        21,
+        0.1142
+      ],
+      [
+        10,
+        22,
+        -0.0293
+      ],
+      [
+        10,
+        26,
+        -0.0441
+      ],
+      [
+        10,
+        27,
+        0.0528
+      ],
+      [
+        10,
+        31,
+        0.1037
+      ],
+      [
+        10,
+        33,
+        -0.0541
+      ],
+      [
+        10,
+        43,
+        -0.0645
+      ],
+      [
+        10,
+        44,
+        -0.0457
+      ],
+      [
+        10,
+        45,
+        0.0418
+      ],
+      [
+        10,
+        48,
+        0.0974
+      ],
+      [
+        10,
+        49,
+        0.049
+      ],
+      [
+        10,
+        53,
+        -0.1098
+      ],
+      [
+        10,
+        56,
+        -0.038
+      ],
+      [
+        10,
+        60,
+        -0.0866
+      ],
+      [
+        10,
+        61,
+        0.0862
+      ],
+      [
+        10,
+        62,
+        -0.0866
+      ],
+      [
+        10,
+        71,
+        -0.1448
+      ],
+      [
+        11,
+        20,
+        -0.0644
+      ],
+      [
+        11,
+        23,
+        0.0502
+      ],
+      [
+        11,
+        24,
+        0.081
+      ],
+      [
+        11,
+        25,
+        0.076
+      ],
+      [
+        11,
+        26,
+        -0.0634
+      ],
+      [
+        11,
+        27,
+        0.0991
+      ],
+      [
+        11,
+        28,
+        -0.0587
+      ],
+      [
+        11,
+        30,
+        0.0502
+      ],
+      [
+        11,
+        31,
+        0.0644
+      ],
+      [
+        11,
+        33,
+        -0.0728
+      ],
+      [
+        11,
+        34,
+        -0.0431
+      ],
+      [
+        11,
+        37,
+        0.1191
+      ],
+      [
+        11,
+        46,
+        0.0491
+      ],
+      [
+        11,
+        47,
+        0.0663
+      ],
+      [
+        11,
+        54,
+        0.0617
+      ],
+      [
+        11,
+        57,
+        0.0847
+      ],
+      [
+        11,
+        58,
+        0.0677
+      ],
+      [
+        11,
+        62,
+        -0.1066
+      ],
+      [
+        11,
+        66,
+        0.054
+      ],
+      [
+        11,
+        69,
+        -0.0575
+      ],
+      [
+        11,
+        78,
+        0.1206
+      ],
+      [
+        12,
+        33,
+        0.0611
+      ],
+      [
+        12,
+        34,
+        -0.0422
+      ],
+      [
+        12,
+        36,
+        -0.076
+      ],
+      [
+        12,
+        37,
+        0.1075
+      ],
+      [
+        12,
+        39,
+        -0.0553
+      ],
+      [
+        12,
+        44,
+        0.115
+      ],
+      [
+        12,
+        45,
+        -0.0758
+      ],
+      [
+        12,
+        52,
+        -0.1159
+      ],
+      [
+        12,
+        53,
+        -0.0505
+      ],
+      [
+        12,
+        54,
+        -0.0511
+      ],
+      [
+        12,
+        56,
+        0.0812
+      ],
+      [
+        12,
+        58,
+        -0.1099
+      ],
+      [
+        12,
+        59,
+        -0.0794
+      ],
+      [
+        12,
+        62,
+        -0.109
+      ],
+      [
+        12,
+        65,
+        0.1419
+      ],
+      [
+        12,
+        67,
+        0.1132
+      ],
+      [
+        12,
+        72,
+        -0.0669
+      ],
+      [
+        12,
+        75,
+        -0.1208
+      ],
+      [
+        12,
+        76,
+        0.0796
+      ],
+      [
+        12,
+        78,
+        0.0864
+      ],
+      [
+        13,
+        20,
+        0.0649
+      ],
+      [
+        13,
+        21,
+        0.0999
+      ],
+      [
+        13,
+        22,
+        -0.1253
+      ],
+      [
+        13,
+        25,
+        -0.0492
+      ],
+      [
+        13,
+        31,
+        0.0558
+      ],
+      [
+        13,
+        32,
+        -0.0694
+      ],
+      [
+        13,
+        39,
+        0.0656
+      ],
+      [
+        13,
+        41,
+        -0.1083
+      ],
+      [
+        13,
+        42,
+        0.0789
+      ],
+      [
+        13,
+        44,
+        -0.0421
+      ],
+      [
+        13,
+        47,
+        -0.0445
+      ],
+      [
+        13,
+        51,
+        0.0392
+      ],
+      [
+        13,
+        53,
+        0.0977
+      ],
+      [
+        13,
+        55,
+        0.075
+      ],
+      [
+        13,
+        58,
+        -0.0815
+      ],
+      [
+        13,
+        59,
+        0.075
+      ],
+      [
+        13,
+        61,
+        -0.0993
+      ],
+      [
+        13,
+        67,
+        -0.0704
+      ],
+      [
+        13,
+        69,
+        -0.093
+      ],
+      [
+        13,
+        71,
+        -0.0988
+      ],
+      [
+        13,
+        75,
+        -0.0589
+      ],
+      [
+        14,
+        20,
+        -0.0505
+      ],
+      [
+        14,
+        22,
+        0.0779
+      ],
+      [
+        14,
+        24,
+        0.0804
+      ],
+      [
+        14,
+        29,
+        0.0998
+      ],
+      [
+        14,
+        32,
+        -0.1093
+      ],
+      [
+        14,
+        35,
+        -0.0301
+      ],
+      [
+        14,
+        39,
+        0.0614
+      ],
+      [
+        14,
+        40,
+        0.0386
+      ],
+      [
+        14,
+        43,
+        -0.1072
+      ],
+      [
+        14,
+        46,
+        0.0537
+      ],
+      [
+        14,
+        47,
+        0.0607
+      ],
+      [
+        14,
+        48,
+        0.1084
+      ],
+      [
+        14,
+        49,
+        0.0475
+      ],
+      [
+        14,
+        55,
+        0.0697
+      ],
+      [
+        14,
+        57,
+        -0.0616
+      ],
+      [
+        14,
+        62,
+        0.1143
+      ],
+      [
+        14,
+        68,
+        0.0763
+      ],
+      [
+        14,
+        70,
+        0.0549
+      ],
+      [
+        14,
+        77,
+        -0.1232
+      ],
+      [
+        14,
+        79,
+        0.1481
+      ],
+      [
+        15,
+        22,
+        -0.1088
+      ],
+      [
+        15,
+        24,
+        -0.0319
+      ],
+      [
+        15,
+        27,
+        -0.0989
+      ],
+      [
+        15,
+        28,
+        -0.071
+      ],
+      [
+        15,
+        30,
+        -0.0796
+      ],
+      [
+        15,
+        31,
+        0.0586
+      ],
+      [
+        15,
+        34,
+        0.0644
+      ],
+      [
+        15,
+        35,
+        -0.0877
+      ],
+      [
+        15,
+        37,
+        -0.0315
+      ],
+      [
+        15,
+        40,
+        -0.0577
+      ],
+      [
+        15,
+        42,
+        -0.0609
+      ],
+      [
+        15,
+        46,
+        0.0554
+      ],
+      [
+        15,
+        52,
+        -0.0332
+      ],
+      [
+        15,
+        54,
+        -0.1129
+      ],
+      [
+        15,
+        56,
+        -0.153
+      ],
+      [
+        15,
+        57,
+        0.0526
+      ],
+      [
+        15,
+        63,
+        0.0704
+      ],
+      [
+        15,
+        64,
+        0.0532
+      ],
+      [
+        15,
+        65,
+        -0.0624
+      ],
+      [
+        15,
+        69,
+        -0.0916
+      ],
+      [
+        15,
+        71,
+        -0.08
+      ],
+      [
+        15,
+        78,
+        -0.0913
+      ],
+      [
+        15,
+        79,
+        0.0591
+      ],
+      [
+        20,
+        16,
+        0.1623
+      ],
+      [
+        20,
+        17,
+        -0.1249
+      ],
+      [
+        20,
+        29,
+        0.0629
+      ],
+      [
+        20,
+        30,
+        -0.0374
+      ],
+      [
+        20,
+        31,
+        0.1294
+      ],
+      [
+        20,
+        40,
+        -0.12
+      ],
+      [
+        20,
+        41,
+        -0.0501
+      ],
+      [
+        20,
+        42,
+        0.0346
+      ],
+      [
+        20,
+        48,
+        0.1388
+      ],
+      [
+        20,
+        53,
+        -0.1234
+      ],
+      [
+        20,
+        56,
+        0.1336
+      ],
+      [
+        20,
+        57,
+        -0.0702
+      ],
+      [
+        20,
+        58,
+        -0.143
+      ],
+      [
+        20,
+        63,
+        0.0724
+      ],
+      [
+        20,
+        64,
+        0.0889
+      ],
+      [
+        20,
+        66,
+        0.1236
+      ],
+      [
+        20,
+        69,
+        -0.0326
+      ],
+      [
+        21,
+        16,
+        -0.0782
+      ],
+      [
+        21,
+        18,
+        -0.2684
+      ],
+      [
+        21,
+        31,
+        0.0364
+      ],
+      [
+        21,
+        32,
+        0.0464
+      ],
+      [
+        21,
+        35,
+        0.1107
+      ],
+      [
+        21,
+        42,
+        0.0412
+      ],
+      [
+        21,
+        44,
+        0.0493
+      ],
+      [
+        21,
+        47,
+        -0.0784
+      ],
+      [
+        21,
+        49,
+        0.1117
+      ],
+      [
+        21,
+        52,
+        0.0399
+      ],
+      [
+        21,
+        55,
+        0.0567
+      ],
+      [
+        21,
+        57,
+        -0.0451
+      ],
+      [
+        21,
+        66,
+        -0.1085
+      ],
+      [
+        21,
+        70,
+        -0.0812
+      ],
+      [
+        21,
+        71,
+        0.051
+      ],
+      [
+        21,
+        72,
+        -0.0473
+      ],
+      [
+        21,
+        76,
+        0.0964
+      ],
+      [
+        21,
+        79,
+        -0.0409
+      ],
+      [
+        22,
+        26,
+        0.0352
+      ],
+      [
+        22,
+        27,
+        -0.1468
+      ],
+      [
+        22,
+        29,
+        -0.1167
+      ],
+      [
+        22,
+        34,
+        -0.0582
+      ],
+      [
+        22,
+        35,
+        0.1301
+      ],
+      [
+        22,
+        36,
+        0.1182
+      ],
+      [
+        22,
+        37,
+        -0.0967
+      ],
+      [
+        22,
+        40,
+        0.0532
+      ],
+      [
+        22,
+        41,
+        -0.0918
+      ],
+      [
+        22,
+        42,
+        0.0937
+      ],
+      [
+        22,
+        43,
+        -0.0894
+      ],
+      [
+        22,
+        44,
+        -0.1255
+      ],
+      [
+        22,
+        47,
+        -0.1571
+      ],
+      [
+        22,
+        54,
+        0.1665
+      ],
+      [
+        22,
+        60,
+        0.0403
+      ],
+      [
+        22,
+        71,
+        0.0804
+      ],
+      [
+        23,
+        16,
+        -0.3666
+      ],
+      [
+        23,
+        18,
+        -0.0866
+      ],
+      [
+        23,
+        26,
+        0.0433
+      ],
+      [
+        23,
+        30,
+        0.0469
+      ],
+      [
+        23,
+        31,
+        0.0502
+      ],
+      [
+        23,
+        33,
+        0.0783
+      ],
+      [
+        23,
+        36,
+        0.0928
+      ],
+      [
+        23,
+        37,
+        -0.0746
+      ],
+      [
+        23,
+        41,
+        0.1019
+      ],
+      [
+        23,
+        42,
+        0.1245
+      ],
+      [
+        23,
+        43,
+        -0.1151
+      ],
+      [
+        23,
+        46,
+        0.0543
+      ],
+      [
+        23,
+        47,
+        0.079
+      ],
+      [
+        23,
+        49,
+        -0.1104
+      ],
+      [
+        23,
+        50,
+        -0.0815
+      ],
+      [
+        23,
+        51,
+        -0.0303
+      ],
+      [
+        23,
+        52,
+        0.1262
+      ],
+      [
+        23,
+        57,
+        0.0483
+      ],
+      [
+        23,
+        59,
+        -0.1172
+      ],
+      [
+        23,
+        63,
+        -0.0514
+      ],
+      [
+        23,
+        64,
+        -0.0623
+      ],
+      [
+        23,
+        67,
+        -0.126
+      ],
+      [
+        23,
+        68,
+        0.1032
+      ],
+      [
+        23,
+        77,
+        -0.0975
+      ],
+      [
+        24,
+        27,
+        -0.1329
+      ],
+      [
+        24,
+        29,
+        -0.0869
+      ],
+      [
+        24,
+        33,
+        0.0636
+      ],
+      [
+        24,
+        34,
+        0.1208
+      ],
+      [
+        24,
+        39,
+        0.0627
+      ],
+      [
+        24,
+        40,
+        0.0822
+      ],
+      [
+        24,
+        41,
+        -0.1344
+      ],
+      [
+        24,
+        42,
+        -0.119
+      ],
+      [
+        24,
+        44,
+        -0.0788
+      ],
+      [
+        24,
+        47,
+        -0.153
+      ],
+      [
+        24,
+        52,
+        0.1329
+      ],
+      [
+        24,
+        54,
+        -0.133
+      ],
+      [
+        24,
+        55,
+        -0.1423
+      ],
+      [
+        24,
+        57,
+        0.0489
+      ],
+      [
+        24,
+        59,
+        -0.0524
+      ],
+      [
+        24,
+        60,
+        0.0306
+      ],
+      [
+        24,
+        62,
+        -0.1463
+      ],
+      [
+        24,
+        68,
+        0.0813
+      ],
+      [
+        24,
+        75,
+        0.1737
+      ],
+      [
+        24,
+        77,
+        -0.154
+      ],
+      [
+        25,
+        18,
+        -0.5267
+      ],
+      [
+        25,
+        27,
+        -0.1383
+      ],
+      [
+        25,
+        29,
+        0.1039
+      ],
+      [
+        25,
+        33,
+        0.151
+      ],
+      [
+        25,
+        34,
+        -0.1506
+      ],
+      [
+        25,
+        36,
+        0.034
+      ],
+      [
+        25,
+        37,
+        -0.092
+      ],
+      [
+        25,
+        39,
+        -0.0698
+      ],
+      [
+        25,
+        41,
+        0.0954
+      ],
+      [
+        25,
+        44,
+        -0.0971
+      ],
+      [
+        25,
+        46,
+        -0.0775
+      ],
+      [
+        25,
+        47,
+        -0.0962
+      ],
+      [
+        25,
+        48,
+        -0.0533
+      ],
+      [
+        25,
+        50,
+        -0.0592
+      ],
+      [
+        25,
+        51,
+        -0.0402
+      ],
+      [
+        25,
+        52,
+        -0.0575
+      ],
+      [
+        25,
+        59,
+        -0.1717
+      ],
+      [
+        25,
+        62,
+        0.0625
+      ],
+      [
+        25,
+        63,
+        0.0601
+      ],
+      [
+        25,
+        64,
+        0.0719
+      ],
+      [
+        25,
+        65,
+        0.1447
+      ],
+      [
+        25,
+        67,
+        -0.0362
+      ],
+      [
+        25,
+        68,
+        0.1171
+      ],
+      [
+        25,
+        72,
+        0.1354
+      ],
+      [
+        25,
+        75,
+        0.0449
+      ],
+      [
+        25,
+        79,
+        -0.1032
+      ],
+      [
+        26,
+        16,
+        -0.0572
+      ],
+      [
+        26,
+        19,
+        -0.3066
+      ],
+      [
+        26,
+        27,
+        0.0503
+      ],
+      [
+        26,
+        32,
+        0.0549
+      ],
+      [
+        26,
+        37,
+        -0.0421
+      ],
+      [
+        26,
+        38,
+        -0.0317
+      ],
+      [
+        26,
+        39,
+        0.093
+      ],
+      [
+        26,
+        51,
+        -0.1086
+      ],
+      [
+        26,
+        56,
+        -0.0797
+      ],
+      [
+        26,
+        57,
+        0.0957
+      ],
+      [
+        26,
+        58,
+        0.1268
+      ],
+      [
+        26,
+        59,
+        0.0903
+      ],
+      [
+        26,
+        61,
+        0.0481
+      ],
+      [
+        26,
+        65,
+        -0.0787
+      ],
+      [
+        26,
+        68,
+        -0.0665
+      ],
+      [
+        26,
+        71,
+        -0.0525
+      ],
+      [
+        26,
+        75,
+        0.0648
+      ],
+      [
+        26,
+        77,
+        -0.1587
+      ],
+      [
+        26,
+        79,
+        -0.0372
+      ],
+      [
+        27,
+        18,
+        -0.6279
+      ],
+      [
+        27,
+        19,
+        0.63
+      ],
+      [
+        27,
+        29,
+        -0.0314
+      ],
+      [
+        27,
+        32,
+        0.0622
+      ],
+      [
+        27,
+        33,
+        0.106
+      ],
+      [
+        27,
+        35,
+        -0.1021
+      ],
+      [
+        27,
+        39,
+        -0.1254
+      ],
+      [
+        27,
+        40,
+        0.1423
+      ],
+      [
+        27,
+        44,
+        -0.0702
+      ],
+      [
+        27,
+        45,
+        0.0583
+      ],
+      [
+        27,
+        46,
+        0.0593
+      ],
+      [
+        27,
+        47,
+        0.0985
+      ],
+      [
+        27,
+        48,
+        0.1139
+      ],
+      [
+        27,
+        51,
+        -0.0388
+      ],
+      [
+        27,
+        53,
+        -0.113
+      ],
+      [
+        27,
+        55,
+        0.0686
+      ],
+      [
+        27,
+        59,
+        -0.1167
+      ],
+      [
+        27,
+        61,
+        -0.0671
+      ],
+      [
+        27,
+        64,
+        0.0609
+      ],
+      [
+        27,
+        65,
+        -0.0501
+      ],
+      [
+        27,
+        66,
+        0.0642
+      ],
+      [
+        27,
+        68,
+        0.0639
+      ],
+      [
+        27,
+        72,
+        -0.04
+      ],
+      [
+        27,
+        75,
+        0.1555
+      ],
+      [
+        27,
+        76,
+        -0.0988
+      ],
+      [
+        27,
+        77,
+        -0.135
+      ],
+      [
+        27,
+        78,
+        0.112
+      ],
+      [
+        28,
+        35,
+        0.0974
+      ],
+      [
+        28,
+        43,
+        -0.103
+      ],
+      [
+        28,
+        44,
+        0.1359
+      ],
+      [
+        28,
+        45,
+        -0.118
+      ],
+      [
+        28,
+        46,
+        -0.0413
+      ],
+      [
+        28,
+        49,
+        -0.0444
+      ],
+      [
+        28,
+        54,
+        0.0762
+      ],
+      [
+        28,
+        57,
+        0.1043
+      ],
+      [
+        28,
+        64,
+        0.1107
+      ],
+      [
+        28,
+        72,
+        -0.0549
+      ],
+      [
+        28,
+        77,
+        0.071
+      ],
+      [
+        28,
+        78,
+        0.0495
+      ],
+      [
+        29,
+        17,
+        -0.1463
+      ],
+      [
+        29,
+        28,
+        0.0294
+      ],
+      [
+        29,
+        31,
+        0.0899
+      ],
+      [
+        29,
+        34,
+        0.0533
+      ],
+      [
+        29,
+        36,
+        0.0898
+      ],
+      [
+        29,
+        38,
+        0.0427
+      ],
+      [
+        29,
+        45,
+        0.111
+      ],
+      [
+        29,
+        46,
+        -0.1034
+      ],
+      [
+        29,
+        47,
+        -0.0251
+      ],
+      [
+        29,
+        49,
+        0.1162
+      ],
+      [
+        29,
+        58,
+        -0.0363
+      ],
+      [
+        29,
+        59,
+        -0.0378
+      ],
+      [
+        29,
+        60,
+        0.0898
+      ],
+      [
+        29,
+        65,
+        -0.1266
+      ],
+      [
+        29,
+        67,
+        -0.0667
+      ],
+      [
+        29,
+        70,
+        0.0458
+      ],
+      [
+        29,
+        71,
+        0.0987
+      ],
+      [
+        29,
+        77,
+        0.1586
+      ],
+      [
+        30,
+        17,
+        0.5407
+      ],
+      [
+        30,
+        18,
+        -0.196
+      ],
+      [
+        30,
+        19,
+        0.2006
+      ],
+      [
+        30,
+        26,
+        -0.0604
+      ],
+      [
+        30,
+        35,
+        -0.056
+      ],
+      [
+        30,
+        36,
+        0.1304
+      ],
+      [
+        30,
+        38,
+        0.0957
+      ],
+      [
+        30,
+        39,
+        0.1156
+      ],
+      [
+        30,
+        40,
+        0.1013
+      ],
+      [
+        30,
+        41,
+        0.1235
+      ],
+      [
+        30,
+        48,
+        -0.0614
+      ],
+      [
+        30,
+        51,
+        -0.041
+      ],
+      [
+        30,
+        53,
+        0.1477
+      ],
+      [
+        30,
+        61,
+        -0.0806
+      ],
+      [
+        30,
+        64,
+        0.0977
+      ],
+      [
+        30,
+        65,
+        0.0841
+      ],
+      [
+        30,
+        69,
+        0.0387
+      ],
+      [
+        30,
+        70,
+        0.0678
+      ],
+      [
+        30,
+        71,
+        0.1706
+      ],
+      [
+        30,
+        76,
+        -0.1761
+      ],
+      [
+        30,
+        77,
+        -0.1234
+      ],
+      [
+        30,
+        78,
+        0.1418
+      ],
+      [
+        30,
+        79,
+        -0.151
+      ],
+      [
+        31,
+        28,
+        0.0701
+      ],
+      [
+        31,
+        30,
+        -0.0666
+      ],
+      [
+        31,
+        33,
+        -0.0589
+      ],
+      [
+        31,
+        36,
+        0.0724
+      ],
+      [
+        31,
+        37,
+        0.1253
+      ],
+      [
+        31,
+        39,
+        0.0587
+      ],
+      [
+        31,
+        40,
+        0.0576
+      ],
+      [
+        31,
+        43,
+        0.0774
+      ],
+      [
+        31,
+        45,
+        0.0694
+      ],
+      [
+        31,
+        50,
+        -0.0996
+      ],
+      [
+        31,
+        54,
+        0.0867
+      ],
+      [
+        31,
+        56,
+        -0.1491
+      ],
+      [
+        31,
+        58,
+        0.0546
+      ],
+      [
+        31,
+        59,
+        0.0735
+      ],
+      [
+        31,
+        62,
+        0.0817
+      ],
+      [
+        31,
+        63,
+        0.0948
+      ],
+      [
+        31,
+        69,
+        -0.0603
+      ],
+      [
+        31,
+        71,
+        0.0765
+      ],
+      [
+        31,
+        75,
+        0.0478
+      ],
+      [
+        31,
+        76,
+        0.1139
+      ],
+      [
+        32,
+        16,
+        0.1403
+      ],
+      [
+        32,
+        18,
+        -0.4661
+      ],
+      [
+        32,
+        19,
+        0.5018
+      ],
+      [
+        32,
+        26,
+        0.117
+      ],
+      [
+        32,
+        29,
+        -0.1283
+      ],
+      [
+        32,
+        31,
+        -0.0482
+      ],
+      [
+        32,
+        33,
+        0.0777
+      ],
+      [
+        32,
+        40,
+        0.0396
+      ],
+      [
+        32,
+        45,
+        -0.0628
+      ],
+      [
+        32,
+        47,
+        -0.0858
+      ],
+      [
+        32,
+        48,
+        -0.1268
+      ],
+      [
+        32,
+        49,
+        -0.0943
+      ],
+      [
+        32,
+        50,
+        0.1148
+      ],
+      [
+        32,
+        52,
+        0.0447
+      ],
+      [
+        32,
+        55,
+        -0.0973
+      ],
+      [
+        32,
+        63,
+        0.0726
+      ],
+      [
+        32,
+        72,
+        -0.0578
+      ],
+      [
+        32,
+        78,
+        -0.1764
+      ],
+      [
+        33,
+        30,
+        0.1324
+      ],
+      [
+        33,
+        34,
+        0.1318
+      ],
+      [
+        33,
+        36,
+        -0.1203
+      ],
+      [
+        33,
+        38,
+        0.0566
+      ],
+      [
+        33,
+        42,
+        -0.0703
+      ],
+      [
+        33,
+        44,
+        -0.1356
+      ],
+      [
+        33,
+        45,
+        -0.1368
+      ],
+      [
+        33,
+        51,
+        -0.1197
+      ],
+      [
+        33,
+        55,
+        0.0879
+      ],
+      [
+        33,
+        59,
+        0.0449
+      ],
+      [
+        33,
+        68,
+        -0.1328
+      ],
+      [
+        33,
+        69,
+        -0.1011
+      ],
+      [
+        33,
+        70,
+        -0.1012
+      ],
+      [
+        33,
+        75,
+        -0.0377
+      ],
+      [
+        34,
+        19,
+        -0.3559
+      ],
+      [
+        34,
+        26,
+        -0.1137
+      ],
+      [
+        34,
+        27,
+        -0.0503
+      ],
+      [
+        34,
+        28,
+        -0.1061
+      ],
+      [
+        34,
+        29,
+        -0.0726
+      ],
+      [
+        34,
+        30,
+        -0.0582
+      ],
+      [
+        34,
+        31,
+        0.1044
+      ],
+      [
+        34,
+        32,
+        0.1485
+      ],
+      [
+        34,
+        40,
+        -0.0919
+      ],
+      [
+        34,
+        42,
+        0.0761
+      ],
+      [
+        34,
+        43,
+        -0.1272
+      ],
+      [
+        34,
+        44,
+        0.0452
+      ],
+      [
+        34,
+        46,
+        0.0601
+      ],
+      [
+        34,
+        47,
+        0.0854
+      ],
+      [
+        34,
+        54,
+        0.1265
+      ],
+      [
+        34,
+        55,
+        0.0613
+      ],
+      [
+        34,
+        56,
+        -0.1448
+      ],
+      [
+        34,
+        61,
+        0.1382
+      ],
+      [
+        34,
+        64,
+        0.112
+      ],
+      [
+        34,
+        66,
+        -0.083
+      ],
+      [
+        34,
+        68,
+        -0.0832
+      ],
+      [
+        34,
+        69,
+        0.0705
+      ],
+      [
+        34,
+        75,
+        0.0346
+      ],
+      [
+        34,
+        78,
+        -0.1573
+      ],
+      [
+        35,
+        31,
+        -0.0823
+      ],
+      [
+        35,
+        32,
+        0.043
+      ],
+      [
+        35,
+        33,
+        0.1366
+      ],
+      [
+        35,
+        37,
+        0.0943
+      ],
+      [
+        35,
+        38,
+        0.0373
+      ],
+      [
+        35,
+        43,
+        0.0683
+      ],
+      [
+        35,
+        51,
+        0.1352
+      ],
+      [
+        35,
+        53,
+        -0.0973
+      ],
+      [
+        35,
+        59,
+        0.062
+      ],
+      [
+        35,
+        60,
+        -0.0504
+      ],
+      [
+        35,
+        63,
+        -0.0713
+      ],
+      [
+        35,
+        64,
+        -0.0564
+      ],
+      [
+        35,
+        67,
+        0.115
+      ],
+      [
+        35,
+        69,
+        0.124
+      ],
+      [
+        35,
+        70,
+        -0.0953
+      ],
+      [
+        35,
+        72,
+        0.0525
+      ],
+      [
+        35,
+        75,
+        -0.1331
+      ],
+      [
+        36,
+        16,
+        -0.4188
+      ],
+      [
+        36,
+        18,
+        -0.0165
+      ],
+      [
+        36,
+        29,
+        0.1309
+      ],
+      [
+        36,
+        31,
+        0.0725
+      ],
+      [
+        36,
+        33,
+        -0.0982
+      ],
+      [
+        36,
+        37,
+        -0.0581
+      ],
+      [
+        36,
+        38,
+        0.0817
+      ],
+      [
+        36,
+        39,
+        0.049
+      ],
+      [
+        36,
+        43,
+        0.0507
+      ],
+      [
+        36,
+        44,
+        0.1364
+      ],
+      [
+        36,
+        45,
+        -0.0844
+      ],
+      [
+        36,
+        51,
+        0.0929
+      ],
+      [
+        36,
+        57,
+        0.1398
+      ],
+      [
+        36,
+        58,
+        -0.0845
+      ],
+      [
+        36,
+        59,
+        -0.0331
+      ],
+      [
+        36,
+        61,
+        -0.0539
+      ],
+      [
+        36,
+        65,
+        0.129
+      ],
+      [
+        36,
+        66,
+        0.0465
+      ],
+      [
+        36,
+        67,
+        -0.055
+      ],
+      [
+        36,
+        68,
+        -0.1267
+      ],
+      [
+        36,
+        69,
+        0.1085
+      ],
+      [
+        36,
+        70,
+        0.0974
+      ],
+      [
+        36,
+        75,
+        0.153
+      ],
+      [
+        36,
+        77,
+        -0.0476
+      ],
+      [
+        36,
+        78,
+        -0.1407
+      ],
+      [
+        36,
+        79,
+        0.0411
+      ],
+      [
+        37,
+        17,
+        0.3755
+      ],
+      [
+        37,
+        18,
+        -0.3466
+      ],
+      [
+        37,
+        28,
+        -0.0771
+      ],
+      [
+        37,
+        30,
+        0.0341
+      ],
+      [
+        37,
+        32,
+        0.0342
+      ],
+      [
+        37,
+        33,
+        -0.0533
+      ],
+      [
+        37,
+        35,
+        -0.0488
+      ],
+      [
+        37,
+        40,
+        -0.0662
+      ],
+      [
+        37,
+        43,
+        -0.0429
+      ],
+      [
+        37,
+        44,
+        0.0497
+      ],
+      [
+        37,
+        50,
+        0.0609
+      ],
+      [
+        37,
+        57,
+        0.0684
+      ],
+      [
+        37,
+        60,
+        0.0304
+      ],
+      [
+        37,
+        72,
+        -0.0605
+      ],
+      [
+        37,
+        75,
+        0.049
+      ],
+      [
+        37,
+        76,
+        -0.08
+      ],
+      [
+        37,
+        78,
+        -0.0933
+      ],
+      [
+        38,
+        27,
+        0.1436
+      ],
+      [
+        38,
+        30,
+        -0.0748
+      ],
+      [
+        38,
+        34,
+        -0.1407
+      ],
+      [
+        38,
+        35,
+        -0.0698
+      ],
+      [
+        38,
+        39,
+        0.0498
+      ],
+      [
+        38,
+        40,
+        0.0396
+      ],
+      [
+        38,
+        41,
+        0.1281
+      ],
+      [
+        38,
+        43,
+        0.1336
+      ],
+      [
+        38,
+        46,
+        0.1163
+      ],
+      [
+        38,
+        47,
+        0.1071
+      ],
+      [
+        38,
+        48,
+        0.0721
+      ],
+      [
+        38,
+        51,
+        -0.1062
+      ],
+      [
+        38,
+        53,
+        -0.1263
+      ],
+      [
+        38,
+        59,
+        0.0578
+      ],
+      [
+        38,
+        64,
+        0.1167
+      ],
+      [
+        38,
+        65,
+        0.0503
+      ],
+      [
+        38,
+        66,
+        -0.1189
+      ],
+      [
+        38,
+        68,
+        0.1349
+      ],
+      [
+        38,
+        69,
+        -0.1563
+      ],
+      [
+        38,
+        71,
+        0.1721
+      ],
+      [
+        38,
+        76,
+        -0.1107
+      ],
+      [
+        38,
+        77,
+        -0.1609
+      ],
+      [
+        39,
+        16,
+        0.3468
+      ],
+      [
+        39,
+        17,
+        -0.3953
+      ],
+      [
+        39,
+        18,
+        0.3204
+      ],
+      [
+        39,
+        19,
+        -0.2998
+      ],
+      [
+        39,
+        26,
+        -0.0498
+      ],
+      [
+        39,
+        32,
+        0.0806
+      ],
+      [
+        39,
+        38,
+        0.0435
+      ],
+      [
+        39,
+        45,
+        -0.1247
+      ],
+      [
+        39,
+        46,
+        -0.0571
+      ],
+      [
+        39,
+        48,
+        0.1167
+      ],
+      [
+        39,
+        49,
+        -0.1218
+      ],
+      [
+        39,
+        55,
+        -0.0341
+      ],
+      [
+        39,
+        62,
+        -0.028
+      ],
+      [
+        39,
+        65,
+        0.1301
+      ],
+      [
+        39,
+        66,
+        -0.1123
+      ],
+      [
+        39,
+        69,
+        0.0557
+      ],
+      [
+        39,
+        71,
+        0.0411
+      ],
+      [
+        39,
+        77,
+        -0.0355
+      ],
+      [
+        40,
+        18,
+        0.2071
+      ],
+      [
+        40,
+        19,
+        -0.1768
+      ],
+      [
+        40,
+        29,
+        0.1086
+      ],
+      [
+        40,
+        30,
+        0.1007
+      ],
+      [
+        40,
+        36,
+        0.1307
+      ],
+      [
+        40,
+        38,
+        0.0332
+      ],
+      [
+        40,
+        39,
+        0.0957
+      ],
+      [
+        40,
+        42,
+        0.0385
+      ],
+      [
+        40,
+        43,
+        0.0753
+      ],
+      [
+        40,
+        44,
+        -0.0644
+      ],
+      [
+        40,
+        45,
+        0.0769
+      ],
+      [
+        40,
+        46,
+        -0.1099
+      ],
+      [
+        40,
+        48,
+        0.0633
+      ],
+      [
+        40,
+        49,
+        -0.1293
+      ],
+      [
+        40,
+        51,
+        0.0507
+      ],
+      [
+        40,
+        52,
+        -0.1789
+      ],
+      [
+        40,
+        54,
+        0.0312
+      ],
+      [
+        40,
+        55,
+        0.1187
+      ],
+      [
+        40,
+        64,
+        0.0966
+      ],
+      [
+        40,
+        68,
+        0.1164
+      ],
+      [
+        40,
+        72,
+        -0.1077
+      ],
+      [
+        40,
+        76,
+        0.0588
+      ],
+      [
+        40,
+        77,
+        -0.0476
+      ],
+      [
+        40,
+        79,
+        -0.0636
+      ],
+      [
+        41,
+        16,
+        -0.2419
+      ],
+      [
+        41,
+        26,
+        0.0877
+      ],
+      [
+        41,
+        29,
+        -0.1151
+      ],
+      [
+        41,
+        30,
+        0.1381
+      ],
+      [
+        41,
+        34,
+        -0.0376
+      ],
+      [
+        41,
+        37,
+        0.051
+      ],
+      [
+        41,
+        38,
+        0.0876
+      ],
+      [
+        41,
+        39,
+        -0.1206
+      ],
+      [
+        41,
+        43,
+        -0.0386
+      ],
+      [
+        41,
+        49,
+        0.0933
+      ],
+      [
+        41,
+        57,
+        -0.0356
+      ],
+      [
+        41,
+        59,
+        0.0705
+      ],
+      [
+        41,
+        62,
+        -0.147
+      ],
+      [
+        41,
+        63,
+        -0.1205
+      ],
+      [
+        41,
+        65,
+        -0.1028
+      ],
+      [
+        41,
+        67,
+        -0.0652
+      ],
+      [
+        41,
+        68,
+        -0.1184
+      ],
+      [
+        41,
+        69,
+        0.128
+      ],
+      [
+        41,
+        70,
+        -0.1073
+      ],
+      [
+        41,
+        72,
+        0.033
+      ],
+      [
+        41,
+        77,
+        -0.0793
+      ],
+      [
+        42,
+        28,
+        -0.1139
+      ],
+      [
+        42,
+        37,
+        -0.1037
+      ],
+      [
+        42,
+        39,
+        -0.0925
+      ],
+      [
+        42,
+        43,
+        0.0841
+      ],
+      [
+        42,
+        48,
+        -0.0822
+      ],
+      [
+        42,
+        52,
+        0.0608
+      ],
+      [
+        42,
+        54,
+        0.0919
+      ],
+      [
+        42,
+        55,
+        0.1252
+      ],
+      [
+        42,
+        56,
+        -0.1622
+      ],
+      [
+        42,
+        60,
+        -0.1213
+      ],
+      [
+        42,
+        61,
+        0.1055
+      ],
+      [
+        42,
+        62,
+        0.0584
+      ],
+      [
+        42,
+        64,
+        -0.0631
+      ],
+      [
+        42,
+        65,
+        -0.1193
+      ],
+      [
+        42,
+        66,
+        0.1109
+      ],
+      [
+        42,
+        69,
+        -0.126
+      ],
+      [
+        42,
+        70,
+        -0.0803
+      ],
+      [
+        42,
+        71,
+        -0.0565
+      ],
+      [
+        42,
+        78,
+        0.1389
+      ],
+      [
+        42,
+        79,
+        0.1573
+      ],
+      [
+        43,
+        27,
+        -0.0457
+      ],
+      [
+        43,
+        30,
+        -0.0404
+      ],
+      [
+        43,
+        31,
+        -0.1304
+      ],
+      [
+        43,
+        34,
+        0.0473
+      ],
+      [
+        43,
+        35,
+        -0.107
+      ],
+      [
+        43,
+        44,
+        0.0988
+      ],
+      [
+        43,
+        49,
+        0.0764
+      ],
+      [
+        43,
+        51,
+        -0.1313
+      ],
+      [
+        43,
+        62,
+        0.031
+      ],
+      [
+        43,
+        69,
+        -0.111
+      ],
+      [
+        43,
+        77,
+        -0.0561
+      ],
+      [
+        43,
+        78,
+        -0.0878
+      ],
+      [
+        44,
+        26,
+        -0.0824
+      ],
+      [
+        44,
+        27,
+        -0.0601
+      ],
+      [
+        44,
+        33,
+        0.0588
+      ],
+      [
+        44,
+        39,
+        0.0569
+      ],
+      [
+        44,
+        43,
+        0.085
+      ],
+      [
+        44,
+        46,
+        -0.1337
+      ],
+      [
+        44,
+        51,
+        -0.057
+      ],
+      [
+        44,
+        52,
+        -0.1435
+      ],
+      [
+        44,
+        55,
+        -0.1481
+      ],
+      [
+        44,
+        57,
+        -0.1026
+      ],
+      [
+        44,
+        58,
+        0.1409
+      ],
+      [
+        44,
+        60,
+        -0.051
+      ],
+      [
+        44,
+        62,
+        -0.0834
+      ],
+      [
+        44,
+        63,
+        -0.0302
+      ],
+      [
+        44,
+        66,
+        -0.1204
+      ],
+      [
+        44,
+        68,
+        -0.0858
+      ],
+      [
+        44,
+        69,
+        -0.1295
+      ],
+      [
+        44,
+        70,
+        0.1309
+      ],
+      [
+        44,
+        75,
+        -0.114
+      ],
+      [
+        44,
+        76,
+        0.1149
+      ],
+      [
+        44,
+        77,
+        0.1691
+      ],
+      [
+        44,
+        79,
+        -0.0442
+      ],
+      [
+        45,
+        17,
+        -0.4509
+      ],
+      [
+        45,
+        28,
+        0.0331
+      ],
+      [
+        45,
+        29,
+        -0.0432
+      ],
+      [
+        45,
+        31,
+        0.1354
+      ],
+      [
+        45,
+        35,
+        -0.0362
+      ],
+      [
+        45,
+        38,
+        -0.0637
+      ],
+      [
+        45,
+        42,
+        -0.0428
+      ],
+      [
+        45,
+        44,
+        0.0535
+      ],
+      [
+        45,
+        47,
+        -0.045
+      ],
+      [
+        45,
+        50,
+        -0.0423
+      ],
+      [
+        45,
+        51,
+        0.1014
+      ],
+      [
+        45,
+        54,
+        0.0329
+      ],
+      [
+        45,
+        55,
+        0.06
+      ],
+      [
+        45,
+        56,
+        0.0703
+      ],
+      [
+        45,
+        60,
+        0.0509
+      ],
+      [
+        45,
+        63,
+        -0.1192
+      ],
+      [
+        45,
+        65,
+        -0.1689
+      ],
+      [
+        45,
+        66,
+        -0.0703
+      ],
+      [
+        45,
+        67,
+        -0.1411
+      ],
+      [
+        45,
+        68,
+        -0.0805
+      ],
+      [
+        45,
+        71,
+        -0.0434
+      ],
+      [
+        45,
+        72,
+        -0.1371
+      ],
+      [
+        45,
+        75,
+        -0.1361
+      ],
+      [
+        45,
+        77,
+        0.0392
+      ],
+      [
+        46,
+        18,
+        0.1988
+      ],
+      [
+        46,
+        30,
+        0.1179
+      ],
+      [
+        46,
+        34,
+        -0.1355
+      ],
+      [
+        46,
+        45,
+        -0.0433
+      ],
+      [
+        46,
+        48,
+        -0.1257
+      ],
+      [
+        46,
+        52,
+        0.0303
+      ],
+      [
+        46,
+        59,
+        0.099
+      ],
+      [
+        46,
+        62,
+        0.0361
+      ],
+      [
+        46,
+        63,
+        -0.0837
+      ],
+      [
+        46,
+        68,
+        -0.0399
+      ],
+      [
+        46,
+        75,
+        -0.0684
+      ],
+      [
+        46,
+        77,
+        0.042
+      ],
+      [
+        47,
+        33,
+        -0.0496
+      ],
+      [
+        47,
+        37,
+        0.0683
+      ],
+      [
+        47,
+        39,
+        0.1077
+      ],
+      [
+        47,
+        41,
+        0.0954
+      ],
+      [
+        47,
+        42,
+        0.0788
+      ],
+      [
+        47,
+        44,
+        -0.0458
+      ],
+      [
+        47,
+        46,
+        0.1268
+      ],
+      [
+        47,
+        51,
+        -0.0893
+      ],
+      [
+        47,
+        52,
+        -0.1387
+      ],
+      [
+        47,
+        54,
+        -0.0448
+      ],
+      [
+        47,
+        57,
+        0.1262
+      ],
+      [
+        47,
+        64,
+        -0.1036
+      ],
+      [
+        47,
+        65,
+        -0.0477
+      ],
+      [
+        47,
+        68,
+        0.046
+      ],
+      [
+        47,
+        76,
+        0.0324
+      ],
+      [
+        47,
+        77,
+        0.1392
+      ],
+      [
+        48,
+        28,
+        0.0561
+      ],
+      [
+        48,
+        29,
+        -0.0285
+      ],
+      [
+        48,
+        32,
+        -0.0719
+      ],
+      [
+        48,
+        33,
+        -0.0908
+      ],
+      [
+        48,
+        36,
+        0.0659
+      ],
+      [
+        48,
+        37,
+        0.0556
+      ],
+      [
+        48,
+        41,
+        0.0923
+      ],
+      [
+        48,
+        47,
+        0.0993
+      ],
+      [
+        48,
+        51,
+        -0.0658
+      ],
+      [
+        48,
+        52,
+        0.0403
+      ],
+      [
+        48,
+        56,
+        0.038
+      ],
+      [
+        48,
+        58,
+        -0.1103
+      ],
+      [
+        48,
+        59,
+        -0.041
+      ],
+      [
+        48,
+        60,
+        0.0636
+      ],
+      [
+        48,
+        62,
+        -0.0671
+      ],
+      [
+        48,
+        68,
+        0.0321
+      ],
+      [
+        48,
+        69,
+        0.1054
+      ],
+      [
+        48,
+        71,
+        -0.1023
+      ],
+      [
+        48,
+        72,
+        -0.0922
+      ],
+      [
+        49,
+        28,
+        -0.1001
+      ],
+      [
+        49,
+        29,
+        -0.0775
+      ],
+      [
+        49,
+        37,
+        0.0307
+      ],
+      [
+        49,
+        39,
+        0.0553
+      ],
+      [
+        49,
+        42,
+        -0.1105
+      ],
+      [
+        49,
+        43,
+        -0.0854
+      ],
+      [
+        49,
+        44,
+        0.0305
+      ],
+      [
+        49,
+        46,
+        -0.141
+      ],
+      [
+        49,
+        47,
+        -0.0977
+      ],
+      [
+        49,
+        48,
+        0.0352
+      ],
+      [
+        49,
+        52,
+        0.0298
+      ],
+      [
+        49,
+        54,
+        -0.1331
+      ],
+      [
+        49,
+        56,
+        0.0706
+      ],
+      [
+        49,
+        58,
+        0.0864
+      ],
+      [
+        49,
+        70,
+        0.0738
+      ],
+      [
+        49,
+        75,
+        -0.0483
+      ],
+      [
+        49,
+        76,
+        -0.1169
+      ],
+      [
+        49,
+        78,
+        -0.0799
+      ],
+      [
+        49,
+        79,
+        -0.0908
+      ],
+      [
+        50,
+        30,
+        0.0354
+      ],
+      [
+        50,
+        31,
+        -0.0304
+      ],
+      [
+        50,
+        32,
+        0.1128
+      ],
+      [
+        50,
+        33,
+        -0.1253
+      ],
+      [
+        50,
+        37,
+        -0.0982
+      ],
+      [
+        50,
+        38,
+        0.0686
+      ],
+      [
+        50,
+        39,
+        0.1231
+      ],
+      [
+        50,
+        41,
+        0.1025
+      ],
+      [
+        50,
+        44,
+        0.0292
+      ],
+      [
+        50,
+        58,
+        0.0472
+      ],
+      [
+        50,
+        59,
+        -0.0913
+      ],
+      [
+        50,
+        60,
+        -0.0388
+      ],
+      [
+        50,
+        62,
+        -0.0427
+      ],
+      [
+        50,
+        63,
+        -0.0547
+      ],
+      [
+        50,
+        70,
+        0.1083
+      ],
+      [
+        50,
+        72,
+        -0.0981
+      ],
+      [
+        50,
+        75,
+        -0.1288
+      ],
+      [
+        50,
+        76,
+        -0.1685
+      ],
+      [
+        51,
+        26,
+        0.0576
+      ],
+      [
+        51,
+        32,
+        -0.0948
+      ],
+      [
+        51,
+        33,
+        0.028
+      ],
+      [
+        51,
+        36,
+        -0.0799
+      ],
+      [
+        51,
+        42,
+        -0.0846
+      ],
+      [
+        51,
+        49,
+        0.0916
+      ],
+      [
+        51,
+        50,
+        -0.0945
+      ],
+      [
+        51,
+        55,
+        -0.0928
+      ],
+      [
+        51,
+        56,
+        -0.1482
+      ],
+      [
+        51,
+        58,
+        -0.1449
+      ],
+      [
+        51,
+        59,
+        0.0837
+      ],
+      [
+        51,
+        60,
+        0.0994
+      ],
+      [
+        51,
+        62,
+        0.0999
+      ],
+      [
+        51,
+        63,
+        0.0667
+      ],
+      [
+        51,
+        64,
+        -0.048
+      ],
+      [
+        51,
+        65,
+        0.0614
+      ],
+      [
+        52,
+        16,
+        0.7156
+      ],
+      [
+        52,
+        27,
+        -0.1086
+      ],
+      [
+        52,
+        28,
+        0.0914
+      ],
+      [
+        52,
+        31,
+        0.0617
+      ],
+      [
+        52,
+        36,
+        -0.0773
+      ],
+      [
+        52,
+        42,
+        0.095
+      ],
+      [
+        52,
+        50,
+        -0.0445
+      ],
+      [
+        52,
+        54,
+        -0.0678
+      ],
+      [
+        52,
+        58,
+        -0.0378
+      ],
+      [
+        52,
+        61,
+        0.0658
+      ],
+      [
+        52,
+        64,
+        -0.087
+      ],
+      [
+        52,
+        65,
+        0.0841
+      ],
+      [
+        52,
+        66,
+        0.0459
+      ],
+      [
+        52,
+        69,
+        0.0648
+      ],
+      [
+        52,
+        72,
+        0.0414
+      ],
+      [
+        52,
+        75,
+        0.149
+      ],
+      [
+        52,
+        78,
+        -0.06
+      ],
+      [
+        53,
+        26,
+        -0.0824
+      ],
+      [
+        53,
+        32,
+        -0.1118
+      ],
+      [
+        53,
+        33,
+        0.0757
+      ],
+      [
+        53,
+        38,
+        0.1094
+      ],
+      [
+        53,
+        40,
+        -0.0457
+      ],
+      [
+        53,
+        44,
+        0.049
+      ],
+      [
+        53,
+        45,
+        0.0989
+      ],
+      [
+        53,
+        46,
+        -0.1
+      ],
+      [
+        53,
+        48,
+        0.1291
+      ],
+      [
+        53,
+        49,
+        0.092
+      ],
+      [
+        53,
+        50,
+        -0.1234
+      ],
+      [
+        53,
+        52,
+        -0.0825
+      ],
+      [
+        53,
+        55,
+        -0.1151
+      ],
+      [
+        53,
+        57,
+        0.049
+      ],
+      [
+        53,
+        58,
+        -0.04
+      ],
+      [
+        53,
+        62,
+        0.0514
+      ],
+      [
+        53,
+        67,
+        0.1109
+      ],
+      [
+        53,
+        69,
+        -0.1054
+      ],
+      [
+        53,
+        75,
+        0.1652
+      ],
+      [
+        53,
+        76,
+        -0.164
+      ],
+      [
+        53,
+        77,
+        0.0667
+      ],
+      [
+        54,
+        16,
+        -0.1059
+      ],
+      [
+        54,
+        26,
+        -0.1317
+      ],
+      [
+        54,
+        32,
+        -0.0306
+      ],
+      [
+        54,
+        33,
+        -0.0459
+      ],
+      [
+        54,
+        42,
+        0.1293
+      ],
+      [
+        54,
+        45,
+        0.0571
+      ],
+      [
+        54,
+        48,
+        0.0632
+      ],
+      [
+        54,
+        57,
+        0.1423
+      ],
+      [
+        54,
+        62,
+        -0.1477
+      ],
+      [
+        54,
+        63,
+        0.0464
+      ],
+      [
+        54,
+        64,
+        -0.0326
+      ],
+      [
+        54,
+        66,
+        -0.0294
+      ],
+      [
+        54,
+        67,
+        -0.1409
+      ],
+      [
+        54,
+        71,
+        0.0564
+      ],
+      [
+        54,
+        72,
+        -0.1171
+      ],
+      [
+        54,
+        76,
+        0.0389
+      ],
+      [
+        54,
+        77,
+        -0.1517
+      ],
+      [
+        54,
+        78,
+        0.1456
+      ],
+      [
+        54,
+        79,
+        -0.1505
+      ],
+      [
+        55,
+        27,
+        -0.06
+      ],
+      [
+        55,
+        31,
+        -0.0375
+      ],
+      [
+        55,
+        33,
+        0.1286
+      ],
+      [
+        55,
+        34,
+        -0.0544
+      ],
+      [
+        55,
+        36,
+        0.0994
+      ],
+      [
+        55,
+        37,
+        -0.0909
+      ],
+      [
+        55,
+        39,
+        0.0749
+      ],
+      [
+        55,
+        41,
+        -0.0995
+      ],
+      [
+        55,
+        43,
+        0.0877
+      ],
+      [
+        55,
+        47,
+        -0.0874
+      ],
+      [
+        55,
+        48,
+        -0.0547
+      ],
+      [
+        55,
+        51,
+        -0.1335
+      ],
+      [
+        55,
+        52,
+        -0.1318
+      ],
+      [
+        55,
+        53,
+        0.1326
+      ],
+      [
+        55,
+        54,
+        -0.0805
+      ],
+      [
+        55,
+        61,
+        -0.0901
+      ],
+      [
+        55,
+        62,
+        0.0728
+      ],
+      [
+        55,
+        63,
+        0.106
+      ],
+      [
+        55,
+        64,
+        0.1267
+      ],
+      [
+        55,
+        68,
+        0.0617
+      ],
+      [
+        55,
+        69,
+        -0.0704
+      ],
+      [
+        55,
+        78,
+        -0.0783
+      ],
+      [
+        56,
+        19,
+        0.3875
+      ],
+      [
+        56,
+        34,
+        -0.1135
+      ],
+      [
+        56,
+        38,
+        -0.0383
+      ],
+      [
+        56,
+        39,
+        0.0779
+      ],
+      [
+        56,
+        41,
+        0.0668
+      ],
+      [
+        56,
+        50,
+        -0.1061
+      ],
+      [
+        56,
+        51,
+        0.0515
+      ],
+      [
+        56,
+        57,
+        0.0838
+      ],
+      [
+        56,
+        60,
+        0.0312
+      ],
+      [
+        56,
+        61,
+        0.0542
+      ],
+      [
+        56,
+        65,
+        -0.1355
+      ],
+      [
+        56,
+        69,
+        -0.0506
+      ],
+      [
+        56,
+        79,
+        0.0818
+      ],
+      [
+        57,
+        17,
+        0.0925
+      ],
+      [
+        57,
+        19,
+        0.1253
+      ],
+      [
+        57,
+        28,
+        0.0956
+      ],
+      [
+        57,
+        31,
+        -0.1182
+      ],
+      [
+        57,
+        32,
+        0.056
+      ],
+      [
+        57,
+        40,
+        0.0757
+      ],
+      [
+        57,
+        41,
+        -0.0375
+      ],
+      [
+        57,
+        48,
+        -0.0731
+      ],
+      [
+        57,
+        49,
+        -0.1008
+      ],
+      [
+        57,
+        52,
+        -0.1565
+      ],
+      [
+        57,
+        55,
+        0.1146
+      ],
+      [
+        57,
+        59,
+        -0.0438
+      ],
+      [
+        57,
+        60,
+        -0.1117
+      ],
+      [
+        57,
+        62,
+        0.0978
+      ],
+      [
+        57,
+        65,
+        -0.0365
+      ],
+      [
+        57,
+        66,
+        0.102
+      ],
+      [
+        57,
+        67,
+        -0.1076
+      ],
+      [
+        57,
+        68,
+        0.076
+      ],
+      [
+        57,
+        77,
+        -0.0454
+      ],
+      [
+        57,
+        79,
+        -0.1059
+      ],
+      [
+        58,
+        19,
+        0.3203
+      ],
+      [
+        58,
+        27,
+        -0.038
+      ],
+      [
+        58,
+        36,
+        -0.091
+      ],
+      [
+        58,
+        40,
+        0.044
+      ],
+      [
+        58,
+        48,
+        0.0511
+      ],
+      [
+        58,
+        50,
+        -0.0362
+      ],
+      [
+        58,
+        51,
+        -0.0957
+      ],
+      [
+        58,
+        52,
+        -0.1373
+      ],
+      [
+        58,
+        54,
+        -0.0288
+      ],
+      [
+        58,
+        55,
+        0.0424
+      ],
+      [
+        58,
+        57,
+        -0.0674
+      ],
+      [
+        58,
+        61,
+        0.0405
+      ],
+      [
+        58,
+        65,
+        0.1472
+      ],
+      [
+        58,
+        70,
+        0.0729
+      ],
+      [
+        58,
+        71,
+        0.0861
+      ],
+      [
+        58,
+        75,
+        -0.1193
+      ],
+      [
+        58,
+        76,
+        -0.0312
+      ],
+      [
+        59,
+        17,
+        -0.1243
+      ],
+      [
+        59,
+        26,
+        0.0545
+      ],
+      [
+        59,
+        29,
+        0.0379
+      ],
+      [
+        59,
+        30,
+        -0.1278
+      ],
+      [
+        59,
+        31,
+        -0.0372
+      ],
+      [
+        59,
+        37,
+        -0.1281
+      ],
+      [
+        59,
+        41,
+        0.117
+      ],
+      [
+        59,
+        44,
+        0.0547
+      ],
+      [
+        59,
+        52,
+        -0.0997
+      ],
+      [
+        59,
+        54,
+        -0.1283
+      ],
+      [
+        59,
+        56,
+        0.089
+      ],
+      [
+        59,
+        58,
+        0.1684
+      ],
+      [
+        59,
+        62,
+        0.0908
+      ],
+      [
+        59,
+        63,
+        0.082
+      ],
+      [
+        59,
+        64,
+        -0.0661
+      ],
+      [
+        59,
+        72,
+        0.0295
+      ],
+      [
+        59,
+        75,
+        0.0402
+      ],
+      [
+        59,
+        78,
+        0.1034
+      ],
+      [
+        59,
+        79,
+        -0.0364
+      ],
+      [
+        60,
+        26,
+        0.0952
+      ],
+      [
+        60,
+        29,
+        0.1311
+      ],
+      [
+        60,
+        31,
+        -0.1225
+      ],
+      [
+        60,
+        35,
+        0.1166
+      ],
+      [
+        60,
+        36,
+        -0.076
+      ],
+      [
+        60,
+        37,
+        0.0479
+      ],
+      [
+        60,
+        39,
+        0.1325
+      ],
+      [
+        60,
+        40,
+        0.0551
+      ],
+      [
+        60,
+        45,
+        -0.0499
+      ],
+      [
+        60,
+        50,
+        0.1225
+      ],
+      [
+        60,
+        52,
+        0.0536
+      ],
+      [
+        60,
+        53,
+        -0.0619
+      ],
+      [
+        60,
+        55,
+        0.0664
+      ],
+      [
+        60,
+        59,
+        -0.046
+      ],
+      [
+        60,
+        69,
+        -0.1297
+      ],
+      [
+        60,
+        70,
+        0.0979
+      ],
+      [
+        61,
+        16,
+        0.4581
+      ],
+      [
+        61,
+        17,
+        -0.466
+      ],
+      [
+        61,
+        26,
+        0.0425
+      ],
+      [
+        61,
+        30,
+        -0.1071
+      ],
+      [
+        61,
+        31,
+        0.0498
+      ],
+      [
+        61,
+        37,
+        -0.0781
+      ],
+      [
+        61,
+        38,
+        0.0382
+      ],
+      [
+        61,
+        47,
+        -0.0566
+      ],
+      [
+        61,
+        50,
+        0.0377
+      ],
+      [
+        61,
+        53,
+        0.1259
+      ],
+      [
+        61,
+        57,
+        0.0903
+      ],
+      [
+        61,
+        59,
+        0.0844
+      ],
+      [
+        61,
+        62,
+        -0.0387
+      ],
+      [
+        61,
+        63,
+        0.0363
+      ],
+      [
+        61,
+        65,
+        0.1499
+      ],
+      [
+        61,
+        66,
+        0.0787
+      ],
+      [
+        61,
+        67,
+        0.0587
+      ],
+      [
+        61,
+        68,
+        -0.1066
+      ],
+      [
+        61,
+        75,
+        -0.1297
+      ],
+      [
+        61,
+        78,
+        0.1183
+      ],
+      [
+        61,
+        79,
+        -0.0953
+      ],
+      [
+        62,
+        19,
+        -0.7815
+      ],
+      [
+        62,
+        26,
+        -0.0675
+      ],
+      [
+        62,
+        29,
+        0.0981
+      ],
+      [
+        62,
+        30,
+        0.0856
+      ],
+      [
+        62,
+        31,
+        0.1428
+      ],
+      [
+        62,
+        32,
+        0.0954
+      ],
+      [
+        62,
+        33,
+        0.0734
+      ],
+      [
+        62,
+        36,
+        -0.0967
+      ],
+      [
+        62,
+        43,
+        -0.0695
+      ],
+      [
+        62,
+        44,
+        0.0787
+      ],
+      [
+        62,
+        46,
+        -0.1114
+      ],
+      [
+        62,
+        47,
+        -0.1131
+      ],
+      [
+        62,
+        52,
+        0.1589
+      ],
+      [
+        62,
+        54,
+        0.1098
+      ],
+      [
+        62,
+        55,
+        -0.1166
+      ],
+      [
+        62,
+        58,
+        -0.0468
+      ],
+      [
+        62,
+        66,
+        0.0484
+      ],
+      [
+        62,
+        67,
+        0.1107
+      ],
+      [
+        62,
+        70,
+        -0.099
+      ],
+      [
+        62,
+        71,
+        0.0756
+      ],
+      [
+        62,
+        75,
+        -0.1069
+      ],
+      [
+        62,
+        78,
+        0.0325
+      ],
+      [
+        63,
+        29,
+        0.1087
+      ],
+      [
+        63,
+        30,
+        -0.1256
+      ],
+      [
+        63,
+        32,
+        0.1327
+      ],
+      [
+        63,
+        33,
+        0.0877
+      ],
+      [
+        63,
+        36,
+        -0.0353
+      ],
+      [
+        63,
+        38,
+        -0.0475
+      ],
+      [
+        63,
+        52,
+        -0.0387
+      ],
+      [
+        63,
+        53,
+        -0.0463
+      ],
+      [
+        63,
+        54,
+        -0.0655
+      ],
+      [
+        63,
+        58,
+        -0.1025
+      ],
+      [
+        63,
+        61,
+        0.0859
+      ],
+      [
+        63,
+        64,
+        -0.136
+      ],
+      [
+        63,
+        65,
+        -0.1607
+      ],
+      [
+        63,
+        66,
+        -0.1376
+      ],
+      [
+        63,
+        67,
+        -0.1515
+      ],
+      [
+        63,
+        69,
+        0.0609
+      ],
+      [
+        63,
+        70,
+        0.0516
+      ],
+      [
+        63,
+        75,
+        0.0848
+      ],
+      [
+        63,
+        79,
+        0.1684
+      ],
+      [
+        64,
+        18,
+        0.213
+      ],
+      [
+        64,
+        26,
+        -0.1185
+      ],
+      [
+        64,
+        34,
+        0.0754
+      ],
+      [
+        64,
+        42,
+        0.0649
+      ],
+      [
+        64,
+        49,
+        0.0602
+      ],
+      [
+        64,
+        51,
+        0.1201
+      ],
+      [
+        64,
+        52,
+        0.0882
+      ],
+      [
+        64,
+        55,
+        -0.11
+      ],
+      [
+        64,
+        56,
+        -0.1549
+      ],
+      [
+        64,
+        59,
+        0.0637
+      ],
+      [
+        64,
+        61,
+        -0.0353
+      ],
+      [
+        64,
+        67,
+        0.1102
+      ],
+      [
+        64,
+        68,
+        -0.0558
+      ],
+      [
+        64,
+        69,
+        0.1139
+      ],
+      [
+        64,
+        77,
+        0.1718
+      ],
+      [
+        64,
+        78,
+        0.1368
+      ],
+      [
+        65,
+        16,
+        -0.568
+      ],
+      [
+        65,
+        18,
+        -0.1815
+      ],
+      [
+        65,
+        34,
+        0.0347
+      ],
+      [
+        65,
+        37,
+        0.0769
+      ],
+      [
+        65,
+        39,
+        -0.1286
+      ],
+      [
+        65,
+        40,
+        0.0931
+      ],
+      [
+        65,
+        41,
+        0.0995
+      ],
+      [
+        65,
+        42,
+        -0.0845
+      ],
+      [
+        65,
+        47,
+        -0.0851
+      ],
+      [
+        65,
+        50,
+        -0.0944
+      ],
+      [
+        65,
+        51,
+        -0.049
+      ],
+      [
+        65,
+        54,
+        0.0911
+      ],
+      [
+        65,
+        57,
+        -0.1103
+      ],
+      [
+        65,
+        58,
+        0.1508
+      ],
+      [
+        65,
+        59,
+        0.1023
+      ],
+      [
+        65,
+        62,
+        -0.0727
+      ],
+      [
+        65,
+        64,
+        -0.1005
+      ],
+      [
+        65,
+        72,
+        -0.1086
+      ],
+      [
+        65,
+        75,
+        -0.0925
+      ],
+      [
+        65,
+        77,
+        -0.0603
+      ],
+      [
+        66,
+        17,
+        0.1399
+      ],
+      [
+        66,
+        18,
+        -0.7494
+      ],
+      [
+        66,
+        19,
+        0.7681
+      ],
+      [
+        66,
+        26,
+        -0.1336
+      ],
+      [
+        66,
+        27,
+        -0.1256
+      ],
+      [
+        66,
+        28,
+        0.1355
+      ],
+      [
+        66,
+        30,
+        -0.0783
+      ],
+      [
+        66,
+        32,
+        -0.1401
+      ],
+      [
+        66,
+        36,
+        -0.1389
+      ],
+      [
+        66,
+        37,
+        0.0967
+      ],
+      [
+        66,
+        38,
+        -0.0301
+      ],
+      [
+        66,
+        50,
+        -0.0961
+      ],
+      [
+        66,
+        55,
+        0.0628
+      ],
+      [
+        66,
+        58,
+        -0.0805
+      ],
+      [
+        66,
+        59,
+        0.0437
+      ],
+      [
+        66,
+        60,
+        -0.0328
+      ],
+      [
+        66,
+        61,
+        -0.0704
+      ],
+      [
+        66,
+        62,
+        -0.1171
+      ],
+      [
+        66,
+        67,
+        -0.1153
+      ],
+      [
+        66,
+        68,
+        -0.1401
+      ],
+      [
+        66,
+        71,
+        -0.161
+      ],
+      [
+        67,
+        18,
+        0.3708
+      ],
+      [
+        67,
+        19,
+        -0.4213
+      ],
+      [
+        67,
+        26,
+        0.0901
+      ],
+      [
+        67,
+        29,
+        0.0732
+      ],
+      [
+        67,
+        30,
+        0.0344
+      ],
+      [
+        67,
+        38,
+        -0.0295
+      ],
+      [
+        67,
+        39,
+        0.1345
+      ],
+      [
+        67,
+        42,
+        0.045
+      ],
+      [
+        67,
+        44,
+        -0.034
+      ],
+      [
+        67,
+        46,
+        0.1254
+      ],
+      [
+        67,
+        60,
+        -0.1253
+      ],
+      [
+        67,
+        61,
+        -0.0448
+      ],
+      [
+        67,
+        65,
+        0.0447
+      ],
+      [
+        67,
+        68,
+        0.1139
+      ],
+      [
+        67,
+        70,
+        0.0385
+      ],
+      [
+        67,
+        72,
+        -0.0746
+      ],
+      [
+        67,
+        77,
+        0.1138
+      ],
+      [
+        68,
+        19,
+        -0.1749
+      ],
+      [
+        68,
+        33,
+        0.0483
+      ],
+      [
+        68,
+        34,
+        0.0517
+      ],
+      [
+        68,
+        37,
+        -0.0578
+      ],
+      [
+        68,
+        41,
+        -0.0582
+      ],
+      [
+        68,
+        45,
+        -0.094
+      ],
+      [
+        68,
+        47,
+        -0.0715
+      ],
+      [
+        68,
+        48,
+        -0.0569
+      ],
+      [
+        68,
+        49,
+        0.0486
+      ],
+      [
+        68,
+        50,
+        -0.1175
+      ],
+      [
+        68,
+        55,
+        -0.1346
+      ],
+      [
+        68,
+        60,
+        -0.1068
+      ],
+      [
+        68,
+        63,
+        0.1001
+      ],
+      [
+        68,
+        64,
+        0.1074
+      ],
+      [
+        68,
+        66,
+        0.0791
+      ],
+      [
+        68,
+        70,
+        -0.1045
+      ],
+      [
+        68,
+        71,
+        -0.0891
+      ],
+      [
+        69,
+        18,
+        -0.3244
+      ],
+      [
+        69,
+        26,
+        -0.0294
+      ],
+      [
+        69,
+        29,
+        -0.1032
+      ],
+      [
+        69,
+        30,
+        -0.1264
+      ],
+      [
+        69,
+        31,
+        -0.1101
+      ],
+      [
+        69,
+        36,
+        0.079
+      ],
+      [
+        69,
+        38,
+        -0.0362
+      ],
+      [
+        69,
+        39,
+        0.095
+      ],
+      [
+        69,
+        46,
+        -0.1126
+      ],
+      [
+        69,
+        47,
+        0.1153
+      ],
+      [
+        69,
+        48,
+        -0.0803
+      ],
+      [
+        69,
+        54,
+        0.1423
+      ],
+      [
+        69,
+        55,
+        0.1472
+      ],
+      [
+        69,
+        59,
+        -0.0495
+      ],
+      [
+        69,
+        63,
+        0.0501
+      ],
+      [
+        69,
+        64,
+        -0.04
+      ],
+      [
+        69,
+        65,
+        0.0737
+      ],
+      [
+        69,
+        67,
+        -0.0954
+      ],
+      [
+        69,
+        77,
+        -0.0507
+      ],
+      [
+        70,
+        26,
+        0.0673
+      ],
+      [
+        70,
+        28,
+        0.0579
+      ],
+      [
+        70,
+        29,
+        0.131
+      ],
+      [
+        70,
+        31,
+        0.0914
+      ],
+      [
+        70,
+        32,
+        0.1046
+      ],
+      [
+        70,
+        33,
+        -0.1115
+      ],
+      [
+        70,
+        40,
+        0.1168
+      ],
+      [
+        70,
+        46,
+        0.0508
+      ],
+      [
+        70,
+        50,
+        -0.0987
+      ],
+      [
+        70,
+        52,
+        -0.0467
+      ],
+      [
+        70,
+        66,
+        -0.0593
+      ],
+      [
+        70,
+        67,
+        -0.0575
+      ],
+      [
+        70,
+        68,
+        -0.0691
+      ],
+      [
+        70,
+        78,
+        -0.1284
+      ],
+      [
+        71,
+        29,
+        0.1222
+      ],
+      [
+        71,
+        30,
+        -0.0352
+      ],
+      [
+        71,
+        34,
+        -0.0626
+      ],
+      [
+        71,
+        41,
+        0.0474
+      ],
+      [
+        71,
+        46,
+        -0.0698
+      ],
+      [
+        71,
+        47,
+        0.1075
+      ],
+      [
+        71,
+        49,
+        0.0692
+      ],
+      [
+        71,
+        53,
+        0.0641
+      ],
+      [
+        71,
+        55,
+        -0.0979
+      ],
+      [
+        71,
+        58,
+        -0.0385
+      ],
+      [
+        71,
+        59,
+        0.1238
+      ],
+      [
+        71,
+        61,
+        -0.0934
+      ],
+      [
+        71,
+        65,
+        0.153
+      ],
+      [
+        71,
+        68,
+        -0.054
+      ],
+      [
+        71,
+        72,
+        0.0485
+      ],
+      [
+        71,
+        76,
+        0.1179
+      ],
+      [
+        71,
+        77,
+        0.1219
+      ],
+      [
+        72,
+        26,
+        -0.107
+      ],
+      [
+        72,
+        29,
+        -0.0586
+      ],
+      [
+        72,
+        34,
+        -0.0946
+      ],
+      [
+        72,
+        38,
+        0.1231
+      ],
+      [
+        72,
+        41,
+        -0.1085
+      ],
+      [
+        72,
+        42,
+        0.1343
+      ],
+      [
+        72,
+        44,
+        -0.1272
+      ],
+      [
+        72,
+        52,
+        -0.0296
+      ],
+      [
+        72,
+        58,
+        -0.1149
+      ],
+      [
+        72,
+        61,
+        -0.0568
+      ],
+      [
+        72,
+        62,
+        -0.0543
+      ],
+      [
+        72,
+        66,
+        0.0459
+      ],
+      [
+        72,
+        67,
+        0.0994
+      ],
+      [
+        72,
+        69,
+        0.0491
+      ],
+      [
+        72,
+        70,
+        0.143
+      ],
+      [
+        72,
+        75,
+        -0.0704
+      ],
+      [
+        72,
+        76,
+        -0.1708
+      ],
+      [
+        72,
+        77,
+        0.0466
+      ],
+      [
+        72,
+        78,
+        -0.1142
+      ],
+      [
+        75,
+        27,
+        0.0511
+      ],
+      [
+        75,
+        28,
+        -0.0532
+      ],
+      [
+        75,
+        34,
+        0.1001
+      ],
+      [
+        75,
+        35,
+        0.0675
+      ],
+      [
+        75,
+        36,
+        0.0468
+      ],
+      [
+        75,
+        37,
+        0.1201
+      ],
+      [
+        75,
+        38,
+        0.1037
+      ],
+      [
+        75,
+        46,
+        -0.071
+      ],
+      [
+        75,
+        48,
+        -0.0357
+      ],
+      [
+        75,
+        57,
+        -0.0703
+      ],
+      [
+        75,
+        70,
+        0.0985
+      ],
+      [
+        75,
+        71,
+        -0.0613
+      ],
+      [
+        75,
+        76,
+        -0.1516
+      ],
+      [
+        76,
+        18,
+        0.2569
+      ],
+      [
+        76,
+        26,
+        -0.0461
+      ],
+      [
+        76,
+        27,
+        -0.0705
+      ],
+      [
+        76,
+        28,
+        0.0933
+      ],
+      [
+        76,
+        29,
+        -0.0744
+      ],
+      [
+        76,
+        30,
+        -0.0486
+      ],
+      [
+        76,
+        31,
+        -0.0774
+      ],
+      [
+        76,
+        36,
+        -0.0543
+      ],
+      [
+        76,
+        43,
+        -0.0868
+      ],
+      [
+        76,
+        44,
+        -0.1001
+      ],
+      [
+        76,
+        46,
+        0.0841
+      ],
+      [
+        76,
+        48,
+        -0.0403
+      ],
+      [
+        76,
+        53,
+        0.0627
+      ],
+      [
+        76,
+        54,
+        0.0424
+      ],
+      [
+        76,
+        56,
+        -0.0388
+      ],
+      [
+        76,
+        57,
+        -0.0658
+      ],
+      [
+        76,
+        58,
+        -0.0376
+      ],
+      [
+        76,
+        60,
+        0.0864
+      ],
+      [
+        76,
+        61,
+        0.0617
+      ],
+      [
+        76,
+        62,
+        -0.0814
+      ],
+      [
+        76,
+        63,
+        -0.0704
+      ],
+      [
+        76,
+        65,
+        0.1676
+      ],
+      [
+        76,
+        70,
+        0.0992
+      ],
+      [
+        76,
+        72,
+        -0.0345
+      ],
+      [
+        76,
+        79,
+        -0.0534
+      ],
+      [
+        77,
+        16,
+        0.4516
+      ],
+      [
+        77,
+        26,
+        -0.0516
+      ],
+      [
+        77,
+        27,
+        0.1134
+      ],
+      [
+        77,
+        28,
+        -0.059
+      ],
+      [
+        77,
+        36,
+        0.0472
+      ],
+      [
+        77,
+        42,
+        -0.0932
+      ],
+      [
+        77,
+        46,
+        -0.0392
+      ],
+      [
+        77,
+        47,
+        -0.0318
+      ],
+      [
+        77,
+        48,
+        0.0623
+      ],
+      [
+        77,
+        49,
+        -0.0602
+      ],
+      [
+        77,
+        53,
+        0.0383
+      ],
+      [
+        77,
+        57,
+        -0.101
+      ],
+      [
+        77,
+        58,
+        -0.0338
+      ],
+      [
+        77,
+        69,
+        -0.0741
+      ],
+      [
+        77,
+        70,
+        -0.0401
+      ],
+      [
+        77,
+        72,
+        -0.0328
+      ],
+      [
+        77,
+        75,
+        -0.1205
+      ],
+      [
+        77,
+        78,
+        0.1157
+      ],
+      [
+        77,
+        79,
+        -0.0483
+      ],
+      [
+        78,
+        16,
+        -0.3198
+      ],
+      [
+        78,
+        18,
+        -0.7101
+      ],
+      [
+        78,
+        19,
+        0.7137
+      ],
+      [
+        78,
+        29,
+        0.0463
+      ],
+      [
+        78,
+        32,
+        0.0669
+      ],
+      [
+        78,
+        33,
+        0.0685
+      ],
+      [
+        78,
+        44,
+        0.1103
+      ],
+      [
+        78,
+        47,
+        -0.0508
+      ],
+      [
+        78,
+        50,
+        -0.0861
+      ],
+      [
+        78,
+        52,
+        0.1435
+      ],
+      [
+        78,
+        53,
+        0.0937
+      ],
+      [
+        78,
+        58,
+        0.1208
+      ],
+      [
+        78,
+        60,
+        -0.0686
+      ],
+      [
+        78,
+        66,
+        0.1046
+      ],
+      [
+        78,
+        70,
+        0.0807
+      ],
+      [
+        78,
+        71,
+        0.0506
+      ],
+      [
+        78,
+        75,
+        0.1326
+      ],
+      [
+        79,
+        18,
+        0.9969
+      ],
+      [
+        79,
+        26,
+        -0.0289
+      ],
+      [
+        79,
+        35,
+        -0.1039
+      ],
+      [
+        79,
+        37,
+        -0.0599
+      ],
+      [
+        79,
+        41,
+        0.107
+      ],
+      [
+        79,
+        51,
+        -0.0837
+      ],
+      [
+        79,
+        53,
+        -0.0836
+      ],
+      [
+        79,
+        58,
+        0.1306
+      ],
+      [
+        79,
+        63,
+        0.0653
+      ],
+      [
+        79,
+        65,
+        -0.0973
+      ],
+      [
+        79,
+        66,
+        -0.0936
+      ],
+      [
+        79,
+        68,
+        -0.0797
+      ],
+      [
+        79,
+        69,
+        0.0593
+      ],
+      [
+        75,
+        75,
+        0.4
+      ],
+      [
+        76,
+        76,
+        0.4099
+      ],
+      [
+        77,
+        77,
+        0.3358
+      ],
+      [
+        78,
+        78,
+        0.4426
+      ],
+      [
+        79,
+        79,
+        0.4483
+      ],
+      [
+        65,
+        65,
+        0.311
+      ],
+      [
+        52,
+        52,
+        0.2857
+      ],
+      [
+        56,
+        56,
+        0.3048
+      ],
+      [
+        58,
+        58,
+        0.3488
+      ],
+      [
+        71,
+        71,
+        0.3648
+      ],
+      [
+        76,
+        80,
+        -0.0391
+      ],
+      [
+        24,
+        80,
+        0.0425
+      ],
+      [
+        67,
+        80,
+        0.0475
+      ],
+      [
+        2,
+        80,
+        0.0375
+      ],
+      [
+        12,
+        81,
+        -0.0487
+      ],
+      [
+        45,
+        33,
+        0.0447
+      ],
+      [
+        50,
+        81,
+        0.0359
+      ],
+      [
+        75,
+        81,
+        -0.0298
+      ],
+      [
+        40,
+        17,
+        0.2061
+      ],
+      [
+        61,
+        58,
+        -0.0372
+      ],
+      [
+        82,
+        67,
+        0.04
+      ],
+      [
+        83,
+        18,
+        -0.0222
+      ],
+      [
+        54,
+        60,
+        0.0323
+      ],
+      [
+        84,
+        65,
+        0.0742
+      ],
+      [
+        69,
+        84,
+        0.0471
+      ],
+      [
+        84,
+        29,
+        0.0651
+      ],
+      [
+        85,
+        68,
+        0.0473
+      ],
+      [
+        85,
+        27,
+        0.0644
+      ],
+      [
+        2,
+        85,
+        -0.0474
+      ],
+      [
+        85,
+        52,
+        0.0422
+      ],
+      [
+        49,
+        64,
+        -0.0433
+      ],
+      [
+        87,
+        30,
+        -0.0445
+      ],
+      [
+        12,
+        87,
+        0.0345
+      ],
+      [
+        35,
+        81,
+        0.035
+      ],
+      [
+        85,
+        49,
+        -0.0295
+      ],
+      [
+        80,
+        47,
+        0.0469
+      ],
+      [
+        81,
+        49,
+        -0.0295
+      ],
+      [
+        29,
+        84,
+        0.0408
+      ],
+      [
+        80,
+        48,
+        -0.0299
+      ],
+      [
+        14,
+        88,
+        0.0288
+      ],
+      [
+        89,
+        52,
+        0.0332
+      ],
+      [
+        45,
+        89,
+        -0.0519
+      ],
+      [
+        89,
+        44,
+        -0.0619
+      ],
+      [
+        87,
+        68,
+        0.034
+      ],
+      [
+        14,
+        82,
+        0.0387
+      ],
+      [
+        56,
+        17,
+        0.2156
+      ],
+      [
+        81,
+        84,
+        -0.0401
+      ],
+      [
+        22,
+        63,
+        -0.0403
+      ],
+      [
+        82,
+        43,
+        -0.0421
+      ],
+      [
+        90,
+        76,
+        0.0818
+      ],
+      [
+        79,
+        81,
+        0.0347
+      ],
+      [
+        92,
+        28,
+        -0.0337
+      ],
+      [
+        5,
+        92,
+        -0.0466
+      ],
+      [
+        93,
+        78,
+        0.0839
+      ],
+      [
+        10,
+        93,
+        -0.0358
+      ],
+      [
+        89,
+        55,
+        -0.0492
+      ],
+      [
+        82,
+        72,
+        -0.0469
+      ],
+      [
+        94,
+        53,
+        0.0617
+      ],
+      [
+        8,
+        94,
+        -0.0309
+      ],
+      [
+        95,
+        37,
+        -0.0486
+      ],
+      [
+        95,
+        70,
+        0.0746
+      ],
+      [
+        10,
+        95,
+        -0.0756
+      ],
+      [
+        23,
+        44,
+        -0.0312
+      ],
+      [
+        79,
+        77,
+        -0.0329
+      ],
+      [
+        96,
+        26,
+        0.0851
+      ],
+      [
+        97,
+        35,
+        0.0521
+      ],
+      [
+        84,
+        41,
+        -0.0453
+      ],
+      [
+        88,
+        52,
+        0.0325
+      ],
+      [
+        55,
+        26,
+        0.0299
+      ],
+      [
+        98,
+        54,
+        0.0359
+      ],
+      [
+        98,
+        16,
+        -0.0433
+      ],
+      [
+        47,
+        99,
+        0.0441
+      ],
+      [
+        29,
+        99,
+        -0.0513
+      ],
+      [
+        99,
+        79,
+        -0.0726
+      ],
+      [
+        72,
+        99,
+        0.0541
+      ],
+      [
+        85,
+        100,
+        -0.0787
+      ],
+      [
+        25,
+        100,
+        0.0423
+      ],
+      [
+        96,
+        89,
+        -0.0294
+      ],
+      [
+        63,
+        102,
+        0.0459
+      ],
+      [
+        90,
+        102,
+        -0.0371
+      ],
+      [
+        39,
+        102,
+        0.0586
+      ],
+      [
+        102,
+        19,
+        -0.1021
+      ],
+      [
+        76,
+        103,
+        -0.0301
+      ],
+      [
+        75,
+        103,
+        0.0548
+      ],
+      [
+        44,
+        103,
+        0.0647
+      ],
+      [
+        1,
+        103,
+        -0.0392
+      ],
+      [
+        56,
+        46,
+        0.0385
+      ],
+      [
+        94,
+        80,
+        0.04
+      ],
+      [
+        104,
+        37,
+        -0.035
+      ],
+      [
+        104,
+        67,
+        0.0512
+      ],
+      [
+        104,
+        17,
+        -0.0774
+      ],
+      [
+        10,
+        104,
+        -0.0689
+      ],
+      [
+        99,
+        78,
+        0.0355
+      ],
+      [
+        41,
+        78,
+        -0.0375
+      ],
+      [
+        104,
+        38,
+        -0.0305
+      ],
+      [
+        46,
+        103,
+        -0.0424
+      ],
+      [
+        106,
+        91,
+        0.0453
+      ],
+      [
+        106,
+        37,
+        0.0435
+      ],
+      [
+        14,
+        106,
+        -0.0727
+      ],
+      [
+        107,
+        60,
+        0.0543
+      ],
+      [
+        107,
+        69,
+        -0.0487
+      ],
+      [
+        107,
+        18,
+        0.2303
+      ],
+      [
+        10,
+        107,
+        -0.0418
+      ],
+      [
+        79,
+        42,
+        0.0428
+      ],
+      [
+        106,
+        19,
+        0.2804
+      ],
+      [
+        101,
+        79,
+        0.0445
+      ],
+      [
+        55,
+        79,
+        -0.0435
+      ],
+      [
+        101,
+        62,
+        -0.0394
+      ],
+      [
+        107,
+        38,
+        0.0331
+      ],
+      [
+        101,
+        26,
+        -0.0479
+      ],
+      [
+        108,
+        103,
+        0.0395
+      ],
+      [
+        14,
+        108,
+        0.065
+      ],
+      [
+        47,
+        109,
+        -0.0566
+      ],
+      [
+        48,
+        109,
+        0.0539
+      ],
+      [
+        98,
+        109,
+        0.0769
+      ],
+      [
+        59,
+        66,
+        0.0333
+      ],
+      [
+        49,
+        102,
+        0.0465
+      ],
+      [
+        106,
+        50,
+        0.0425
+      ],
+      [
+        20,
+        79,
+        0.0353
+      ],
+      [
+        81,
+        39,
+        -0.0487
+      ],
+      [
+        62,
+        110,
+        0.0756
+      ],
+      [
+        13,
+        110,
+        -0.0617
+      ],
+      [
+        49,
+        111,
+        0.063
+      ],
+      [
+        80,
+        111,
+        0.0413
+      ],
+      [
+        111,
+        16,
+        -0.044
+      ],
+      [
+        6,
+        111,
+        -0.0232
+      ],
+      [
+        36,
+        50,
+        0.0364
+      ],
+      [
+        86,
+        32,
+        -0.0357
+      ],
+      [
+        92,
+        89,
+        -0.0489
+      ],
+      [
+        7,
+        71,
+        -0.0469
+      ],
+      [
+        90,
+        27,
+        -0.0387
+      ],
+      [
+        76,
+        112,
+        0.0392
+      ],
+      [
+        112,
+        92,
+        -0.0582
+      ],
+      [
+        113,
+        66,
+        -0.0402
+      ],
+      [
+        72,
+        19,
+        0.0157
+      ],
+      [
+        110,
+        92,
+        0.0509
+      ],
+      [
+        97,
+        112,
+        -0.0338
+      ],
+      [
+        110,
+        114,
+        0.0393
+      ],
+      [
+        103,
+        114,
+        -0.0798
+      ],
+      [
+        11,
+        114,
+        0.0529
+      ],
+      [
+        115,
+        43,
+        -0.0834
+      ],
+      [
+        98,
+        115,
+        -0.043
+      ],
+      [
+        107,
+        115,
+        -0.0537
+      ],
+      [
+        5,
+        95,
+        -0.0486
+      ],
+      [
+        92,
+        45,
+        -0.0315
+      ],
+      [
+        96,
+        30,
+        0.0509
+      ],
+      [
+        102,
+        101,
+        0.0564
+      ],
+      [
+        108,
+        52,
+        -0.0396
+      ],
+      [
+        92,
+        34,
+        0.0521
+      ],
+      [
+        32,
+        116,
+        -0.057
+      ],
+      [
+        44,
+        116,
+        -0.0453
+      ],
+      [
+        4,
+        116,
+        -0.0472
+      ],
+      [
+        107,
+        117,
+        0.0858
+      ],
+      [
+        72,
+        117,
+        0.0701
+      ],
+      [
+        117,
+        19,
+        -0.0497
+      ],
+      [
+        113,
+        50,
+        -0.0346
+      ],
+      [
+        32,
+        62,
+        -0.0495
+      ],
+      [
+        86,
+        101,
+        -0.0439
+      ],
+      [
+        50,
+        53,
+        -0.0415
+      ],
+      [
+        7,
+        37,
+        -0.0376
+      ],
+      [
+        64,
+        118,
+        0.0556
+      ],
+      [
+        118,
+        28,
+        -0.0824
+      ],
+      [
+        23,
+        118,
+        0.082
+      ],
+      [
+        2,
+        118,
+        -0.106
+      ],
+      [
+        98,
+        119,
+        -0.0663
+      ],
+      [
+        119,
+        78,
+        0.0432
+      ],
+      [
+        119,
+        30,
+        0.0663
+      ],
+      [
+        119,
+        19,
+        0.0525
+      ],
+      [
+        11,
+        52,
+        0.0285
+      ],
+      [
+        81,
+        55,
+        0.0491
+      ],
+      [
+        86,
+        120,
+        0.0577
+      ],
+      [
+        40,
+        120,
+        -0.036
+      ],
+      [
+        120,
+        19,
+        -0.0686
+      ],
+      [
+        6,
+        120,
+        -0.0592
+      ],
+      [
+        71,
+        121,
+        0.0657
+      ],
+      [
+        121,
+        63,
+        0.0596
+      ],
+      [
+        56,
+        121,
+        0.087
+      ],
+      [
+        11,
+        121,
+        -0.0626
+      ],
+      [
+        99,
+        72,
+        -0.0538
+      ],
+      [
+        38,
+        56,
+        -0.0396
+      ],
+      [
+        25,
+        19,
+        0.1237
+      ],
+      [
+        4,
+        24,
+        -0.0514
+      ],
+      [
+        109,
+        71,
+        0.0519
+      ],
+      [
+        20,
+        108,
+        0.0424
+      ],
+      [
+        95,
+        76,
+        -0.0378
+      ],
+      [
+        117,
+        112,
+        0.0455
+      ],
+      [
+        122,
+        34,
+        -0.0566
+      ],
+      [
+        122,
+        56,
+        0.0521
+      ],
+      [
+        122,
+        69,
+        0.0363
+      ],
+      [
+        122,
+        18,
+        -0.0414
+      ],
+      [
+        92,
+        123,
+        -0.0605
+      ],
+      [
+        123,
+        17,
+        0.0463
+      ],
+      [
+        7,
+        123,
+        -0.0624
+      ],
+      [
+        14,
+        102,
+        0.0446
+      ],
+      [
+        87,
+        37,
+        -0.0443
+      ],
+      [
+        108,
+        58,
+        -0.0505
+      ],
+      [
+        106,
+        34,
+        0.0514
+      ],
+      [
+        124,
+        101,
+        -0.0458
+      ],
+      [
+        45,
+        124,
+        0.0793
+      ],
+      [
+        124,
+        67,
+        0.0282
+      ],
+      [
+        20,
+        124,
+        -0.0079
+      ],
+      [
+        124,
+        16,
+        -0.0111
+      ],
+      [
+        11,
+        124,
+        0.0664
+      ],
+      [
+        120,
+        125,
+        0.0349
+      ],
+      [
+        40,
+        125,
+        0.0929
+      ],
+      [
+        125,
+        64,
+        0.0521
+      ],
+      [
+        125,
+        52,
+        0.0602
+      ],
+      [
+        125,
+        16,
+        -0.0623
+      ],
+      [
+        5,
+        125,
+        -0.027
+      ],
+      [
+        24,
+        115,
+        -0.0393
+      ],
+      [
+        36,
+        76,
+        -0.057
+      ],
+      [
+        104,
+        16,
+        0.0664
+      ],
+      [
+        110,
+        90,
+        -0.0287
+      ],
+      [
+        122,
+        125,
+        0.0495
+      ],
+      [
+        10,
+        79,
+        -0.0512
+      ],
+      [
+        126,
+        66,
+        -0.0053
+      ],
+      [
+        126,
+        27,
+        -0.0563
+      ],
+      [
+        126,
+        69,
+        0.0559
+      ],
+      [
+        126,
+        109,
+        0.0883
+      ],
+      [
+        126,
+        17,
+        0.0489
+      ],
+      [
+        2,
+        126,
+        0.017
+      ],
+      [
+        127,
+        54,
+        0.0258
+      ],
+      [
+        94,
+        127,
+        -0.0251
+      ],
+      [
+        127,
+        72,
+        -0.0847
+      ],
+      [
+        127,
+        45,
+        0.0889
+      ],
+      [
+        127,
+        17,
+        -0.0682
+      ],
+      [
+        13,
+        127,
+        -0.0009
+      ],
+      [
+        88,
+        56,
+        0.0484
+      ],
+      [
+        126,
+        90,
+        0.0114
+      ],
+      [
+        70,
+        21,
+        -0.0572
+      ],
+      [
+        103,
+        65,
+        -0.0383
+      ],
+      [
+        90,
+        34,
+        -0.0101
+      ],
+      [
+        103,
+        32,
+        -0.05
+      ]
+    ]
+  }
+}

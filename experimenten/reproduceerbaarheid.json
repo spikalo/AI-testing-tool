@@ -1,0 +1,25 @@
+{
+  "beschrijving": "Elke conditie twee keer gedraaid met hetzelfde breinzaad en hetzelfde wereldzaad; vergeleken zijn de volledige leercurve, alle toetsen, alle structuurmaten en het eindnetwerk.",
+  "pogingenPerRun": 200,
+  "uitgevoerd": "2026-09-08T15:28:01.702Z",
+  "runs": [
+    {
+      "zaad": 1000,
+      "identiek": true,
+      "succes20": 0.95,
+      "toets": 0.7
+    },
+    {
+      "zaad": 1005,
+      "identiek": true,
+      "succes20": 0.8,
+      "toets": 0.4
+    },
+    {
+      "zaad": 1011,
+      "identiek": true,
+      "succes20": 0.8,
+      "toets": 0.75
+    }
+  ]
+}

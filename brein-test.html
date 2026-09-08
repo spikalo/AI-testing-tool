@@ -44,6 +44,9 @@
   .grid{display:grid;grid-template-columns:326px 1fr 348px;gap:18px;align-items:start;}
   .grid > *{min-width:0;}
   .lowerrow > *{min-width:0;}
+  .expgrid{display:grid;grid-template-columns:minmax(0,1fr) 320px;gap:18px;align-items:start;}
+  .expgrid > *{min-width:0;}
+  @media (max-width:900px){ .expgrid{grid-template-columns:1fr;} }
   @media (max-width:1400px){ .grid{grid-template-columns:300px 1fr;} .grid .col3{grid-column:1 / -1;} }
   @media (max-width:1000px){ .grid{grid-template-columns:1fr;} }
 
@@ -248,6 +251,15 @@
         <div class="field">
           <label>Naam van dit brein</label>
           <input type="text" id="brainname" value="brein-01">
+        </div>
+
+        <div class="field">
+          <label>Breinzaad <span class="val" id="bseedval">willekeurig</span></label>
+          <div class="row2">
+            <input type="number" id="bseed" min="0" max="999999" step="1" placeholder="leeg = loot een zaad">
+            <button class="actionbtn" id="bseedrand">&#127922; willekeurig</button>
+          </div>
+          <div class="hint">Het zaad waaruit de <b>startstructuur</b> geloot wordt: welk neuron welk type krijgt en welke verbindingen er in het begin liggen. Samen met het <b>wereldzaad</b> (rechts, bij Wereld &amp; spel) ligt een training daarmee volledig vast &mdash; dezelfde twee zaden geven dezelfde leercurve, tot op het laatste cijfer. Laat je het leeg, dan wordt er bij elk nieuw brein een zaad geloot en hier ingevuld, zodat je het altijd kunt teruglezen.</div>
         </div>
         <div class="row2">
           <button class="actionbtn primary" id="genbrain">⟳ nieuw brein</button>
@@ -550,6 +562,17 @@
         </div>
         <div class="savestatus" id="savestatus" style="margin-top:8px;">nog geen map gekozen — kies de map <b>resultaten-brein</b> in je projectmap.</div>
       </div>
+
+      <div class="panel">
+        <h2>Herhalen &amp; inladen</h2>
+        <div class="savebar">
+          <button class="actionbtn" id="btnrepeat">&#8635; herhaal deze run</button>
+          <button class="actionbtn" id="btnloadcfg">&#9881; instellingen uit resultaat</button>
+          <button class="actionbtn" id="btnloadbrain">&#129504; brein uit resultaat</button>
+        </div>
+        <input type="file" id="loadfile" accept="application/json" style="display:none">
+        <div class="savestatus" id="loadstatus" style="margin-top:8px;">Een resultaatbestand bevat alle instellingen &eacute;n de volledige eindstructuur. <b>Instellingen</b> zet alle knoppen en beide zaden terug en maakt daarmee een vers brein; <b>brein</b> laadt het getrainde netwerk zelf terug, zodat je het kunt doortrainen of opnieuw kunt toetsen.</div>
+      </div>
     </div>
 
   </div>
@@ -591,6 +614,58 @@
       </div>
       <div id="cmpbars"><div class="hint">Nog geen breinen toegevoegd.</div></div>
     </div>
+  </div>
+
+  <div class="panel" style="margin-top:18px;">
+    <h2>Experimentloper <span class="hd" id="exphd">niets gedraaid</span></h2>
+    <div class="hint" style="margin-bottom:10px;">Draait een lijst <b>condities &times; zaden</b> achter elkaar af zonder te tekenen, en schrijft per run een JSON weg plus &eacute;&eacute;n regel in <b>experimenten/runs.csv</b>. Een conditie is een naam met een stel afwijkingen van de huidige instellingen; alles wat je niet noemt komt uit de pagina zoals die nu staat. De spreiding tussen zaden is ongeveer 0,10 &mdash; reken op minstens twaalf zaden per conditie voordat een verschil iets betekent.</div>
+    <div class="expgrid">
+      <div>
+        <label style="display:block;font-size:12.5px;color:var(--text-dim);margin-bottom:6px;">Condities (JSON)</label>
+        <textarea id="expspec" spellcheck="false" style="width:100%;height:190px;background:var(--panel-alt);color:var(--text);border:1px solid var(--border);border-radius:3px;padding:9px;font-family:'IBM Plex Mono',monospace;font-size:11.5px;line-height:1.5;">[
+  {"naam":"vol model"},
+  {"naam":"vaste structuur", "structOn":false},
+  {"naam":"geen groei",      "growOn":false},
+  {"naam":"geen hertypering", "retypeOn":false}
+]</textarea>
+        <div class="hint">Sleutels zijn de namen uit de configuratie: <code>nNeurons, density, nObs, maxSteps, worldEvery, seed, lr, lam, decay, wmax, stepMax, memLeak, prop, noise0, lrAnneal, structOn, structEvery, pruneT, sprout, growOn, growStagnant, growMax, growN, newLinks, retypeOn, retypeN, retypeCost, rGoal, rProg, rCol, rStep, rIdle, nEpisodes, evalOn, evalMode, inputOnlySens</code>. Types uitzetten kan met <code>"types.mem.on": false</code>.</div>
+      </div>
+      <div>
+        <div class="field">
+          <label>Zaden per conditie <span class="val" id="expseedsval">12</span></label>
+          <input type="range" id="expseeds" min="1" max="32" step="1" value="12">
+        </div>
+        <div class="field">
+          <label>Eerste zaad</label>
+          <input type="number" id="expseed0" min="0" max="999000" step="1" value="1000">
+        </div>
+        <div class="field">
+          <label>Pogingen per run <span class="val" id="expepval">500</span></label>
+          <input type="range" id="expep" min="50" max="3000" step="10" value="500">
+        </div>
+        <div class="checkline"><input type="checkbox" id="expeval" checked> toetsen op onbekende werelden meelopen</div>
+        <div class="checkline"><input type="checkbox" id="expjson" checked> ook per run een volledige JSON wegschrijven</div>
+        <div class="row2" style="margin-top:10px;">
+          <button class="actionbtn primary" id="expstart">&#9654; draai reeks</button>
+          <button class="actionbtn stop" id="expstop" disabled>&#9632; afbreken</button>
+        </div>
+        <div class="savebar">
+          <button class="actionbtn" id="expdir">&#128193; kies map experimenten</button>
+          <button class="actionbtn" id="expcsv">&#11015; download CSV</button>
+        </div>
+        <div class="savestatus" id="expstatus" style="margin-top:8px;">nog geen map gekozen &mdash; kies de map <b>experimenten</b> in je projectmap, of gebruik de downloadknop.</div>
+      </div>
+    </div>
+    <div class="progresswrap" style="margin-top:12px;"><div class="progressbar" id="expbar"></div></div>
+    <div class="scrollx" style="max-height:260px;overflow-y:auto;margin-top:12px;">
+      <table style="width:100%;border-collapse:collapse;font-size:11.5px;">
+        <thead><tr>
+          <th>conditie</th><th>zaad</th><th>succes</th><th>laatste 20</th><th>toets</th><th>neuronen</th><th>verb.</th><th>actief</th><th>reflex</th><th>lussen</th><th>pad</th><th>tijd</th>
+        </tr></thead>
+        <tbody id="expbody"></tbody>
+      </table>
+    </div>
+    <div id="expsummary"></div>
   </div>
 
   <details class="info">
@@ -1355,7 +1430,9 @@ function readCfg(){
     retypeOn:$("retype").checked, retypeN:+$("retypen").value, retypeCost:+$("retypecost").value/100,
     rGoal:+$("rgoal").value/10, rProg:+$("rprog").value/100, rCol:+$("rcol").value/100,
     rStep:+$("rstep").value/1000, rIdle:+$("ridle").value/1000,
-    nEpisodes:+$("nep").value, evalOn:$("evalon").checked
+    nEpisodes:+$("nep").value, evalOn:$("evalon").checked,
+    evalMode: ($("evalstrict")&&$("evalstrict").checked) ? "streng" : "beleid",
+    brainSeed: ($("bseed")&&$("bseed").value!=="") ? +$("bseed").value : null
   };
 }
 const SPEEDS=[1,2,4,8,20,60,"turbo"];
@@ -1372,7 +1449,8 @@ const S={
   rnd:Math.random, evalRnd:null, evalSample:false, evalTemp:undefined,
   phase:0, selected:-1, hover:-1,
   lastRestructure:{pruned:0,sprouted:0,retyped:0,grown:0}, structLog:[],
-  resultsDirHandle:null, lastResult:null, dirty:false
+  resultsDirHandle:null, lastResult:null, dirty:false,
+  expDirHandle:null, expCsvLines:null, expCsvName:"runs.csv", expAbort:false, expRunning:false
 };
 
 /* ======================= spel ======================= */
@@ -1497,7 +1575,7 @@ function evalWorlds(nWorlds,mode){
   return {pct:ok/nWorlds, gemStappen: ok? steps/ok : null};
 }
 function runEval(){
-  const mode=$("evalstrict")&&$("evalstrict").checked ? "streng" : "beleid";
+  const mode=(S.cfg&&S.cfg.evalMode)||(($("evalstrict")&&$("evalstrict").checked)?"streng":"beleid");
   const r=evalWorlds(EVAL_WORLDS,mode);
   S.evalHist.push({ep:S.ep,pct:r.pct});
 }
@@ -1903,15 +1981,25 @@ function stopTraining(finished){
   drawCharts(); updateMetrics(); renderStructReport();
   if(S.hist.length){
     const row=buildResult();
+    S.lastResult=row;
     S.rows.push(row); renderCompare();
     if($("autosave").checked) persistResult(row);
   }
 }
 
 /* ======================= brein maken ======================= */
-function genBrain(){
+/* Het zaad bepaalt de hele startwolk. Staat er een zaad in de pagina, dan gebruiken
+   we dat; anders loten we er een en zetten hem er zichtbaar in, zodat elke run
+   achteraf exact te herhalen is. */
+function genBrain(seedOverride){
   S.cfg=readCfg();
-  const seed=Math.floor(Math.random()*1e6);
+  let seed = seedOverride;
+  if(seed===undefined||seed===null||!isFinite(seed)) seed = S.cfg.brainSeed;
+  if(seed===undefined||seed===null||!isFinite(seed)) seed = Math.floor(Math.random()*1e6);
+  seed = Math.round(seed);
+  if($("bseed")) $("bseed").value=seed;
+  if($("bseedval")) $("bseedval").textContent=seed;
+  S.cfg.brainSeed=seed;
   S.B=createBrain(S.cfg,seed);
   S.selected=-1;
   resetBrainState(S.B);
@@ -1951,15 +2039,17 @@ function validateTypes(){
 }
 
 /* ======================= vergelijken + opslaan ======================= */
-function buildResult(){
-  const A=S.lastAnalysis||analyze(S.B,S.cfg);
+function buildResult(naamOverride){
+  const A=analyze(S.B,S.cfg);
   const h=S.hist;
   const succ20=h.length?h[h.length-1].succ20:0;
   const ev=S.evalHist.length?S.evalHist[S.evalHist.length-1].pct:null;
   return {
+    versie:2,
     tijdstip:new Date().toISOString(),
     spel:"doel bereiken (2D)",
-    brein:$("brainname").value||"brein",
+    brein:naamOverride||$("brainname").value||"brein",
+    breinZaad:S.B.seed,
     config:{
       /* alles wat je in de pagina kunt instellen, precies zoals het stond */
       startNeuronen:S.cfg.nNeurons, samenstelling:S.B.comp, samenstellingStart:S.B.compStart,
@@ -1970,7 +2060,7 @@ function buildResult(){
         refl:{aan:S.cfg.types.refl.on,min:S.cfg.types.refl.min,max:S.cfg.types.refl.max},
         mem:{aan:S.cfg.types.mem.on,min:S.cfg.types.mem.min,max:S.cfg.types.mem.max}
       },
-      startdichtheid:S.cfg.density,
+      startdichtheid:S.cfg.density, invoerAlleenViaSens:!!S.cfg.inputOnlySens,
       wereld:{obstakels:S.cfg.nObs, stappenPerPoging:S.cfg.maxSteps, nieuweWereldElke:S.cfg.worldEvery,
         seed:S.cfg.seed, snelheidKarakter:S.cfg.chSpeed, stoptNaBotsing:S.cfg.stopOnCollide},
       leren:{leersnelheid:S.cfg.lr, sporenVervaging:S.cfg.lam, vervagingPerPoging:S.cfg.decay,
@@ -1985,7 +2075,8 @@ function buildResult(){
         maxOmschakelkosten:S.cfg.retypeCost},
       beloningen:{doel:S.cfg.rGoal,vooruitgang:S.cfg.rProg,botsing:-S.cfg.rCol,
         perStap:-S.cfg.rStep,stilstaan:-S.cfg.rIdle},
-      training:{pogingen:S.cfg.nEpisodes, toetsenAan:S.cfg.evalOn}
+      training:{pogingen:S.cfg.nEpisodes, toetsenAan:S.cfg.evalOn,
+        toetsModus:S.cfg.evalMode||"beleid", toetswerelden:EVAL_WORLDS, breinZaad:S.B.seed}
     },
     resultaat:{
       pogingen:S.ep, succes:S.succTotal, succesPct:S.ep?S.succTotal/S.ep:0,
@@ -2009,6 +2100,7 @@ function buildResult(){
     toetsen:S.evalHist.map(e=>({poging:e.ep,pct:e.pct})),
     herstructureringen:S.structLog,
     netwerk:{
+      nextId:S.B.nextId||0,
       neuronen:Array.from({length:S.B.n},(_,i)=>({i,type:KIND_KEY[S.B.kinds[i]],label:S.B.labels[i],
         x:Math.round(S.B.lay.x[i]),y:Math.round(S.B.lay.y[i]),bias:+fmt(S.B.bias[i],4)})),
       verbindingen:Array.from({length:S.B.nc},(_,c)=>[S.B.cFrom[c],S.B.cTo[c],+fmt(S.B.cW[c],4)])
@@ -2083,6 +2175,334 @@ async function persistResult(row){
   }catch(err){ st.textContent="opslaan mislukt: "+err.message; }
 }
 async function persistPending(){ for(const r of S.rows) if(!r.__saved) await persistResult(r); }
+
+/* =====================================================================
+   Herhalen en inladen
+   Een resultaatbestand bevat alle instellingen en de volledige eindstructuur.
+   Daarmee kun je twee dingen: de instellingen terugzetten en een vers brein
+   maken uit hetzelfde zaad, of het getrainde netwerk zelf terugladen om verder
+   te trainen of opnieuw te toetsen.
+   ===================================================================== */
+const KEY_KIND={in:K_IN,sens:K_SENS,work:K_WORK,refl:K_REFL,mem:K_MEM,neut:K_NEUT,out:K_OUT};
+function loadStatus(html){ const el=$("loadstatus"); if(el) el.innerHTML=html; }
+
+/* Alle knoppen in de pagina terugzetten zoals ze stonden. De schuiven bewaren
+   hele getallen, dus alles wordt teruggeschaald met dezelfde factor als in
+   readCfg() — vandaar de vermenigvuldigingen. */
+function applyCfgToUI(R){
+  const c=R&&R.config; if(!c) throw new Error("dit bestand bevat geen configuratie");
+  const set=(id,v)=>{ const el=$(id); if(el===null||v===undefined||v===null||!isFinite(v)) return;
+    el.value=Math.round(v); el.dispatchEvent(new Event("input")); };
+  const chk=(id,v)=>{ const el=$(id); if(el&&v!==undefined&&v!==null) el.checked=!!v; };
+  const num=(id,v)=>{ const el=$(id); if(el&&v!==undefined&&v!==null&&isFinite(v)) el.value=v; };
+  set("nneurons",c.startNeuronen); set("density",c.startdichtheid*10);
+  const w=c.wereld||{};
+  set("nobs",w.obstakels); set("maxsteps",w.stappenPerPoging); set("worldevery",w.nieuweWereldElke);
+  set("seed",w.seed); set("chspeed",w.snelheidKarakter*10); chk("botsstop",w.stoptNaBotsing);
+  const l=c.leren||{};
+  set("lr",l.leersnelheid*1000); set("elam",l.sporenVervaging*100); set("dec",l.vervagingPerPoging*10000);
+  set("wmax",l.maxGewicht*10); set("stepmax",l.maxVeranderingPerStap*1000); set("memleak",l.geheugenlek*100);
+  set("prop",l.propagatiestappen); set("noise",l.exploratieStart*100); chk("lranneal",l.leersnelheidMeeschalen);
+  const st=c.structureel||{};
+  chk("structplast",st.aan); set("structevery",st.herstructureerElke); set("prune",st.snoeidrempel*1000);
+  set("sprout",st.nieuweVerbindingenPerRonde); chk("grow",st.groeiAan); chk("growstag",st.alleenBijStagnatie);
+  set("growmax",st.maxNeuronen); set("grown",st.nieuweNeuronenPerRonde); set("newlinks",st.startverbindingenNieuwNeuron);
+  chk("retype",st.typeVeranderingAan); set("retypen",st.typeVeranderingenPerRonde); set("retypecost",st.maxOmschakelkosten*100);
+  const b=c.beloningen||{};
+  set("rgoal",b.doel*10); set("rprog",b.vooruitgang*100); set("rcol",-b.botsing*100);
+  set("rstep",-b.perStap*1000); set("ridle",-b.stilstaan*1000);
+  const t=c.training||{};
+  set("nep",t.pogingen); chk("evalon",t.toetsenAan); chk("evalstrict",(t.toetsModus||"beleid")==="streng");
+  chk("inputonlysens",c.invoerAlleenViaSens);
+  const ty=c.types||{};
+  for(const k of ["sens","work","refl","mem"]){
+    if(!ty[k]) continue;
+    const en=$("en-"+k); if(en&&ty[k].aan!==undefined) en.checked=!!ty[k].aan;
+    num("min-"+k,ty[k].min); num("max-"+k,ty[k].max);
+  }
+  if(R.brein && $("brainname")) $("brainname").value=R.brein;
+  const bs=(R.breinZaad!==undefined&&R.breinZaad!==null)?R.breinZaad:(t.breinZaad);
+  if($("bseed")&&bs!==undefined&&bs!==null&&isFinite(bs)){ $("bseed").value=Math.round(bs); if($("bseedval")) $("bseedval").textContent=Math.round(bs); }
+  validateTypes();
+  return (bs!==undefined&&bs!==null&&isFinite(bs))?Math.round(bs):null;
+}
+
+/* Het getrainde netwerk zelf terugbouwen uit het resultaatbestand. */
+function brainFromResult(R){
+  const N=R&&R.netwerk;
+  if(!N||!Array.isArray(N.neuronen)||!Array.isArray(N.verbindingen)) throw new Error("dit bestand bevat geen netwerk");
+  const n=N.neuronen.length;
+  if(n<HID0) throw new Error("het netwerk in dit bestand is te klein");
+  const kinds=new Int8Array(n), labels=new Array(n);
+  const lx=new Float32Array(n), ly=new Float32Array(n), bias=new Float32Array(n);
+  for(const q of N.neuronen){
+    const i=q.i|0;
+    if(i<0||i>=n) throw new Error("neuronnummer buiten bereik: "+q.i);
+    const k=KEY_KIND[q.type]; if(k===undefined) throw new Error("onbekend neurontype: "+q.type);
+    kinds[i]=k; labels[i]=q.label||("n"+i);
+    lx[i]=+q.x||0; ly[i]=+q.y||0; bias[i]=+q.bias||0;
+  }
+  const B={
+    n, kinds, labels, comp:null, nextId:0,
+    act:new Float32Array(n), next:new Float32Array(n), sum:new Float32Array(n),
+    clean:new Float32Array(n), prev:new Float32Array(n), dev:new Float32Array(n),
+    bias, ebias:new Float32Array(n), press:new Uint8Array(N_OUT), rbar:0,
+    from:[], to:[], w:[], e:[], rms:[], weakAge:[],
+    pruned:0, sprouted:0, grown:0, retyped:0, born:0,
+    lay:{x:lx,y:ly}, seed:(R.breinZaad!==undefined&&R.breinZaad!==null)?R.breinZaad:0
+  };
+  let illegaal=0;
+  for(const c of N.verbindingen){
+    const a=c[0]|0, b=c[1]|0, ww=+c[2];
+    if(a<0||a>=n||b<0||b>=n) throw new Error("verbinding wijst buiten het netwerk");
+    if(a!==b && !canConnect(kinds,a,b)) illegaal++;
+    B.from.push(a); B.to.push(b); B.w.push(ww); B.e.push(0); B.rms.push(0); B.weakAge.push(0);
+  }
+  let mx=0;
+  for(const L of labels){ const m=/^[SWRMN](\d+)$/.exec(L||""); if(m) mx=Math.max(mx,+m[1]); }
+  B.nextId=(N.nextId|0)||mx;
+  finalizeConns(B);
+  B.comp=countKinds(B);
+  B.compStart=(R.config&&R.config.samenstellingStart)?Object.assign({},R.config.samenstellingStart):Object.assign({},B.comp);
+  const st=R.structuur||{};
+  B.pruned=st.gesnoeid|0; B.sprouted=st.bijgegroeid|0; B.born=st.nieuweNeuronen|0; B.retyped=st.typeVeranderingen|0;
+  resetBrainState(B);
+  B.__illegaal=illegaal;
+  return B;
+}
+
+function clearRunState(){
+  S.hist=[]; S.evalHist=[]; S.rewards=[]; S.stepsSucc=[]; S.succTotal=0; S.collisions=0;
+  S.structLog=[]; S.ep=0; S.elapsed=0; S.selected=-1;
+}
+
+function applyResult(R,mode){
+  const zaad=applyCfgToUI(R);
+  S.cfg=readCfg();
+  if(mode==="brain"){
+    S.B=brainFromResult(R);
+    clearRunState();
+    newWorld(0); startEpisode();
+    updateTypeCounts(); renderStructReport(); updateStatus(); updateMetrics(); drawCharts(); drawNet();
+    const ill=S.B.__illegaal||0;
+    loadStatus(`brein <b>${R.brein||"?"}</b> geladen: ${S.B.n-HID0} neuronen, ${S.B.nc} verbindingen, zaad ${S.B.seed}.
+      Alle instellingen staan terug. Druk op <b>start</b> om door te trainen, of op <b>kijk &eacute;&eacute;n poging</b> om te zien wat het doet.`
+      + (ill? ` <b>Let op:</b> ${ill} verbindingen passen niet bij de huidige typeregels &mdash; ze blijven staan, maar worden bij de eerste herstructurering opgeruimd.`:""));
+    $("s-state").textContent="brein geladen";
+  } else {
+    genBrain(zaad);
+    loadStatus(`instellingen van <b>${R.brein||"?"}</b> teruggezet, met breinzaad ${S.B.seed} en wereldzaad ${S.cfg.seed}.
+      Er staat een vers brein klaar dat identiek is aan het brein waarmee die run begon.`);
+  }
+}
+
+function repeatRun(){
+  const R=S.lastResult||(S.rows.length?S.rows[S.rows.length-1]:null);
+  if(!R){ loadStatus("nog geen afgeronde run om te herhalen &mdash; train eerst een brein, of laad een resultaatbestand."); return; }
+  applyCfgToUI(R);
+  genBrain(R.breinZaad);
+  loadStatus(`run <b>${R.brein}</b> wordt herhaald: breinzaad ${S.B.seed}, wereldzaad ${S.cfg.seed}, ${S.cfg.nEpisodes} pogingen.`);
+  startTraining();
+}
+
+/* =====================================================================
+   Experimentloper
+   Condities x zaden achter elkaar, zonder tekenen. Per run een JSON en een
+   regel in runs.csv. Dit is het verschil tussen een demo en een instrument:
+   niets wordt gemeten wat niet ook wordt weggeschreven.
+   ===================================================================== */
+const CSV_COLS=["tijdstip","conditie","brein","breinZaad","wereldZaad","pogingen",
+  "neuronenStart","neuronenEind","dichtheid","sens","work","refl","mem","neut",
+  "lr","lam","decay","wmax","stepMax","memLeak","prop","noise0","lrAnneal",
+  "structOn","structEvery","pruneT","sprout","growOn","retypeOn","inputOnlySens",
+  "obstakels","maxSteps","worldEvery","toetsModus",
+  "succesPct","succes20","toetsPct","gemStappenBijSucces","botsingenPerPoging","rekentijdMs",
+  "verbindingen","actieveVerbindingen","gemAbsW","kortstePad","reflexbogen","lussen",
+  "meedoendeNeuronen","losgeraakt","gesnoeid","bijgegroeid","nieuweNeuronen","typeVeranderingen"];
+function csvCell(v){
+  if(v===null||v===undefined) return "";
+  if(typeof v==="boolean") return v?"1":"0";
+  if(typeof v==="number") return Number.isInteger(v)?String(v):v.toFixed(6).replace(/0+$/,"").replace(/\.$/,"");
+  const t=String(v);
+  return /[",\n]/.test(t) ? '"'+t.replace(/"/g,'""')+'"' : t;
+}
+function csvRow(r){
+  const c=r.config, w=c.wereld, l=c.leren, st=c.structureel, res=r.resultaat, s2=r.structuur, comp=c.samenstelling;
+  const v={
+    tijdstip:r.tijdstip, conditie:r.conditie||"", brein:r.brein, breinZaad:r.breinZaad, wereldZaad:w.seed,
+    pogingen:res.pogingen, neuronenStart:c.startNeuronen, neuronenEind:c.neuronenNu, dichtheid:c.startdichtheid,
+    sens:comp.sens, work:comp.work, refl:comp.refl, mem:comp.mem, neut:comp.neut,
+    lr:l.leersnelheid, lam:l.sporenVervaging, decay:l.vervagingPerPoging, wmax:l.maxGewicht,
+    stepMax:l.maxVeranderingPerStap, memLeak:l.geheugenlek, prop:l.propagatiestappen,
+    noise0:l.exploratieStart, lrAnneal:l.leersnelheidMeeschalen,
+    structOn:st.aan, structEvery:st.herstructureerElke, pruneT:st.snoeidrempel, sprout:st.nieuweVerbindingenPerRonde,
+    growOn:st.groeiAan, retypeOn:st.typeVeranderingAan, inputOnlySens:c.invoerAlleenViaSens,
+    obstakels:w.obstakels, maxSteps:w.stappenPerPoging, worldEvery:w.nieuweWereldElke,
+    toetsModus:(c.training&&c.training.toetsModus)||"beleid",
+    succesPct:res.succesPct, succes20:res.succes20, toetsPct:res.toetsPct,
+    gemStappenBijSucces:res.gemStappenBijSucces, botsingenPerPoging:res.botsingenPerPoging, rekentijdMs:res.rekentijdMs,
+    verbindingen:s2.verbindingen, actieveVerbindingen:s2.actieveVerbindingen, gemAbsW:s2.gemAbsW,
+    kortstePad:s2.kortstePad, reflexbogen:s2.reflexbogen, lussen:s2.lussen,
+    meedoendeNeuronen:s2.meedoendeNeuronen, losgeraakt:s2.losgeraakt,
+    gesnoeid:s2.gesnoeid, bijgegroeid:s2.bijgegroeid, nieuweNeuronen:s2.nieuweNeuronen,
+    typeVeranderingen:s2.typeVeranderingen
+  };
+  return CSV_COLS.map(k=>csvCell(v[k])).join(",");
+}
+function expStatus(html){ const el=$("expstatus"); if(el) el.innerHTML=html; }
+
+/* Eén losse meting: brein uit een zaad, training tot het einde, resultaat terug.
+   Geen tekenwerk, geen wachten — dit is de kern van de loper. */
+function runOne(cfg,brainSeed,naam){
+  S.cfg=cfg;
+  S.B=createBrain(cfg,brainSeed);
+  clearRunState();
+  resetBrainState(S.B);
+  S.rnd=mulberry32(cfg.seed*7717+991);
+  S.startTime=performance.now();
+  newWorld(0); startEpisode();
+  while(S.ep<cfg.nEpisodes){ if(gameTick(true,noiseNow())) finishEpisode(); }
+  S.elapsed=performance.now()-S.startTime;
+  const row=buildResult();
+  row.conditie=naam;
+  return row;
+}
+function cfgOverride(base,ov){
+  const c=JSON.parse(JSON.stringify(base));
+  for(const k in ov){
+    if(k==="naam") continue;
+    const path=k.split(".");
+    let o=c;
+    for(let i=0;i<path.length-1;i++){ if(typeof o[path[i]]!=="object"||o[path[i]]===null) o[path[i]]={}; o=o[path[i]]; }
+    o[path[path.length-1]]=ov[k];
+  }
+  return c;
+}
+async function expOpenCsv(){
+  const hdr=CSV_COLS.join(",");
+  S.expCsvName="runs.csv";
+  if(!S.expDirHandle){ if(!S.expCsvLines) S.expCsvLines=[hdr]; return; }
+  try{
+    const fh=await S.expDirHandle.getFileHandle("runs.csv",{create:true});
+    const txt=(await (await fh.getFile()).text()).trim();
+    if(!txt){ S.expCsvLines=[hdr]; return; }
+    const lines=txt.split(/\r?\n/);
+    if(lines[0]===hdr){ S.expCsvLines=lines; return; }
+    S.expCsvName="runs-"+fileTimestamp(new Date())+".csv";
+    S.expCsvLines=[hdr];
+    expStatus(`de bestaande <b>runs.csv</b> heeft andere kolommen &mdash; deze reeks gaat naar <b>${S.expCsvName}</b>.`);
+  }catch(e){ S.expCsvLines=[hdr]; }
+}
+async function expFlushCsv(){
+  if(!S.expDirHandle||!S.expCsvLines) return;
+  try{
+    const fh=await S.expDirHandle.getFileHandle(S.expCsvName,{create:true});
+    const wr=await fh.createWritable();
+    await wr.write(S.expCsvLines.join("\n")+"\n"); await wr.close();
+  }catch(e){ expStatus("CSV schrijven mislukt: "+e.message); }
+}
+async function expWriteJson(row){
+  if(!S.expDirHandle) return;
+  try{
+    const sub=await S.expDirHandle.getDirectoryHandle("runs",{create:true});
+    const naam=`${safeName(row.conditie)}_z${row.breinZaad}_${fileTimestamp(new Date(row.tijdstip))}.json`;
+    const fh=await sub.getFileHandle(naam,{create:true});
+    const wr=await fh.createWritable();
+    await wr.write(JSON.stringify(row,null,2)); await wr.close();
+  }catch(e){ expStatus("JSON schrijven mislukt: "+e.message); }
+}
+function expAddRow(row){
+  const b=$("expbody"); if(!b) return;
+  const tr=document.createElement("tr");
+  const pct=v=>v===null||v===undefined?"–":(100*v).toFixed(0)+"%";
+  tr.innerHTML=`<td>${row.conditie}</td><td>${row.breinZaad}</td><td>${pct(row.resultaat.succesPct)}</td>
+    <td>${pct(row.resultaat.succes20)}</td><td>${pct(row.resultaat.toetsPct)}</td>
+    <td>${row.config.neuronenNu}</td><td>${row.structuur.verbindingen}</td><td>${row.structuur.actieveVerbindingen}</td>
+    <td>${row.structuur.reflexbogen}</td><td>${row.structuur.lussen}</td><td>${row.structuur.kortstePad}</td>
+    <td>${(row.resultaat.rekentijdMs/1000).toFixed(1)}s</td>`;
+  b.appendChild(tr);
+  b.parentElement.scrollTop=b.parentElement.scrollHeight;
+}
+/* Gemiddelde met een 95%-interval. Met de spreiding die we tussen zaden zien
+   (ongeveer 0,10) is dit interval het enige eerlijke antwoord op "is dit beter?" */
+function meanCI(xs){
+  const v=xs.filter(x=>x!==null&&x!==undefined&&isFinite(x));
+  const n=v.length; if(!n) return null;
+  const m=v.reduce((a,b)=>a+b,0)/n;
+  if(n<2) return {n,m,ci:0};
+  const sd=Math.sqrt(v.reduce((a,b)=>a+(b-m)*(b-m),0)/(n-1));
+  return {n,m,ci:1.96*sd/Math.sqrt(n)};
+}
+function expSummary(rows){
+  const el=$("expsummary"); if(!el) return;
+  if(!rows.length){ el.innerHTML=""; return; }
+  const per=new Map();
+  for(const r of rows){ if(!per.has(r.conditie)) per.set(r.conditie,[]); per.get(r.conditie).push(r); }
+  const f=x=>x===null?"–":(100*x.m).toFixed(1)+"% ± "+(100*x.ci).toFixed(1);
+  let h=`<h3 style="font-size:13px;margin:16px 0 8px;color:var(--text-dim);">Samenvatting per conditie</h3>
+    <div class="scrollx"><table style="width:100%;border-collapse:collapse;font-size:11.5px;">
+    <thead><tr><th>conditie</th><th>zaden</th><th>succes laatste 20</th><th>toets onbekende werelden</th><th>verbindingen</th><th>reflexbogen</th><th>tijd</th></tr></thead><tbody>`;
+  for(const [naam,rs] of per){
+    const s20=meanCI(rs.map(r=>r.resultaat.succes20));
+    const ev=meanCI(rs.map(r=>r.resultaat.toetsPct));
+    const cn=meanCI(rs.map(r=>r.structuur.verbindingen));
+    const rf=meanCI(rs.map(r=>r.structuur.reflexbogen));
+    const tm=meanCI(rs.map(r=>r.resultaat.rekentijdMs));
+    h+=`<tr><td>${naam}</td><td>${rs.length}</td><td>${f(s20)}</td><td>${f(ev)}</td>
+      <td>${cn?cn.m.toFixed(0):"–"}</td><td>${rf?rf.m.toFixed(1):"–"}</td><td>${tm?(tm.m/1000).toFixed(1)+"s":"–"}</td></tr>`;
+  }
+  h+=`</tbody></table></div><div class="note">De intervallen zijn 95%-intervallen over de zaden. Overlappen twee intervallen elkaar ruim, dan is het verschil niet aangetoond &mdash; hoe verleidelijk het gemiddelde ook oogt.</div>`;
+  el.innerHTML=h;
+}
+async function runExperiments(){
+  if(S.expRunning) return;
+  let spec;
+  try{ spec=JSON.parse($("expspec").value); }
+  catch(e){ expStatus("de condities zijn geen geldige JSON: "+e.message); return; }
+  if(!Array.isArray(spec)||!spec.length){ expStatus("geen condities opgegeven."); return; }
+  if(S.running) stopTraining(false);
+  const nSeeds=+$("expseeds").value, seed0=+$("expseed0").value, nEp=+$("expep").value;
+  const base=readCfg();
+  base.nEpisodes=nEp; base.evalOn=$("expeval").checked;
+  const total=spec.length*nSeeds;
+  S.expAbort=false; S.expRunning=true;
+  $("expstart").disabled=true; $("expstop").disabled=false; $("btnstart").disabled=true;
+  $("expbody").innerHTML=""; $("expsummary").innerHTML="";
+  await expOpenCsv();
+  const rows=[]; let done=0;
+  const t0=performance.now();
+  for(let ci=0;ci<spec.length && !S.expAbort;ci++){
+    const cond=spec[ci];
+    const naam=cond.naam||("conditie "+(ci+1));
+    let cfg0;
+    try{ cfg0=cfgOverride(base,cond); }
+    catch(e){ expStatus(`conditie "${naam}" is onbruikbaar: ${e.message}`); break; }
+    for(let k=0;k<nSeeds && !S.expAbort;k++){
+      const bs=seed0+k;
+      $("exphd").textContent=`${naam} · zaad ${bs} · ${done+1} van ${total}`;
+      await new Promise(r=>setTimeout(r,0));
+      let row;
+      try{ row=runOne(JSON.parse(JSON.stringify(cfg0)),bs,naam); }
+      catch(e){ expStatus(`run mislukt bij "${naam}", zaad ${bs}: ${e.message}`); S.expAbort=true; break; }
+      rows.push(row);
+      S.expCsvLines.push(csvRow(row));
+      if($("expjson").checked) await expWriteJson(row);
+      await expFlushCsv();
+      done++;
+      $("expbar").style.width=(100*done/total).toFixed(1)+"%";
+      expAddRow(row);
+      expSummary(rows);
+    }
+  }
+  S.expRunning=false;
+  $("expstart").disabled=false; $("expstop").disabled=true; $("btnstart").disabled=false;
+  const secs=((performance.now()-t0)/1000).toFixed(0);
+  $("exphd").textContent=`${done} van ${total} runs · ${secs}s`;
+  const waar=S.expDirHandle?`weggeschreven naar <b>${S.expDirHandle.name}/${S.expCsvName}</b>`
+    :"nog nergens weggeschreven &mdash; kies de map <b>experimenten</b> of gebruik de downloadknop";
+  expStatus(`${done} runs klaar in ${secs} seconden, ${waar}. Het brein dat je nu in beeld ziet is de laatste run uit de reeks.`);
+  updateTypeCounts(); renderStructReport(); updateStatus(); updateMetrics(); drawCharts(); drawNet();
+}
 
 /* ======================= wiring ======================= */
 function bindSlider(id,valId,fn){
@@ -2169,6 +2589,48 @@ function initUI(){
     }catch(e){}
   });
 
+  /* --- zaad, herhalen en inladen --- */
+  if($("bseedrand")) $("bseedrand").addEventListener("click",()=>{
+    const z=Math.floor(Math.random()*1e6);
+    $("bseed").value=z; if($("bseedval")) $("bseedval").textContent=z;
+  });
+  if($("bseed")) $("bseed").addEventListener("input",()=>{
+    if($("bseedval")) $("bseedval").textContent = $("bseed").value===""?"willekeurig":$("bseed").value;
+  });
+  if($("btnrepeat")) $("btnrepeat").addEventListener("click",repeatRun);
+  let loadMode="cfg";
+  const pick=m=>{ loadMode=m; $("loadfile").value=""; $("loadfile").click(); };
+  if($("btnloadcfg")) $("btnloadcfg").addEventListener("click",()=>pick("cfg"));
+  if($("btnloadbrain")) $("btnloadbrain").addEventListener("click",()=>pick("brain"));
+  if($("loadfile")) $("loadfile").addEventListener("change",async e=>{
+    const f=e.target.files&&e.target.files[0]; if(!f) return;
+    try{
+      const R=JSON.parse(await f.text());
+      applyResult(Array.isArray(R)?R[R.length-1]:R,loadMode);
+    }catch(err){ loadStatus("inladen mislukt: "+err.message); }
+    e.target.value="";
+  });
+
+  /* --- experimentloper --- */
+  if($("expseeds")) bindSlider("expseeds","expseedsval",v=>v);
+  if($("expep")) bindSlider("expep","expepval",v=>v);
+  if($("expstart")) $("expstart").addEventListener("click",runExperiments);
+  if($("expstop")) $("expstop").addEventListener("click",()=>{ S.expAbort=true; expStatus("afbreken &mdash; de lopende run wordt nog afgemaakt."); });
+  if($("expdir")) $("expdir").addEventListener("click",async()=>{
+    if(!window.showDirectoryPicker){ expStatus("deze browser ondersteunt geen mapkeuze &mdash; gebruik de downloadknop (Chrome of Edge werkt wel)."); return; }
+    try{
+      S.expDirHandle=await window.showDirectoryPicker({id:"llm-lab-exp",mode:"readwrite",startIn:"documents"});
+      await dirDbSet("breinExpDir",S.expDirHandle);
+      expStatus(`map gekozen: "${S.expDirHandle.name}" &mdash; elke reeks vult <b>runs.csv</b> aan en zet de volledige runs in <b>runs/</b>.`);
+    }catch(e){}
+  });
+  if($("expcsv")) $("expcsv").addEventListener("click",()=>{
+    if(!S.expCsvLines||S.expCsvLines.length<2){ expStatus("nog geen runs om te downloaden."); return; }
+    const blob=new Blob([S.expCsvLines.join("\n")+"\n"],{type:"text/csv"});
+    const url=URL.createObjectURL(blob); const a=document.createElement("a");
+    a.href=url; a.download="runs_"+fileTimestamp(new Date())+".csv"; a.click(); URL.revokeObjectURL(url);
+  });
+
   const cvs=$("netcvs");
   cvs.addEventListener("mousemove",e=>{
     const r=cvs.getBoundingClientRect();
@@ -2203,6 +2665,15 @@ function applyPreset(){
   $("en-sens").checked=true; $("en-refl").checked=true; $("en-mem").checked=true; $("inputonlysens").checked=false;
   validateTypes();
 }
+async function restoreExpDir(){
+  const saved=await dirDbGet("breinExpDir"); if(!saved) return;
+  try{
+    if(await saved.queryPermission({mode:"readwrite"})==="granted"){
+      S.expDirHandle=saved;
+      expStatus(`map onthouden: "${saved.name}" &mdash; reeksen worden hier weggeschreven.`);
+    }
+  }catch(e){}
+}
 async function restoreDir(){
   const saved=await dirDbGet("breinDir"); if(!saved) return;
   const st=$("savestatus");
@@ -2223,6 +2694,7 @@ async function restoreDir(){
 initUI();
 genBrain();
 restoreDir();
+restoreExpDir();
 loop();
 /* Zelfde training, maar zonder tekenen — handig om instellingen door te meten. */
 function runHeadless(nEp,brainSeed,evalOn){
@@ -2236,7 +2708,9 @@ function runHeadless(nEp,brainSeed,evalOn){
     hist:S.hist.map(h=>({ok:h.ok,reward:h.reward,steps:h.steps,idle:h.idle,maxW:h.maxW,meanW:h.meanW}))};
 }
 window.__brain={S,createBrain,analyze,makeWorld,readCfg,startTraining,stopTraining,runHeadless,genBrain,evalWorlds,
-  canConnect,countKinds,restructure,K:{K_IN,K_SENS,K_WORK,K_REFL,K_MEM,K_NEUT,K_OUT,HID0,OUT0}};
+  canConnect,countKinds,restructure,buildResult,brainFromResult,applyCfgToUI,applyResult,repeatRun,
+  runOne,cfgOverride,runExperiments,csvRow,CSV_COLS,meanCI,
+  K:{K_IN,K_SENS,K_WORK,K_REFL,K_MEM,K_NEUT,K_OUT,HID0,OUT0}};
 </script>
 </body>
 </html>

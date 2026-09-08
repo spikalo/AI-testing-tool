@@ -43,3 +43,13 @@ ANG-paper*.docx
 ANG-paper*.pdf
 ~$*.docx
 kritiek chatGPT.docx
+
+# ---------------------------------------------------------------------------
+# Meetreeksen: runs.csv en de reproduceerbaarheidscontrole gaan wel mee,
+# de volledige runs (elk ~325 kB) niet -- die zijn uit de zaden te reproduceren.
+# ---------------------------------------------------------------------------
+experimenten/runs/
+
+# Gerenderde formules van het paper: met een commando terug te maken (paper/mkeq.py)
+paper/eq/
+paper/fig*.png

@@ -147,11 +147,41 @@ werkelijk meedoen, en welke van de zestien sensoren het brein feitelijk negeert.
 run wordt met alle instellingen én de volledige eindstructuur weggeschreven, zodat
 `brein-resultaten.html` het netwerk opnieuw kan tekenen zonder de training over te doen.
 
-Met de standaardinstellingen (60 neuronen, 500 pogingen, 7 obstakels) haalt zo'n brein
-ongeveer **85% van de doelen aan het eind van de training en 75% op twintig werelden die
-het nooit gezien heeft**, in ongeveer 20 seconden. Ter vergelijking: een zuiver
-reactieve agent die recht op het doel af loopt en langs obstakels glijdt, haalt op
-diezelfde werelden 57%.
+**Wat het haalt.** Met de standaardinstellingen (60 neuronen, startdichtheid 35, 7
+obstakels, 500 pogingen) gemeten over **twaalf onafhankelijke breinzaden**:
+
+| grootheid | gemiddelde ± 95% | spreiding |
+|---|---|---|
+| succes over alle pogingen | 63,3% ± 2,8 | sd 5,0% |
+| succes laatste 20 pogingen | 85,0% ± 5,9 | sd 10,4% |
+| toets op onbekende werelden | 68,3% ± 3,0 | sd 5,4% |
+| rekentijd per run | 13,5 s ± 0,3 | |
+
+Ter vergelijking: een zuiver reactieve agent die recht op het doel af loopt en langs
+obstakels glijdt haalt op diezelfde werelden 57%. Let op de spreiding: **sd 10,4% op de
+trainingsscore** betekent dat een enkele run niets bewijst en dat een verschil van tien
+procentpunt pas boven de ruis uitkomt bij ruwweg zestien runs per conditie. De ruwe
+meting staat in `experimenten/runs.csv`.
+
+### Herhaalbaar, laadbaar, en in reeksen te draaien
+
+Een run ligt volledig vast door twee zaden: het **breinzaad** (de startwolk) en het
+**wereldzaad** (de werelden en alle ruis tijdens het leren). Beide staan in de pagina en
+in elk resultaatbestand. Twee keer dezelfde zaden geeft bit voor bit dezelfde leercurve,
+dezelfde toetsen, dezelfde structuurmaten en hetzelfde eindnetwerk — gecontroleerd, niet
+aangenomen (`experimenten/reproduceerbaarheid.json`).
+
+Daaruit volgen drie dingen die de pagina nu kan:
+
+- **↻ herhaal deze run** — zet zaden en instellingen terug en draait dezelfde training opnieuw.
+- **brein of instellingen uit een resultaat laden** — een opgeslagen JSON bevat de
+  volledige eindstructuur, dus je kunt een getraind brein terugladen om door te trainen
+  of opnieuw te toetsen, of alleen de instellingen terugzetten en met een vers brein
+  vanaf hetzelfde punt verder experimenteren.
+- **Experimentloper** — een lijst condities × zaden achter elkaar, zonder tekenen, met
+  per run een JSON en één regel in `experimenten/runs.csv` (52 kolommen: beide zaden,
+  alle parameters die tussen condities verschillen, en alle uitkomst- en structuurmaten).
+  Onderaan verschijnt per conditie het gemiddelde met een 95%-interval over de zaden.
 
 ## Inhoud
 
@@ -169,6 +199,9 @@ diezelfde werelden 57%.
 | `resultaten/` | Opgeslagen runs van test 01 (JSON) |
 | `resultaten-llm/` | Opgeslagen runs van test 02 (JSON, één bestand per model) |
 | `resultaten-brein/` | Opgeslagen runs van test 04 (JSON, één bestand per brein) |
+| `experimenten/` | Meetreeksen van test 04: `runs.csv` met één regel per run, en de volledige runs in `runs/` (niet in git — ze zijn uit de zaden te reproduceren) |
+| `paper/` | Generator van het ANG-paper (`paper.js`) plus de scripts voor de formules en figuren |
+| `tests/` | Playwright-tests die de eigenschappen bewijzen waarop de paper zich beroept |
 | `datasets/` | MNIST/EMNIST — **niet in git**, zie `datasets/README.md` |
 | `DOCUMENTATIE.md` | Volledige documentatie van test 01 en 02: opdrachten, scoring, faalpatronen, remedies en het logboek |
 

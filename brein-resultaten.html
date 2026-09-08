@@ -110,7 +110,7 @@
     <div class="scrollx">
       <table id="tbl">
         <thead><tr>
-          <th data-k="brein">brein</th><th data-k="tijd">tijdstip</th><th data-k="neuronen">neuronen</th>
+          <th data-k="brein">brein</th><th data-k="tijd">tijdstip</th><th data-k="zaad">zaden b/w</th><th data-k="neuronen">neuronen</th>
           <th data-k="comp">S/W/R/M (start → eind)</th>
           <th data-k="geboren">bij</th><th data-k="omgetypt">omgetypt</th><th data-k="verb">verb.</th><th data-k="actief">actief</th>
           <th data-k="succes">succes</th><th data-k="succes20">laatste 20</th><th data-k="toets">toets</th>
@@ -220,7 +220,9 @@ function row(o,naam){
     pad:st.kortstePad===undefined?-1:st.kortstePad, reflex:st.reflexbogen||0,
     lussen:st.lussen||0, dood:st.losgeraakt||0, tijdms:r.rekentijdMs||0,
     geboren:st.nieuweNeuronen||0, omgetypt:st.typeVeranderingen||0,
-    pogingen:r.pogingen||0
+    pogingen:r.pogingen||0,
+    zaad:(o.breinZaad===undefined||o.breinZaad===null)?((cf.training&&cf.training.breinZaad)!==undefined?cf.training.breinZaad:null):o.breinZaad,
+    wzaad:(wr.seed===undefined?null:wr.seed)
   };
 }
 function laadJSON(txt,naam){
@@ -253,6 +255,7 @@ function renderTable(){
     const tr=document.createElement("tr");
     if(i===sel) tr.className="sel";
     tr.innerHTML=`<td>${r.brein}</td><td>${r.tijd?r.tijd.slice(0,16).replace("T"," "):"–"}</td>
+      <td title="breinzaad / wereldzaad — samen leggen ze de run vast">${r.zaad===null?"–":r.zaad}${r.wzaad===null?"":" / "+r.wzaad}</td>
       <td>${r.neuronenStart===r.neuronen?r.neuronen:r.neuronenStart+" → "+r.neuronen}</td>
       <td>${r.compStart} → ${r.comp}</td><td>${r.geboren}</td><td>${r.omgetypt}</td>
       <td>${r.verb}</td><td>${r.actief}</td>
