@@ -43,6 +43,33 @@ De vaste benchmarkset en wat erop gemeten is (werkplan stap 4).
 Draaien: `node tests/exp-stap4.js` (ongeveer tien minuten). De controle dat de
 meetopstelling deugt vóórdat er iets mee gemeten wordt, is `node tests/test-stap4.js`.
 
+## `basislijnen.json`
+
+De basislijnreeks van werkplan stap 5: vijf condities × 16 zaden met **exact dezelfde
+leerregel**, dezelfde wereldzaden en dezelfde benchmarkset, zodat alleen de structuur
+nog verschilt.
+
+| conditie | wat het is |
+|---|---|
+| `ang-vol` | de wolk zoals zij is (overgenomen uit de reeks van stap 4, niet opnieuw gedraaid) |
+| `ang-vast` | dezelfde wolk, structurele plasticiteit uit |
+| `gelaagd-1x150` | één verborgen laag, ±3000 verbindingen — zelfde parameterbudget, zelfde kortste pad |
+| `gelaagd-2x46` | twee lagen, zelfde budget, één boog langer |
+| `gelaagd-1x60` | één laag van 60, minder dan de helft van de gewichten |
+
+`ang-vol` tegen `ang-vast` isoleert de plasticiteit; `ang-vast` tegen `gelaagd-1x150`
+isoleert de topologie, want beide staan dan vast. Het bestand bevat per conditie het
+gemiddelde met 95 %-interval over de zaden voor twaalf maten, zeven Mann-Whitney-toetsen,
+de twee vaste beleidsvormen uit `benchmark.json` als vloer, en de ruwe waarden per zaad.
+Het paper leest het in sectie 10.4.
+
+Draaien: `node tests/exp-stap5.js` (ongeveer twaalf minuten; met `ALLEEN=<conditie>` één
+conditie tegelijk — de reeks is hervatbaar, wat al in `runs.csv` staat wordt niet
+overgedaan). De controle op de basislijn zelf is `node tests/test-stap5.js`: die rekent na
+dat het gelaagde netwerk werkelijk gelaagd is, dat het parameterbudget klopt, dat de
+bedrading tijdens het leren niet verschuift en dat alle 21 velden van de leerregel en de
+spelregels identiek zijn aan de wolkconditie.
+
 ## `reproduceerbaarheid.json`
 
 De controle die de rest pas betekenis geeft: dezelfde twee zaden twee keer achter elkaar

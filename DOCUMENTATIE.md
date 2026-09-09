@@ -390,6 +390,73 @@ en herstart het:
 
 ## 10. Logboek
 
+### 2026-09-09 — Basislijnen: de leerregel doet het werk, niet de graaf (werkplan stap 5)
+
+**De vraag.** De leerregel van sectie 3 vraagt nergens om een graaf — zij werkt op elke
+topologie waarop de knoop-update gedefinieerd is. Het is dus goed mogelijk dat de
+leerregel al het werk doet en de structuur niets toevoegt. Dat is de eerste vraag die een
+kritische lezer stelt, en tot nu toe stond er geen conditie in het project die haar kon
+beantwoorden.
+
+**Wat er gebouwd is.** `createLayered()` in `brein-test.html` maakt een vaste stapel
+lagen in plaats van een wolk: alle verborgen knopen zijn workers, invoer → laag → knop,
+geen terugkoppeling, geen zelfverbindingen. Het is geen ander model — dezelfde
+`propagate`, dezelfde `brainStep`, dezelfde `updateTraces`, dezelfde `applyReward`,
+dezelfde `fadeWeights`. Alleen `B.cFrom`/`B.cTo` zien er anders uit. In de
+experimentloper aan te zetten met `"layered": true` plus `"layerSizes": [150]`.
+
+**De opzet.** Vijf condities × 16 zaden, dezelfde wereldzaden, dezelfde benchmarkset:
+
+| conditie | benchmark | argmax | laatste 20 | verb. | pad | stappen | tijd |
+|---|---|---|---|---|---|---|---|
+| ANG, wolk met plasticiteit | 65,4% ± 2,0 | 52,3% ± 3,0 | 87,2% ± 4,6 | 2996 | 2,00 | 159 | 7,0 s |
+| ANG, wolk bevroren | 67,5% ± 1,3 | 50,3% ± 2,7 | 90,9% ± 4,3 | 2650 | 2,00 | 154 | 5,8 s |
+| gelaagd, 1 × 150 | 66,9% ± 0,5 | 40,9% ± 1,5 | 90,9% ± 3,5 | 3000 | 2,00 | 107 | 5,3 s |
+| gelaagd, 2 × 46 | 62,4% ± 2,6 | 49,7% ± 2,6 | 81,6% ± 5,3 | 3036 | 3,00 | 168 | 7,2 s |
+| gelaagd, 1 × 60 | 67,0% ± 1,0 | 42,8% ± 1,8 | 91,3% ± 4,0 | 1200 | 2,00 | 129 | 2,7 s |
+| *ijkpunt: reactieve agent* | *38,6% ± 4,3* | | | | | | |
+| *ijkpunt: willekeurig beleid* | *0,0%* | | | | | | |
+
+`ang-vol` tegen `ang-vast` isoleert de plasticiteit; `ang-vast` tegen `gelaagd-1x150`
+isoleert de topologie, want beide staan dan vast en hebben hetzelfde parameterbudget en
+dezelfde padlengte.
+
+**Drie uitkomsten.**
+
+1. **De graafstructuur voegt niets toe.** Gelaagd 1 × 150 tegen de bevroren wolk:
+   −0,6 pp, p = 0,76. Zelfs één laag van zestig knopen — minder dan de helft van de
+   gewichten — komt op 67,0% ± 1,0. Op deze taak is alles boven de reactieve ondergrens
+   toe te schrijven aan de leerregel.
+2. **De structurele plasticiteit ook niet.** Snoeien, aangroei, groei en hertypering
+   samen uitzetten kost niets; de bevroren wolk scoort zelfs 2,1 pp hóger (p = 0,11,
+   binnen de ruis). Het kost wel 20% rekentijd en het vergroot de spreiding tussen zaden
+   (± 2,0 tegen ± 1,3).
+3. **Padlengte is het enige structurele effect dat boven de ruis uitkomt.** Twee lagen
+   van 46 hebben hetzelfde budget maar een boog meer, en scoren 5,1 pp lager dan de
+   bevroren wolk (p = 0,003). Bij propagatiediepte 1 is een boog een tijdstap, dus dit is
+   reactietijd en geen capaciteit — precies de eigenschap waarop de resterende
+   onderzoeksvraag rust. Zij pleit alleen evengoed voor een ondiep gelaagd netwerk als
+   voor een graaf.
+
+Bijvangst: het gat tussen geloot en argmax verschilt sterk per architectuur (ANG 50–52%
+argmax tegen 41–43% voor de gelaagde netten). Het gelote beleid van de wolk is dus
+scherper dan dat van een laag; wat dat betekent is nog niet onderzocht.
+
+**Wat het bewijst dat het een eerlijke vergelijking is** (`tests/test-stap5.js`, twaalf
+controles, alle groen): het netwerk is werkelijk gelaagd (geen zelfverbindingen, geen
+lussen, geen verbinding buiten het lagenpatroon), het parameterbudget klopt exact, het
+kortste pad is 2 bij één laag en 3 bij twee, de bedrading is na 120 pogingen leren nog
+bit voor bit dezelfde terwijl alle 3000 gewichten wél veranderd zijn, en alle 21 velden
+van de leerregel en de spelregels zijn identiek aan de wolkconditie.
+
+**Nieuw of gewijzigd:** `createLayered()` in `brein-test.html`, `tests/test-stap5.js`,
+`tests/exp-stap5.js` (hervatbaar, met `ALLEEN=<conditie>` voor één conditie tegelijk),
+`experimenten/basislijnen.json`, 64 nieuwe regels in `runs.csv`. Paper naar versie 1.4:
+nieuwe sectie 10.4 met de basislijntabel en de drie uitkomsten, 10.5 en 10.6 doorgenummerd,
+de samenvatting en de conclusie bijgesteld op wat er gemeten is in plaats van op wat het
+model belooft.
+
+
 ### 2026-09-09 — Een vaste benchmarkset en de onzekerheid erbij (werkplan stap 4)
 
 **Waarom.** Alle generalisatiecijfers tot nu toe kwamen van twintig toetswerelden. Bij

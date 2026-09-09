@@ -195,6 +195,26 @@ gespeeld omdat het beleid geloot wordt; het interval gaat over de wérelden, nie
 speelbeurten. Daarmee zakt de onzekerheid van één meting naar ± 3,6 procentpunt. De
 verzameling ligt vast in `experimenten/benchmark-werelden.json`.
 
+**Draagt de graafstructuur eigenlijk iets bij?** Dat is de eerste vraag die een kritische
+lezer stelt, en het antwoord is op deze taak: nee. Vijf condities met **exact dezelfde
+leerregel**, dezelfde wereldzaden en dezelfde benchmark, 16 zaden elk:
+
+| conditie | benchmark | argmax | verb. | pad | rekentijd |
+|---|---|---|---|---|---|
+| ANG, wolk met plasticiteit | 65,4% ± 2,0 | 52,3% ± 3,0 | 2996 | 2,00 | 7,0 s |
+| ANG, wolk bevroren | 67,5% ± 1,3 | 50,3% ± 2,7 | 2650 | 2,00 | 5,8 s |
+| gelaagd, 1 × 150 | 66,9% ± 0,5 | 40,9% ± 1,5 | 3000 | 2,00 | 5,3 s |
+| gelaagd, 2 × 46 | 62,4% ± 2,6 | 49,7% ± 2,6 | 3036 | 3,00 | 7,2 s |
+| gelaagd, 1 × 60 | 67,0% ± 1,0 | 42,8% ± 1,8 | 1200 | 2,00 | 2,7 s |
+
+Een vaste stapel lagen met hetzelfde parameterbudget doet het net zo goed als de wolk
+(p = 0,76), en de structurele plasticiteit uitzetten kost niets (p = 0,11) maar scheelt
+wel rekentijd. Het enige structurele effect dat boven de ruis uitkomt is **padlengte**:
+twee lagen in plaats van één kost 5,1 procentpunt (p = 0,003) — bij propagatiediepte 1 is
+elke boog een tijdstap, dus dat is reactietijd, geen capaciteit. Alles boven de reactieve
+ondergrens van 38,6% is dus toe te schrijven aan de leerregel, niet aan de graaf. Ruwe
+meting: `experimenten/basislijnen.json`.
+
 ### Herhaalbaar, laadbaar, en in reeksen te draaien
 
 Een run ligt volledig vast door twee zaden: het **breinzaad** (de startwolk) en het

@@ -627,7 +627,7 @@
   {"naam":"trace-nieuw", "traceOud":false},
   {"naam":"trace-oud",   "traceOud":true}
 ]</textarea>
-        <div class="hint">Sleutels zijn de namen uit de configuratie: <code>nNeurons, density, nObs, maxSteps, worldEvery, seed, lr, lam, decay, wmax, stepMax, memLeak, prop, noise0, lrAnneal, structOn, structEvery, pruneT, sprout, growOn, growStagnant, growMax, growN, newLinks, retypeOn, retypeN, retypeCost, rGoal, rProg, rCol, rStep, rIdle, nEpisodes, evalOn, evalMode, inputOnlySens, traceOud, benchOn, benchN, benchReps</code>. Types uitzetten kan met <code>"types.mem.on": false</code>. <code>traceOud:true</code> zet de foutieve postsynaptische eligibility-trace van v&oacute;&oacute;r 9&nbsp;september 2026 terug &mdash; alleen bedoeld als ablatie.</div>
+        <div class="hint">Sleutels zijn de namen uit de configuratie: <code>nNeurons, density, nObs, maxSteps, worldEvery, seed, lr, lam, decay, wmax, stepMax, memLeak, prop, noise0, lrAnneal, structOn, structEvery, pruneT, sprout, growOn, growStagnant, growMax, growN, newLinks, retypeOn, retypeN, retypeCost, rGoal, rProg, rCol, rStep, rIdle, nEpisodes, evalOn, evalMode, inputOnlySens, traceOud, benchOn, benchN, benchReps</code>. Met <code>"layered": true</code> plus <code>"layerSizes": [150]</code> draait dezelfde leerregel op een <b>gelaagd netwerk</b> in plaats van op de wolk &mdash; de basislijn die laat zien wat de graafstructuur toevoegt; zet daar <code>"structOn": false</code> bij, anders blijft er van de lagen niets over. Types uitzetten kan met <code>"types.mem.on": false</code>. <code>traceOud:true</code> zet de foutieve postsynaptische eligibility-trace van v&oacute;&oacute;r 9&nbsp;september 2026 terug &mdash; alleen bedoeld als ablatie.</div>
       </div>
       <div>
         <div class="field">
@@ -960,6 +960,53 @@ function createBrain(cfg,seed){
     if(indeg[i]===0){ const L=legalTo(i); if(L.length){ const q=L[Math.floor(rnd()*L.length)]; if(add(q[0],q[1],(rnd()-0.5)*0.5)){indeg[i]++;outdeg[q[0]]++;} } }
     if(outdeg[i]===0){ const L=legalFrom(i); if(L.length){ const q=L[Math.floor(rnd()*L.length)]; if(add(q[0],q[1],(rnd()-0.5)*0.5)){outdeg[i]++;indeg[q[1]]++;} } }
   }
+  finalizeConns(B);
+  B.comp=countKinds(B); B.compStart={...B.comp};
+  layoutBrain(B,300,false);
+  return B;
+}
+/* ======================= basislijn: een gelaagd netwerk =======================
+   De scherpste controle op de vraag of de graafstructuur iets toevoegt. Dit is
+   geen ander model: dezelfde knoop-update (vgl. 4), dezelfde node-perturbatie,
+   dezelfde sporen, dezelfde basislijn, dezelfde begrensde stap, dezelfde
+   vervaging — alleen de topologie is een vaste stapel lagen in plaats van een
+   wolk. Alle verborgen knopen zijn workers, want die soort verbiedt niets; de
+   structurele plasticiteit hoort in deze conditie uit te staan, anders is het na
+   tien pogingen geen gelaagd netwerk meer.
+   Met één verborgen laag is het kortste pad zintuig → knop twee bogen, precies
+   wat de wolk in de praktijk ook bouwt. Bij twee lagen is het er drie, en omdat
+   elke boog bij P = 1 letterlijk één tijdstap kost, is dat een echte extra
+   reactielatentie en geen boekhoudkundig detail. */
+function createLayered(cfg,seed){
+  const rnd=mulberry32(seed*104729+7);
+  const sizes=(cfg.layerSizes&&cfg.layerSizes.length)?cfg.layerSizes.slice():[150];
+  const kinds=[], labels=[];
+  for(let i=0;i<8;i++){ kinds.push(K_IN); labels.push("obst "+DIRNAME[i]); }
+  for(let i=0;i<8;i++){ kinds.push(K_IN); labels.push("doel "+DIRNAME[i]); }
+  for(let i=0;i<4;i++){ kinds.push(K_OUT); labels.push(OUTNAME[i]); }
+  const lagen=[]; let ctr=0;
+  for(let L=0;L<sizes.length;L++){
+    const idx=[];
+    for(let i=0;i<sizes[L];i++){ idx.push(kinds.length); kinds.push(K_WORK); labels.push("W"+(++ctr)+"·L"+(L+1)); }
+    lagen.push(idx);
+  }
+  const n=kinds.length;
+  const B={
+    n, kinds:Int8Array.from(kinds), labels, comp:null, nextId:ctr,
+    act:new Float32Array(n), next:new Float32Array(n), sum:new Float32Array(n),
+    clean:new Float32Array(n), prev:new Float32Array(n), dev:new Float32Array(n),
+    pre:new Float32Array(n),
+    bias:new Float32Array(n), ebias:new Float32Array(n), press:new Uint8Array(N_OUT), rbar:0,
+    from:[], to:[], w:[], e:[], rms:[], weakAge:[],
+    pruned:0, sprouted:0, grown:0, retyped:0, born:0,
+    lay:null, seed, lagen:sizes.slice()
+  };
+  for(let i=0;i<n;i++) B.bias[i]=(rnd()-0.5)*0.2;
+  const add=(a,b)=>{ B.from.push(a); B.to.push(b); B.w.push((rnd()-0.5)*0.5);
+    B.e.push(0); B.rms.push(0); B.weakAge.push(0); };
+  for(let i=0;i<N_IN;i++) for(const j of lagen[0]) add(i,j);
+  for(let L=0;L+1<lagen.length;L++) for(const a of lagen[L]) for(const b of lagen[L+1]) add(a,b);
+  for(const a of lagen[lagen.length-1]) for(let o=OUT0;o<HID0;o++) add(a,o);
   finalizeConns(B);
   B.comp=countKinds(B); B.compStart={...B.comp};
   layoutBrain(B,300,false);
@@ -2266,7 +2313,10 @@ function buildResult(naamOverride){
     breinZaad:S.B.seed,
     config:{
       /* alles wat je in de pagina kunt instellen, precies zoals het stond */
-      startNeuronen:S.cfg.nNeurons, samenstelling:S.B.comp, samenstellingStart:S.B.compStart,
+      startNeuronen:S.cfg.layered?(S.B.n-HID0):S.cfg.nNeurons,
+      /* basislijn: geen wolk maar een vaste stapel lagen */
+      gelaagd:S.cfg.layered?{lagen:S.B.lagen.slice(), verbindingen:S.B.nc}:null,
+      samenstelling:S.B.comp, samenstellingStart:S.B.compStart,
       neuronenNu:S.B.n-HID0,
       types:{
         sens:{aan:S.cfg.types.sens.on,min:S.cfg.types.sens.min,max:S.cfg.types.sens.max},
@@ -2652,7 +2702,7 @@ function expStatus(html){ const el=$("expstatus"); if(el) el.innerHTML=html; }
    Geen tekenwerk, geen wachten — dit is de kern van de loper. */
 function runOne(cfg,brainSeed,naam){
   S.cfg=cfg;
-  S.B=createBrain(cfg,brainSeed);
+  S.B=cfg.layered? createLayered(cfg,brainSeed) : createBrain(cfg,brainSeed);
   clearRunState();
   resetBrainState(S.B);
   S.rnd=mulberry32(cfg.seed*7717+991);
@@ -3085,7 +3135,7 @@ function runHeadless(nEp,brainSeed,evalOn){
 window.__brain={S,createBrain,analyze,makeWorld,readCfg,startTraining,stopTraining,runHeadless,genBrain,evalWorlds,
   canConnect,countKinds,restructure,buildResult,brainFromResult,applyCfgToUI,applyResult,repeatRun,
   runOne,cfgOverride,runExperiments,csvRow,CSV_COLS,meanCI,mannWhitney,
-  benchmarkWorlds,benchWorldSeed,playWorlds,benchBrain,benchReactief,runBenchmark,
+  benchmarkWorlds,benchWorldSeed,playWorlds,benchBrain,benchReactief,runBenchmark,createLayered,
   reactiefDir,reactiefTick,moveAgent,rayDist,blocked,DIRV,
   BENCH:{N:BENCH_N,REPS:BENCH_REPS,SEED0:BENCH_SEED0,STRIDE:BENCH_STRIDE,OBS:BENCH_OBS,RNG:BENCH_RNG},
   EVAL_WORLDS,

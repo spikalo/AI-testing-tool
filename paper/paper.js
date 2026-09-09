@@ -43,6 +43,7 @@ const PGAIN = lees(path.join(EXPDIR, 'perturbatie-schaal.json'));
 const PGAINLR = lees(path.join(EXPDIR, 'perturbatie-schaal-lr.json'));
 const BENCH = lees(path.join(EXPDIR, 'benchmark.json'));
 const BENCHSET = lees(path.join(EXPDIR, 'benchmark-werelden.json'));
+const BASIS = lees(path.join(EXPDIR, 'basislijnen.json'));
 function stat(xs) {
   const v = xs.filter(x => typeof x === 'number' && isFinite(x));
   const n = v.length; if (!n) return null;
@@ -57,7 +58,7 @@ const num = (x, d = 0) => x === null ? '–' : x.m.toFixed(d) + ' ± ' + x.ci.to
 const kol = k => RUNS ? RUNS.map(r => r[k]) : [];
 /* een gemiddelde-met-interval uit benchmark.json in dezelfde vorm als stat() */
 const bm = o => o ? { n: o.n, m: o.m, sd: o.sd, ci: o.ci, min: o.m, max: o.m } : null;
-const VERSIE = '1.3';
+const VERSIE = '1.4';
 const DATUM = '9 september 2026';
 const SERIF = 'Cambria';
 const TEXTW_PT = 448;              // bruikbare tekstbreedte in punten
@@ -273,11 +274,15 @@ C.push(new Paragraph({
       'moduleert een eligibility trace. Drie begrenzingen — een maximale stap per keer, een demping die toeneemt ' +
       'naarmate een gewicht zijn plafond nadert, en een vervaging per poging — zorgen dat verbindingen geleidelijk ' +
       'ontstaan, versterken en verdwijnen in plaats van abrupt. Dit document beschrijft het model, de leerregel, de ' +
-      'structurele plasticiteit en de meetinstrumenten volledig, met een referentiemeting over twaalf ' +
-      'onafhankelijke breinzaden en een numerieke controle van de leerregel zelf. Die controle laat zien dat de ' +
-      'exacte score-functie voor de uitvoerknopen de gradiënt nauwkeurig volgt, dat de node-perturbatieschatter ' +
-      'de goede richting aanwijst maar veel ruwer, en dat de twee delen van de update niet op dezelfde schaal ' +
-      'staan. De ablaties en de basislijnen volgen in een latere versie.'
+      'structurele plasticiteit en de meetinstrumenten volledig, met een referentiemeting over zestien ' +
+      'onafhankelijke breinzaden op een vaste benchmarkset van vijfhonderd werelden, en een numerieke controle ' +
+      'van de leerregel zelf. Die controle laat zien dat de exacte score-functie voor de uitvoerknopen de ' +
+      'gradiënt nauwkeurig volgt, dat de node-perturbatieschatter de goede richting aanwijst maar veel ruwer, ' +
+      'en dat de twee delen van de update niet op dezelfde schaal staan. Een basislijnreeks met dezelfde ' +
+      'leerregel op een vaste gelaagde topologie scoort binnen de meetruis gelijk aan de graaf: op deze taak ' +
+      'is de prestatie toe te schrijven aan de leerregel en niet aan de structuur. Het enige structurele ' +
+      'effect dat boven de ruis uitkomt is padlengte, die bij propagatiediepte één samenvalt met reactietijd. ' +
+      'De ablaties per mechanisme en de basislijnen met backpropagation volgen in een latere versie.'
   })]
 }));
 C.push(new Paragraph({
@@ -1428,18 +1433,108 @@ if (RUNS && RUNS.length) {
   ));
 }
 
-C.push(h2('10.4', 'Wat hierna gemeten wordt'));
+/* --- 10.4: basislijnen binnen dezelfde leerregel ---------------------------
+   Volledig uit experimenten/basislijnen.json. De tekst hieronder leest de
+   uitkomst en zegt wat er staat, ook als dat tegen het model pleit. */
+if (BASIS && BASIS.tabel) {
+  const T = BASIS.tabel, TS = BASIS.toetsen.filter(Boolean);
+  const naam = { 'ang-vol': 'ANG, wolk met plasticiteit', 'ang-vast': 'ANG, wolk met bevroren structuur',
+    'gelaagd-1x150': 'gelaagd, 1 × 150', 'gelaagd-2x46': 'gelaagd, 2 × 46', 'gelaagd-1x60': 'gelaagd, 1 × 60' };
+  const vs = (a, b) => TS.find(t => t.tegen === a && t.conditie === b);
+  C.push(h2('10.4', 'Basislijnen binnen dezelfde leerregel'));
+  C.push(body(
+    'De referentiemeting zegt dat het netwerk leert, niet waaraan dat ligt. De leerregel van sectie 3 vraagt ' +
+    'nergens om een graaf: zij werkt op elke topologie waarop de knoop-update van vergelijking 4 gedefinieerd ' +
+    'is. Het is dus goed mogelijk dat de leerregel al het werk doet en de structuur er niets aan toevoegt. Om ' +
+    'dat uit elkaar te trekken zijn vier condities gedraaid die alles delen behalve de bedrading: dezelfde ' +
+    'knoop-update, dezelfde node-perturbatie, dezelfde sporen, basislijn, begrensde stap en vervaging, dezelfde ' +
+    'wereldzaden, dezelfde ' + BASIS.zaden + ' breinzaden en dezelfde benchmarkset.'
+  ));
+  C.push(bullet([bd('ANG met plasticiteit. '), t('De wolk zoals sectie 2 en 4 haar beschrijven.')]));
+  C.push(bullet([bd('ANG met bevroren structuur. '), t('Dezelfde beginwolk, maar snoeien, aangroei, groei en ' +
+    'soortverandering staan uit. Het verschil met de vorige conditie is precies wat de structurele ' +
+    'plasticiteit oplevert.')]));
+  C.push(bullet([bd('Gelaagd, één verborgen laag van 150. '), t('Een vaste stapel lagen met hetzelfde ' +
+    'parameterbudget (' + Math.round(T['gelaagd-1x150'].verbindingen.m) + ' verbindingen tegen ' +
+    Math.round(T['ang-vol'].verbindingen.m) + '), alle verborgen knopen workers, geen terugkoppeling. Het ' +
+    'kortste pad zintuig → knop is twee bogen, net als bij de wolk. Het verschil met de bevroren wolk is ' +
+    'precies wat de topologie oplevert, want beide staan vast.')]));
+  C.push(bullet([bd('Gelaagd, twee lagen van 46. '), t('Hetzelfde budget, maar een boog langer. Bij ' +
+    'propagatiediepte één kost dat letterlijk één tijdstap extra tussen prikkel en actie.')]));
+  C.push(bullet([bd('Gelaagd, één laag van 60. '), t('Evenveel neuronen als de wolk aan het begin, en daarmee ' +
+    'nog geen half zo veel gewichten (' + Math.round(T['gelaagd-1x60'].verbindingen.m) + ').')]));
+  C.push(tbl(
+    ['conditie', 'benchmark, geloot', 'benchmark, argmax', 'laatste 20', 'verb.', 'pad', 'stappen', 'tijd'],
+    [['willekeurig beleid', (100 * BASIS.vasteBeleidsvormen.willekeurig.pct).toFixed(1) + '%', '—', '—', '—', '—', '—', '—'],
+     ['reactieve agent', (100 * BASIS.vasteBeleidsvormen.reactief.pct).toFixed(1) + '% ± ' +
+       (100 * BASIS.vasteBeleidsvormen.reactief.ci).toFixed(1), '—', '—', '—', '—', '—', '—']]
+      .concat(Object.keys(T).map(k => [naam[k] || k, pct(T[k].benchBeleid), pct(T[k].benchStreng),
+        pct(T[k].succes20), String(Math.round(T[k].verbindingen.m)), T[k].pad.m.toFixed(2),
+        T[k].benchStappen.m.toFixed(0), (T[k].tijdMs.m / 1000).toFixed(1) + ' s'])),
+    [2500, 1500, 1500, 1300, 800, 600, 800, 672]
+  ));
+  C.push(gap(60));
+  const pl = vs('ang-vol', 'ang-vast'), top = vs('ang-vast', 'gelaagd-1x150'),
+        diep = vs('ang-vast', 'gelaagd-2x46'), klein = vs('ang-vast', 'gelaagd-1x60');
+  const pTekst = o => o ? (o.p < 0.001 ? 'p < 0,001' : 'p = ' + o.p.toFixed(3)) : '';
+  C.push(h3('Wat de structuur oplevert: op deze taak niets'));
+  C.push(body([
+    bd('Het gelaagde netwerk doet het even goed als de wolk. '),
+    t('Met hetzelfde parameterbudget en hetzelfde kortste pad haalt het ' + pct(T['gelaagd-1x150'].benchBeleid) +
+      ' tegen ' + pct(T['ang-vast'].benchBeleid) + ' voor de bevroren wolk — ' +
+      (top ? (top.verschilPp >= 0 ? '+' : '') + top.verschilPp.toFixed(1) + ' procentpunt, ' + pTekst(top) +
+        ', ' + top.oordeel : '') + '. Ook een laag van zestig knopen, met minder dan de helft van de gewichten, ' +
+      'komt op ' + pct(T['gelaagd-1x60'].benchBeleid) + '. Op deze taak voegt de graafstructuur dus niets toe ' +
+      'aan wat de leerregel al doet, en het parameterbudget doet er nauwelijks toe.')
+  ]));
+  C.push(body([
+    bd('En de structurele plasticiteit evenmin. '),
+    t('Snoeien, aangroei, neuronale groei en soortverandering samen uitzetten kost ' +
+      (pl ? (pl.verschilPp >= 0 ? 'niets — de bevroren wolk scoort zelfs ' + pl.verschilPp.toFixed(1) +
+        ' procentpunt hoger (' + pTekst(pl) + ', ' + pl.oordeel + ')'
+        : Math.abs(pl.verschilPp).toFixed(1) + ' procentpunt (' + pTekst(pl) + ', ' + pl.oordeel + ')') : '') +
+      '. Het mechanisme dat het model zijn naam geeft, is op deze omgeving dus niet aantoonbaar nuttig — het ' +
+      'kost wel rekentijd (' + (T['ang-vol'].tijdMs.m / 1000).toFixed(1) + ' s tegen ' +
+      (T['ang-vast'].tijdMs.m / 1000).toFixed(1) + ' s per run) en het vergroot de spreiding tussen zaden ' +
+      '(± ' + (100 * T['ang-vol'].benchBeleid.ci).toFixed(1) + ' tegen ± ' +
+      (100 * T['ang-vast'].benchBeleid.ci).toFixed(1) + '). Sectie 10.5 splitst dit in de afzonderlijke ' +
+      'mechanismen; deze meting zegt alleen dat het geheel niets oplevert.')
+  ]));
+  C.push(h3('Wat wél meetbaar is: padlengte'));
+  C.push(body([
+    t('Eén structureel verschil komt er wel doorheen. Twee lagen van 46 hebben hetzelfde budget als één laag ' +
+      'van 150, maar een boog meer tussen zintuig en knop, en scoren ' + pct(T['gelaagd-2x46'].benchBeleid) +
+      ' — ' + (diep ? Math.abs(diep.verschilPp).toFixed(1) + ' procentpunt onder de bevroren wolk, ' +
+        pTekst(diep) + ', ' + diep.oordeel : '') + '. Dat is de enige conditie in deze tabel waar het verschil ' +
+      'boven de ruis uitkomt. Bij propagatiediepte één is een boog een tijdstap, dus dit is geen verschil in ' +
+      'capaciteit maar in '), it('reactietijd'),
+    t(': het netwerk reageert een tik later op wat het ziet, en dat kost succes. Precies dat is de eigenschap ' +
+      'waarop sectie 10.6 de resterende onderzoeksvraag baseert — maar zij pleit hier evengoed voor een ondiep ' +
+      'gelaagd netwerk als voor een graaf.')
+  ]));
+  C.push(body([
+    bd('De eerlijke samenvatting. '),
+    t('Alles boven de reactieve ondergrens van ' + (100 * BASIS.vasteBeleidsvormen.reactief.pct).toFixed(1) +
+      '% is op deze taak toe te schrijven aan de leerregel, niet aan de graaf. Wie wil laten zien dat een ' +
+      'zichzelf herstructurerende topologie iets toevoegt, heeft een omgeving nodig waarin verschillende ' +
+      'informatielatenties werkelijk nodig zijn; in een taak waarin het doel altijd zichtbaar is en één ' +
+      'tussenlaag volstaat, is er niets te herstructureren dat de moeite loont. Dat is de aanleiding voor de ' +
+      'tweede taak in sectie 10.5, en het is de reden dat de vraagstelling in sectie 10.6 smaller is dan waar ' +
+      'dit werk mee begon.')
+  ]));
+  C.push(gap(60));
+}
+
+C.push(h2('10.5', 'Wat hierna gemeten wordt'));
 C.push(body(
-  'De referentiemeting hierboven zegt op zichzelf nog niets over de vraag of de graafstructuur iets bijdraagt. ' +
-  'Daarvoor zijn condities nodig die telkens één onderdeel wegnemen, en basislijnen die telkens één aanname ' +
-  'wegnemen. De volgende versie van dit document rapporteert:'
+  'Sectie 10.4 laat zien dat de structurele plasticiteit als geheel niets oplevert. Dat zegt nog niet welk van ' +
+  'de mechanismen daaraan schuldig is, en evenmin wat er wordt opgegeven door geen backpropagation te ' +
+  'gebruiken. De volgende versie van dit document rapporteert:'
 ));
 C.push(bullet([bd('Ablaties. '), t('Tien condities die elk één mechanisme uitzetten — geheugen-neuronen, ' +
   'reflex-neuronen, invoer-neuronen, snoeien, aangroei, neuronale groei, soortverandering, de soortregels zelf, ' +
   'en als uiterste de volledig bevroren structuur waarin alleen de gewichten nog leren.')]));
-C.push(bullet([bd('Basislijn met dezelfde leerregel. '), t('Een gelaagd netwerk met hetzelfde parameterbudget, ' +
-  'getraind met exact de leerregel uit sectie 3. Dit isoleert wat de structuur bijdraagt; zonder deze conditie is ' +
-  'niet uit te sluiten dat de leerregel alleen het werk doet.')]));
+
 C.push(bullet([bd('Basislijnen met backpropagation. '), t('Twee kleine MLP\'s en een GRU, getraind met een ' +
   'gewone policy-gradient. Dit isoleert wat er wordt opgegeven door geen backpropagation te gebruiken. Dat is een ' +
   'andere vraag dan de vorige, en beide zijn nodig.')]));
@@ -1455,9 +1550,11 @@ C.push(bullet([bd('Een tweede taak. '), t('In de huidige taak is het doel altijd
   'doel na verloop van tijd verdwijnt terwijl er tegelijk obstakels opduiken die binnen één tik ontweken moeten ' +
   'worden, is de eerste opzet waarin de twee soorten paden — kort en reflexmatig, lang en met geheugen — ook ' +
   'werkelijk allebei nodig zijn.')]));
+C.push(h2('10.6', 'De onderzoeksvraag, smaller gemaakt'));
 C.push(body(
-  'Bij dat laatste hoort een scherpe afbakening. ANG is geen goedkoper alternatief ' +
-  'voor backpropagation, en op een taak als deze zal een klein gelaagd netwerk vermoedelijk op rekenkosten winnen. ' +
+  'Sectie 10.4 dwingt tot een scherpe afbakening. ANG is geen goedkoper alternatief ' +
+  'voor backpropagation, en op een taak als deze wint een klein gelaagd netwerk met dezelfde leerregel al op ' +
+  'rekentijd bij gelijke score — gemeten, niet vermoed. ' +
   'De verdedigbare vraag is smaller: of een lokaal lerende, zichzelf herstructurerende recurrente graaf door ' +
   'structurele spaarzaamheid en verschillende informatielatenties een gunstiger compromis tussen rekenwerk en ' +
   'gedrag vindt dan een vaste architectuur. Bij propagatiediepte één kost elke boog letterlijk één tijdstap, ' +
@@ -1482,6 +1579,15 @@ C.push(body(
   'begrijpen waarom een te klein of slecht getraind netwerk faalt — is dat precies de vorm waarin je een antwoord ' +
   'wilt hebben.'
 ));
+if (BASIS && BASIS.tabel) C.push(body([
+  bd('Wat het model op deze taak niet laat zien, hoort er even hard bij. '),
+  t('Een vaste stapel lagen met dezelfde leerregel en hetzelfde parameterbudget scoort binnen de meetruis ' +
+    'gelijk (sectie 10.4), en de structurele plasticiteit als geheel levert niets aantoonbaars op. De ' +
+    'prestatie is dus toe te schrijven aan de leerregel, niet aan de graaf. Dat is geen weerlegging van het ' +
+    'idee, maar het bepaalt wel waar het bewijs vandaan moet komen: uit een omgeving waarin korte en lange ' +
+    'paden allebei nodig zijn, niet uit een taak waarin het doel altijd zichtbaar is en één tussenlaag ' +
+    'volstaat. Zolang die meting er niet is, is de afleesbaarheid de bijdrage en niet de prestatie.')
+]));
 
 /* ===== referenties ===== */
 /* =====================================================================
