@@ -390,6 +390,68 @@ en herstart het:
 
 ## 10. Logboek
 
+### 2026-09-09 — De leerregel numeriek gecontroleerd (werkplan stap 3)
+De sterkste aanspraak in de paper — dat de ANG-update een schatter van de echte
+gradiënt is — was opgeschreven en nooit gemeten. Nu wel.
+
+**Opzet.** Een miniatuur-ANG: vier verborgen knopen, bevroren topologie, 74
+verbindingen, drie obstakels, 160 stappen. Per gewicht een centrale differentie
+`(J(w+ε) − J(w−ε)) / 2ε`, met **gemeenschappelijke toevalsgetallen** — elke poging heeft
+een vaste eigen generator en een vaste wereld, identiek voor elke waarde van `w`. Zonder
+die truc verdrinkt het verschil in de ruis van het beleid zelf. 800 pogingen per
+J-schatting, dus ruim 236 000 pogingen per meetpunt.
+
+**IJking van de meetlat.** De numerieke gradiënt wordt twee keer berekend op
+onafhankelijke blokken pogingen. De cosinus tussen die twee helften is 0,95–0,99, dus
+het meetbare plafond ligt op ≈ 1,00. Zonder die controle weet je niet of een lage
+cosinus iets over de leerregel zegt of over je eigen meetruis. De stapgrootte ε doet er
+ook niet toe: over ε = 0,01 tot 0,12 blijft de uitkomst tussen 0,69 en 0,72.
+
+**Uitkomst — de update bestaat uit twee delen die niet op dezelfde schaal staan.**
+
+| deel van de update | cos met ∇J (3 meetpunten) | schaalfactor c | aandeel in \|Δw\| | aandeel in \|∇J\| |
+|---|---|---|---|---|
+| naar een knop (exacte score-functie) | 0,99 / 0,85 / 1,00 | ≈ 2 | 100 % | 73 / 12 / 71 % |
+| naar de wolk (node-perturbatie) | 0,27 / 0,83 / 0,36 | 96 / 608 / 225 | 0–2 % | 68 / 99 / 70 % |
+
+- **De exacte score-functie voor de knoppen klopt.** Cosinus tegen het plafond aan.
+- **Node-perturbatie wijst de goede kant op, maar ruw**, en sterk afhankelijk van waar
+  je in de gewichtsruimte staat.
+- **De schaalfout.** Het wolkdeel is 44–349× te klein ten opzichte van het knopdeel.
+  Dat komt overeen met de ontbrekende normalisatie **1/Var(ξ) ≈ 272** die de
+  standaardformulering van node-perturbatie wél heeft. Gevolg: met één leersnelheid
+  krijgt de wolk feitelijk nauwelijks een update, terwijl daar 68–99 % van de echte
+  gradiënt ligt. Schaal je de twee delen apart, dan gaat de cosinus over alle
+  verbindingen op het half getrainde punt van **0,12 naar 0,83**.
+- **De ruis is niet de bottleneck.** Het gemiddelde over ongeveer dertig pogingen zit al
+  op de eindwaarde; wat er dan nog tussen zit is vertekening, geen variantie.
+
+**En als je het "repareert"?** Dan stort het leren in. Met versterking g van het wolkdeel
+(8 zaden, 500 pogingen) zakt de toets van 67,5 % (g = 1) naar 21,3 / 9,4 / 5,6 / 1,9 % bij
+g = 10 / 30 / 100 / 272. Met de leersnelheid meegeschaald als 1/g idem: 37,5 / 14,4 / 4,4 /
+2,5 %. De huidige η is stilzwijgend op de ónjuiste schaal afgesteld, en leersnelheid,
+stapbegrenzing en exploratie hangen samen — dat rechtzetten is een ablatie op zichzelf
+(stap 7), geen knop die je even omzet.
+
+**Bijvangst.** De meting verklaart ook waarom het eligibility-herstel van stap 2 geen
+prestatieverschil gaf: over een losse tik met een willekeurige wolktoestand schelen de
+twee sporen tientallen procenten, maar in het beloningsgewogen gemiddelde over een hele
+poging is het verschil **0,3–0,8 %**. De toestand van de wolk verandert langzaam, dus de
+activatie van vóór en ná één propagatiestap lijken sterk op elkaar.
+
+**Code.** `tests/gradcheck-stap3.js` (meting), `tests/gradcheck-analyse.py` (nabewerking),
+`tests/exp-perturbgain.js` (de versterkingsreeks), `paper/mkfig-grad.py` (figuur 2).
+In `brein-test.html`: een meetstand `S.gradAccum` waarmee `applyReward` het ruwe
+leersignaal optelt in plaats van toepast, en een instelling `perturbGain` die het
+wolkdeel van het spoor versterkt. Data: `experimenten/gradcheck.csv`, `gradcheck.json`,
+`gradcheck-delen.json`, `perturbatie-schaal.json`, `perturbatie-schaal-lr.json`.
+
+**Paper (versie 1.2).** Vergelijking 13 draagt nu een knoopafhankelijke constante `c_j`
+in plaats van één `c`, met de nieuwe vergelijking 37 die zegt waar die vandaan komt.
+Nieuwe sectie 3.11 met figuur 2 en de tabellen hierboven. Sectie 9 kreeg drie nieuwe
+beperkingen erbij. Sectie 10.2 gebruikt nu de conditie `trace-nieuw` in plaats van de
+oudere `standaard`-rijen, die nog met de foutieve trace draaiden.
+
 ### 2026-09-09 — Eligibility-fout hersteld en gemeten (werkplan stap 2)
 - **De fout.** `updateTraces()` vermenigvuldigde de postsynaptische afwijking met
   `B.act` — de toestand *ná* de propagatie. Maar `propagate()` is synchroon: alle
@@ -411,7 +473,10 @@ en herstart het:
   dat `B.pre` precies `B.act` voortbrengt (maxafwijking ~1·10⁻⁷ bij *P* = 1, 2 en 3)
   en dat `B.act` dat níét doet. Verder: verbindingen uit een invoer-node geven oud en
   nieuw exact dezelfde trace (645 van 645), verbindingen uit de wolk allemaal een
-  andere (1997 van 1997; relatief verschil 95 % bij *P* = 1, 59 % bij *P* = 2). De
+  andere (1997 van 1997; relatief verschil 95 % bij *P* = 1, 59 % bij *P* = 2). Let op:
+  dat is één tik met een wíllekeurige wolktoestand, wat het verschil maximaliseert. In
+  werkelijk gebruik, over een hele poging beloningsgewogen, blijft er 0,3–0,8 % van over
+  — zie de meting van stap 3 hierboven. Dat verklaart de nulmeting hieronder. De
   reproduceerbaarheid uit stap 1 blijft bit voor bit staan.
 - **Voor/na-meting:** 12 breinzaden per conditie, 500 pogingen, verder identiek.
   Succes over de laatste 20 pogingen 85,0 % ± 5,9 (oud) tegen 89,2 % ± 5,6 (nieuw);

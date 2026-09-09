@@ -10,7 +10,7 @@ const path = require('path');
 /* Alle paden liggen ten opzichte van de projectmap, niet ten opzichte van de
    omgeving waarin dit toevallig een keer gedraaid heeft. */
 const ROOT = path.resolve(__dirname, '..');
-const MAN = JSON.parse(fs.readFileSync(path.join(ROOT, 'docs/eq/manifest.json'), 'utf8'));
+const MAN = JSON.parse(fs.readFileSync(path.join(ROOT, 'paper/eq/manifest.json'), 'utf8'));
 
 /* ======================= gemeten data =======================
    De resultatensectie wordt niet met de hand geschreven maar uit
@@ -37,6 +37,10 @@ const RUNS = leesCsv(path.join(EXPDIR, 'runs.csv'));
 const lees = (p) => fs.existsSync(p) ? JSON.parse(fs.readFileSync(p, 'utf8')) : null;
 const HERH = lees(path.join(EXPDIR, 'reproduceerbaarheid.json'));
 const TRACE = lees(path.join(EXPDIR, 'trace-voor-na.json'));
+const GRAD = lees(path.join(EXPDIR, 'gradcheck.json'));
+const GRADD = lees(path.join(EXPDIR, 'gradcheck-delen.json'));
+const PGAIN = lees(path.join(EXPDIR, 'perturbatie-schaal.json'));
+const PGAINLR = lees(path.join(EXPDIR, 'perturbatie-schaal-lr.json'));
 function stat(xs) {
   const v = xs.filter(x => typeof x === 'number' && isFinite(x));
   const n = v.length; if (!n) return null;
@@ -403,7 +407,7 @@ C.push(body([
     'informatie-flessenhals die het leren aanzienlijk moeilijker maakt. Beide varianten zijn instelbaar, en het ' +
     'verschil ertussen is een van de metingen die sectie 10 voorstelt.')
 ]));
-figure(path.join(ROOT, 'docs/fig1-typen.png'), 1,
+figure(path.join(ROOT, 'paper/fig1-typen.png'), 1,
   'De toegestane verbindingen tussen de knoopsoorten. Streepjeslijnen gelden zolang een neuron neutraal is. ' +
   'Er gaat nooit iets naar een invoerknoop toe, nooit iets uit een uitvoerknoop vandaan, en een invoerknoop hangt ' +
   'nooit rechtstreeks aan een knop.').forEach(x => C.push(x));
@@ -509,11 +513,21 @@ C.push(body([
     'verbinding met de perturbatie erna, gewogen met de beloningsafwijking, een schatter van de gradiënt:')
 ]));
 C.push(eq(13));
-C.push(body(
-  'De schatter is zuiver op een term van tweede orde in de ruissterkte na. Belangrijker voor de praktijk is dat hij ' +
-  'volledig lokaal is: hij vraagt alleen de activatie aan de ene kant van een verbinding en de perturbatie aan de ' +
-  'andere. Er is geen pad terug door het netwerk nodig, en dus ook geen acyclische structuur.'
-));
+C.push(body([
+  t('De evenredigheidsconstante is niet één getal voor het hele netwerk. Voor een knoop in de wolk komt zij uit de ' +
+    'variantie van de perturbatie en de helling van de overdrachtsfunctie; voor een knop is zij de schaal van de ' +
+    'exacte score-functie uit 3.3:')
+]));
+C.push(eq(37));
+C.push(body([
+  t('Dat onderscheid is niet cosmetisch. Var('), it('ξ'), t(') is bij de standaardinstellingen ongeveer 3,7·10⁻³, ' +
+    'dus de twee delen van de update verschillen van nature ruwweg twee ordes in schaal. In de gebruikelijke ' +
+    'formulering van node-perturbatie [10, 3] wordt daarvoor gecorrigeerd met een factor 1/Var('), it('ξ'),
+  t('); ANG deed dat niet, en sectie 3.11 laat zien wat dat kost. De schatter is verder zuiver op een term van ' +
+    'tweede orde in de ruissterkte na. Belangrijker voor de praktijk is dat hij volledig lokaal is: hij vraagt ' +
+    'alleen de activatie aan de ene kant van een verbinding en de perturbatie aan de andere. Er is geen pad terug ' +
+    'door het netwerk nodig, en dus ook geen acyclische structuur.')
+]));
 
 C.push(h2('3.5', 'Eligibility traces'));
 C.push(body(
@@ -564,6 +578,12 @@ if (TRACE) {
     [2700, 1600, 1600, 1900, 1272]
   ));
   const b = M.toets, sig = b.mannWhitney.p < 0.05;
+  if (GRADD) C.push(body(
+    'Waarom het verschil in de praktijk klein blijft, bleek pas bij de controle van sectie 3.11: over een losse ' +
+    'tik met een willekeurige wolktoestand schelen de twee sporen tientallen procenten, maar in het ' +
+    'beloningsgewogen gemiddelde over een hele poging is het verschil ' +
+    (100 * GRADD.punten[0].verschilOudNieuw).toFixed(1) + ' %. De toestand van de wolk verandert langzaam, dus de ' +
+    'activatie van vóór en ná één propagatiestap lijken sterk op elkaar.'));
   C.push(body(
     `De correctie is gemeten en niet aangenomen: ${N} breinzaden per conditie, ` +
     `${TRACE.pogingenPerRun} pogingen per run, verder identieke instellingen en dezelfde wereldzaden. ` +
@@ -661,6 +681,131 @@ code([
   '    w ← (1 − ρ) w                                    (21)',
   '    als e mod K = 0:  herstructureer (algoritme 2)'
 ], 'Algoritme 1 — leren').forEach(x => C.push(x));
+
+/* --- 3.11: de numerieke controle van de leerregel -----------------------------
+   Volledig uit experimenten/gradcheck*.json opgebouwd. Zonder die bestanden zegt
+   de sectie dat de controle nog moet gebeuren; er wordt niets verzonnen. */
+C.push(h2('3.11', 'Numerieke controle van de leerregel'));
+C.push(body([
+  t('De aanspraak van 3.4 — dat de update een schatter van de gradiënt is — was tot nu toe een afleiding en ' +
+    'geen meting. Wij toetsen haar op een miniatuur-ANG met vier verborgen knopen en een bevroren topologie, ' +
+    'waar de gradiënt nog met de hand na te rekenen is:')
+]));
+C.push(body([
+  it('∂J/∂w'), t('ᵢⱼ ≈ ( '), it('J'), t('('), it('w'), t('+ε) − '), it('J'), t('('), it('w'),
+  t('−ε) ) / 2ε, met '), it('J'), t(' geschat als de gemiddelde totale beloning over een vast blok pogingen.')
+]));
+if (GRAD && GRADD) {
+  const P = GRAD.punten[0], D = GRADD.punten;
+  C.push(body([
+    t('Twee dingen maken die schatting bruikbaar. Ten eerste '), bd('gemeenschappelijke toevalsgetallen'),
+    t(': elke poging heeft een vaste eigen toevalsgenerator en een vaste wereld, identiek voor elke waarde van '),
+    it('w'), t('. Zonder die truc verdrinkt het verschil tussen '), it('J'), t('('), it('w'), t('+ε) en '),
+    it('J'), t('('), it('w'), t('−ε) in de ruis van het beleid zelf. Ten tweede een '), bd('ijking van de meetlat'),
+    t(': de numerieke gradiënt wordt twee keer berekend op onafhankelijke blokken pogingen. De cosinus tussen die ' +
+      'twee helften zegt hoeveel van de gemeten richting signaal is, en dus hoe hoog een cosinus überhaupt kan ' +
+      `worden. Bij ${GRAD.opzet.pogingenPerJhelft} pogingen per helft is die ${P.splitHalfNumGrad.toFixed(3)}; ` +
+      `het meetbare plafond ligt daarmee op ${P.cosinusPlafond.toFixed(2)}. Een cosinus die daar tegenaan zit, is ` +
+      'niet meer van een perfecte uitlijning te onderscheiden.')
+  ]));
+  C.push(figure(path.join(ROOT, 'paper/fig2-gradcheck.png'), 2,
+    'De ANG-update tegen de numerieke gradiënt op de miniatuurgraaf. Links: per verbinding, met één ' +
+    'gemeenschappelijke schaalfactor. De verbindingen naar de knoppen liggen op de diagonaal; de verbindingen ' +
+    'naar de wolk liggen plat tegen de nullijn — hun richting klopt wel, hun grootte niet. Rechts: de cosinus ' +
+    'als functie van het aantal pogingen waarover de update gemiddeld wordt.', 460));
+  const rij = (d, k) => [k === 'knop' ? 'naar een knop (score-functie)' : 'naar de wolk (node-perturbatie)',
+    String(d.delen[k].n), d.delen[k].cos.toFixed(2), d.delen[k].schaal.toFixed(0),
+    (100 * d.delen[k].aandeelNormSchatter).toFixed(0) + ' %', (100 * d.delen[k].aandeelNormGrad).toFixed(0) + ' %'];
+  for (const d of D) {
+    C.push(h3(`Meetpunt: ${d.punt}`));
+    C.push(tbl(
+      ['deel van de update', 'n', 'cos met ∇J', 'schaalfactor c', 'aandeel in |Δw|', 'aandeel in |∇J|'],
+      [rij(d, 'knop'), rij(d, 'wolk')],
+      [3100, 700, 1300, 1500, 1600, 1472]
+    ));
+    C.push(body(
+      `Over alle verbindingen samen is de cosinus ${d.cosTotaal.toFixed(2)}; schaalt men de twee delen apart, ` +
+      `dan wordt zij ${d.cosNaDeelherschaling.toFixed(2)}. De schaalfactor van het wolkdeel is ` +
+      `${d.schaalverhoudingWolkOverKnop.toFixed(0)}× die van het knopdeel.`, { spacing: { after: 140 } }));
+  }
+  const gem = D.reduce((a, d) => a + d.schaalverhoudingWolkOverKnop, 0) / D.length;
+  C.push(h3('Wat de meting zegt'));
+  C.push(bullet([bd('De exacte score-functie klopt. '), t('Voor de verbindingen naar de knoppen is de cosinus ' +
+    D.map(d => d.delen.knop.cos.toFixed(2)).join(' / ') + ' op de drie meetpunten. Bij een meetbaar plafond ' +
+    'van ' + GRAD.punten.map(x => x.cosinusPlafond.toFixed(2)).join(' / ') + ' is dat niet van exact te ' +
+    'onderscheiden: vergelijking 11 doet wat zij belooft.')]));
+  C.push(bullet([bd('Node-perturbatie wijst de goede kant op, maar ruw. '), t('Voor de verbindingen naar de wolk ' +
+    'is de cosinus ' + D.map(d => d.delen.wolk.cos.toFixed(2)).join(' / ') + '. Positief en bruikbaar, maar ' +
+    'ver van exact — en sterk afhankelijk van het punt in de gewichtsruimte.')]));
+  C.push(bullet([bd('De twee delen staan niet op dezelfde schaal. '), t('Dit is de belangrijkste uitkomst. Het ' +
+    'wolkdeel van de update is gemiddeld ongeveer ' + Math.round(gem) + '× te klein ten opzichte van het ' +
+    'knopdeel, wat overeenkomt met de ontbrekende normalisatie 1/Var(ξ) uit vergelijking 37 (≈ ' +
+    (3 / (GRAD.punten[0].sigmaRuis ** 2)).toFixed(0) + ' bij deze exploratie). Het gevolg is te zien in figuur 2a: ' +
+    'met één leersnelheid krijgt de wolk feitelijk nauwelijks een update, terwijl de echte gradiënt daar ' +
+    D.map(d => (100 * d.delen.wolk.aandeelNormGrad).toFixed(0) + ' %').join(' / ') + ' van zijn lengte heeft ' +
+    'liggen.')]));
+  C.push(bullet([bd('De ruis is niet het probleem. '), t('Uit figuur 2b: het gemiddelde over ongeveer dertig ' +
+    'pogingen zit al op de eindwaarde. Meer monsters helpen daarna niet meer — wat er dan nog tussen zit is ' +
+    'geen variantie maar vertekening.')]));
+  const eb = GRAD.epsilonReeks;
+  if (eb && eb.length) C.push(body(
+    'De keuze van ε stuurt de uitkomst niet: over ε = ' + eb[0].epsilon + ' tot ' + eb[eb.length - 1].epsilon +
+    ' blijft de cosinus met de schatter tussen ' + Math.min(...eb.map(x => x.cosMetSchatter)).toFixed(2) +
+    ' en ' + Math.max(...eb.map(x => x.cosMetSchatter)).toFixed(2) + '.'));
+  if (PGAIN) {
+    const gs = Object.keys(PGAIN.perGain).map(Number).sort((a, b) => a - b);
+    const pct = o => (100 * o.m).toFixed(1) + '% ± ' + (100 * o.ci).toFixed(1);
+    C.push(h3('Wat de correctie waard is — nog niets, zonder de rest bij te stellen'));
+    C.push(body([
+      t('De ontbrekende factor toevoegen is één regel code. Wij hebben het gedaan, op het volledige brein, met '),
+      it('g'), t(' als versterking van het wolkdeel van het spoor — en het resultaat is de moeite waard om te ' +
+        'melden juist omdat het tegenvalt:')
+    ]));
+    const kop = ['versterking g', 'succes laatste 20', 'toets', 'actieve verbindingen'];
+    C.push(tbl(kop, gs.map(g => [g === 1 ? '1 (huidige leerregel)' : String(g),
+      pct(PGAIN.perGain[g].s20), pct(PGAIN.perGain[g].toets),
+      PGAIN.perGain[g].actief ? PGAIN.perGain[g].actief.m.toFixed(0) : '–']),
+      [2600, 2300, 2000, 2172]));
+    C.push(body(
+      `${PGAIN.zaden} zaden per waarde, ${PGAIN.pogingenPerRun} pogingen, leersnelheid ongewijzigd. Het leren ` +
+      'stort in. Dat is geen weerlegging van de meting maar een bevestiging van wat zij zegt: als het wolkdeel ' +
+      'twee ordes groter wordt terwijl η en de stapbegrenzing op de oude schaal blijven staan, loopt elke update ' +
+      'in de wolk tegen de begrenzing uit sectie 3.7 aan en verliest die haar functie. De huidige η is stilzwijgend ' +
+      'op de ónjuiste schaal afgesteld.'));
+    if (PGAINLR) {
+      const gl = Object.keys(PGAINLR.perGain).map(Number).sort((a, b) => a - b);
+      C.push(body([
+        t('De schone tegenproef schaalt de leersnelheid mee met 1/'), it('g'), t('. Dan blijft het wolkdeel op ' +
+          'zijn oude grootte en wordt het knopdeel '), it('g'), t(' keer zachter — dezelfde verschuiving in de ' +
+          'onderlinge verhouding, zonder dat de totale stap ontploft:')
+      ]));
+      C.push(tbl(kop, gl.map(g => [g === 1 ? '1 (huidige leerregel)' : String(g),
+        pct(PGAINLR.perGain[g].s20), pct(PGAINLR.perGain[g].toets),
+        PGAINLR.perGain[g].actief ? PGAINLR.perGain[g].actief.m.toFixed(0) : '–']),
+        [2600, 2300, 2000, 2172]));
+      const best = gl.reduce((a, g) => PGAINLR.perGain[g].toets.m > PGAINLR.perGain[a].toets.m ? g : a, gl[0]);
+      C.push(body(
+        best === 1
+          ? 'Ook zo wint geen enkele waarde van g het van de bestaande verhouding. De conclusie is dan dat de ' +
+            'scheve schaal wel aantoonbaar is op de miniatuurgraaf, maar dat het herstellen ervan met alleen deze ' +
+            'ene knop niet werkt: leersnelheid, stapbegrenzing en exploratie hangen samen en moeten als geheel ' +
+            'opnieuw afgesteld worden. Dat is een ablatie op zichzelf en hoort niet in deze sectie thuis.'
+          : `De beste waarde is g = ${best} (toets ${pct(PGAINLR.perGain[best].toets)} tegen ` +
+            `${pct(PGAINLR.perGain[1].toets)} bij g = 1). Dat is een aanwijzing dat de scheve schaal ook in het ` +
+            'volledige model iets kost, maar geen afgeronde ablatie: η, de stapbegrenzing en de exploratie hangen ' +
+            'samen en zijn hier niet als geheel opnieuw afgesteld.'));
+    }
+    C.push(body(
+      'Wat er wél staat is dit: de leerregel bevat een aantoonbare schaalfout, die op de miniatuurgraaf de ' +
+      'cosinus met de echte gradiënt van 0,12 naar 0,83 scheelt, en die in het volledige model niet met één ' +
+      'parameter recht te zetten is. Dat is een scherpere en eerlijkere uitspraak dan de oorspronkelijke ' +
+      '"de schatter is zuiver op een tweede-ordeterm na".'));
+  }
+} else {
+  C.push(body('De numerieke controle is nog niet gedraaid; zodra experimenten/gradcheck.json bestaat, ' +
+    'verschijnen hier de figuur en de tabellen.'));
+}
+
 
 /* ===== 4 ===== */
 C.push(h1('4', 'Structurele plasticiteit'));
@@ -998,6 +1143,20 @@ C.push(h1('9', 'Beperkingen'));
 C.push(bullet([bd('De gradiëntschatter is ruis. '), t('Node-perturbatie levert een zuivere maar variabele ' +
   'schatting; de variantie groeit met het aantal knopen dat tegelijk verstoord wordt. Dat begrenst hoe groot een ' +
   'wolk zinvol kan worden zonder de leersnelheid te verlagen.')]));
+C.push(bullet([bd('De twee delen van de update staan niet op dezelfde schaal. '),
+  t('Sectie 3.11 meet dat het node-perturbatiedeel twee ordes te klein is ten opzichte van het ' +
+    'score-functiedeel, doordat de normalisatie 1/Var(ξ) ontbreekt. Met één leersnelheid krijgt de wolk daardoor ' +
+    'nauwelijks een update. Dit is de scherpste bekende tekortkoming van de leerregel; het herstellen ervan vraagt ' +
+    'om de leersnelheid en de stapbegrenzing samen opnieuw af te stellen, en dat is nog niet gedaan.')]));
+C.push(bullet([bd('De uitkomst hangt af van het punt in de gewichtsruimte. '),
+  t('De cosinus van het wolkdeel met de echte gradiënt loopt in dezelfde opstelling van 0,27 bij een vers brein ' +
+    'tot 0,83 na tweehonderd pogingen leren. Eén meting op één punt zegt dus weinig; de controle is uitgevoerd op ' +
+    'drie punten en zelfs dat is weinig.')]));
+C.push(bullet([bd('De controle is klein. '), t('De numerieke gradiënt is alleen na te rekenen op een graaf met ' +
+  'vier verborgen knopen en een bevroren topologie, in een omgeving waarin die miniatuuragent het doel zelden ' +
+  'haalt. Dat J daar vooral door de dichtheidsterm wordt bepaald is geen bezwaar voor het toetsen van de ' +
+  'leerregel — dat is ook het signaal dat het brein tijdens de training grotendeels ziet — maar het blijft een ' +
+  'ander regime dan het volledige model.')]));
 C.push(bullet([bd('Geen kritiek­functie. '), t('De advantage is een lopend gemiddelde over stappen, geen ' +
   'toestandsafhankelijke waardeschatting. In toestanden die systematisch beter of slechter zijn dan gemiddeld, ' +
   'is het signaal daardoor vertekend.')]));
@@ -1018,7 +1177,8 @@ C.push(h1('10', 'Evaluatie'));
 C.push(body(
   'De meetopzet is met opzet niet ingericht om te laten zien dat het model werkt, maar om uit elkaar te trekken ' +
   'wáár een eventuele prestatie vandaan komt. Deze versie van het document bevat de referentiemeting en de ' +
-  'reproduceerbaarheidscontrole; de ablaties en de basislijnen volgen in versie 1.2.'
+  'reproduceerbaarheidscontrole, en sectie 3.11 de numerieke controle van de leerregel zelf; de ablaties en de '+
+  'basislijnen volgen in een latere versie.'
 ));
 C.push(h2('10.1', 'Twee meetassen'));
 C.push(body(
@@ -1038,8 +1198,12 @@ C.push(body([
 
 /* --- referentiemeting, opgebouwd uit runs.csv --- */
 if (RUNS && RUNS.length) {
-  const R0 = RUNS.filter(r => r.conditie === 'standaard');
-  const R = R0.length ? R0 : RUNS;
+  /* De referentiemeting hoort bij de leerregel zoals die nu is: de conditie
+     trace-nieuw. De oudere rijen 'standaard' draaiden met de foutieve trace
+     (kolom traceOud = 1) en worden hier niet meegenomen. */
+  const R0 = RUNS.filter(r => r.conditie === 'trace-nieuw');
+  const R1 = R0.length ? R0 : RUNS.filter(r => r.conditie === 'standaard');
+  const R = R1.length ? R1 : RUNS;
   const s20 = stat(R.map(r => r.succes20));
   const ev = stat(R.map(r => r.toetsPct));
   const sc = stat(R.map(r => r.succesPct));
@@ -1127,9 +1291,10 @@ C.push(bullet([bd('Basislijnen met backpropagation. '), t('Twee kleine MLP\'s en
 C.push(bullet([bd('Rekenkosten, apart geteld. '), t('Sample-efficiëntie (omgevingsstappen tot een drempel), ' +
   'rekenefficiëntie (kanten-bezoeken tot diezelfde drempel), wandkloktijd en inferentiekosten worden los ' +
   'gerapporteerd. Zij vallen zelden samen, en één cijfer voor "efficiëntie" verbergt meer dan het laat zien.')]));
-C.push(bullet([bd('Numerieke controle op de leerregel. '), t('Op een bevroren miniatuurgraaf wordt de gemiddelde ' +
-  'update vergeleken met een numeriek bepaalde gradiënt, zodat de uitspraak in sectie 3.4 over de zuiverheid van ' +
-  'de schatter een gemeten grondslag krijgt in plaats van een analytische aanname.')]));
+C.push(bullet([bd('De schaal van het wolkdeel van de update. '), t('Sectie 3.11 laat zien dat het ' +
+  'node-perturbatiedeel twee ordes te klein is ten opzichte van het score-functiedeel. De ontbrekende factor ' +
+  'toevoegen is één regel code, maar vraagt om de leersnelheid en de stapbegrenzing samen opnieuw af te stellen; ' +
+  'dat wordt als volwaardige conditie gemeten, niet als aanname doorgevoerd.')]));
 C.push(bullet([bd('Een tweede taak. '), t('In de huidige taak is het doel altijd zichtbaar; er valt niets te ' +
   'onthouden, en elke uitspraak over de geheugen-neuronen is daarmee betekenisloos. Een tweede taak waarin het ' +
   'doel na verloop van tijd verdwijnt terwijl er tegelijk obstakels opduiken die binnen één tik ontweken moeten ' +
@@ -1289,7 +1454,7 @@ const doc = new Document({
         children: [new Paragraph({
           alignment: AlignmentType.CENTER,
           children: [
-            new TextRun({ text: 'Adaptive Neural Graph (ANG) · versie 1.15 · ', font: SERIF, size: 16, color: DIM }),
+            new TextRun({ text: 'Adaptive Neural Graph (ANG) · versie 1.2 · ', font: SERIF, size: 16, color: DIM }),
             new TextRun({ children: [PageNumber.CURRENT], font: SERIF, size: 16, color: DIM })
           ]
         })]

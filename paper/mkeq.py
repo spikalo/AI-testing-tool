@@ -22,7 +22,7 @@ EQ = {
 10: r"$\frac{\partial}{\partial u_k}\log \pi_\theta(a_k)\;=\;a_k-p_k$",
 11: r"$\frac{\partial}{\partial w_{ik}}\log \pi_\theta(a_k)\;=\;\frac{1}{\tau}\;\tilde{x}_i\,(a_k-p_k)$",
 12: r"$\delta_j\;=\;x_j-\bar{x}_j$",
-13: r"$\mathrm{E}\left[\tilde{x}_i\,\delta_j\,\hat{A}\right]\;=\;c\;\frac{\partial J}{\partial w_{ij}}\;+\;\mathcal{O}\!\left(\sigma_h^{2}\right),\qquad c>0$",
+13: r"$\mathrm{E}\left[\tilde{x}_i\,\delta_j\,\hat{A}\right]\;=\;c_j\;\frac{\partial J}{\partial w_{ij}}\;+\;\mathcal{O}\!\left(\sigma_h^{2}\right),\qquad c_j>0$",
 14: r"$e_{ij}(t)\;=\;\lambda\,e_{ij}(t-1)\;+\;(1-\lambda)\;\tilde{x}_i(t)\,\delta_j(t),\qquad \tilde{x}_i(t)\;\equiv\;x_i^{(P-1)}(t)$",
 15: r"$\bar{r}_t\;=\;\bar{r}_{t-1}+\beta\left(r_t-\bar{r}_{t-1}\right),\qquad \beta=0.02$",
 16: r"$\hat{A}_t\;=\;\mathrm{clip}\left(r_t-\bar{r}_t,\;-c,\;c\right),\qquad c=10$",
@@ -45,6 +45,7 @@ EQ = {
 33: r"$E_\theta\;=\;\left\{(a,b)\in E\;:\;|w_{ab}|>0.08\,w_{\max}\right\}$",
 34: r"$\nu_i\;=\;\sum_{h=1}^{5}\;\sum_{o\in\mathcal{O}}\left(\widetilde{W}^{\,h}\right)_{io},\qquad \widetilde{W}_{ab}=\min\left(1,\;\frac{|w_{ab}|}{w_{\max}}\right)$",
 35: r"$\mathcal{C}_{\mathrm{tik}}=\mathcal{O}\left(P\left(|E|+|V|\right)\right),\qquad \mathcal{C}_{\mathrm{poging}}=\mathcal{O}\left(T\,P\left(|E|+|V|\right)\right)$",
+37: r"$c_j\;\approx\;\mathrm{Var}(\xi)\,\varphi'\!\left(u_j\right)\;\;(j\in\mathcal{H}),\qquad c_k\;=\;\frac{1}{\tau}\;\;(k\in\mathcal{O}),\qquad \mathrm{Var}(\xi)=\frac{\sigma_h^{2}}{3}$",
 36: r"$T(i)\;\neq\;\kappa(i)\quad\Leftrightarrow\quad C\!\left(i,T(i)\right)-S\!\left(T(i)\right)\;<\;-S\!\left(\kappa(i)\right)-\mu\;\;\mathrm{en}\;\;C\!\left(i,T(i)\right)\leq C_{\max},\qquad \mu=0.02$",
 }
 

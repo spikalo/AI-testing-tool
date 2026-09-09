@@ -1,0 +1,83 @@
+{
+  "beschrijving": "Nabewerking van experimenten/gradcheck.csv (werkplan stap 3).\n\nDe update valt uiteen in twee delen met een verschillende afleiding:\nverbindingen naar een uitvoerknoop dragen de exacte score-functie (a − p),\nverbindingen naar de wolk dragen node-perturbatie. Dit script berekent per deel\nde cosinus met de numerieke gradiënt, de kleinste-kwadraten-schaalfactor c uit\nc·Δw ≈ ∇J, en het aandeel dat elk deel in de lengte van beide vectoren heeft.\nVerschillen die schaalfactoren sterk, dan wijst elk deel apart wel de goede kant\nop maar staan de twee delen niet op dezelfde schaal — en dat is precies wat er\naan de hand blijkt te zijn.",
+  "punten": [
+    {
+      "punt": "begin",
+      "cosTotaal": 0.7299951560387338,
+      "splitHalfNumGrad": 0.98662767120018,
+      "verschilOudNieuw": 0.007027193865156099,
+      "delen": {
+        "knop": {
+          "n": 12,
+          "splitHalf": 0.9959966611438572,
+          "cos": 0.9930842787589006,
+          "schaal": 2.2149214529683157,
+          "aandeelNormGrad": 0.7340325732774985,
+          "aandeelNormSchatter": 0.9999834339825237
+        },
+        "wolk": {
+          "n": 62,
+          "splitHalf": 0.9779255711120347,
+          "cos": 0.26887303196463896,
+          "schaal": 96.38679395686663,
+          "aandeelNormGrad": 0.6791142623797659,
+          "aandeelNormSchatter": 0.005756019503061749
+        }
+      },
+      "cosNaDeelherschaling": 0.751477394629841,
+      "schaalverhoudingWolkOverKnop": 43.51702577429749
+    },
+    {
+      "punt": "half getraind",
+      "cosTotaal": 0.12299976868740864,
+      "splitHalfNumGrad": 0.9455386512072669,
+      "verschilOudNieuw": 0.008437273695006256,
+      "delen": {
+        "knop": {
+          "n": 12,
+          "splitHalf": 0.6792241180174272,
+          "cos": 0.8536401341827597,
+          "schaal": 1.7417138768340088,
+          "aandeelNormGrad": 0.12229639293643894,
+          "aandeelNormSchatter": 0.9997443637517053
+        },
+        "wolk": {
+          "n": 62,
+          "splitHalf": 0.9508579600145395,
+          "cos": 0.8301784410483137,
+          "schaal": 607.8242471579142,
+          "aandeelNormGrad": 0.9924936232917249,
+          "aandeelNormSchatter": 0.022609890461877655
+        }
+      },
+      "cosNaDeelherschaling": 0.8305342258925615,
+      "schaalverhoudingWolkOverKnop": 348.9805387913562
+    },
+    {
+      "punt": "begin prop=2",
+      "cosTotaal": 0.7083459374435882,
+      "splitHalfNumGrad": 0.9781339402589112,
+      "verschilOudNieuw": 0.0033758060537644047,
+      "delen": {
+        "knop": {
+          "n": 12,
+          "splitHalf": 0.9944743692584075,
+          "cos": 0.9956500462559496,
+          "schaal": 2.154810315795103,
+          "aandeelNormGrad": 0.7105938588764309,
+          "aandeelNormSchatter": 0.9999942784114847
+        },
+        "wolk": {
+          "n": 62,
+          "splitHalf": 0.9619151091250033,
+          "cos": 0.3559378364337927,
+          "schaal": 225.47956465312603,
+          "aandeelNormGrad": 0.7036024216324892,
+          "aandeelNormSchatter": 0.0033827716881011495
+        }
+      },
+      "cosNaDeelherschaling": 0.7505196721534181,
+      "schaalverhoudingWolkOverKnop": 104.64009894528762
+    }
+  ]
+}

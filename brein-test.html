@@ -738,6 +738,9 @@ let INPUT_ONLY_SENS=false;
    terugladen van een resultaat zetten hem. true = de foutieve trace van vóór
    9 september 2026 (postsynaptische toestand i.p.v. presynaptische). */
 let TRACE_OUD=false;
+/* Versterking van het node-perturbatiedeel van het spoor t.o.v. het score-functiedeel.
+   1 = zoals het altijd was. Zie de meting van stap 3 en `updateTraces`. */
+let PERTURB_GAIN=1;
 const KIND_OF={sens:K_SENS,work:K_WORK,refl:K_REFL,mem:K_MEM};
 
 function rectHit(x,y,o,pad){ return x> o.x-pad && x< o.x+o.w+pad && y> o.y-pad && y< o.y+o.h+pad; }
@@ -1037,10 +1040,28 @@ function brainStep(B,inp,cfg,expl,rnd){
    toestand NA de propagatie. Dat is één tik te laat voor alles wat uit de wolk zelf
    komt. B.pre is de juiste grootheid. traceOud=true zet de oude regel terug, puur om
    het verschil te kunnen meten. */
-function updateTraces(B,lam,traceOud){
+function updateTraces(B,lam,traceOud,gain){
   const act=(traceOud||!B.pre)? B.act : B.pre, dev=B.dev, k1=1-lam;
-  for(let c=0;c<B.nc;c++) B.cE[c]=lam*B.cE[c]+k1*act[B.cFrom[c]]*dev[B.cTo[c]];
-  for(let j=N_IN;j<B.n;j++) B.ebias[j]=lam*B.ebias[j]+k1*dev[j];
+  const g=(gain===undefined||gain===null)?1:gain;
+  if(g===1){
+    for(let c=0;c<B.nc;c++) B.cE[c]=lam*B.cE[c]+k1*act[B.cFrom[c]]*dev[B.cTo[c]];
+    for(let j=N_IN;j<B.n;j++) B.ebias[j]=lam*B.ebias[j]+k1*dev[j];
+    return;
+  }
+  /* Twee soorten leersignaal op één schaal brengen. De uitvoerknopen dragen de
+     exacte score-functie (a − p); de wolk draagt node-perturbatie, en die is in de
+     literatuur genormaliseerd op 1/Var(ξ). ANG deed dat niet, waardoor het
+     wolkdeel van de update ordes te klein is ten opzichte van het knopdeel — zie de
+     meting van stap 3. g is die ontbrekende versterking, als losse knop zodat het
+     effect meetbaar is in plaats van aangenomen. */
+  for(let c=0;c<B.nc;c++){
+    const t=B.cTo[c], s=(B.kinds[t]===K_OUT)?1:g;
+    B.cE[c]=lam*B.cE[c]+k1*s*act[B.cFrom[c]]*dev[t];
+  }
+  for(let j=N_IN;j<B.n;j++){
+    const s=(B.kinds[j]===K_OUT)?1:g;
+    B.ebias[j]=lam*B.ebias[j]+k1*s*dev[j];
+  }
 }
 /* Beloning telt alleen voor zover ze afwijkt van wat het brein de laatste tijd
    gewend was (basislijn). Anders wordt bij een altijd-positieve beloning simpelweg
@@ -1049,6 +1070,16 @@ function applyReward(B,r,cfg,scale){
   const eta=cfg.lr*(scale===undefined?1:scale), wmax=cfg.wmax, smax=cfg.stepMax;
   B.rbar+=0.02*(r-B.rbar);
   const rh=clamp(r-B.rbar,-10,10);
+  /* Meetstand (stap 3). Staat S.gradAccum aan, dan wordt het ruwe leersignaal
+     Â·e opgeteld in plaats van toegepast. Zo is de schatter zelf te meten zonder
+     dat het brein tijdens het meten verandert, en zonder de demping en begrenzing
+     die daarna pas komen — die horen bij de update, niet bij de schatter. */
+  if(S.gradAccum){
+    const g=S.gradAccum;
+    for(let c=0;c<B.nc;c++) g[c]+=rh*B.cE[c];
+    if(S.gradAccumBias) for(let j=N_IN;j<B.n;j++) S.gradAccumBias[j]+=0.5*rh*B.ebias[j];
+    return;
+  }
   for(let c=0;c<B.nc;c++){
     let w=B.cW[c];
     let d=eta*rh*B.cE[c];
@@ -1440,7 +1471,7 @@ function readCfg(){
     prop:+$("prop").value, noise0:+$("noise").value/100,
     lrAnneal:$("lranneal").checked,
     /* alleen bedoeld als ablatie: zet de foutieve postsynaptische trace terug */
-    traceOud:TRACE_OUD,
+    traceOud:TRACE_OUD, perturbGain:PERTURB_GAIN,
     structOn:$("structplast").checked, structEvery:+$("structevery").value,
     pruneT:+$("prune").value/1000, sprout:+$("sprout").value,
     growOn:$("grow").checked, growStagnant:$("growstag").checked,
@@ -1468,6 +1499,7 @@ const S={
   phase:0, selected:-1, hover:-1,
   lastRestructure:{pruned:0,sprouted:0,retyped:0,grown:0}, structLog:[],
   resultsDirHandle:null, lastResult:null, dirty:false,
+  gradAccum:null, gradAccumBias:null,
   expDirHandle:null, expCsvLines:null, expCsvName:"runs.csv", expAbort:false, expRunning:false
 };
 
@@ -1503,7 +1535,7 @@ function gameTick(learn,noise){
   let dx=P[3]-P[2], dy=P[1]-P[0];
   const mag=Math.hypot(dx,dy);
   if(mag>0){ dx=dx/mag*c.chSpeed; dy=dy/mag*c.chSpeed; }
-  if(learn) updateTraces(B,c.lam,c.traceOud);
+  if(learn) updateTraces(B,c.lam,c.traceOud,c.perturbGain);
 
   let collided=false;
   let nx=S.ag.x+dx, ny=S.ag.y+dy;
@@ -2084,7 +2116,8 @@ function buildResult(naamOverride){
       leren:{leersnelheid:S.cfg.lr, sporenVervaging:S.cfg.lam, vervagingPerPoging:S.cfg.decay,
         maxGewicht:S.cfg.wmax, maxVeranderingPerStap:S.cfg.stepMax, geheugenlek:S.cfg.memLeak,
         propagatiestappen:S.cfg.prop, exploratieStart:S.cfg.noise0, exploratieEind:noiseEnd(S.cfg.noise0),
-        leersnelheidMeeschalen:S.cfg.lrAnneal, oudeTrace:!!S.cfg.traceOud},
+        leersnelheidMeeschalen:S.cfg.lrAnneal, oudeTrace:!!S.cfg.traceOud,
+        perturbatieVersterking:S.cfg.perturbGain||1},
       structureel:{aan:S.cfg.structOn, herstructureerElke:S.cfg.structEvery,
         snoeidrempel:S.cfg.pruneT, nieuweVerbindingenPerRonde:S.cfg.sprout,
         groeiAan:S.cfg.growOn, alleenBijStagnatie:S.cfg.growStagnant, maxNeuronen:S.cfg.growMax,
@@ -2220,7 +2253,7 @@ function applyCfgToUI(R){
   const l=c.leren||{};
   set("lr",l.leersnelheid*1000); set("elam",l.sporenVervaging*100); set("dec",l.vervagingPerPoging*10000);
   set("wmax",l.maxGewicht*10); set("stepmax",l.maxVeranderingPerStap*1000); set("memleak",l.geheugenlek*100);
-  TRACE_OUD=!!l.oudeTrace;
+  TRACE_OUD=!!l.oudeTrace; PERTURB_GAIN=+l.perturbatieVersterking||1;
   set("prop",l.propagatiestappen); set("noise",l.exploratieStart*100); chk("lranneal",l.leersnelheidMeeschalen);
   const st=c.structureel||{};
   chk("structplast",st.aan); set("structevery",st.herstructureerElke); set("prune",st.snoeidrempel*1000);
@@ -2731,6 +2764,7 @@ window.__brain={S,createBrain,analyze,makeWorld,readCfg,startTraining,stopTraini
   canConnect,countKinds,restructure,buildResult,brainFromResult,applyCfgToUI,applyResult,repeatRun,
   runOne,cfgOverride,runExperiments,csvRow,CSV_COLS,meanCI,
   propagate,brainStep,updateTraces,resetBrainState,mulberry32,sense,makeWorld2:makeWorld,
+  gameTick,applyReward,fadeWeights,noiseEnd,
   K:{K_IN,K_SENS,K_WORK,K_REFL,K_MEM,K_NEUT,K_OUT,HID0,OUT0}};
 </script>
 </body>

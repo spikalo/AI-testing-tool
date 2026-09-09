@@ -1,0 +1,480 @@
+{
+  "uitgevoerd": "2026-09-09T05:53:24.135Z",
+  "opzet": {
+    "verborgenKnopen": 4,
+    "werelden": 20,
+    "stappenPerPoging": 160,
+    "obstakels": 3,
+    "exploratie": 0.3,
+    "pogingenPerJhelft": 800,
+    "pogingenSchatter": 4000,
+    "epsilon": 0.05,
+    "toelichting": "J wordt met gemeenschappelijke toevalsgetallen geschat: elke poging heeft een vaste eigen generator en een vaste wereld, identiek voor elke waarde van w. De numerieke gradient wordt twee keer berekend op onafhankelijke pogingenblokken; de cosinus tussen die twee helften is de bovengrens van wat er te meten valt."
+  },
+  "epsilonReeks": [
+    {
+      "epsilon": 0.01,
+      "pogingenPerHelft": 267,
+      "splitHalf": 0.8169011858482017,
+      "cosMetSchatter": 0.7028949837990057
+    },
+    {
+      "epsilon": 0.02,
+      "pogingenPerHelft": 267,
+      "splitHalf": 0.9038574072572041,
+      "cosMetSchatter": 0.6863473685714178
+    },
+    {
+      "epsilon": 0.03,
+      "pogingenPerHelft": 267,
+      "splitHalf": 0.9459124415927128,
+      "cosMetSchatter": 0.6950558994742847
+    },
+    {
+      "epsilon": 0.06,
+      "pogingenPerHelft": 267,
+      "splitHalf": 0.9570042403003622,
+      "cosMetSchatter": 0.7193043546592152
+    },
+    {
+      "epsilon": 0.12,
+      "pogingenPerHelft": 267,
+      "splitHalf": 0.9714130112568327,
+      "cosMetSchatter": 0.710658895712828
+    }
+  ],
+  "punten": [
+    {
+      "punt": "begin",
+      "prop": 1,
+      "succes": 0,
+      "verbindingen": 74,
+      "verbindingenUitWolk": 21,
+      "sigmaRuis": 0.105,
+      "varianteRuis": 0.0036749999999999994,
+      "splitHalfNumGrad": 0.9866276710822325,
+      "cosinusPlafond": 0.9966287321918635,
+      "normGrad": 9.119694518410538,
+      "varianten": {
+        "nieuw": {
+          "cosinus": 0.7299951548633652,
+          "cosinusGecorrigeerd": 0.7324644888151107,
+          "cosinusUitWolk": 0.9765172831123418,
+          "cosinusUitInvoer": 0.2693408479269418,
+          "tekenOvereenkomst": 0.6081081081081081,
+          "schaalfactor": 2.218041556779545,
+          "theoretischeSchaal": 272.108843537415,
+          "restBiasRelatief": 0.683452320118976,
+          "gemiddeldeSignaalRuis": 0.11663968285071298,
+          "cosinusKromme": [
+            {
+              "pogingen": 1,
+              "cosMediaan": 0.4232916171965649,
+              "cos10": -0.07862932817187124,
+              "cos90": 0.6035846991964997
+            },
+            {
+              "pogingen": 3,
+              "cosMediaan": 0.5339342376773184,
+              "cos10": 0.24881845841332342,
+              "cos90": 0.6398255853725702
+            },
+            {
+              "pogingen": 10,
+              "cosMediaan": 0.644765023186295,
+              "cos10": 0.5209972553260221,
+              "cos90": 0.7111573213607801
+            },
+            {
+              "pogingen": 30,
+              "cosMediaan": 0.709981969534325,
+              "cos10": 0.6554255597984733,
+              "cos90": 0.7270021630822202
+            },
+            {
+              "pogingen": 100,
+              "cosMediaan": 0.7221336564231834,
+              "cos10": 0.7021348539502977,
+              "cos90": 0.7287924522838345
+            },
+            {
+              "pogingen": 300,
+              "cosMediaan": 0.727568610623137,
+              "cos10": 0.7188061673291174,
+              "cos90": 0.7310417575056354
+            },
+            {
+              "pogingen": 1000,
+              "cosMediaan": 0.7289657664926417,
+              "cos10": 0.72431650411867,
+              "cos90": 0.7317958838618568
+            },
+            {
+              "pogingen": 3000,
+              "cosMediaan": 0.7294318955527742,
+              "cos10": 0.7262967865228436,
+              "cos90": 0.7311963008711231
+            }
+          ]
+        },
+        "oud": {
+          "cosinus": 0.7299588665475227,
+          "cosinusGecorrigeerd": 0.7324280777478092,
+          "cosinusUitWolk": 0.9764774192614268,
+          "cosinusUitInvoer": 0.2693408479269418,
+          "tekenOvereenkomst": 0.6081081081081081,
+          "schaalfactor": 2.2033610118658977,
+          "theoretischeSchaal": 272.108843537415,
+          "restBiasRelatief": 0.6834910775925724,
+          "gemiddeldeSignaalRuis": 0.11674112498705913,
+          "cosinusKromme": [
+            {
+              "pogingen": 1,
+              "cosMediaan": 0.30311001940761023,
+              "cos10": -0.2768844937442824,
+              "cos90": 0.5510910297212034
+            },
+            {
+              "pogingen": 3,
+              "cosMediaan": 0.5549397509324738,
+              "cos10": 0.09545269656924481,
+              "cos90": 0.6823971787085085
+            },
+            {
+              "pogingen": 10,
+              "cosMediaan": 0.6630734734823327,
+              "cos10": 0.5258392456618041,
+              "cos90": 0.71297210627716
+            },
+            {
+              "pogingen": 30,
+              "cosMediaan": 0.7087202476573975,
+              "cos10": 0.6449029469219959,
+              "cos90": 0.7262913850572302
+            },
+            {
+              "pogingen": 100,
+              "cosMediaan": 0.7252935353164142,
+              "cos10": 0.7101495136024707,
+              "cos90": 0.7332213176321923
+            },
+            {
+              "pogingen": 300,
+              "cosMediaan": 0.7265882832042965,
+              "cos10": 0.7188512703207046,
+              "cos90": 0.7319173769180316
+            },
+            {
+              "pogingen": 1000,
+              "cosMediaan": 0.7292293334958796,
+              "cos10": 0.7256924330604534,
+              "cos90": 0.7319372634044383
+            },
+            {
+              "pogingen": 3000,
+              "cosMediaan": 0.7296800851300344,
+              "cos10": 0.7276810360972065,
+              "cos90": 0.7313277307887962
+            }
+          ]
+        }
+      },
+      "schattersOnderling": {
+        "cosinus": 0.9999971919541991,
+        "relatiefVerschil": 0.007027214993351234,
+        "relatiefVerschilUitWolk": 0.007027328234947176
+      },
+      "JvoorLeren": -6.885212057822982,
+      "JnaLeren": -6.885212057822982,
+      "pogingenGeleerd": 0
+    },
+    {
+      "punt": "half getraind",
+      "prop": 1,
+      "succes": 0.01,
+      "verbindingen": 74,
+      "verbindingenUitWolk": 21,
+      "sigmaRuis": 0.105,
+      "varianteRuis": 0.0036749999999999994,
+      "splitHalfNumGrad": 0.9455386520142177,
+      "cosinusPlafond": 0.9859041836642235,
+      "normGrad": 19.351813642175024,
+      "varianten": {
+        "nieuw": {
+          "cosinus": 0.12299976940932057,
+          "cosinusGecorrigeerd": 0.12475834005712211,
+          "cosinusUitWolk": 0.6472026086218736,
+          "cosinusUitInvoer": 0.8299510734454421,
+          "tekenOvereenkomst": 0.7972972972972973,
+          "schaalfactor": 2.051547598155848,
+          "theoretischeSchaal": 272.108843537415,
+          "restBiasRelatief": 0.9924066992545212,
+          "gemiddeldeSignaalRuis": 0.09164033455245571,
+          "cosinusKromme": [
+            {
+              "pogingen": 1,
+              "cosMediaan": 0.04110386597298574,
+              "cos10": -0.09700611676870113,
+              "cos90": 0.15932378273893089
+            },
+            {
+              "pogingen": 3,
+              "cosMediaan": 0.06282792720734247,
+              "cos10": -0.017806147034809046,
+              "cos90": 0.1531304491423525
+            },
+            {
+              "pogingen": 10,
+              "cosMediaan": 0.08611520612678276,
+              "cos10": 0.02602870597160341,
+              "cos90": 0.1579917697246812
+            },
+            {
+              "pogingen": 30,
+              "cosMediaan": 0.11782073229466153,
+              "cos10": 0.06704444075248735,
+              "cos90": 0.14897685517384998
+            },
+            {
+              "pogingen": 100,
+              "cosMediaan": 0.11584661135419837,
+              "cos10": 0.09277757279925614,
+              "cos90": 0.14083545741327572
+            },
+            {
+              "pogingen": 300,
+              "cosMediaan": 0.12142130636498286,
+              "cos10": 0.10839171793608804,
+              "cos90": 0.1321925753248867
+            },
+            {
+              "pogingen": 1000,
+              "cosMediaan": 0.12229854283871862,
+              "cos10": 0.1132520736506829,
+              "cos90": 0.12915858710456052
+            },
+            {
+              "pogingen": 3000,
+              "cosMediaan": 0.12258469649570182,
+              "cos10": 0.11900256170414741,
+              "cos90": 0.12745716468101573
+            }
+          ]
+        },
+        "oud": {
+          "cosinus": 0.12281348538705852,
+          "cosinusGecorrigeerd": 0.12456939266715394,
+          "cosinusUitWolk": 0.6467057544841696,
+          "cosinusUitInvoer": 0.8299510734454421,
+          "tekenOvereenkomst": 0.7972972972972973,
+          "schaalfactor": 2.036595105399752,
+          "theoretischeSchaal": 272.108843537415,
+          "restBiasRelatief": 0.992429769710221,
+          "gemiddeldeSignaalRuis": 0.09182136631327482,
+          "cosinusKromme": [
+            {
+              "pogingen": 1,
+              "cosMediaan": 0.04447738592189072,
+              "cos10": -0.02294546880629227,
+              "cos90": 0.15624575207080804
+            },
+            {
+              "pogingen": 3,
+              "cosMediaan": 0.06445525675780303,
+              "cos10": -0.038703200429126325,
+              "cos90": 0.13469015583415284
+            },
+            {
+              "pogingen": 10,
+              "cosMediaan": 0.08812752285599294,
+              "cos10": 0.03603403968808818,
+              "cos90": 0.1423926391682519
+            },
+            {
+              "pogingen": 30,
+              "cosMediaan": 0.10573257725160727,
+              "cos10": 0.06748654431533956,
+              "cos90": 0.1455466803956407
+            },
+            {
+              "pogingen": 100,
+              "cosMediaan": 0.11567248546142614,
+              "cos10": 0.09118471682329722,
+              "cos90": 0.13807437560024827
+            },
+            {
+              "pogingen": 300,
+              "cosMediaan": 0.12093044123918113,
+              "cos10": 0.10656125071945417,
+              "cos90": 0.13515621229863736
+            },
+            {
+              "pogingen": 1000,
+              "cosMediaan": 0.12303107408484593,
+              "cos10": 0.11716745322866876,
+              "cos90": 0.1296858011195434
+            },
+            {
+              "pogingen": 3000,
+              "cosMediaan": 0.1228363791451422,
+              "cos10": 0.11878904377770413,
+              "cos90": 0.12711077535603738
+            }
+          ]
+        }
+      },
+      "schattersOnderling": {
+        "cosinus": 0.9999814287886605,
+        "relatiefVerschil": 0.008437273133261453,
+        "relatiefVerschilUitWolk": 0.00843939784929093
+      },
+      "JvoorLeren": -6.885212057822982,
+      "JnaLeren": 2.8323370704968545,
+      "pogingenGeleerd": 400
+    },
+    {
+      "punt": "begin, prop=2",
+      "prop": 2,
+      "succes": 0,
+      "verbindingen": 74,
+      "verbindingenUitWolk": 21,
+      "sigmaRuis": 0.105,
+      "varianteRuis": 0.0036749999999999994,
+      "splitHalfNumGrad": 0.9781339406668952,
+      "cosinusPlafond": 0.9944577004139774,
+      "normGrad": 9.260431605843547,
+      "varianten": {
+        "nieuw": {
+          "cosinus": 0.7083459385518246,
+          "cosinusGecorrigeerd": 0.7122936835392306,
+          "cosinusUitWolk": 0.9720648417995088,
+          "cosinusUitInvoer": 0.3629874799240436,
+          "tekenOvereenkomst": 0.6756756756756757,
+          "schaalfactor": 2.1573658833497515,
+          "theoretischeSchaal": 272.108843537415,
+          "restBiasRelatief": 0.7058654484653113,
+          "gemiddeldeSignaalRuis": 0.1112693169644498,
+          "cosinusKromme": [
+            {
+              "pogingen": 1,
+              "cosMediaan": 0.42175725507173617,
+              "cos10": 0.02759162025523331,
+              "cos90": 0.5575793368136992
+            },
+            {
+              "pogingen": 3,
+              "cosMediaan": 0.5443449149959109,
+              "cos10": 0.2832219480243844,
+              "cos90": 0.6635518524711873
+            },
+            {
+              "pogingen": 10,
+              "cosMediaan": 0.6537871532132907,
+              "cos10": 0.5258915140378275,
+              "cos90": 0.687069859734598
+            },
+            {
+              "pogingen": 30,
+              "cosMediaan": 0.6784940290667513,
+              "cos10": 0.6419177631262581,
+              "cos90": 0.7032997988698266
+            },
+            {
+              "pogingen": 100,
+              "cosMediaan": 0.7008426717094441,
+              "cos10": 0.688484796688977,
+              "cos90": 0.7088960482270898
+            },
+            {
+              "pogingen": 300,
+              "cosMediaan": 0.7054587958333747,
+              "cos10": 0.6987784060020386,
+              "cos90": 0.7105081301607589
+            },
+            {
+              "pogingen": 1000,
+              "cosMediaan": 0.7076557421761607,
+              "cos10": 0.7040367771606038,
+              "cos90": 0.7098580676205738
+            },
+            {
+              "pogingen": 3000,
+              "cosMediaan": 0.708092258273686,
+              "cos10": 0.7065632562245979,
+              "cos90": 0.7092934095889971
+            }
+          ]
+        },
+        "oud": {
+          "cosinus": 0.708391670628367,
+          "cosinusGecorrigeerd": 0.712339670489227,
+          "cosinusUitWolk": 0.9721289037742904,
+          "cosinusUitInvoer": 0.3629874799240436,
+          "tekenOvereenkomst": 0.6756756756756757,
+          "schaalfactor": 2.155044867549411,
+          "theoretischeSchaal": 272.108843537415,
+          "restBiasRelatief": 0.7058195527075959,
+          "gemiddeldeSignaalRuis": 0.11066417139841656,
+          "cosinusKromme": [
+            {
+              "pogingen": 1,
+              "cosMediaan": 0.33544461646519386,
+              "cos10": -0.1411284322288647,
+              "cos90": 0.5327549969878989
+            },
+            {
+              "pogingen": 3,
+              "cosMediaan": 0.5420767951623384,
+              "cos10": 0.273193372456348,
+              "cos90": 0.6311855199100352
+            },
+            {
+              "pogingen": 10,
+              "cosMediaan": 0.6301098705633248,
+              "cos10": 0.5144108975380297,
+              "cos90": 0.6865558012957388
+            },
+            {
+              "pogingen": 30,
+              "cosMediaan": 0.6835450089285314,
+              "cos10": 0.6542422867861151,
+              "cos90": 0.7054405202290276
+            },
+            {
+              "pogingen": 100,
+              "cosMediaan": 0.7008174873755271,
+              "cos10": 0.6829007092996265,
+              "cos90": 0.7091162541463797
+            },
+            {
+              "pogingen": 300,
+              "cosMediaan": 0.7063030271516791,
+              "cos10": 0.6977590435846321,
+              "cos90": 0.710541835347291
+            },
+            {
+              "pogingen": 1000,
+              "cosMediaan": 0.7072375061583939,
+              "cos10": 0.7047053293996488,
+              "cos90": 0.7092484978343927
+            },
+            {
+              "pogingen": 3000,
+              "cosMediaan": 0.7079010910297608,
+              "cos10": 0.7059970615809793,
+              "cos90": 0.7091545719459484
+            }
+          ]
+        }
+      },
+      "schattersOnderling": {
+        "cosinus": 0.999994959367466,
+        "relatiefVerschil": 0.003375815572777426,
+        "relatiefVerschilUitWolk": 0.0033758327673678525
+      },
+      "JvoorLeren": -6.8872745187529825,
+      "JnaLeren": -6.8872745187529825,
+      "pogingenGeleerd": 0
+    }
+  ]
+}

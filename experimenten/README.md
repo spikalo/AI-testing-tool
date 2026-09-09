@@ -42,6 +42,35 @@ hij gedraaid heeft. Alle runs van vóór 9 september 2026 staan op `1`.
 Draaien met `node tests/exp-stap2.js`; de controle die het herstel bewijst is
 `node tests/test-stap2.js`.
 
+## `gradcheck.csv`, `gradcheck.json` en `gradcheck-delen.json`
+
+De numerieke controle van de leerregel (werkplan stap 3). Op een miniatuur-ANG met vier
+verborgen knopen en een bevroren topologie wordt per gewicht een centrale differentie
+`(J(w+ε) − J(w−ε)) / 2ε` bepaald en vergeleken met de gemiddelde ANG-update.
+
+- **`gradcheck.csv`** — één regel per verbinding per meetpunt: het gewicht, de twee
+  onafhankelijk berekende helften van de numerieke gradiënt, en de gemiddelde ANG-update
+  met de nieuwe én de oude traceregel. De kolommen `bron` en `doel` geven de soort van
+  de knopen aan de uiteinden; op dat onderscheid draait de hele analyse.
+- **`gradcheck.json`** — de opzet, de cosinuskrommen, de schaalfactoren, de
+  helft-tegen-helft-betrouwbaarheid en de ε-reeks.
+- **`gradcheck-delen.json`** — de nabewerking die het paper leest: per meetpunt de
+  cosinus en de schaalfactor voor het score-functiedeel (verbindingen naar een knop) en
+  voor het node-perturbatiedeel (verbindingen naar de wolk), apart.
+
+Draaien: `node tests/gradcheck-stap3.js` (ongeveer twintig minuten), daarna
+`python3 tests/gradcheck-analyse.py`. De figuur komt uit `python3 paper/mkfig-grad.py`.
+
+## `perturbatie-schaal.json` en `perturbatie-schaal-lr.json`
+
+Wat de gevonden schaalfout waard is op het volledige brein: het node-perturbatiedeel van
+het spoor met een factor `g` versterkt, 8 zaden per waarde. Eén keer met de leersnelheid
+ongewijzigd, één keer met de leersnelheid meegeschaald als 1/g. Beide reeksen worden
+slechter dan `g = 1`; de leerregel is als geheel op de bestaande verhouding afgesteld.
+Dit is een vooruitblik op stap 7 en bewust níét in `runs.csv` opgenomen — de volledige
+ablatie, met η per conditie opnieuw afgesteld, komt daar wel in.
+Draaien: `node tests/exp-perturbgain.js`, en `LRDEEL=1 node tests/exp-perturbgain.js`.
+
 ## `runs/` — niet in git
 
 De volledige resultaatbestanden per run (elk ongeveer 325 kB: alle instellingen, de

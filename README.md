@@ -137,6 +137,19 @@ Drie remmen houden dat stabiel: de stap per keer is begrensd (*niet abrupt*), de
 aanpassing wordt gedempt naarmate een gewicht zijn plafond nadert (*niet oneindig
 versterken*), en alles zakt per poging een beetje terug naar nul (*vervagen*).
 
+**Doet die regel wat hij belooft?** Deels — en dat is nagemeten in plaats van aangenomen.
+Op een miniatuurbrein met bevroren topologie is per gewicht de echte gradiënt numeriek
+bepaald en met de update vergeleken (`tests/gradcheck-stap3.js`, figuur in
+`docs/fig2-gradcheck.png`). Voor de vier knoppen, waar de formule exact is, wijst de
+update precies de goede kant op (cosinus 0,99–1,00, tegen het meetbare plafond aan). Voor
+de wolk, waar node-perturbatie wordt gebruikt, wijst hij de goede kant op maar veel
+grover (0,27–0,83) — en, belangrijker: hij is er **twee ordes te klein**, doordat de
+normalisatie 1/Var(ξ) ontbreekt die bij node-perturbatie hoort. Met één leersnelheid
+krijgt de wolk daardoor nauwelijks een update, terwijl daar het grootste deel van de
+echte gradiënt ligt. Die factor er zomaar bij zetten maakt het overigens *slechter*: de
+leersnelheid en de stapbegrenzing zijn stilzwijgend op de bestaande verhouding
+afgesteld. Dat rechtzetten is een eigen experiment, geen knop die je even omzet.
+
 **De structuur verandert mee.** Verbindingen die te lang te zwak zijn worden gesnoeid en
 er groeien nieuwe bij. Loopt het leren vast, dan komen er neuronen bij — die zijn
 *neutraal* en krijgen bij de volgende opruimronde de soort die het beste past bij de
@@ -203,7 +216,7 @@ Daaruit volgen drie dingen die de pagina nu kan:
 | `resultaten-brein/` | Opgeslagen runs van test 04 (JSON, één bestand per brein) |
 | `experimenten/` | Meetreeksen van test 04: `runs.csv` met één regel per run, en de volledige runs in `runs/` (niet in git — ze zijn uit de zaden te reproduceren) |
 | `paper/` | Generator van het ANG-paper (`paper.js`) plus de scripts voor de formules en figuren |
-| `tests/` | Playwright-tests die de eigenschappen bewijzen waarop de paper zich beroept |
+| `tests/` | Playwright-tests die de eigenschappen bewijzen waarop de paper zich beroept, plus de numerieke gradiëntcontrole (`gradcheck-*`) |
 | `datasets/` | MNIST/EMNIST — **niet in git**, zie `datasets/README.md` |
 | `DOCUMENTATIE.md` | Volledige documentatie van test 01 en 02: opdrachten, scoring, faalpatronen, remedies en het logboek |
 
