@@ -623,12 +623,10 @@
       <div>
         <label style="display:block;font-size:12.5px;color:var(--text-dim);margin-bottom:6px;">Condities (JSON)</label>
         <textarea id="expspec" spellcheck="false" style="width:100%;height:190px;background:var(--panel-alt);color:var(--text);border:1px solid var(--border);border-radius:3px;padding:9px;font-family:'IBM Plex Mono',monospace;font-size:11.5px;line-height:1.5;">[
-  {"naam":"vol model"},
-  {"naam":"vaste structuur", "structOn":false},
-  {"naam":"geen groei",      "growOn":false},
-  {"naam":"geen hertypering", "retypeOn":false}
+  {"naam":"trace-nieuw", "traceOud":false},
+  {"naam":"trace-oud",   "traceOud":true}
 ]</textarea>
-        <div class="hint">Sleutels zijn de namen uit de configuratie: <code>nNeurons, density, nObs, maxSteps, worldEvery, seed, lr, lam, decay, wmax, stepMax, memLeak, prop, noise0, lrAnneal, structOn, structEvery, pruneT, sprout, growOn, growStagnant, growMax, growN, newLinks, retypeOn, retypeN, retypeCost, rGoal, rProg, rCol, rStep, rIdle, nEpisodes, evalOn, evalMode, inputOnlySens</code>. Types uitzetten kan met <code>"types.mem.on": false</code>.</div>
+        <div class="hint">Sleutels zijn de namen uit de configuratie: <code>nNeurons, density, nObs, maxSteps, worldEvery, seed, lr, lam, decay, wmax, stepMax, memLeak, prop, noise0, lrAnneal, structOn, structEvery, pruneT, sprout, growOn, growStagnant, growMax, growN, newLinks, retypeOn, retypeN, retypeCost, rGoal, rProg, rCol, rStep, rIdle, nEpisodes, evalOn, evalMode, inputOnlySens, traceOud</code>. Types uitzetten kan met <code>"types.mem.on": false</code>. <code>traceOud:true</code> zet de foutieve postsynaptische eligibility-trace van v&oacute;&oacute;r 9&nbsp;september 2026 terug &mdash; alleen bedoeld als ablatie.</div>
       </div>
       <div>
         <div class="field">
@@ -736,6 +734,10 @@ const TYPES=["sens","work","refl","mem"];
 /* Aan: invoer-nodes mogen uitsluitend aan invoer-neuronen hangen. Dan loopt élk
    signaal via een invoer-neuron en is de reflexboog het kortste pad dat er is. */
 let INPUT_ONLY_SENS=false;
+/* Ablatievlag zonder eigen knop in de pagina: alleen de experimentloper en het
+   terugladen van een resultaat zetten hem. true = de foutieve trace van vóór
+   9 september 2026 (postsynaptische toestand i.p.v. presynaptische). */
+let TRACE_OUD=false;
 const KIND_OF={sens:K_SENS,work:K_WORK,refl:K_REFL,mem:K_MEM};
 
 function rectHit(x,y,o,pad){ return x> o.x-pad && x< o.x+o.w+pad && y> o.y-pad && y< o.y+o.h+pad; }
@@ -913,6 +915,7 @@ function createBrain(cfg,seed){
     n, kinds:Int8Array.from(kinds), labels, comp, nextId:ctr,
     act:new Float32Array(n), next:new Float32Array(n), sum:new Float32Array(n),
     clean:new Float32Array(n), prev:new Float32Array(n), dev:new Float32Array(n),
+    pre:new Float32Array(n),
     bias:new Float32Array(n), ebias:new Float32Array(n), press:new Uint8Array(N_OUT), rbar:0,
     from:[], to:[], w:[], e:[], rms:[], weakAge:[],
     pruned:0, sprouted:0, grown:0, retyped:0, born:0,
@@ -965,6 +968,7 @@ function expandBrain(B,extra){
   const cp=(old,C)=>{ const a=new C(nn); a.set(old); return a; };
   B.act=cp(B.act,Float32Array); B.next=cp(B.next,Float32Array); B.sum=cp(B.sum,Float32Array);
   B.clean=cp(B.clean,Float32Array); B.prev=cp(B.prev,Float32Array); B.dev=cp(B.dev,Float32Array);
+  B.pre=cp(B.pre,Float32Array);
   B.bias=cp(B.bias,Float32Array); B.ebias=cp(B.ebias,Float32Array);
   const k=new Int8Array(nn); k.set(B.kinds); B.kinds=k;
   if(B.lay){ const x=new Float32Array(nn), y=new Float32Array(nn); x.set(B.lay.x); y.set(B.lay.y); B.lay={x,y}; }
@@ -973,6 +977,7 @@ function expandBrain(B,extra){
 
 function resetBrainState(B){
   B.act.fill(0); B.next.fill(0); B.clean.fill(0); B.prev.fill(0); B.dev.fill(0); B.ebias.fill(0);
+  if(B.pre) B.pre.fill(0);
   if(B.cE) B.cE.fill(0);
 }
 const hiddenNoiseOf = expl => 0.35*expl;
@@ -981,6 +986,12 @@ function propagate(B,inp,cfg,hn,tp,state,rnd){
   const n=B.n, next=B.next, sum=B.sum;
   for(let i=0;i<N_IN;i++) state[i]=inp[i];
   for(let s=0;s<cfg.prop;s++){
+    /* De presynaptische activatie die de uitvoer van deze tik veroorzaakt, is de
+       toestand aan het BEGIN van de laatste propagatiestap — niet de toestand erna.
+       propagate() is synchroon: eerst worden alle sommen uit de oude toestand
+       berekend, pas daarna geschreven. De momentopname wordt genomen nadat de
+       sensorwaarden zijn ingezet, dus de invoerknopen staan er goed in. */
+    if(s===cfg.prop-1 && state===B.act && B.pre) B.pre.set(state);
     sum.fill(0);
     for(let c=0;c<B.nc;c++) sum[B.cTo[c]]+=B.cW[c]*state[B.cFrom[c]];
     for(let j=0;j<n;j++){
@@ -1021,8 +1032,13 @@ function brainStep(B,inp,cfg,expl,rnd){
     B.dev[j]=a-pr;
   }
 }
-function updateTraces(B,lam){
-  const act=B.act, dev=B.dev, k1=1-lam;
+/* De eligibility-trace vermenigvuldigt de presynaptische activatie met de
+   postsynaptische afwijking. Tot 9 september 2026 werd daar B.act voor gebruikt: de
+   toestand NA de propagatie. Dat is één tik te laat voor alles wat uit de wolk zelf
+   komt. B.pre is de juiste grootheid. traceOud=true zet de oude regel terug, puur om
+   het verschil te kunnen meten. */
+function updateTraces(B,lam,traceOud){
+  const act=(traceOud||!B.pre)? B.act : B.pre, dev=B.dev, k1=1-lam;
   for(let c=0;c<B.nc;c++) B.cE[c]=lam*B.cE[c]+k1*act[B.cFrom[c]]*dev[B.cTo[c]];
   for(let j=N_IN;j<B.n;j++) B.ebias[j]=lam*B.ebias[j]+k1*dev[j];
 }
@@ -1423,6 +1439,8 @@ function readCfg(){
     wmax:+$("wmax").value/10, stepMax:+$("stepmax").value/1000, memLeak:+$("memleak").value/100,
     prop:+$("prop").value, noise0:+$("noise").value/100,
     lrAnneal:$("lranneal").checked,
+    /* alleen bedoeld als ablatie: zet de foutieve postsynaptische trace terug */
+    traceOud:TRACE_OUD,
     structOn:$("structplast").checked, structEvery:+$("structevery").value,
     pruneT:+$("prune").value/1000, sprout:+$("sprout").value,
     growOn:$("grow").checked, growStagnant:$("growstag").checked,
@@ -1485,7 +1503,7 @@ function gameTick(learn,noise){
   let dx=P[3]-P[2], dy=P[1]-P[0];
   const mag=Math.hypot(dx,dy);
   if(mag>0){ dx=dx/mag*c.chSpeed; dy=dy/mag*c.chSpeed; }
-  if(learn) updateTraces(B,c.lam);
+  if(learn) updateTraces(B,c.lam,c.traceOud);
 
   let collided=false;
   let nx=S.ag.x+dx, ny=S.ag.y+dy;
@@ -2066,7 +2084,7 @@ function buildResult(naamOverride){
       leren:{leersnelheid:S.cfg.lr, sporenVervaging:S.cfg.lam, vervagingPerPoging:S.cfg.decay,
         maxGewicht:S.cfg.wmax, maxVeranderingPerStap:S.cfg.stepMax, geheugenlek:S.cfg.memLeak,
         propagatiestappen:S.cfg.prop, exploratieStart:S.cfg.noise0, exploratieEind:noiseEnd(S.cfg.noise0),
-        leersnelheidMeeschalen:S.cfg.lrAnneal},
+        leersnelheidMeeschalen:S.cfg.lrAnneal, oudeTrace:!!S.cfg.traceOud},
       structureel:{aan:S.cfg.structOn, herstructureerElke:S.cfg.structEvery,
         snoeidrempel:S.cfg.pruneT, nieuweVerbindingenPerRonde:S.cfg.sprout,
         groeiAan:S.cfg.growOn, alleenBijStagnatie:S.cfg.growStagnant, maxNeuronen:S.cfg.growMax,
@@ -2202,6 +2220,7 @@ function applyCfgToUI(R){
   const l=c.leren||{};
   set("lr",l.leersnelheid*1000); set("elam",l.sporenVervaging*100); set("dec",l.vervagingPerPoging*10000);
   set("wmax",l.maxGewicht*10); set("stepmax",l.maxVeranderingPerStap*1000); set("memleak",l.geheugenlek*100);
+  TRACE_OUD=!!l.oudeTrace;
   set("prop",l.propagatiestappen); set("noise",l.exploratieStart*100); chk("lranneal",l.leersnelheidMeeschalen);
   const st=c.structureel||{};
   chk("structplast",st.aan); set("structevery",st.herstructureerElke); set("prune",st.snoeidrempel*1000);
@@ -2246,6 +2265,7 @@ function brainFromResult(R){
     n, kinds, labels, comp:null, nextId:0,
     act:new Float32Array(n), next:new Float32Array(n), sum:new Float32Array(n),
     clean:new Float32Array(n), prev:new Float32Array(n), dev:new Float32Array(n),
+    pre:new Float32Array(n),
     bias, ebias:new Float32Array(n), press:new Uint8Array(N_OUT), rbar:0,
     from:[], to:[], w:[], e:[], rms:[], weakAge:[],
     pruned:0, sprouted:0, grown:0, retyped:0, born:0,
@@ -2313,7 +2333,7 @@ function repeatRun(){
    ===================================================================== */
 const CSV_COLS=["tijdstip","conditie","brein","breinZaad","wereldZaad","pogingen",
   "neuronenStart","neuronenEind","dichtheid","sens","work","refl","mem","neut",
-  "lr","lam","decay","wmax","stepMax","memLeak","prop","noise0","lrAnneal",
+  "lr","lam","decay","wmax","stepMax","memLeak","prop","noise0","lrAnneal","traceOud",
   "structOn","structEvery","pruneT","sprout","growOn","retypeOn","inputOnlySens",
   "obstakels","maxSteps","worldEvery","toetsModus",
   "succesPct","succes20","toetsPct","gemStappenBijSucces","botsingenPerPoging","rekentijdMs",
@@ -2334,7 +2354,7 @@ function csvRow(r){
     sens:comp.sens, work:comp.work, refl:comp.refl, mem:comp.mem, neut:comp.neut,
     lr:l.leersnelheid, lam:l.sporenVervaging, decay:l.vervagingPerPoging, wmax:l.maxGewicht,
     stepMax:l.maxVeranderingPerStap, memLeak:l.geheugenlek, prop:l.propagatiestappen,
-    noise0:l.exploratieStart, lrAnneal:l.leersnelheidMeeschalen,
+    noise0:l.exploratieStart, lrAnneal:l.leersnelheidMeeschalen, traceOud:!!l.oudeTrace,
     structOn:st.aan, structEvery:st.herstructureerElke, pruneT:st.snoeidrempel, sprout:st.nieuweVerbindingenPerRonde,
     growOn:st.groeiAan, retypeOn:st.typeVeranderingAan, inputOnlySens:c.invoerAlleenViaSens,
     obstakels:w.obstakels, maxSteps:w.stappenPerPoging, worldEvery:w.nieuweWereldElke,
@@ -2710,6 +2730,7 @@ function runHeadless(nEp,brainSeed,evalOn){
 window.__brain={S,createBrain,analyze,makeWorld,readCfg,startTraining,stopTraining,runHeadless,genBrain,evalWorlds,
   canConnect,countKinds,restructure,buildResult,brainFromResult,applyCfgToUI,applyResult,repeatRun,
   runOne,cfgOverride,runExperiments,csvRow,CSV_COLS,meanCI,
+  propagate,brainStep,updateTraces,resetBrainState,mulberry32,sense,makeWorld2:makeWorld,
   K:{K_IN,K_SENS,K_WORK,K_REFL,K_MEM,K_NEUT,K_OUT,HID0,OUT0}};
 </script>
 </body>

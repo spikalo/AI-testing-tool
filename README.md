@@ -127,6 +127,8 @@ elke tik twee keer doorrekenen: één keer schoon, één keer met ruis
     voor de vier knoppen exacter:  δ = geloten actie − kans
 spoor bijhouden per verbinding:
     e ← λ·e + (1−λ)·x_pre·δ_post
+    x_pre = de toestand vóór de laatste propagatiestap, niet erna:
+            die activatie bracht δ_post voort (zie het logboek van 9 september)
 en bijstellen naar de afwijking van een lopende basislijn:
     Δw = η · (r − r̄) · e
 ```
@@ -152,16 +154,16 @@ obstakels, 500 pogingen) gemeten over **twaalf onafhankelijke breinzaden**:
 
 | grootheid | gemiddelde ± 95% | spreiding |
 |---|---|---|
-| succes over alle pogingen | 63,3% ± 2,8 | sd 5,0% |
-| succes laatste 20 pogingen | 85,0% ± 5,9 | sd 10,4% |
-| toets op onbekende werelden | 68,3% ± 3,0 | sd 5,4% |
-| rekentijd per run | 13,5 s ± 0,3 | |
+| succes over alle pogingen | 63,5% ± 1,9 | sd 3,4% |
+| succes laatste 20 pogingen | 89,2% ± 5,6 | sd 10,0% |
+| toets op onbekende werelden | 67,9% ± 4,3 | sd 7,5% |
+| rekentijd per run | 12,9 s ± 0,3 | |
 
 Ter vergelijking: een zuiver reactieve agent die recht op het doel af loopt en langs
-obstakels glijdt haalt op diezelfde werelden 57%. Let op de spreiding: **sd 10,4% op de
+obstakels glijdt haalt op diezelfde werelden 57%. Let op de spreiding: **sd 10,0% op de
 trainingsscore** betekent dat een enkele run niets bewijst en dat een verschil van tien
 procentpunt pas boven de ruis uitkomt bij ruwweg zestien runs per conditie. De ruwe
-meting staat in `experimenten/runs.csv`.
+meting staat in `experimenten/runs.csv`, conditie `trace-nieuw`.
 
 ### Herhaalbaar, laadbaar, en in reeksen te draaien
 
@@ -179,7 +181,7 @@ Daaruit volgen drie dingen die de pagina nu kan:
   of opnieuw te toetsen, of alleen de instellingen terugzetten en met een vers brein
   vanaf hetzelfde punt verder experimenteren.
 - **Experimentloper** — een lijst condities × zaden achter elkaar, zonder tekenen, met
-  per run een JSON en één regel in `experimenten/runs.csv` (52 kolommen: beide zaden,
+  per run een JSON en één regel in `experimenten/runs.csv` (53 kolommen: beide zaden,
   alle parameters die tussen condities verschillen, en alle uitkomst- en structuurmaten).
   Onderaan verschijnt per conditie het gemiddelde met een 95%-interval over de zaden.
 

@@ -1,0 +1,408 @@
+{
+  "uitgevoerd": "2026-09-09T05:25:30.112Z",
+  "pogingenPerRun": 500,
+  "zaden": 12,
+  "beschrijving": "Eligibility-trace: presynaptische activatie uit de momentopname B.pre (nieuw) tegenover de postsynaptische toestand B.act (oud). Zelfde breinzaden, zelfde wereldzaad, verder identieke instellingen.",
+  "maten": {
+    "succes20": {
+      "oud": {
+        "n": 12,
+        "m": 0.85,
+        "sd": 0.10444659357341869,
+        "ci": 0.05909622353724167
+      },
+      "nieuw": {
+        "n": 12,
+        "m": 0.8916666666666666,
+        "sd": 0.09962049198956219,
+        "ci": 0.056365599509637154
+      },
+      "verschilGepaard": {
+        "n": 12,
+        "m": 0.04166666666666666,
+        "sd": 0.12401124093721454,
+        "ci": 0.07016596487088754
+      },
+      "mannWhitney": {
+        "U": 54.5,
+        "z": -0.9814954576223637,
+        "p": 0.32634847866288075
+      },
+      "oordeel": "verschil valt binnen de ruis"
+    },
+    "toets": {
+      "oud": {
+        "n": 12,
+        "m": 0.6833333333333335,
+        "sd": 0.05365433699886598,
+        "ci": 0.030357798991296446
+      },
+      "nieuw": {
+        "n": 12,
+        "m": 0.6791666666666667,
+        "sd": 0.07525210155124432,
+        "ci": 0.04257788466594204
+      },
+      "verschilGepaard": {
+        "n": 12,
+        "m": -0.004166666666666652,
+        "sd": 0.06894771844512244,
+        "ci": 0.03901084412821593
+      },
+      "mannWhitney": {
+        "U": 70,
+        "z": -0.08660254037844385,
+        "p": 0.9309873179703314
+      },
+      "oordeel": "verschil valt binnen de ruis"
+    },
+    "succes": {
+      "oud": {
+        "n": 12,
+        "m": 0.6325000000000001,
+        "sd": 0.04958830507286975,
+        "ci": 0.028057224856829065
+      },
+      "nieuw": {
+        "n": 12,
+        "m": 0.6348333333333334,
+        "sd": 0.034287112164865394,
+        "ci": 0.01939975996935753
+      },
+      "verschilGepaard": {
+        "n": 12,
+        "m": 0.002333333333333326,
+        "sd": 0.039338469104874325,
+        "ci": 0.022257834212662832
+      },
+      "mannWhitney": {
+        "U": 70.5,
+        "z": -0.05773502691896257,
+        "p": 0.9539595543136667
+      },
+      "oordeel": "verschil valt binnen de ruis"
+    },
+    "actief": {
+      "oud": {
+        "n": 12,
+        "m": 1438.75,
+        "sd": 193.53934295829174,
+        "ci": 109.50519192063798
+      },
+      "nieuw": {
+        "n": 12,
+        "m": 1445.75,
+        "sd": 188.591007690765,
+        "ci": 106.70540767586584
+      },
+      "verschilGepaard": {
+        "n": 12,
+        "m": 7,
+        "sd": 161.9416280920101,
+        "ci": 91.62710172048972
+      },
+      "mannWhitney": {
+        "U": 71,
+        "z": -0.028867513459481284,
+        "p": 0.9769701513840158
+      },
+      "oordeel": "verschil valt binnen de ruis"
+    },
+    "reflex": {
+      "oud": {
+        "n": 12,
+        "m": 3.25,
+        "sd": 2.3403573930647275,
+        "ci": 1.3241818514681343
+      },
+      "nieuw": {
+        "n": 12,
+        "m": 3.75,
+        "sd": 2.7344602259445514,
+        "ci": 1.5471665205866636
+      },
+      "verschilGepaard": {
+        "n": 12,
+        "m": 0.5,
+        "sd": 1,
+        "ci": 0.5658032638058332
+      },
+      "mannWhitney": {
+        "U": 64,
+        "z": -0.4330127018922193,
+        "p": 0.6650056102807532
+      },
+      "oordeel": "verschil valt binnen de ruis"
+    }
+  },
+  "perZaad": {
+    "trace-oud": [
+      {
+        "zaad": 1000,
+        "succes20": 0.8,
+        "toets": 0.7,
+        "succes": 0.688,
+        "stappen": 152.0843023255814,
+        "actief": 1482,
+        "reflex": 1,
+        "pad": 2,
+        "neuronen": 116
+      },
+      {
+        "zaad": 1001,
+        "succes20": 0.9,
+        "toets": 0.7,
+        "succes": 0.668,
+        "stappen": 152.34730538922156,
+        "actief": 1315,
+        "reflex": 1,
+        "pad": 2,
+        "neuronen": 110
+      },
+      {
+        "zaad": 1002,
+        "succes20": 0.65,
+        "toets": 0.6,
+        "succes": 0.592,
+        "stappen": 165.19594594594594,
+        "actief": 1201,
+        "reflex": 3,
+        "pad": 2,
+        "neuronen": 108
+      },
+      {
+        "zaad": 1003,
+        "succes20": 0.85,
+        "toets": 0.75,
+        "succes": 0.61,
+        "stappen": 162.01967213114753,
+        "actief": 1299,
+        "reflex": 6,
+        "pad": 2,
+        "neuronen": 112
+      },
+      {
+        "zaad": 1004,
+        "succes20": 0.9,
+        "toets": 0.6,
+        "succes": 0.614,
+        "stappen": 162.82084690553745,
+        "actief": 1114,
+        "reflex": 2,
+        "pad": 2,
+        "neuronen": 110
+      },
+      {
+        "zaad": 1005,
+        "succes20": 0.95,
+        "toets": 0.75,
+        "succes": 0.626,
+        "stappen": 167.18210862619807,
+        "actief": 1569,
+        "reflex": 7,
+        "pad": 2,
+        "neuronen": 106
+      },
+      {
+        "zaad": 1006,
+        "succes20": 1,
+        "toets": 0.65,
+        "succes": 0.622,
+        "stappen": 168.4565916398714,
+        "actief": 1573,
+        "reflex": 0,
+        "pad": 2,
+        "neuronen": 112
+      },
+      {
+        "zaad": 1007,
+        "succes20": 0.8,
+        "toets": 0.7,
+        "succes": 0.698,
+        "stappen": 145.61318051575932,
+        "actief": 1708,
+        "reflex": 3,
+        "pad": 2,
+        "neuronen": 116
+      },
+      {
+        "zaad": 1008,
+        "succes20": 0.8,
+        "toets": 0.65,
+        "succes": 0.684,
+        "stappen": 146.90058479532163,
+        "actief": 1487,
+        "reflex": 6,
+        "pad": 2,
+        "neuronen": 110
+      },
+      {
+        "zaad": 1009,
+        "succes20": 0.9,
+        "toets": 0.65,
+        "succes": 0.658,
+        "stappen": 160.4498480243161,
+        "actief": 1526,
+        "reflex": 4,
+        "pad": 2,
+        "neuronen": 110
+      },
+      {
+        "zaad": 1010,
+        "succes20": 0.95,
+        "toets": 0.75,
+        "succes": 0.606,
+        "stappen": 158.53465346534654,
+        "actief": 1284,
+        "reflex": 5,
+        "pad": 2,
+        "neuronen": 112
+      },
+      {
+        "zaad": 1011,
+        "succes20": 0.7,
+        "toets": 0.7,
+        "succes": 0.524,
+        "stappen": 172.5648854961832,
+        "actief": 1707,
+        "reflex": 1,
+        "pad": 2,
+        "neuronen": 114
+      }
+    ],
+    "trace-nieuw": [
+      {
+        "zaad": 1000,
+        "succes20": 1,
+        "toets": 0.7,
+        "succes": 0.69,
+        "stappen": 153.631884057971,
+        "actief": 1547,
+        "reflex": 0,
+        "pad": 2,
+        "neuronen": 112
+      },
+      {
+        "zaad": 1001,
+        "succes20": 0.8,
+        "toets": 0.75,
+        "succes": 0.64,
+        "stappen": 159.4375,
+        "actief": 1493,
+        "reflex": 2,
+        "pad": 2,
+        "neuronen": 112
+      },
+      {
+        "zaad": 1002,
+        "succes20": 0.7,
+        "toets": 0.55,
+        "succes": 0.608,
+        "stappen": 163.2203947368421,
+        "actief": 1416,
+        "reflex": 4,
+        "pad": 2,
+        "neuronen": 108
+      },
+      {
+        "zaad": 1003,
+        "succes20": 1,
+        "toets": 0.65,
+        "succes": 0.604,
+        "stappen": 160.97019867549668,
+        "actief": 1245,
+        "reflex": 7,
+        "pad": 2,
+        "neuronen": 106
+      },
+      {
+        "zaad": 1004,
+        "succes20": 1,
+        "toets": 0.65,
+        "succes": 0.614,
+        "stappen": 168.50162866449512,
+        "actief": 1153,
+        "reflex": 2,
+        "pad": 2,
+        "neuronen": 108
+      },
+      {
+        "zaad": 1005,
+        "succes20": 0.95,
+        "toets": 0.8,
+        "succes": 0.612,
+        "stappen": 156.87908496732027,
+        "actief": 1434,
+        "reflex": 8,
+        "pad": 2,
+        "neuronen": 112
+      },
+      {
+        "zaad": 1006,
+        "succes20": 0.8,
+        "toets": 0.7,
+        "succes": 0.622,
+        "stappen": 170.04501607717043,
+        "actief": 1532,
+        "reflex": 0,
+        "pad": 2,
+        "neuronen": 108
+      },
+      {
+        "zaad": 1007,
+        "succes20": 0.95,
+        "toets": 0.6,
+        "succes": 0.7,
+        "stappen": 145.05714285714285,
+        "actief": 1711,
+        "reflex": 3,
+        "pad": 2,
+        "neuronen": 116
+      },
+      {
+        "zaad": 1008,
+        "succes20": 0.9,
+        "toets": 0.75,
+        "succes": 0.672,
+        "stappen": 146.28869047619048,
+        "actief": 1570,
+        "reflex": 8,
+        "pad": 2,
+        "neuronen": 116
+      },
+      {
+        "zaad": 1009,
+        "succes20": 0.8,
+        "toets": 0.65,
+        "succes": 0.598,
+        "stappen": 168.30769230769232,
+        "actief": 1132,
+        "reflex": 4,
+        "pad": 2,
+        "neuronen": 114
+      },
+      {
+        "zaad": 1010,
+        "succes20": 0.95,
+        "toets": 0.75,
+        "succes": 0.626,
+        "stappen": 157.52715654952075,
+        "actief": 1426,
+        "reflex": 4,
+        "pad": 2,
+        "neuronen": 108
+      },
+      {
+        "zaad": 1011,
+        "succes20": 0.85,
+        "toets": 0.6,
+        "succes": 0.632,
+        "stappen": 164.94303797468353,
+        "actief": 1690,
+        "reflex": 3,
+        "pad": 2,
+        "neuronen": 112
+      }
+    ]
+  }
+}

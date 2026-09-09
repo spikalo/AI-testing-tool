@@ -32,4 +32,5 @@ leesbaar zijn. Vandaar afbeeldingen.
 ## Versie
 
 De voettekst draagt het versienummer. Verhoog het als de inhoud wezenlijk verandert:
-1.0 = alleen het systeem, 1.1 = met referentiemeting en reproduceerbaarheid.
+1.0 = alleen het systeem, 1.1 = met referentiemeting en reproduceerbaarheid,
+1.15 = met het eligibility-herstel en de voor/na-meting.

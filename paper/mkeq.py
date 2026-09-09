@@ -1,9 +1,13 @@
-import json, matplotlib
+import json, os, matplotlib
 matplotlib.use("Agg")
 matplotlib.rcParams["mathtext.fontset"]="stix"
 matplotlib.rcParams["font.family"]="STIXGeneral"
 import matplotlib.pyplot as plt
 from PIL import Image
+
+ROOT=os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+EQDIR=os.path.join(ROOT,"paper","eq")
+os.makedirs(EQDIR,exist_ok=True)
 
 EQ = {
  1: r"$V=\mathcal{I}\cup\mathcal{O}\cup\mathcal{H},\qquad |\mathcal{I}|=16,\quad |\mathcal{O}|=4,\quad E\subseteq V\times V$",
@@ -16,10 +20,10 @@ EQ = {
  8: r"$\Delta\mathbf{q}_t\;=\;v\cdot\frac{\left(a_{r}-a_{l},\;a_{d}-a_{u}\right)}{\left\|\left(a_{r}-a_{l},\;a_{d}-a_{u}\right)\right\|}$",
  9: r"$J(\theta)\;=\;\mathrm{E}_{\pi_\theta}\left[\sum_{t=0}^{T} r_t\right],\qquad \theta=\left\{w_{ij},\,b_j\right\}$",
 10: r"$\frac{\partial}{\partial u_k}\log \pi_\theta(a_k)\;=\;a_k-p_k$",
-11: r"$\frac{\partial}{\partial w_{ik}}\log \pi_\theta(a_k)\;=\;\frac{1}{\tau}\;x_i\,(a_k-p_k)$",
+11: r"$\frac{\partial}{\partial w_{ik}}\log \pi_\theta(a_k)\;=\;\frac{1}{\tau}\;\tilde{x}_i\,(a_k-p_k)$",
 12: r"$\delta_j\;=\;x_j-\bar{x}_j$",
-13: r"$\mathrm{E}\left[x_i\,\delta_j\,\hat{A}\right]\;=\;c\;\frac{\partial J}{\partial w_{ij}}\;+\;\mathcal{O}\!\left(\sigma_h^{2}\right),\qquad c>0$",
-14: r"$e_{ij}(t)\;=\;\lambda\,e_{ij}(t-1)\;+\;(1-\lambda)\;x_i(t)\,\delta_j(t)$",
+13: r"$\mathrm{E}\left[\tilde{x}_i\,\delta_j\,\hat{A}\right]\;=\;c\;\frac{\partial J}{\partial w_{ij}}\;+\;\mathcal{O}\!\left(\sigma_h^{2}\right),\qquad c>0$",
+14: r"$e_{ij}(t)\;=\;\lambda\,e_{ij}(t-1)\;+\;(1-\lambda)\;\tilde{x}_i(t)\,\delta_j(t),\qquad \tilde{x}_i(t)\;\equiv\;x_i^{(P-1)}(t)$",
 15: r"$\bar{r}_t\;=\;\bar{r}_{t-1}+\beta\left(r_t-\bar{r}_{t-1}\right),\qquad \beta=0.02$",
 16: r"$\hat{A}_t\;=\;\mathrm{clip}\left(r_t-\bar{r}_t,\;-c,\;c\right),\qquad c=10$",
 17: r"$\widetilde{\Delta}w_{ij}\;=\;\eta_t\;\hat{A}_t\;e_{ij}$",
@@ -41,6 +45,7 @@ EQ = {
 33: r"$E_\theta\;=\;\left\{(a,b)\in E\;:\;|w_{ab}|>0.08\,w_{\max}\right\}$",
 34: r"$\nu_i\;=\;\sum_{h=1}^{5}\;\sum_{o\in\mathcal{O}}\left(\widetilde{W}^{\,h}\right)_{io},\qquad \widetilde{W}_{ab}=\min\left(1,\;\frac{|w_{ab}|}{w_{\max}}\right)$",
 35: r"$\mathcal{C}_{\mathrm{tik}}=\mathcal{O}\left(P\left(|E|+|V|\right)\right),\qquad \mathcal{C}_{\mathrm{poging}}=\mathcal{O}\left(T\,P\left(|E|+|V|\right)\right)$",
+36: r"$T(i)\;\neq\;\kappa(i)\quad\Leftrightarrow\quad C\!\left(i,T(i)\right)-S\!\left(T(i)\right)\;<\;-S\!\left(\kappa(i)\right)-\mu\;\;\mathrm{en}\;\;C\!\left(i,T(i)\right)\leq C_{\max},\qquad \mu=0.02$",
 }
 
 man={}; bad=[]
@@ -48,14 +53,14 @@ for k,s in EQ.items():
     try:
         fig=plt.figure(figsize=(0.01,0.01))
         fig.text(0,0,s,fontsize=13.5,color="#111111")
-        path=f"/home/claude/eq/eq{k:02d}.png"
+        path=os.path.join(EQDIR,f"eq{k:02d}.png")
         fig.savefig(path,dpi=320,bbox_inches="tight",pad_inches=0.03,facecolor="white")
         plt.close(fig)
         w,h=Image.open(path).size
         man[k]={"path":path,"w":w,"h":h}
     except Exception as ex:
         bad.append((k,str(ex).splitlines()[-1][:120]))
-json.dump(man,open("/home/claude/eq/manifest.json","w"),indent=1)
+json.dump(man,open(os.path.join(EQDIR,"manifest.json"),"w"),indent=1)
 print("ok:",len(man),"fout:",bad)
 mx=max((v["w"] for v in man.values()), default=0)
 print("breedste px:",mx)

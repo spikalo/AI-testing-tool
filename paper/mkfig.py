@@ -1,4 +1,4 @@
-import matplotlib
+import os, matplotlib
 matplotlib.use("Agg")
 matplotlib.rcParams["font.family"]="STIXGeneral"
 import matplotlib.pyplot as plt
@@ -45,5 +45,5 @@ ax.add_patch(FancyArrowPatch((MEM[0]+2.5,MEM[1]),(MEM[0]+7.5,MEM[1]),
 ax.text(MEM[0]+5,MEM[1]-8.2,"zelflus",ha="center",fontsize=7.6,color=COL["mem"])
 ax.text(63,-5.0,"tijdelijk: krijgt bij de eerstvolgende ronde een soort toegewezen",
         ha="center",fontsize=7.4,color="#7c8794",style="italic")
-fig.savefig("/home/claude/fig1-typen.png",dpi=300,bbox_inches="tight",pad_inches=0.10,facecolor="white")
+fig.savefig(os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))),"paper","fig1-typen.png"),dpi=300,bbox_inches="tight",pad_inches=0.10,facecolor="white")
 print("ok")

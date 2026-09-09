@@ -5,15 +5,19 @@ const {
   PageBreak, ExternalHyperlink, LineRuleType
 } = require('docx');
 const fs = require('fs');
+const path = require('path');
 
-const MAN = JSON.parse(fs.readFileSync('/home/claude/eq/manifest.json', 'utf8'));
+/* Alle paden liggen ten opzichte van de projectmap, niet ten opzichte van de
+   omgeving waarin dit toevallig een keer gedraaid heeft. */
+const ROOT = path.resolve(__dirname, '..');
+const MAN = JSON.parse(fs.readFileSync(path.join(ROOT, 'docs/eq/manifest.json'), 'utf8'));
 
 /* ======================= gemeten data =======================
    De resultatensectie wordt niet met de hand geschreven maar uit
    experimenten/runs.csv opgebouwd. Zo kan een tabel in dit document nooit
    uit de pas lopen met wat er werkelijk gemeten is. Ontbreekt het bestand,
    dan valt de sectie terug op "volgt nog". */
-const EXPDIR = '/home/claude/experimenten';
+const EXPDIR = path.join(ROOT, 'experimenten');
 function leesCsv(pad) {
   if (!fs.existsSync(pad)) return null;
   const lines = fs.readFileSync(pad, 'utf8').trim().split(/\r?\n/);
@@ -29,9 +33,10 @@ function leesCsv(pad) {
     return o;
   });
 }
-const RUNS = leesCsv(EXPDIR + '/runs.csv');
-const HERH = fs.existsSync(EXPDIR + '/reproduceerbaarheid.json')
-  ? JSON.parse(fs.readFileSync(EXPDIR + '/reproduceerbaarheid.json', 'utf8')) : null;
+const RUNS = leesCsv(path.join(EXPDIR, 'runs.csv'));
+const lees = (p) => fs.existsSync(p) ? JSON.parse(fs.readFileSync(p, 'utf8')) : null;
+const HERH = lees(path.join(EXPDIR, 'reproduceerbaarheid.json'));
+const TRACE = lees(path.join(EXPDIR, 'trace-voor-na.json'));
 function stat(xs) {
   const v = xs.filter(x => typeof x === 'number' && isFinite(x));
   const n = v.length; if (!n) return null;
@@ -398,7 +403,7 @@ C.push(body([
     'informatie-flessenhals die het leren aanzienlijk moeilijker maakt. Beide varianten zijn instelbaar, en het ' +
     'verschil ertussen is een van de metingen die sectie 10 voorstelt.')
 ]));
-figure('/home/claude/fig1-typen.png', 1,
+figure(path.join(ROOT, 'docs/fig1-typen.png'), 1,
   'De toegestane verbindingen tussen de knoopsoorten. Streepjeslijnen gelden zolang een neuron neutraal is. ' +
   'Er gaat nooit iets naar een invoerknoop toe, nooit iets uit een uitvoerknoop vandaan, en een invoerknoop hangt ' +
   'nooit rechtstreeks aan een knop.').forEach(x => C.push(x));
@@ -517,11 +522,67 @@ C.push(body(
 ));
 C.push(eq(14));
 C.push(body([
+  t('Welke activatie hier aan de presynaptische kant hoort, ligt minder voor de hand dan het lijkt. Een tik bestaat ' +
+    'uit '), it('P'), t(' propagatiestappen (vgl. 4), en die worden synchroon uitgevoerd: eerst worden alle ' +
+    'netto-invoeren uit de bestaande toestand berekend, pas daarna wordt geschreven. De uitvoer van knoop '),
+  it('j'), t(' in deze tik is dus voortgebracht door de toestand aan het '), it('begin'),
+  t(' van de laatste propagatiestap, niet door de toestand die erna in het netwerk staat. Dat is de grootheid '),
+  it('x̃'), t('ᵢ in vergelijking 14, en om dezelfde reden ook in 11 en 13. Voor invoerknopen maakt het niets ' +
+    'uit — die worden aan het begin van de tik op hun sensorwaarde gezet en veranderen daarna niet meer — maar ' +
+    'voor elke verbinding die uit de wolk zelf vertrekt wél, en bij '), it('P'), t(' > 1 groeit het verschil.')
+]));
+C.push(body([
   t('De normalisatie met (1 − '), it('λ'), t(') is niet cosmetisch: zonder die factor groeit het spoor met 1/(1 − '),
   it('λ'), t('), waardoor een verandering van '), it('λ'), t(' ongemerkt ook de effectieve leersnelheid verandert. ' +
     'Met de factor erbij blijft de schaal van het spoor gelijk en regelt '), it('λ'), t(' uitsluitend hoe ver terug ' +
     'de beloning wordt uitgesmeerd. Voor de biasterm geldt dezelfde regel met de pre-activatie gelijk aan één.')
 ]));
+
+/* --- 3.5.1: het implementatiedetail, met de meting erbij ---------------------
+   Dit kader wordt uit experimenten/trace-voor-na.json opgebouwd. Ontbreekt dat
+   bestand, dan zegt de tekst dat de meting nog moet gebeuren in plaats van een
+   getal te verzinnen. */
+C.push(h3('Een implementatiedetail dat er wél toe doet'));
+C.push(body(
+  'Tot 9 september 2026 stond in de implementatie de activatie ná de propagatie op de plaats van x̃ᵢ. De ' +
+  'leerregel die daadwerkelijk draaide was daarmee, voor elke verbinding die uit de wolk vertrok, één ' +
+  'propagatiestap uit de pas met de regel die hierboven beschreven staat. Wij melden dit niet uit ' +
+  'volledigheidsdrang: het is precies de term waarop de aanspraak van sectie 3.4 rust, en een lezer die de ' +
+  'code naast de formules legt hoort geen verschil te vinden.'
+));
+if (TRACE) {
+  const M = TRACE.maten, N = TRACE.zaden;
+  const v = (o) => (100 * o.m).toFixed(1) + '% ± ' + (100 * o.ci).toFixed(1);
+  const vd = (o) => (o.m >= 0 ? '+' : '') + (100 * o.m).toFixed(1) + ' ± ' + (100 * o.ci).toFixed(1) + ' pp';
+  const rij = (naam, k) => [naam, v(M[k].oud), v(M[k].nieuw), vd(M[k].verschilGepaard),
+    'p = ' + M[k].mannWhitney.p.toFixed(3)];
+  C.push(tbl(
+    ['maat', 'oude term', 'juiste term', 'verschil (gepaard)', 'Mann-Whitney'],
+    [rij('succes over de laatste 20 pogingen', 'succes20'),
+     rij('toets op onbekende werelden', 'toets'),
+     rij('succes over de hele training', 'succes')],
+    [2700, 1600, 1600, 1900, 1272]
+  ));
+  const b = M.toets, sig = b.mannWhitney.p < 0.05;
+  C.push(body(
+    `De correctie is gemeten en niet aangenomen: ${N} breinzaden per conditie, ` +
+    `${TRACE.pogingenPerRun} pogingen per run, verder identieke instellingen en dezelfde wereldzaden. ` +
+    (sig
+      ? 'Het verschil op de toets is groter dan de spreiding tussen zaden. De cijfers elders in dit document ' +
+        'zijn met de juiste term gemeten; oudere reeksen zijn in runs.csv herkenbaar aan de kolom traceOud.'
+      : 'Het verschil op de toets valt binnen de spreiding tussen zaden: op deze taak leerde het netwerk ook ' +
+        'met de foutieve term, en de correctie levert geen aantoonbare winst in prestatie op. Dat maakt haar ' +
+        'niet minder nodig — de formule en de code beschrijven nu hetzelfde algoritme, en de numerieke ' +
+        'controle van sectie 3.4 is pas zinvol als dat zo is — maar het is geen resultaat dat wij als ' +
+        'verbetering mogen presenteren.') +
+    ' Beide reeksen staan volledig in experimenten/runs.csv onder de condities trace-oud en trace-nieuw.'
+  ));
+} else {
+  C.push(body(
+    'De voor/na-vergelijking van beide varianten is nog niet gedraaid; zodra ' +
+    'experimenten/trace-voor-na.json bestaat, verschijnt hier de gemeten tabel.'
+  ));
+}
 
 C.push(h2('3.6', 'Basislijn en advantage'));
 C.push(body(
@@ -590,11 +651,11 @@ code([
   '    voor elke spelstap t = 1 … T:',
   '        neem waar          → invoervector s',
   '        schone doorrekening x̄ ← propagate(s, ruis = 0)',
-  '        ruisige doorrekening x ← propagate(s, ruis = ε)',
+  '        ruisige doorrekening x ← propagate(s, ruis = ε);  bewaar x̃ = toestand vóór de laatste stap',
   '        δ ← x − x̄                                    (12)',
   '        voor elke knop k:  a_k ~ Bernoulli(p_k);  δ_k ← a_k − p_k   (7, 10)',
   '        voer de actie uit  → beloning r',
-  '        e_ij ← λ e_ij + (1−λ) x_i δ_j                 (14)',
+  '        e_ij ← λ e_ij + (1−λ) x̃_i δ_j                 (14)',
   '        Â ← clip(r − r̄, −c, c);   r̄ ← r̄ + β(r − r̄)   (15, 16)',
   '        w_ij ← clip(w_ij + clip(φ · η Â e_ij, ±Δmax), ±wmax)   (17–20)',
   '    w ← (1 − ρ) w                                    (21)',
@@ -1139,6 +1200,7 @@ C.push(tbl(
     ['L(·,·)', 'toelaatbaarheidsrelatie tussen soorten'],
     ['wᵢⱼ, bⱼ', 'gewicht van verbinding i→j; bias van knoop j'],
     ['uⱼ, xⱼ', 'netto-invoer en activatie van knoop j'],
+    ['x̃ᵢ', 'presynaptische activatie: de toestand aan het begin van de laatste propagatiestap'],
     ['x̄ⱼ, δⱼ', 'schone activatie en perturbatie (= x − x̄)'],
     ['pₖ, aₖ', 'kans op en uitkomst van knopdruk k'],
     ['eᵢⱼ', 'eligibility trace van verbinding i→j'],
@@ -1227,7 +1289,7 @@ const doc = new Document({
         children: [new Paragraph({
           alignment: AlignmentType.CENTER,
           children: [
-            new TextRun({ text: 'Adaptive Neural Graph (ANG) · versie 1.1 · ', font: SERIF, size: 16, color: DIM }),
+            new TextRun({ text: 'Adaptive Neural Graph (ANG) · versie 1.15 · ', font: SERIF, size: 16, color: DIM }),
             new TextRun({ children: [PageNumber.CURRENT], font: SERIF, size: 16, color: DIM })
           ]
         })]
@@ -1238,6 +1300,6 @@ const doc = new Document({
 });
 
 Packer.toBuffer(doc).then(b => {
-  fs.writeFileSync('/home/claude/ANG-paper.docx', b);
+  fs.writeFileSync(path.join(ROOT, 'ANG-paper.docx'), b);
   console.log('geschreven:', b.length, 'bytes');
 });

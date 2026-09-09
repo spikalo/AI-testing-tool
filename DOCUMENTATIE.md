@@ -390,6 +390,44 @@ en herstart het:
 
 ## 10. Logboek
 
+### 2026-09-09 — Eligibility-fout hersteld en gemeten (werkplan stap 2)
+- **De fout.** `updateTraces()` vermenigvuldigde de postsynaptische afwijking met
+  `B.act` — de toestand *ná* de propagatie. Maar `propagate()` is synchroon: alle
+  verbindingssommen worden uit de oude toestand berekend en pas daarna geschreven. De
+  activatie die de uitvoer van dit moment veroorzaakte is dus de toestand aan het
+  *begin* van de laatste propagatiestap. Voor verbindingen die uit een invoer-node
+  komen maakte dat niets uit (die staan de hele tik op hun sensorwaarde), voor alles
+  wat uit de wolk vertrok wél.
+- **Het herstel.** `propagate()` schrijft aan het begin van de laatste stap een
+  momentopname `B.pre` weg; `updateTraces()` leest daaruit. De momentopname wordt
+  genomen ná het inzetten van de sensorwaarden, dus invoerknopen hoeven niet apart
+  behandeld te worden.
+- **Nieuwe meetgrootheid:** de kolom `traceOud` in `experimenten/runs.csv` (53 kolommen
+  nu) zegt van elke run met welke van de twee regels hij gedraaid heeft. De twaalf
+  bestaande regels van 8 september staan op `1`; die draaiden nog met de oude term.
+  In de experimentloper is `traceOud` een gewone conditiesleutel, zodat de oude regel
+  als ablatie meetbaar blijft.
+- **Bewijs:** `tests/test-stap2.js` — met een handmatige propagatiestap wordt getoond
+  dat `B.pre` precies `B.act` voortbrengt (maxafwijking ~1·10⁻⁷ bij *P* = 1, 2 en 3)
+  en dat `B.act` dat níét doet. Verder: verbindingen uit een invoer-node geven oud en
+  nieuw exact dezelfde trace (645 van 645), verbindingen uit de wolk allemaal een
+  andere (1997 van 1997; relatief verschil 95 % bij *P* = 1, 59 % bij *P* = 2). De
+  reproduceerbaarheid uit stap 1 blijft bit voor bit staan.
+- **Voor/na-meting:** 12 breinzaden per conditie, 500 pogingen, verder identiek.
+  Succes over de laatste 20 pogingen 85,0 % ± 5,9 (oud) tegen 89,2 % ± 5,6 (nieuw);
+  toets op onbekende werelden 68,3 % ± 3,0 tegen 67,9 % ± 4,3. Mann-Whitney geeft op
+  alle maten *p* > 0,3. **Het verschil valt binnen de ruis** — op deze taak leerde het
+  netwerk ook met de foutieve term. De correctie is daarmee geen prestatieverbetering
+  maar wel noodzakelijk: de formule en de code beschrijven nu hetzelfde algoritme, en
+  de numerieke gradiëntcontrole van stap 3 is pas zinvol als dat zo is. Alle cijfers
+  staan in `experimenten/trace-voor-na.json` en in `runs.csv`.
+- **Paper:** vergelijkingen 11, 13 en 14 dragen nu de presynaptische term x̃ᵢ, met een
+  definitie in bijlage A en een kader "Een implementatiedetail dat er wél toe doet" in
+  sectie 3.5 dat de tabel hierboven rechtstreeks uit `trace-voor-na.json` opbouwt.
+  Ook hersteld: vergelijking 36 (de omschakelvoorwaarde bij hertypering) ontbrak in
+  `mkeq.py`, waardoor de generator crashte. De generator gebruikt geen absolute paden
+  meer maar paden ten opzichte van de projectmap.
+
 ### 2026-09-06 — Ollama LLM-test toegevoegd
 - Nieuw: `ollama-test.html` — verbindingsindicator met groen statusbolletje,
   uitschuifbaar vak met installatie-eisen, modelgegevens via `/api/show` en `/api/ps`,
