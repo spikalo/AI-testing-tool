@@ -53,6 +53,8 @@ const pct = x => x === null ? '–' : (100 * x.m).toFixed(1) + '% ± ' + (100 * 
 const pctSd = x => x === null ? '–' : (100 * x.sd).toFixed(1) + '%';
 const num = (x, d = 0) => x === null ? '–' : x.m.toFixed(d) + ' ± ' + x.ci.toFixed(d);
 const kol = k => RUNS ? RUNS.map(r => r[k]) : [];
+const VERSIE = '1.2';
+const DATUM = '9 september 2026';
 const SERIF = 'Cambria';
 const TEXTW_PT = 448;              // bruikbare tekstbreedte in punten
 const INK = '1A1D21', DIM = '55606B', ACC = '1F5C73';
@@ -203,23 +205,30 @@ C.push(new Paragraph({
   })]
 }));
 C.push(new Paragraph({
-  spacing: { after: 40 },
+  spacing: { after: 30 },
   border: { top: { style: BorderStyle.SINGLE, size: 6, color: ACC, space: 8 } },
-  children: [t('Claude (Opus 5), Anthropic', { bold: true }), t('   ·   '), t('Frank Jacobs', { bold: true })]
+  children: [t('Frank Jacobs', { bold: true })]
 }));
 C.push(new Paragraph({
-  spacing: { after: 200 },
+  spacing: { after: 150 },
   children: [new TextRun({
-    text: 'Versie 1.0 — systeembeschrijving · 6 september 2026 · empirische evaluatie volgt in een latere versie',
+    text: 'Correspondentie: frljacobs@gmail.com',
+    font: SERIF, size: 18, color: DIM
+  })]
+}));
+C.push(new Paragraph({
+  spacing: { after: 60 },
+  children: [new TextRun({
+    text: `Preprint, versie ${VERSIE} · ${DATUM} · niet peer-reviewed`,
     font: SERIF, size: 18, color: DIM
   })]
 }));
 C.push(new Paragraph({
   spacing: { after: 240 },
   children: [new TextRun({
-    text: 'Claude heeft het model ontworpen, geïmplementeerd, doorgemeten en dit document geschreven. ' +
-      'Frank Jacobs heeft het onderzoeksdoel bepaald, de ontwerpeisen aan de neuronsoorten en de dynamiek ' +
-      'geformuleerd, en het werk begeleid.',
+    text: 'Bij dit onderzoek is een generatief AI-hulpmiddel gebruikt, en wel in aanzienlijke mate. ' +
+      'Wat het precies heeft gedaan staat in de verklaring achterin; die verklaring hoort bij het werk ' +
+      'en niet in de kleine lettertjes.',
     font: SERIF, size: 18, italics: true, color: DIM
   })]
 }));
@@ -246,7 +255,11 @@ C.push(new Paragraph({
       'moduleert een eligibility trace. Drie begrenzingen — een maximale stap per keer, een demping die toeneemt ' +
       'naarmate een gewicht zijn plafond nadert, en een vervaging per poging — zorgen dat verbindingen geleidelijk ' +
       'ontstaan, versterken en verdwijnen in plaats van abrupt. Dit document beschrijft het model, de leerregel, de ' +
-      'structurele plasticiteit en de meetinstrumenten volledig; de empirische evaluatie volgt in een latere versie.'
+      'structurele plasticiteit en de meetinstrumenten volledig, met een referentiemeting over twaalf ' +
+      'onafhankelijke breinzaden en een numerieke controle van de leerregel zelf. Die controle laat zien dat de ' +
+      'exacte score-functie voor de uitvoerknopen de gradiënt nauwkeurig volgt, dat de node-perturbatieschatter ' +
+      'de goede richting aanwijst maar veel ruwer, en dat de twee delen van de update niet op dezelfde schaal ' +
+      'staan. De ablaties en de basislijnen volgen in een latere versie.'
   })]
 }));
 C.push(new Paragraph({
@@ -1048,6 +1061,12 @@ C.push(body(
 
 /* ===== 7 ===== */
 C.push(h1('7', 'Implementatie'));
+C.push(body([
+  t('Het model, de meetscripts en dit document zijn tot stand gekomen met behulp van een generatief ' +
+    'AI-hulpmiddel (Claude, Opus 5, Anthropic). Wat dat hulpmiddel precies heeft gedaan, en waarom het niet als ' +
+    'auteur is opgevoerd, staat in de verklaring achter in dit document. Het wordt hier genoemd omdat het bij de ' +
+    'werkwijze hoort en niet bij de kleine lettertjes.')
+]));
 C.push(h2('7.1', 'Indexering en datastructuren'));
 C.push(body(
   'De knopen liggen in een vaste volgorde: eerst de zestien invoerknopen, dan de vier uitvoerknopen, dan de wolk. ' +
@@ -1329,6 +1348,79 @@ C.push(body(
 ));
 
 /* ===== referenties ===== */
+/* =====================================================================
+   Nawerk. Voor een preprint is dit geen bijzaak: uitgevers en preprintservers
+   eisen dat het gebruik van generatieve AI expliciet gemeld wordt, en dat een
+   AI-hulpmiddel NIET als auteur wordt opgevoerd — het kan geen verantwoording
+   dragen, geen belangenverstrengeling melden en geen auteursrecht overdragen
+   (COPE, ICMJE, arXiv). Vandaar deze drie secties.
+   ===================================================================== */
+C.push(h1('', 'Verklaring over het gebruik van AI-hulpmiddelen'));
+C.push(body([
+  t('Bij dit onderzoek is Claude (Opus 5, Anthropic) gebruikt, en niet marginaal. Het hulpmiddel staat '),
+  bd('niet als auteur vermeld'),
+  t('. Dat is geen bescheidenheid maar de regel: een AI-hulpmiddel kan geen verantwoording dragen voor het ' +
+    'werk, geen belangenverstrengeling melden en geen rechten overdragen, en kan daarom volgens COPE, de ICMJE ' +
+    'en het beleid van arXiv geen auteur zijn. De auteur is volledig verantwoordelijk voor de inhoud van dit ' +
+    'document, ook voor de delen die met behulp van het hulpmiddel tot stand zijn gekomen.')
+]));
+C.push(h3('Waar het aan heeft bijgedragen'));
+C.push(bullet([bd('Ontwerp en implementatie. '), t('Het model, de leerregel en de structurele plasticiteit zijn ' +
+  'in samenspraak ontworpen: de auteur stelde het onderzoeksdoel, de eis van een laagloze graaf, de vier ' +
+  'neuronsoorten en hun bedradingsregels vast; het hulpmiddel heeft die eisen uitgewerkt tot de formuleringen ' +
+  'in de secties 2 tot en met 6 en tot de volledige implementatie in JavaScript.')]));
+C.push(bullet([bd('Meten en analyseren. '), t('De meetscripts, de experimentloper, de statistiek en de figuren ' +
+  'zijn met het hulpmiddel geschreven en door het hulpmiddel uitgevoerd. Alle ruwe meetgegevens zijn ' +
+  'weggeschreven en meegeleverd (zie hieronder), zodat elke uitspraak in dit document tot de onderliggende ' +
+  'getallen te herleiden is.')]));
+C.push(bullet([bd('Schrijven. '), t('De tekst van dit document is door het hulpmiddel opgesteld en door de ' +
+  'auteur inhoudelijk beoordeeld en geaccordeerd.')]));
+C.push(h3('Wat dat betekent voor de lezer'));
+C.push(body(
+  'Twee dingen. Ten eerste: de tabellen in de secties 3.5, 3.11 en 10 worden door de generator rechtstreeks uit ' +
+  'de meetbestanden opgebouwd en niet met de hand overgetypt, juist omdat een getal dat een taalmodel uit zijn ' +
+  'hoofd opschrijft geen meting is. Ontbreekt een meetbestand, dan zegt de betreffende sectie dat de meting nog ' +
+  'moet gebeuren in plaats van een getal te noemen. Ten tweede: de referenties zijn nog niet stuk voor stuk tegen ' +
+  'de originelen geverifieerd. Tot dat gebeurd is, moet de lezer de bibliografie met gepaste argwaan lezen — ' +
+  'juist bij een document dat op deze manier tot stand is gekomen.'
+));
+
+C.push(h1('', 'Belangenverklaring'));
+C.push(body(
+  'De auteur verklaart geen concurrerende financiële of persoonlijke belangen te hebben die de in dit document ' +
+  'gerapporteerde bevindingen hebben kunnen beïnvloeden. Er is geen externe financiering ontvangen. Anthropic, ' +
+  'de leverancier van het gebruikte AI-hulpmiddel, heeft geen rol gehad bij de opzet van het onderzoek, de ' +
+  'uitvoering, de analyse of het besluit tot publicatie.'
+));
+
+C.push(h1('', 'Beschikbaarheid van code en gegevens'));
+C.push(body([
+  t('Alles wat nodig is om de cijfers in dit document na te rekenen is openbaar: '),
+  new ExternalHyperlink({
+    children: [new TextRun({ text: 'github.com/spikalo/AI-testing-tool', font: SERIF, size: 21, color: ACC,
+      underline: {} })],
+    link: 'https://github.com/spikalo/AI-testing-tool'
+  }),
+  t('.')
+]));
+C.push(tbl(
+  ['wat', 'waar'],
+  [['het model en de leeromgeving', 'brein-test.html — één bestand, geen bibliotheken, draait in de browser'],
+   ['de generator van dit document', 'paper/paper.js, met paper/mkeq.py en de figuurscripts'],
+   ['de meetreeksen', 'experimenten/runs.csv — één regel per run, met beide zaden en alle instellingen'],
+   ['de gradiëntcontrole', 'experimenten/gradcheck.csv en gradcheck*.json'],
+   ['de controles die de eigenschappen bewijzen', 'tests/ — Playwright-scripts, elk met een eigen uitkomst'],
+   ['de reproduceerbaarheidscontrole', 'experimenten/reproduceerbaarheid.json']],
+  [3400, 6272]
+));
+C.push(body(
+  'Een run ligt volledig vast door twee getallen: het breinzaad en het wereldzaad, die beide in elk ' +
+  'resultaatbestand staan (bijlage B). Twee runs met dezelfde zaden geven bit voor bit dezelfde leercurve, ' +
+  'dezelfde toetsen, dezelfde structuurmaten en hetzelfde eindnetwerk — gecontroleerd, niet aangenomen. De ' +
+  'volledige resultaatbestanden per run zijn niet meegeleverd omdat zij groot zijn en uit die twee zaden exact ' +
+  'te reproduceren.'
+));
+
 C.push(h1('', 'Referenties'));
 const REFS = [
   'Bogdan, P. A., Rowley, A. G. D., Rhodes, O., & Furber, S. B. (2018). Structural plasticity on the SpiNNaker many-core neuromorphic system. Frontiers in Neuroscience, 12.',
@@ -1423,8 +1515,8 @@ C.push(body(
 
 /* ======================= document ======================= */
 const doc = new Document({
-  creator: 'Frank Jacobs · Claude (Opus 5), Anthropic',
-  lastModifiedBy: 'Frank Jacobs · Claude (Opus 5), Anthropic',
+  creator: 'Frank Jacobs',
+  lastModifiedBy: 'Frank Jacobs',
   title: 'Adaptive Neural Graph (ANG)',
   description: 'Een zelfstructurerend neuraal netwerk zonder lagen en zonder backpropagation',
   numbering: {
@@ -1455,7 +1547,7 @@ const doc = new Document({
         children: [new Paragraph({
           alignment: AlignmentType.CENTER,
           children: [
-            new TextRun({ text: 'Adaptive Neural Graph (ANG) · versie 1.2 · ', font: SERIF, size: 16, color: DIM }),
+            new TextRun({ text: `Adaptive Neural Graph (ANG) · versie ${VERSIE} · `, font: SERIF, size: 16, color: DIM }),
             new TextRun({ children: [PageNumber.CURRENT], font: SERIF, size: 16, color: DIM })
           ]
         })]
