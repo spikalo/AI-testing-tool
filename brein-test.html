@@ -590,6 +590,7 @@
           <tbody id="cmpbody"></tbody>
         </table>
       </div>
+      <div id="cmpstats"></div>
       <div class="savebar">
         <button class="actionbtn" id="addcompare">+ huidige brein toevoegen</button>
         <button class="actionbtn" id="clearcompare">wis tabel</button>
@@ -626,7 +627,7 @@
   {"naam":"trace-nieuw", "traceOud":false},
   {"naam":"trace-oud",   "traceOud":true}
 ]</textarea>
-        <div class="hint">Sleutels zijn de namen uit de configuratie: <code>nNeurons, density, nObs, maxSteps, worldEvery, seed, lr, lam, decay, wmax, stepMax, memLeak, prop, noise0, lrAnneal, structOn, structEvery, pruneT, sprout, growOn, growStagnant, growMax, growN, newLinks, retypeOn, retypeN, retypeCost, rGoal, rProg, rCol, rStep, rIdle, nEpisodes, evalOn, evalMode, inputOnlySens, traceOud</code>. Types uitzetten kan met <code>"types.mem.on": false</code>. <code>traceOud:true</code> zet de foutieve postsynaptische eligibility-trace van v&oacute;&oacute;r 9&nbsp;september 2026 terug &mdash; alleen bedoeld als ablatie.</div>
+        <div class="hint">Sleutels zijn de namen uit de configuratie: <code>nNeurons, density, nObs, maxSteps, worldEvery, seed, lr, lam, decay, wmax, stepMax, memLeak, prop, noise0, lrAnneal, structOn, structEvery, pruneT, sprout, growOn, growStagnant, growMax, growN, newLinks, retypeOn, retypeN, retypeCost, rGoal, rProg, rCol, rStep, rIdle, nEpisodes, evalOn, evalMode, inputOnlySens, traceOud, benchOn, benchN, benchReps</code>. Types uitzetten kan met <code>"types.mem.on": false</code>. <code>traceOud:true</code> zet de foutieve postsynaptische eligibility-trace van v&oacute;&oacute;r 9&nbsp;september 2026 terug &mdash; alleen bedoeld als ablatie.</div>
       </div>
       <div>
         <div class="field">
@@ -643,6 +644,16 @@
         </div>
         <div class="checkline"><input type="checkbox" id="expeval" checked> toetsen op onbekende werelden meelopen</div>
         <div class="checkline"><input type="checkbox" id="expjson" checked> ook per run een volledige JSON wegschrijven</div>
+        <div class="checkline"><input type="checkbox" id="benchon" checked> aan het eind meten op de <b>vaste benchmarkset</b>, in beide beleidsvormen</div>
+        <div class="field">
+          <label>Benchmarkwerelden <span class="val" id="benchnval">500</span></label>
+          <input type="range" id="benchn" min="20" max="500" step="20" value="500">
+        </div>
+        <div class="field">
+          <label>Keer per wereld <span class="val" id="benchrepsval">3</span></label>
+          <input type="range" id="benchreps" min="1" max="5" step="1" value="3">
+        </div>
+        <div class="hint">De benchmark is een vaste verzameling werelden uit een eigen zaad, los van de trainingswerelden en van de twintig toetswerelden die tijdens het leren meelopen. Zij wordt nooit gebruikt om instellingen te kiezen. Omdat het beleid geloot wordt, telt pas het gemiddelde over meerdere keren spelen.</div>
         <div class="row2" style="margin-top:10px;">
           <button class="actionbtn primary" id="expstart">&#9654; draai reeks</button>
           <button class="actionbtn stop" id="expstop" disabled>&#9632; afbreken</button>
@@ -658,7 +669,7 @@
     <div class="scrollx" style="max-height:260px;overflow-y:auto;margin-top:12px;">
       <table style="width:100%;border-collapse:collapse;font-size:11.5px;">
         <thead><tr>
-          <th>conditie</th><th>zaad</th><th>succes</th><th>laatste 20</th><th>toets</th><th>neuronen</th><th>verb.</th><th>actief</th><th>reflex</th><th>lussen</th><th>pad</th><th>tijd</th>
+          <th>conditie</th><th>zaad</th><th>succes</th><th>laatste 20</th><th>toets</th><th>bench geloot</th><th>bench argmax</th><th>neuronen</th><th>verb.</th><th>actief</th><th>reflex</th><th>lussen</th><th>pad</th><th>tijd</th>
         </tr></thead>
         <tbody id="expbody"></tbody>
       </table>
@@ -1481,11 +1492,25 @@ function readCfg(){
     rStep:+$("rstep").value/1000, rIdle:+$("ridle").value/1000,
     nEpisodes:+$("nep").value, evalOn:$("evalon").checked,
     evalMode: ($("evalstrict")&&$("evalstrict").checked) ? "streng" : "beleid",
+    /* de vaste benchmarkset aan het eind van een run; alleen de experimentloper
+       zet hem standaard aan, want hij kost meer tijd dan de training zelf */
+    benchOn: $("benchon")? $("benchon").checked : false,
+    benchN: $("benchn")? +$("benchn").value : 500,
+    benchReps: $("benchreps")? +$("benchreps").value : 3,
     brainSeed: ($("bseed")&&$("bseed").value!=="") ? +$("bseed").value : null
   };
 }
 const SPEEDS=[1,2,4,8,20,60,"turbo"];
 const EVAL_WORLDS=20;
+/* De benchmarkset. Twintig toetswerelden zijn een goedkoop signaal tijdens het
+   afstellen, geen bewijs: bij 75 % op 20 werelden loopt het 95 %-interval van
+   ongeveer 51 tot 91 %. Daarom een vaste verzameling van 500 werelden uit een eigen
+   zaadreeks, die noch de training noch de tussentijdse toets ooit ziet, en die nooit
+   gebruikt wordt om instellingen te kiezen. Het aantal obstakels ligt hier vast op 7:
+   de benchmark is een meetlat, en een meetlat die per conditie meebeweegt meet niets.
+   Omdat het beleid geloot wordt, speelt elke wereld standaard drie keer. */
+const BENCH_N=500, BENCH_REPS=3, BENCH_SEED0=5000000, BENCH_STRIDE=101,
+      BENCH_OBS=7, BENCH_RNG=20260909;
 
 /* ======================= toestand ======================= */
 const S={
@@ -1500,7 +1525,8 @@ const S={
   lastRestructure:{pruned:0,sprouted:0,retyped:0,grown:0}, structLog:[],
   resultsDirHandle:null, lastResult:null, dirty:false,
   gradAccum:null, gradAccumBias:null,
-  expDirHandle:null, expCsvLines:null, expCsvName:"runs.csv", expAbort:false, expRunning:false
+  expDirHandle:null, expCsvLines:null, expCsvName:"runs.csv", expAbort:false, expRunning:false,
+  benchWorlds:null, lastBench:null, evalStreng:null
 };
 
 /* ======================= spel ======================= */
@@ -1524,6 +1550,22 @@ function noiseNow(){
   const end=noiseEnd(c.noise0);
   return c.noise0+(end-c.noise0)*Math.min(1,f);
 }
+/* De verplaatsing zelf, losgemaakt uit gameTick zodat de reactieve ijkagent van
+   sectie "benchmark" op precies dezelfde spelregels loopt als het brein: dezelfde
+   snelheid, dezelfde botsingsafhandeling, dezelfde glijbeweging langs een muur.
+   Zou dit twee keer los opgeschreven staan, dan is het ijkpunt geen ijkpunt meer. */
+function moveAgent(dx,dy,mag,w){
+  let collided=false;
+  const nx=S.ag.x+dx, ny=S.ag.y+dy;
+  if(mag>0){
+    if(!blocked(nx,ny,w.obs)){ S.ag.x=nx; S.ag.y=ny; }
+    else if(!blocked(nx,S.ag.y,w.obs)){ S.ag.x=nx; collided=true; }
+    else if(!blocked(S.ag.x,ny,w.obs)){ S.ag.y=ny; collided=true; }
+    else collided=true;
+  }
+  if(S.trail.length<4000) S.trail.push([S.ag.x,S.ag.y]);
+  return collided;
+}
 /* één spelstap. learn=false → geen ruis, geen plasticiteit (toetsen/kijken) */
 function gameTick(learn,noise){
   const c=S.cfg, B=S.B, w=S.world;
@@ -1537,15 +1579,7 @@ function gameTick(learn,noise){
   if(mag>0){ dx=dx/mag*c.chSpeed; dy=dy/mag*c.chSpeed; }
   if(learn) updateTraces(B,c.lam,c.traceOud,c.perturbGain);
 
-  let collided=false;
-  let nx=S.ag.x+dx, ny=S.ag.y+dy;
-  if(mag>0){
-    if(!blocked(nx,ny,w.obs)){ S.ag.x=nx; S.ag.y=ny; }
-    else if(!blocked(nx,S.ag.y,w.obs)){ S.ag.x=nx; collided=true; }
-    else if(!blocked(S.ag.x,ny,w.obs)){ S.ag.y=ny; collided=true; }
-    else collided=true;
-  }
-  if(S.trail.length<4000) S.trail.push([S.ag.x,S.ag.y]);
+  const collided=moveAgent(dx,dy,mag,w);
 
   const dist=Math.hypot(w.goal.x-S.ag.x,w.goal.y-S.ag.y);
   let r=c.rProg*(S.prevDist-dist)-c.rStep;
@@ -1628,6 +1662,136 @@ function runEval(){
   const mode=(S.cfg&&S.cfg.evalMode)||(($("evalstrict")&&$("evalstrict").checked)?"streng":"beleid");
   const r=evalWorlds(EVAL_WORLDS,mode);
   S.evalHist.push({ep:S.ep,pct:r.pct});
+}
+
+/* ======================= de vaste benchmarkset ======================= */
+/* makeWorld doet per wereld een bereikbaarheidszoektocht, dus vijfhonderd stuks
+   kosten even tijd. Ze worden één keer gemaakt en onthouden. */
+function benchWorldSeed(k){ return BENCH_SEED0+k*BENCH_STRIDE; }
+function benchmarkWorlds(n){
+  const N=n||BENCH_N;
+  if(!S.benchWorlds || S.benchWorlds.length<N){
+    const out=[];
+    for(let k=0;k<Math.max(N,BENCH_N);k++) out.push(makeWorld(benchWorldSeed(k),BENCH_OBS));
+    S.benchWorlds=out;
+  }
+  return S.benchWorlds.slice(0,N);
+}
+/* Speel een vaste verzameling werelden af. `tik` bepaalt per stap de verplaatsing:
+   het brein of de reactieve ijkagent. Elke wereld wordt `reps` keer gespeeld met een
+   eigen toevalsgenerator per speelbeurt, zodat het beeld niet verschuift zodra één
+   wereld toevallig een stap langer duurt.
+   Het interval gaat over de wérelden, niet over de speelbeurten: drie keer dezelfde
+   wereld spelen levert geen drie onafhankelijke waarnemingen over generalisatie op. */
+function playWorlds(worlds,reps,tik,rngBase){
+  const perWereld=[]; let ok=0, steps=0, n=0;
+  for(let k=0;k<worlds.length;k++){
+    let okW=0;
+    for(let rep=0;rep<reps;rep++){
+      S.evalRnd=mulberry32(rngBase+k*131+rep*7919);
+      S.world=worlds[k];
+      S.ag.x=S.world.start.x; S.ag.y=S.world.start.y; S.trail=[];
+      S.step=0; S.epReward=0; S.epCollisions=0; S.epIdle=0; S.reached=false;
+      S.prevDist=Math.hypot(S.world.goal.x-S.ag.x,S.world.goal.y-S.ag.y);
+      if(S.B) resetBrainState(S.B);
+      let done=false;
+      while(!done) done=tik();
+      n++;
+      if(S.reached){ ok++; okW++; steps+=S.step; }
+    }
+    perWereld.push(okW/reps);
+  }
+  const W=perWereld.length;
+  const m=W? perWereld.reduce((a,b)=>a+b,0)/W : 0;
+  const sd=W>1? Math.sqrt(perWereld.reduce((a,b)=>a+(b-m)*(b-m),0)/(W-1)) : 0;
+  return {pct:m, ci:W?1.96*sd/Math.sqrt(W):0, sd, werelden:W, herhalingen:reps,
+    pogingen:n, gemStappen: ok? steps/ok : null, perWereld};
+}
+/* De benchmark met het brein, in één beleidsvorm. Alles wat de lopende run aangaat
+   wordt bewaard en teruggezet: dit is een meting, geen voortzetting van het spel. */
+function benchBrain(mode,n,reps){
+  const c=S.cfg, B=S.B;
+  const saveW=Float32Array.from(B.cW), saveE=Float32Array.from(B.cE), saveB=Float32Array.from(B.bias);
+  const saveWorld=S.world, saveAg={x:S.ag.x,y:S.ag.y}, saveTrail=S.trail, saveStep=S.step,
+        savePrev=S.prevDist, saveR=S.epReward, saveCol=S.epCollisions, saveReach=S.reached,
+        saveIdle=S.epIdle;
+  const wasSample=S.evalSample, wasTemp=S.evalTemp, wasRnd=S.evalRnd;
+  S.evalSample=(mode!=="streng");
+  S.evalTemp=tempOf(noiseEnd(c.noise0));
+  const out=playWorlds(benchmarkWorlds(n),reps,()=>gameTick(false,0),BENCH_RNG);
+  B.cW.set(saveW); B.cE.set(saveE); B.bias.set(saveB);
+  S.world=saveWorld; S.ag=saveAg; S.trail=saveTrail; S.step=saveStep; S.epIdle=saveIdle;
+  S.prevDist=savePrev; S.epReward=saveR; S.epCollisions=saveCol; S.reached=saveReach;
+  S.evalSample=wasSample; S.evalTemp=wasTemp; S.evalRnd=wasRnd;
+  resetBrainState(S.B);
+  out.modus=mode;
+  return out;
+}
+/* De reactieve ijkagent: geen brein, geen geheugen, geen leren, en precies dezelfde
+   zintuigen als het brein — de acht straalafstanden en de richting van het doel.
+   Elke tik kiest hij van de acht richtingen die met de hoogste score
+       richting naar het doel  −  κ · (hoe dichtbij staat daar iets)²
+   Dat is een potentiaalveld: aangetrokken door het doel, afgestoten door wat vlakbij
+   staat. "Recht op het doel af, en langs een obstakel glijden" in de kortst mogelijke
+   vorm — het glijden zelf doet de botsingsafhandeling in moveAgent.
+   Hij staat hier niet om te winnen maar om de meetlat te ijken: hij is de ondergrens
+   waar alles wat het brein leert bovenuit moet komen, en zijn getal moet elke keer
+   hetzelfde zijn.
+   κ = 1 is gekozen op een aparte afstelset van 200 werelden (zaadreeks 7 000 000),
+   níét op de benchmark; tussen κ = 0,5 en κ = 2 scheelt het daar minder dan de
+   meetruis, dus het midden van dat vlakke stuk is een eerlijker keuze dan de
+   toevallige uitschieter. */
+const REACT_KAPPA=1;
+function reactiefDir(){
+  const w=S.world, ag=S.ag;
+  const gx=w.goal.x-ag.x, gy=w.goal.y-ag.y;
+  const gd=Math.hypot(gx,gy)||1e-6;
+  let best=0, bs=-Infinity;
+  for(let i=0;i<8;i++){
+    const d=DIRV[i];
+    const nabij=1-rayDist(ag.x,ag.y,d[0],d[1],w.obs)/RAY_MAX;
+    const s=(d[0]*gx+d[1]*gy)/gd - REACT_KAPPA*nabij*nabij;
+    if(s>bs){ bs=s; best=i; }
+  }
+  return DIRV[best];
+}
+function reactiefTick(){
+  const c=S.cfg, w=S.world;
+  const d=reactiefDir(), mag=Math.hypot(d[0],d[1]);
+  const collided=moveAgent(d[0]/mag*c.chSpeed,d[1]/mag*c.chSpeed,mag,w);
+  const dist=Math.hypot(w.goal.x-S.ag.x,w.goal.y-S.ag.y);
+  if(collided) S.epCollisions++;
+  S.prevDist=dist;
+  let done=false;
+  if(dist<GOAL_R+AGENT_R){ S.reached=true; done=true; }
+  if(collided && c.stopOnCollide) done=true;
+  S.step++;
+  if(S.step>=c.maxSteps) done=true;
+  return done;
+}
+/* De ijkagent is deterministisch, dus één speelbeurt per wereld is genoeg. */
+function benchReactief(n){
+  const saveWorld=S.world, saveAg={x:S.ag.x,y:S.ag.y}, saveTrail=S.trail, saveStep=S.step,
+        savePrev=S.prevDist, saveReach=S.reached, saveCol=S.epCollisions;
+  const out=playWorlds(benchmarkWorlds(n),1,reactiefTick,BENCH_RNG);
+  S.world=saveWorld; S.ag=saveAg; S.trail=saveTrail; S.step=saveStep;
+  S.prevDist=savePrev; S.reached=saveReach; S.epCollisions=saveCol;
+  out.modus="reactief";
+  return out;
+}
+/* Beide beleidsvormen naast elkaar. Het gat tussen geloot en argmax is zelf een
+   bevinding: is het groot, dan is het toeval onderdeel van de strategie geworden en
+   niet iets waar je met "gewoon de beste knop nemen" omheen kunt.
+   Argmax is deterministisch, dus daar heeft herhalen geen zin. */
+function runBenchmark(n,reps){
+  const N=n||BENCH_N, R=reps||BENCH_REPS;
+  const beleid=benchBrain("beleid",N,R);
+  const streng=benchBrain("streng",N,1);
+  S.lastBench={werelden:beleid.werelden, herhalingen:R, obstakels:BENCH_OBS,
+    stappenPerPoging:S.cfg.maxSteps,
+    zaadreeks:{eerste:benchWorldSeed(0), stap:BENCH_STRIDE, toevalsbasis:BENCH_RNG},
+    beleid, streng};
+  return S.lastBench;
 }
 
 /* ======================= tekenen: wereld ======================= */
@@ -2127,16 +2291,33 @@ function buildResult(naamOverride){
       beloningen:{doel:S.cfg.rGoal,vooruitgang:S.cfg.rProg,botsing:-S.cfg.rCol,
         perStap:-S.cfg.rStep,stilstaan:-S.cfg.rIdle},
       training:{pogingen:S.cfg.nEpisodes, toetsenAan:S.cfg.evalOn,
-        toetsModus:S.cfg.evalMode||"beleid", toetswerelden:EVAL_WORLDS, breinZaad:S.B.seed}
+        toetsModus:S.cfg.evalMode||"beleid", toetswerelden:EVAL_WORLDS, breinZaad:S.B.seed},
+      benchmark:{aan:!!S.cfg.benchOn, werelden:S.cfg.benchN||BENCH_N,
+        herhalingen:S.cfg.benchReps||BENCH_REPS, obstakels:BENCH_OBS}
     },
     resultaat:{
       pogingen:S.ep, succes:S.succTotal, succesPct:S.ep?S.succTotal/S.ep:0,
-      succes20:succ20, toetsPct:ev,
+      succes20:succ20, toetsPct:ev, toetsStreng:S.evalStreng,
       gemStappenBijSucces:S.stepsSucc.length?S.stepsSucc.reduce((a,b)=>a+b,0)/S.stepsSucc.length:null,
       gemBeloningLaatste20:S.rewards.slice(-20).reduce((a,b)=>a+b,0)/Math.max(1,S.rewards.slice(-20).length),
       besteBeloning:S.rewards.length?Math.max(...S.rewards):null,
       botsingenPerPoging:S.ep?S.collisions/S.ep:0, rekentijdMs:Math.round(S.elapsed)
     },
+    /* De vaste benchmarkset: per beleidsvorm het gemiddelde met een 95%-interval
+       over de werelden, plus de uitslag per wereld. Die laatste maakt een gepaarde
+       vergelijking tussen twee condities mogelijk — dezelfde werelden, dus veel
+       gevoeliger dan twee losse gemiddelden naast elkaar leggen. */
+    benchmark:S.lastBench?{
+      werelden:S.lastBench.werelden, herhalingen:S.lastBench.herhalingen,
+      obstakels:S.lastBench.obstakels, stappenPerPoging:S.lastBench.stappenPerPoging,
+      zaadreeks:S.lastBench.zaadreeks,
+      beleid:{pct:S.lastBench.beleid.pct, ci:S.lastBench.beleid.ci, sd:S.lastBench.beleid.sd,
+        gemStappen:S.lastBench.beleid.gemStappen, pogingen:S.lastBench.beleid.pogingen,
+        perWereld:S.lastBench.beleid.perWereld},
+      streng:{pct:S.lastBench.streng.pct, ci:S.lastBench.streng.ci, sd:S.lastBench.streng.sd,
+        gemStappen:S.lastBench.streng.gemStappen, pogingen:S.lastBench.streng.pogingen,
+        perWereld:S.lastBench.streng.perWereld}
+    }:null,
     structuur:{
       verbindingen:S.B.nc, actieveVerbindingen:A.activeConns, gemAbsW:A.meanW,
       sterkeVerbindingen:A.strong, kortstePad:A.shortest, reflexbogen:A.reflexArcs,
@@ -2179,7 +2360,60 @@ function renderCompare(){
     b.appendChild(tr);
   });
   $("cmpcount").textContent=S.rows.length+(S.rows.length===1?" brein":" breinen");
+  renderCmpStats();
   renderCmpBars();
+}
+/* Losse rijen naast elkaar zeggen weinig: met een spreiding van ongeveer 0,10 tussen
+   zaden lijkt bijna elk verschil groot. Daarom hieronder hetzelfde materiaal
+   gegroepeerd — op conditie als die er is, anders op de naam zonder het zaadnummer —
+   met een 95%-interval over de runs en, bij twee of meer groepen, een Mann-Whitney U
+   tegen de eerste. */
+function cmpGroep(r){
+  if(r.conditie) return r.conditie;
+  return (r.brein||"brein").replace(/[ _-]*(z(aad)?)?\s*\d+\s*$/i,"")||r.brein;
+}
+function renderCmpStats(){
+  const el=$("cmpstats"); if(!el) return;
+  if(S.rows.length<2){ el.innerHTML=""; return; }
+  const per=new Map();
+  for(const r of S.rows){ const g=cmpGroep(r); if(!per.has(g)) per.set(g,[]); per.get(g).push(r); }
+  const groepen=[...per.entries()];
+  if(groepen.length===1 && groepen[0][1].length<2){ el.innerHTML=""; return; }
+  const f=x=>x===null?"–":(100*x.m).toFixed(1)+"% ± "+(100*x.ci).toFixed(1);
+  const bench=r=>r.benchmark||null;
+  const heeftBench=S.rows.some(bench);
+  let h=`<div class="note" style="margin-top:12px;"><b>Gemiddelden met een 95%-interval</b>,
+    gegroepeerd op ${S.rows.some(r=>r.conditie)?"conditie":"naam zonder zaadnummer"}.</div>
+    <div class="scrollx"><table style="width:100%;border-collapse:collapse;font-size:11.5px;">
+    <thead><tr><th>groep</th><th>runs</th><th>succes laatste 20</th><th>toets (20 werelden)</th>`
+    +(heeftBench?`<th>benchmark, geloot</th><th>benchmark, argmax</th>`:``)
+    +`</tr></thead><tbody>`;
+  for(const [naam,rs] of groepen){
+    h+=`<tr><td>${naam}</td><td>${rs.length}</td>
+      <td>${f(meanCI(rs.map(r=>r.resultaat.succes20)))}</td>
+      <td>${f(meanCI(rs.map(r=>r.resultaat.toetsPct)))}</td>`
+      +(heeftBench?`<td>${f(meanCI(rs.map(r=>bench(r)?bench(r).beleid.pct:null)))}</td>
+        <td>${f(meanCI(rs.map(r=>bench(r)?bench(r).streng.pct:null)))}</td>`:``)
+      +`</tr>`;
+  }
+  h+=`</tbody></table></div>`;
+  if(groepen.length>1){
+    const maat=heeftBench? {n:"de benchmarkscore",g:r=>bench(r)?bench(r).beleid.pct:null}
+                         : {n:"de toets op onbekende werelden",g:r=>r.resultaat.toetsPct};
+    const ref=groepen[0];
+    let t="", regels=0;
+    for(let i=1;i<groepen.length;i++){
+      const st=mannWhitney(ref[1].map(maat.g),groepen[i][1].map(maat.g));
+      if(!st) continue;
+      regels++;
+      t+=`<div class="metric"><span class="k">${groepen[i][0]} tegen ${ref[0]}</span>
+        <span class="v">p = ${st.p.toFixed(3)} &mdash; ${st.oordeel}</span></div>`;
+    }
+    if(regels) h+=`<div class="note" style="margin-top:10px;">Mann-Whitney U op ${maat.n}:</div>`+t
+      +`<div class="note">Twee of drie runs per groep zijn te weinig om wat dan ook aan te tonen;
+        reken op twaalf tot zestien.</div>`;
+  }
+  el.innerHTML=h;
 }
 function renderCmpBars(){
   const el=$("cmpbars"); const key=$("cmpmetric").value;
@@ -2326,7 +2560,7 @@ function brainFromResult(R){
 
 function clearRunState(){
   S.hist=[]; S.evalHist=[]; S.rewards=[]; S.stepsSucc=[]; S.succTotal=0; S.collisions=0;
-  S.structLog=[]; S.ep=0; S.elapsed=0; S.selected=-1;
+  S.structLog=[]; S.ep=0; S.elapsed=0; S.selected=-1; S.lastBench=null; S.evalStreng=null;
 }
 
 function applyResult(R,mode){
@@ -2371,7 +2605,11 @@ const CSV_COLS=["tijdstip","conditie","brein","breinZaad","wereldZaad","pogingen
   "obstakels","maxSteps","worldEvery","toetsModus",
   "succesPct","succes20","toetsPct","gemStappenBijSucces","botsingenPerPoging","rekentijdMs",
   "verbindingen","actieveVerbindingen","gemAbsW","kortstePad","reflexbogen","lussen",
-  "meedoendeNeuronen","losgeraakt","gesnoeid","bijgegroeid","nieuweNeuronen","typeVeranderingen"];
+  "meedoendeNeuronen","losgeraakt","gesnoeid","bijgegroeid","nieuweNeuronen","typeVeranderingen",
+  /* stap 4: de vaste benchmarkset en de tweede beleidsvorm. Runs van vóór
+     9 september 2026 hebben deze kolommen leeg — dat is geen nul maar "niet gemeten". */
+  "toetsStreng","benchWerelden","benchHerhalingen","benchBeleid","benchBeleidCI",
+  "benchStreng","benchStrengCI","benchStappen"];
 function csvCell(v){
   if(v===null||v===undefined) return "";
   if(typeof v==="boolean") return v?"1":"0";
@@ -2381,6 +2619,7 @@ function csvCell(v){
 }
 function csvRow(r){
   const c=r.config, w=c.wereld, l=c.leren, st=c.structureel, res=r.resultaat, s2=r.structuur, comp=c.samenstelling;
+  const bm=r.benchmark||null;
   const v={
     tijdstip:r.tijdstip, conditie:r.conditie||"", brein:r.brein, breinZaad:r.breinZaad, wereldZaad:w.seed,
     pogingen:res.pogingen, neuronenStart:c.startNeuronen, neuronenEind:c.neuronenNu, dichtheid:c.startdichtheid,
@@ -2398,7 +2637,12 @@ function csvRow(r){
     kortstePad:s2.kortstePad, reflexbogen:s2.reflexbogen, lussen:s2.lussen,
     meedoendeNeuronen:s2.meedoendeNeuronen, losgeraakt:s2.losgeraakt,
     gesnoeid:s2.gesnoeid, bijgegroeid:s2.bijgegroeid, nieuweNeuronen:s2.nieuweNeuronen,
-    typeVeranderingen:s2.typeVeranderingen
+    typeVeranderingen:s2.typeVeranderingen,
+    toetsStreng:(res.toetsStreng===undefined?null:res.toetsStreng),
+    benchWerelden:bm?bm.werelden:null, benchHerhalingen:bm?bm.herhalingen:null,
+    benchBeleid:bm?bm.beleid.pct:null, benchBeleidCI:bm?bm.beleid.ci:null,
+    benchStreng:bm?bm.streng.pct:null, benchStrengCI:bm?bm.streng.ci:null,
+    benchStappen:bm?bm.beleid.gemStappen:null
   };
   return CSV_COLS.map(k=>csvCell(v[k])).join(",");
 }
@@ -2416,6 +2660,12 @@ function runOne(cfg,brainSeed,naam){
   newWorld(0); startEpisode();
   while(S.ep<cfg.nEpisodes){ if(gameTick(true,noiseNow())) finishEpisode(); }
   S.elapsed=performance.now()-S.startTime;
+  /* Beide beleidsvormen op de goedkope toets, zodat elk resultaat ze naast elkaar
+     heeft — de code kon het al, het werd alleen niet samen weggeschreven. */
+  if(cfg.evalOn) S.evalStreng=evalWorlds(EVAL_WORLDS,"streng").pct;
+  else S.evalStreng=null;
+  /* En dan de meetlat waar het paper op steunt. */
+  if(cfg.benchOn) runBenchmark(cfg.benchN,cfg.benchReps);
   const row=buildResult();
   row.conditie=naam;
   return row;
@@ -2468,8 +2718,11 @@ function expAddRow(row){
   const b=$("expbody"); if(!b) return;
   const tr=document.createElement("tr");
   const pct=v=>v===null||v===undefined?"–":(100*v).toFixed(0)+"%";
+  const bm=row.benchmark;
   tr.innerHTML=`<td>${row.conditie}</td><td>${row.breinZaad}</td><td>${pct(row.resultaat.succesPct)}</td>
     <td>${pct(row.resultaat.succes20)}</td><td>${pct(row.resultaat.toetsPct)}</td>
+    <td>${bm?pct(bm.beleid.pct)+" ± "+(100*bm.beleid.ci).toFixed(1):"–"}</td>
+    <td>${bm?pct(bm.streng.pct):"–"}</td>
     <td>${row.config.neuronenNu}</td><td>${row.structuur.verbindingen}</td><td>${row.structuur.actieveVerbindingen}</td>
     <td>${row.structuur.reflexbogen}</td><td>${row.structuur.lussen}</td><td>${row.structuur.kortstePad}</td>
     <td>${(row.resultaat.rekentijdMs/1000).toFixed(1)}s</td>`;
@@ -2484,7 +2737,36 @@ function meanCI(xs){
   const m=v.reduce((a,b)=>a+b,0)/n;
   if(n<2) return {n,m,ci:0};
   const sd=Math.sqrt(v.reduce((a,b)=>a+(b-m)*(b-m),0)/(n-1));
-  return {n,m,ci:1.96*sd/Math.sqrt(n)};
+  return {n,m,sd,ci:1.96*sd/Math.sqrt(n)};
+}
+/* Mann-Whitney U: verschilt conditie A van conditie B, of is het ruis? Geen aanname
+   over de vorm van de verdeling, en met twaalf tot zestien zaden per conditie is dat
+   precies wat je wilt — een t-toets doet daar aannames die we niet kunnen nakijken.
+   Gelijke waarden krijgen een gedeelde rang; de normale benadering met
+   continuïteitscorrectie is bij n ≥ 8 per groep ruim goed genoeg. */
+function erf(x){
+  const s=Math.sign(x); x=Math.abs(x);
+  const t=1/(1+0.3275911*x);
+  const y=1-((((1.061405429*t-1.453152027)*t+1.421413741)*t-0.284496736)*t+0.254829592)*t*Math.exp(-x*x);
+  return s*y;
+}
+function mannWhitney(a,b){
+  a=a.filter(v=>v!==null&&v!==undefined&&isFinite(v));
+  b=b.filter(v=>v!==null&&v!==undefined&&isFinite(v));
+  if(a.length<2||b.length<2) return null;
+  const all=a.map(v=>[v,0]).concat(b.map(v=>[v,1])).sort((x,y)=>x[0]-y[0]);
+  const rank=new Array(all.length);
+  for(let i=0;i<all.length;){
+    let j=i; while(j+1<all.length && all[j+1][0]===all[i][0]) j++;
+    const r=(i+j)/2+1; for(let k=i;k<=j;k++) rank[k]=r; i=j+1;
+  }
+  let Ra=0; all.forEach((e,i)=>{ if(e[1]===0) Ra+=rank[i]; });
+  const na=a.length, nb=b.length;
+  const Ua=Ra-na*(na+1)/2, U=Math.min(Ua,na*nb-Ua);
+  const mu=na*nb/2, sg=Math.sqrt(na*nb*(na+nb+1)/12);
+  const z=(U-mu+0.5)/sg;
+  const p=2*(0.5*(1+erf(-Math.abs(z)/Math.SQRT2)));
+  return {U,z,p,n:[na,nb], oordeel: p<0.05?"verschil is er echt":"verschil valt binnen de ruis"};
 }
 function expSummary(rows){
   const el=$("expsummary"); if(!el) return;
@@ -2492,19 +2774,57 @@ function expSummary(rows){
   const per=new Map();
   for(const r of rows){ if(!per.has(r.conditie)) per.set(r.conditie,[]); per.get(r.conditie).push(r); }
   const f=x=>x===null?"–":(100*x.m).toFixed(1)+"% ± "+(100*x.ci).toFixed(1);
+  const bench=r=>r.benchmark||null;
+  const heeftBench=rows.some(bench);
   let h=`<h3 style="font-size:13px;margin:16px 0 8px;color:var(--text-dim);">Samenvatting per conditie</h3>
     <div class="scrollx"><table style="width:100%;border-collapse:collapse;font-size:11.5px;">
-    <thead><tr><th>conditie</th><th>zaden</th><th>succes laatste 20</th><th>toets onbekende werelden</th><th>verbindingen</th><th>reflexbogen</th><th>tijd</th></tr></thead><tbody>`;
+    <thead><tr><th>conditie</th><th>zaden</th><th>succes laatste 20</th><th>toets (20 werelden)</th>`
+    +(heeftBench?`<th>benchmark, geloot</th><th>benchmark, argmax</th>`:``)
+    +`<th>verbindingen</th><th>reflexbogen</th><th>tijd</th></tr></thead><tbody>`;
+  const perNaam=[];
   for(const [naam,rs] of per){
     const s20=meanCI(rs.map(r=>r.resultaat.succes20));
     const ev=meanCI(rs.map(r=>r.resultaat.toetsPct));
+    const bb=meanCI(rs.map(r=>bench(r)?bench(r).beleid.pct:null));
+    const bs=meanCI(rs.map(r=>bench(r)?bench(r).streng.pct:null));
     const cn=meanCI(rs.map(r=>r.structuur.verbindingen));
     const rf=meanCI(rs.map(r=>r.structuur.reflexbogen));
     const tm=meanCI(rs.map(r=>r.resultaat.rekentijdMs));
-    h+=`<tr><td>${naam}</td><td>${rs.length}</td><td>${f(s20)}</td><td>${f(ev)}</td>
-      <td>${cn?cn.m.toFixed(0):"–"}</td><td>${rf?rf.m.toFixed(1):"–"}</td><td>${tm?(tm.m/1000).toFixed(1)+"s":"–"}</td></tr>`;
+    perNaam.push({naam,rs,bb});
+    h+=`<tr><td>${naam}</td><td>${rs.length}</td><td>${f(s20)}</td><td>${f(ev)}</td>`
+      +(heeftBench?`<td>${f(bb)}</td><td>${f(bs)}</td>`:``)
+      +`<td>${cn?cn.m.toFixed(0):"–"}</td><td>${rf?rf.m.toFixed(1):"–"}</td><td>${tm?(tm.m/1000).toFixed(1)+"s":"–"}</td></tr>`;
   }
   h+=`</tbody></table></div><div class="note">De intervallen zijn 95%-intervallen over de zaden. Overlappen twee intervallen elkaar ruim, dan is het verschil niet aangetoond &mdash; hoe verleidelijk het gemiddelde ook oogt.</div>`;
+  /* Elke conditie tegen de eerste, op de maat die in het paper komt. Twee
+     overlappende intervallen zijn een aanwijzing; dit is het antwoord. */
+  if(perNaam.length>1){
+    const ref=perNaam[0];
+    const maat=heeftBench
+      ? {naam:"de benchmarkscore (geloot)", get:r=>bench(r)?bench(r).beleid.pct:null}
+      : {naam:"de toets op onbekende werelden", get:r=>r.resultaat.toetsPct};
+    let t=`<h3 style="font-size:13px;margin:16px 0 8px;color:var(--text-dim);">Verschilt het van
+      &ldquo;${ref.naam}&rdquo;? &mdash; Mann-Whitney U op ${maat.naam}</h3>
+      <div class="scrollx"><table style="width:100%;border-collapse:collapse;font-size:11.5px;">
+      <thead><tr><th>conditie</th><th>verschil</th><th>U</th><th>p</th><th>uitkomst</th></tr></thead><tbody>`;
+    let regels=0;
+    for(let i=1;i<perNaam.length;i++){
+      const A=ref.rs.map(maat.get), Bv=perNaam[i].rs.map(maat.get);
+      const st=mannWhitney(A,Bv);
+      const mA=meanCI(A), mB=meanCI(Bv);
+      if(!st||!mA||!mB) continue;
+      regels++;
+      const d=100*(mB.m-mA.m);
+      t+=`<tr><td>${perNaam[i].naam}</td><td>${d>=0?"+":""}${d.toFixed(1)} pp</td>
+        <td>${st.U}</td><td>${st.p.toFixed(3)}</td>
+        <td><span class="badge ${st.p<0.05?"ok":"mid"}">${st.oordeel}</span></td></tr>`;
+    }
+    t+=`</tbody></table></div><div class="note">&ldquo;Valt binnen de ruis&rdquo; betekent niet
+      &ldquo;er is geen verschil&rdquo;, maar &ldquo;met dit aantal zaden is het niet aan te tonen&rdquo;.
+      Bij een spreiding van ongeveer 0,10 tussen zaden heb je er ruwweg zestien nodig om een
+      verschil van 0,10 te zien.</div>`;
+    if(regels) h+=t;
+  }
   el.innerHTML=h;
 }
 async function runExperiments(){
@@ -2667,6 +2987,8 @@ function initUI(){
   /* --- experimentloper --- */
   if($("expseeds")) bindSlider("expseeds","expseedsval",v=>v);
   if($("expep")) bindSlider("expep","expepval",v=>v);
+  if($("benchn")) bindSlider("benchn","benchnval",v=>v);
+  if($("benchreps")) bindSlider("benchreps","benchrepsval",v=>v);
   if($("expstart")) $("expstart").addEventListener("click",runExperiments);
   if($("expstop")) $("expstop").addEventListener("click",()=>{ S.expAbort=true; expStatus("afbreken &mdash; de lopende run wordt nog afgemaakt."); });
   if($("expdir")) $("expdir").addEventListener("click",async()=>{
@@ -2762,7 +3084,11 @@ function runHeadless(nEp,brainSeed,evalOn){
 }
 window.__brain={S,createBrain,analyze,makeWorld,readCfg,startTraining,stopTraining,runHeadless,genBrain,evalWorlds,
   canConnect,countKinds,restructure,buildResult,brainFromResult,applyCfgToUI,applyResult,repeatRun,
-  runOne,cfgOverride,runExperiments,csvRow,CSV_COLS,meanCI,
+  runOne,cfgOverride,runExperiments,csvRow,CSV_COLS,meanCI,mannWhitney,
+  benchmarkWorlds,benchWorldSeed,playWorlds,benchBrain,benchReactief,runBenchmark,
+  reactiefDir,reactiefTick,moveAgent,rayDist,blocked,DIRV,
+  BENCH:{N:BENCH_N,REPS:BENCH_REPS,SEED0:BENCH_SEED0,STRIDE:BENCH_STRIDE,OBS:BENCH_OBS,RNG:BENCH_RNG},
+  EVAL_WORLDS,
   propagate,brainStep,updateTraces,resetBrainState,mulberry32,sense,makeWorld2:makeWorld,
   gameTick,applyReward,fadeWeights,noiseEnd,
   K:{K_IN,K_SENS,K_WORK,K_REFL,K_MEM,K_NEUT,K_OUT,HID0,OUT0}};

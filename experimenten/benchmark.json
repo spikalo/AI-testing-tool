@@ -1,0 +1,319 @@
+{
+  "uitgevoerd": "2026-09-09T14:13:35.960Z",
+  "beschrijving": "Werkplan stap 4: de vaste benchmarkset van 500 werelden, elke wereld 3 keer gespeeld met het geleerde (gelote) beleid en één keer met argmax. Zestien breinzaden op de standaardconditie. De intervallen binnen een run gaan over de werelden, de intervallen over de reeks gaan over de zaden — dat zijn twee verschillende onzekerheden en ze horen apart gerapporteerd te worden.",
+  "conditie": "benchmark-standaard",
+  "zaden": 16,
+  "eersteZaad": 1000,
+  "pogingenPerRun": 500,
+  "benchmark": {
+    "werelden": 500,
+    "herhalingen": 3,
+    "obstakels": 7,
+    "controlegetal": 418697495
+  },
+  "ijkpunten": {
+    "reactief": {
+      "pct": 0.386,
+      "ci": 0.04271531726979109,
+      "gemStappen": 64.56994818652849,
+      "werelden": 500
+    },
+    "willekeurig": {
+      "pct": 0,
+      "ci": 0,
+      "werelden": 500
+    },
+    "reactiefOp20": {
+      "pct": 0.3,
+      "ci": 0.20605773335083588,
+      "werelden": 20
+    }
+  },
+  "maten": {
+    "succes20": {
+      "naam": "succes laatste 20",
+      "overZaden": {
+        "n": 16,
+        "m": 0.871875,
+        "sd": 0.09481341325642345,
+        "ci": 0.04645857249564749
+      }
+    },
+    "toets20": {
+      "naam": "toets, 20 werelden",
+      "overZaden": {
+        "n": 16,
+        "m": 0.68125,
+        "sd": 0.07274384280931732,
+        "ci": 0.035644482976565486
+      }
+    },
+    "toets20streng": {
+      "naam": "toets streng, 20 werelden",
+      "overZaden": {
+        "n": 16,
+        "m": 0.575,
+        "sd": 0.06582805886043831,
+        "ci": 0.03225574884161477
+      }
+    },
+    "benchBeleid": {
+      "naam": "benchmark geloot",
+      "overZaden": {
+        "n": 16,
+        "m": 0.6538333333333334,
+        "sd": 0.040560882450770074,
+        "ci": 0.019874832400877337
+      }
+    },
+    "benchStreng": {
+      "naam": "benchmark argmax",
+      "overZaden": {
+        "n": 16,
+        "m": 0.52325,
+        "sd": 0.06114409211035846,
+        "ci": 0.029960605134075648
+      }
+    }
+  },
+  "verschilArgmaxMinGeloot": {
+    "n": 16,
+    "m": -0.13058333333333336,
+    "sd": 0.04666341258495866,
+    "ci": 0.02286507216662974
+  },
+  "mannWhitney": {
+    "U": 11,
+    "z": -4.390758955413683,
+    "p": 0.000011304665880507159,
+    "n": [
+      16,
+      16
+    ],
+    "oordeel": "verschil is er echt"
+  },
+  "onzekerheidPerMeting": {
+    "benchmarkBinnenRun": {
+      "n": 16,
+      "m": 0.03636077444830306,
+      "sd": 0.0010833584333269075,
+      "ci": 0.0005308456323301847
+    },
+    "toets20Binomiaal": {
+      "n": 16,
+      "m": 0.20151197872068788,
+      "sd": 0.012644785257617525,
+      "ci": 0.006195944776232587
+    }
+  },
+  "perZaad": [
+    {
+      "zaad": 1000,
+      "succes20": 1,
+      "toets20": 0.7,
+      "toets20streng": 0.6,
+      "benchBeleid": 0.6980000000000001,
+      "benchBeleidCI": 0.03616692423896046,
+      "benchStreng": 0.582,
+      "benchStrengCI": 0.04327682903196714,
+      "benchStappen": 137.85195797516715,
+      "actief": 1547,
+      "reflex": 0
+    },
+    {
+      "zaad": 1001,
+      "succes20": 0.8,
+      "toets20": 0.75,
+      "toets20streng": 0.55,
+      "benchBeleid": 0.6046666666666669,
+      "benchBeleidCI": 0.03726471891117426,
+      "benchStreng": 0.486,
+      "benchStrengCI": 0.04385362440605224,
+      "benchStappen": 162.9614112458655,
+      "actief": 1493,
+      "reflex": 2
+    },
+    {
+      "zaad": 1002,
+      "succes20": 0.7,
+      "toets20": 0.55,
+      "toets20streng": 0.55,
+      "benchBeleid": 0.5753333333333333,
+      "benchBeleidCI": 0.03843449298817504,
+      "benchStreng": 0.488,
+      "benchStrengCI": 0.04385818852393725,
+      "benchStappen": 170.58169177288528,
+      "actief": 1416,
+      "reflex": 4
+    },
+    {
+      "zaad": 1003,
+      "succes20": 1,
+      "toets20": 0.65,
+      "toets20streng": 0.55,
+      "benchBeleid": 0.6253333333333331,
+      "benchBeleidCI": 0.03768948463333075,
+      "benchStreng": 0.488,
+      "benchStrengCI": 0.04385818852393725,
+      "benchStappen": 161.97761194029852,
+      "actief": 1245,
+      "reflex": 7
+    },
+    {
+      "zaad": 1004,
+      "succes20": 1,
+      "toets20": 0.65,
+      "toets20streng": 0.6,
+      "benchBeleid": 0.6446666666666667,
+      "benchBeleidCI": 0.03738206211990832,
+      "benchStreng": 0.458,
+      "benchStrengCI": 0.0437157748775691,
+      "benchStappen": 158.3733195449845,
+      "actief": 1153,
+      "reflex": 2
+    },
+    {
+      "zaad": 1005,
+      "succes20": 0.95,
+      "toets20": 0.8,
+      "toets20streng": 0.65,
+      "benchBeleid": 0.6873333333333334,
+      "benchBeleidCI": 0.03497649205639299,
+      "benchStreng": 0.554,
+      "benchStrengCI": 0.043614220034047954,
+      "benchStappen": 160.37342386032978,
+      "actief": 1434,
+      "reflex": 8
+    },
+    {
+      "zaad": 1006,
+      "succes20": 0.8,
+      "toets20": 0.7,
+      "toets20streng": 0.5,
+      "benchBeleid": 0.67,
+      "benchBeleidCI": 0.03598596376457104,
+      "benchStreng": 0.472,
+      "benchStrengCI": 0.04380198167202946,
+      "benchStappen": 163.33333333333334,
+      "actief": 1532,
+      "reflex": 0
+    },
+    {
+      "zaad": 1007,
+      "succes20": 0.95,
+      "toets20": 0.6,
+      "toets20streng": 0.55,
+      "benchBeleid": 0.6853333333333332,
+      "benchBeleidCI": 0.036116037853662325,
+      "benchStreng": 0.592,
+      "benchStrengCI": 0.043121785351999294,
+      "benchStappen": 135.0875486381323,
+      "actief": 1711,
+      "reflex": 3
+    },
+    {
+      "zaad": 1008,
+      "succes20": 0.9,
+      "toets20": 0.75,
+      "toets20streng": 0.6,
+      "benchBeleid": 0.7119999999999999,
+      "benchBeleidCI": 0.03462435681283817,
+      "benchStreng": 0.624,
+      "benchStrengCI": 0.0425003019770008,
+      "benchStappen": 138.56554307116104,
+      "actief": 1570,
+      "reflex": 8
+    },
+    {
+      "zaad": 1009,
+      "succes20": 0.8,
+      "toets20": 0.65,
+      "toets20streng": 0.5,
+      "benchBeleid": 0.6079999999999999,
+      "benchBeleidCI": 0.036914390594987995,
+      "benchStreng": 0.516,
+      "benchStrengCI": 0.04384835752585758,
+      "benchStappen": 176.95394736842104,
+      "actief": 1132,
+      "reflex": 4
+    },
+    {
+      "zaad": 1010,
+      "succes20": 0.95,
+      "toets20": 0.75,
+      "toets20streng": 0.65,
+      "benchBeleid": 0.7173333333333335,
+      "benchBeleidCI": 0.03500998131557307,
+      "benchStreng": 0.638,
+      "benchStrengCI": 0.04216677855406151,
+      "benchStappen": 144.6421933085502,
+      "actief": 1426,
+      "reflex": 4
+    },
+    {
+      "zaad": 1011,
+      "succes20": 0.85,
+      "toets20": 0.6,
+      "toets20streng": 0.45,
+      "benchBeleid": 0.6446666666666669,
+      "benchBeleidCI": 0.03640830941587885,
+      "benchStreng": 0.526,
+      "benchStrengCI": 0.04381147163579176,
+      "benchStappen": 162.1913133402275,
+      "actief": 1690,
+      "reflex": 3
+    },
+    {
+      "zaad": 1012,
+      "succes20": 0.8,
+      "toets20": 0.6,
+      "toets20streng": 0.65,
+      "benchBeleid": 0.6633333333333338,
+      "benchBeleidCI": 0.03536253390631423,
+      "benchStreng": 0.44,
+      "benchStrengCI": 0.04355380980692039,
+      "benchStappen": 167.93768844221105,
+      "actief": 1173,
+      "reflex": 3
+    },
+    {
+      "zaad": 1013,
+      "succes20": 0.75,
+      "toets20": 0.65,
+      "toets20streng": 0.55,
+      "benchBeleid": 0.6460000000000001,
+      "benchBeleidCI": 0.03646127477085553,
+      "benchStreng": 0.552,
+      "benchStrengCI": 0.043632926692849454,
+      "benchStappen": 155.98968008255935,
+      "actief": 1632,
+      "reflex": 3
+    },
+    {
+      "zaad": 1014,
+      "succes20": 0.85,
+      "toets20": 0.75,
+      "toets20streng": 0.55,
+      "benchBeleid": 0.6586666666666665,
+      "benchBeleidCI": 0.03566990364324669,
+      "benchStreng": 0.456,
+      "benchStrengCI": 0.04370062716287782,
+      "benchStappen": 167.64676113360323,
+      "actief": 1476,
+      "reflex": 7
+    },
+    {
+      "zaad": 1015,
+      "succes20": 0.85,
+      "toets20": 0.75,
+      "toets20streng": 0.7,
+      "benchBeleid": 0.6206666666666664,
+      "benchBeleidCI": 0.03730546414697918,
+      "benchStreng": 0.5,
+      "benchStrengCI": 0.043870825141512824,
+      "benchStappen": 177.546723952739,
+      "actief": 1502,
+      "reflex": 1
+    }
+  ]
+}

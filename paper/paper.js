@@ -41,6 +41,8 @@ const GRAD = lees(path.join(EXPDIR, 'gradcheck.json'));
 const GRADD = lees(path.join(EXPDIR, 'gradcheck-delen.json'));
 const PGAIN = lees(path.join(EXPDIR, 'perturbatie-schaal.json'));
 const PGAINLR = lees(path.join(EXPDIR, 'perturbatie-schaal-lr.json'));
+const BENCH = lees(path.join(EXPDIR, 'benchmark.json'));
+const BENCHSET = lees(path.join(EXPDIR, 'benchmark-werelden.json'));
 function stat(xs) {
   const v = xs.filter(x => typeof x === 'number' && isFinite(x));
   const n = v.length; if (!n) return null;
@@ -53,7 +55,9 @@ const pct = x => x === null ? '–' : (100 * x.m).toFixed(1) + '% ± ' + (100 * 
 const pctSd = x => x === null ? '–' : (100 * x.sd).toFixed(1) + '%';
 const num = (x, d = 0) => x === null ? '–' : x.m.toFixed(d) + ' ± ' + x.ci.toFixed(d);
 const kol = k => RUNS ? RUNS.map(r => r[k]) : [];
-const VERSIE = '1.2';
+/* een gemiddelde-met-interval uit benchmark.json in dezelfde vorm als stat() */
+const bm = o => o ? { n: o.n, m: o.m, sd: o.sd, ci: o.ci, min: o.m, max: o.m } : null;
+const VERSIE = '1.3';
 const DATUM = '9 september 2026';
 const SERIF = 'Cambria';
 const TEXTW_PT = 448;              // bruikbare tekstbreedte in punten
@@ -108,9 +112,23 @@ function eq(num, scale = 1) {
   });
 }
 
+/* De afmetingen van een figuur, zodat de verhouding klopt. Welk commando python
+   heet verschilt per machine — op Windows is het meestal `py`, elders `python3` —
+   dus we proberen ze op volgorde in plaats van er één te veronderstellen. */
+let PY = null;
+function pythonCmd() {
+  if (PY) return PY;
+  const { execSync } = require('child_process');
+  for (const c of ['python3', 'py', 'python']) {
+    try { execSync(`${c} -c "import PIL"`, { stdio: 'ignore' }); return (PY = c); } catch (e) { }
+  }
+  throw new Error('geen python met Pillow gevonden; probeer: py -m pip install pillow');
+}
 function figure(path, capNum, capText, widthPt = 470) {
   const { execSync } = require('child_process');
-  const dims = execSync(`python3 -c "from PIL import Image;im=Image.open('${path}');print(im.width,im.height)"`)
+  /* backslashes uit een Windows-pad zijn in een Python-string een ontsnapping */
+  const pyPad = path.replace(/\\/g, '/');
+  const dims = execSync(`${pythonCmd()} -c "from PIL import Image;im=Image.open('${pyPad}');print(im.width,im.height)"`)
     .toString().trim().split(' ').map(Number);
   const h = widthPt * dims[1] / dims[0];
   return [
@@ -1010,9 +1028,26 @@ C.push(body([
 C.push(body(
   'De toets draait daarom met dezelfde loting als tijdens het leren, maar zonder leren, zonder ruis in de wolk en ' +
   'met een eigen toevalsgenerator, zodat de toets reproduceerbaar is en de training niet verstoort. De strengere ' +
-  'variant blijft als optie beschikbaar; het verschil tussen beide is zelf een interessante meting, want het zegt ' +
-  'hoeveel van de prestatie op de scherpte van de beslissingen berust en hoeveel op het blijven bewegen.'
+  'variant wordt sinds versie 1.3 niet meer als optie bewaard maar in elke run naast de gelote variant gemeten, ' +
+  'want het verschil tussen beide is zelf een meting: het zegt hoeveel van de prestatie op de scherpte van de ' +
+  'beslissingen berust en hoeveel op het blijven bewegen.'
 ));
+/* Het verschil tussen beide beleidsvormen, rechtstreeks uit experimenten/benchmark.json. */
+if (BENCH && BENCH.maten && BENCH.maten.benchBeleid && BENCH.maten.benchStreng) {
+  const g = bm(BENCH.maten.benchBeleid.overZaden), s = bm(BENCH.maten.benchStreng.overZaden);
+  const d = BENCH.verschilArgmaxMinGeloot, mwu = BENCH.mannWhitney;
+  C.push(body([
+    bd('En dat verschil is groot. '),
+    t('Over ' + g.n + ' breinzaden haalt het geleerde, gelote beleid op de benchmarkset van sectie 10.2 '),
+    bd(pct(g)), t(', terwijl steeds de waarschijnlijkste knop nemen op diezelfde werelden blijft steken op '),
+    bd(pct(s)), t('. Gepaard per zaad scheelt dat ' + (100 * d.m).toFixed(1) + ' ± ' + (100 * d.ci).toFixed(1) +
+      ' procentpunt in het nadeel van argmax' + (mwu ? ' (Mann-Whitney U, p ' +
+      (mwu.p < 0.001 ? '< 0,001' : '= ' + mwu.p.toFixed(3)) + ')' : '') + '. Het toeval is dus geen ruis die je ' +
+      'er bij het toetsen netjes uit haalt — het is onderdeel van de strategie geworden. Wie deze twee door ' +
+      'elkaar haalt, meet een ander beleid dan hij getraind heeft, en onderschat het resultaat met ruwweg een ' +
+      'achtste van de score.')
+  ]));
+}
 
 C.push(h1('6', 'Het meten van de gevormde structuur'));
 C.push(body(
@@ -1151,7 +1186,8 @@ C.push(tbl(
     ['—', 'obstakels in de wereld', '7', 'sectie 5'],
     ['T', 'stappen per poging', '320', 'sectie 5'],
     ['E', 'aantal pogingen', '500', 'algoritme 1'],
-    ['—', 'werelden per toets', '20', 'sectie 5.4']
+    ['—', 'werelden per tussentijdse toets', '20', 'sectie 5.4'],
+    ['—', 'werelden in de benchmarkset × keer gespeeld', '500 × 3', 'sectie 10.2']
   ],
   [1500, 4200, 2100, 1272]
 ));
@@ -1190,14 +1226,23 @@ C.push(bullet([bd('De structuurmaten hangen aan een drempel. '), t('Wat "actief"
   'elkaar te vergelijken, niet als absolute grootheid.')]));
 C.push(bullet([bd('Eén omgeving. '), t('Alle ontwerpbeslissingen zijn gemaakt met één taak voor ogen. Welke ervan ' +
   'algemeen zijn en welke aan die taak vastzitten, is een open vraag.')]));
+C.push(bullet([bd('De benchmarkset is één trekking uit één generator. '), t('Vijfhonderd werelden halen de ' +
+  'meetruis omlaag, maar zij komen alle uit dezelfde wereldgenerator met hetzelfde aantal obstakels. Het ' +
+  'interval eromheen zegt hoe zeker de score op déze verdeling is, niet hoe het model het doet op werelden die ' +
+  'anders in elkaar zitten. Sectie 10.4 noemt de tweede taak die dat moet uitwijzen.')]));
+C.push(bullet([bd('Alle instellingen zijn op de trainingsverdeling gekozen. '), t('De standaardwaarden uit ' +
+  'sectie 8 zijn afgesteld vóórdat de benchmarkset bestond, op twintig toetswerelden. De benchmark is sindsdien ' +
+  'nooit gebruikt om iets te kiezen, maar de instellingen die zij beoordeelt zijn wel met een minder ' +
+  'betrouwbaar signaal tot stand gekomen. Het raster van dichtheid tegen aantal neuronen wordt daarom opnieuw ' +
+  'gedraaid met de benchmark als toets.')]));
 
 /* ===== 10 ===== */
 C.push(h1('10', 'Evaluatie'));
 C.push(body(
   'De meetopzet is met opzet niet ingericht om te laten zien dat het model werkt, maar om uit elkaar te trekken ' +
-  'wáár een eventuele prestatie vandaan komt. Deze versie van het document bevat de referentiemeting en de ' +
-  'reproduceerbaarheidscontrole, en sectie 3.11 de numerieke controle van de leerregel zelf; de ablaties en de '+
-  'basislijnen volgen in een latere versie.'
+  'wáár een eventuele prestatie vandaan komt. Deze versie van het document bevat de benchmarkset, de ' +
+  'referentiemeting daarop en de reproduceerbaarheidscontrole, en sectie 3.11 de numerieke controle van de ' +
+  'leerregel zelf; de ablaties en de basislijnen volgen in een latere versie.'
 ));
 C.push(h2('10.1', 'Twee meetassen'));
 C.push(body(
@@ -1205,24 +1250,86 @@ C.push(body(
   'gezien heeft. Het verschil tussen die twee is de eigenlijke grootheid: het onderscheidt het uit het hoofd leren ' +
   'van een route van het leren navigeren. Daarnaast wordt na elke run de gevormde structuur met de maten uit ' +
   'sectie 6 vastgelegd, zodat de vraag beantwoord kan worden welke structurele eigenschappen met goed presteren ' +
-  'samenhangen. Als referentiepunt dient een zuiver reactieve agent die recht op het doel af loopt en langs ' +
-  'obstakels glijdt; die geeft aan wat zonder geheugen of planning haalbaar is.'
+  'samenhangen.'
 ));
 C.push(body([
   bd('Over onzekerheid. '),
-  t('De spreiding tussen zaden is bij deze leerregel aanzienlijk, en een gemiddelde zonder interval is daarom ' +
-    'misleidend. Alle getallen hieronder staan als gemiddelde met een 95%-interval over de zaden. Overlappen twee ' +
-    'intervallen elkaar ruim, dan is een verschil niet aangetoond, hoe suggestief het gemiddelde ook oogt.')
+  t('Er zijn er twee, en ze worden makkelijk verward. De eerste is de spreiding '), it('tussen zaden'),
+  t(': hetzelfde recept levert verschillende breinen op. De tweede is de onzekerheid '), it('binnen één run'),
+  t(': op hoeveel werelden is die ene agent afgerekend? Beide staan hieronder als 95%-interval, en ze horen ' +
+    'niet bij elkaar opgeteld te worden. Overlappen twee intervallen elkaar ruim, dan is een verschil niet ' +
+    'aangetoond, hoe suggestief het gemiddelde ook oogt.')
 ]));
+
+/* --- 10.2: de benchmarkset --- */
+C.push(h2('10.2', 'Waarop getoetst wordt: een vaste benchmarkset'));
+if (BENCH && BENCH.benchmark) {
+  const B = BENCH.benchmark, O = BENCH.onzekerheidPerMeting;
+  C.push(body([
+    t('Tot versie 1.2 werd op twintig onbekende werelden getoetst. Dat is een bruikbaar signaal tijdens het ' +
+      'afstellen en het is goedkoop, maar het draagt geen conclusie: bij een score rond 70% is het ' +
+      '95%-interval van twintig trekkingen ongeveer '),
+    bd('± ' + (100 * O.toets20Binomiaal.m).toFixed(0) + ' procentpunt'),
+    t('. Twee condities die in werkelijkheid tien procentpunt schelen, zijn zo niet uit elkaar te houden.')
+  ]));
+  C.push(body(
+    'Daarom is er nu een vaste benchmarkset: ' + B.werelden + ' werelden uit een eigen zaadreeks, met vast ' +
+    B.obstakels + ' obstakels, gescheiden van de trainingswerelden én van de twintig werelden die tijdens het ' +
+    'leren meelopen. Zij wordt nooit gebruikt om instellingen te kiezen. Omdat het beleid geloot wordt, speelt ' +
+    'elke wereld ' + B.herhalingen + ' keer; het interval gaat over de werelden en niet over de speelbeurten, ' +
+    'want drie keer dezelfde wereld spelen levert geen drie onafhankelijke waarnemingen over generalisatie op. ' +
+    'Daarmee zakt de onzekerheid van één meting naar ± ' + (100 * O.benchmarkBinnenRun.m).toFixed(1) +
+    ' procentpunt. De twintig werelden blijven bestaan als goedkoop signaal tijdens de training; wat in dit ' +
+    'document staat, komt van de benchmark.' +
+    (BENCHSET ? ' De verzameling ligt vast in experimenten/benchmark-werelden.json, met een controlegetal ' +
+      'waarmee een afwijking direct opvalt.' : '')
+  ));
+  const ij = BENCH.ijkpunten;
+  if (ij) {
+    C.push(h3('Twee ijkpunten op diezelfde werelden'));
+    C.push(body([
+      t('Een schaal zonder ijkpunt meet niets. Een agent die elke tik een willekeurige richting kiest haalt op ' +
+        'deze werelden '), bd((100 * ij.willekeurig.pct).toFixed(1) + '%'),
+      t(' — de vloer. Een zuiver reactieve agent met precies dezelfde zintuigen als het netwerk, die naar het ' +
+        'doel toe wordt getrokken en van wat vlakbij staat wordt afgestoten, haalt '),
+      bd((100 * ij.reactief.pct).toFixed(1) + '% ± ' + (100 * ij.reactief.ci).toFixed(1)),
+      t('. Dat is wat zonder geheugen, zonder planning en zonder leren haalbaar is, en het is de ondergrens ' +
+        'waar alles wat het netwerk leert bovenuit moet komen.')
+    ]));
+    if (ij.reactiefOp20) {
+      C.push(body([
+        bd('Terzijde, en illustratief voor waarom deze sectie er is: '),
+        t('dezelfde reactieve agent scoort op de twintig oude toetswerelden ' +
+          (100 * ij.reactiefOp20.pct).toFixed(1) + '% ± ' + (100 * ij.reactiefOp20.ci).toFixed(1) +
+          ' en op de vijfhonderd benchmarkwerelden ' + (100 * ij.reactief.pct).toFixed(1) + '% ± ' +
+          (100 * ij.reactief.ci).toFixed(1) + '. Hetzelfde beleid, hetzelfde soort werelden, en toch een ' +
+          'verschil van ' + Math.abs(100 * (ij.reactiefOp20.pct - ij.reactief.pct)).toFixed(0) +
+          ' procentpunt — geheel binnen wat twintig trekkingen aan speling geven. Eerdere werknotities noemen ' +
+          'voor een reactieve referentie een getal rond 57%; dat cijfer komt uit een script dat niet in de ' +
+          'repository is bewaard en is daarom hier niet overgenomen. Het ijkpunt van dit document is de agent ' +
+          'waarvan de code er wél in staat.')
+      ]));
+    }
+  }
+} else {
+  C.push(body('De benchmarkset is nog niet gedraaid; zodra experimenten/benchmark.json bestaat, verschijnen hier ' +
+    'de opzet en de twee ijkpunten.'));
+}
 
 /* --- referentiemeting, opgebouwd uit runs.csv --- */
 if (RUNS && RUNS.length) {
-  /* De referentiemeting hoort bij de leerregel zoals die nu is: de conditie
-     trace-nieuw. De oudere rijen 'standaard' draaiden met de foutieve trace
-     (kolom traceOud = 1) en worden hier niet meegenomen. */
-  const R0 = RUNS.filter(r => r.conditie === 'trace-nieuw');
+  /* De referentiemeting hoort bij de leerregel zoals die nu is en bij de
+     meetopstelling zoals die nu is: de conditie benchmark-standaard, zestien zaden,
+     gemeten op de vaste benchmarkset. Ontbreekt die, dan valt de sectie terug op
+     trace-nieuw (zelfde leerregel, alleen de oude toets van twintig werelden) en
+     daarna op de oudste rijen, die nog met de foutieve trace draaiden. */
+  const Rb = RUNS.filter(r => r.conditie === 'benchmark-standaard');
+  const R0 = Rb.length ? Rb : RUNS.filter(r => r.conditie === 'trace-nieuw');
   const R1 = R0.length ? R0 : RUNS.filter(r => r.conditie === 'standaard');
   const R = R1.length ? R1 : RUNS;
+  const bBel = stat(R.map(r => r.benchBeleid));
+  const bStr = stat(R.map(r => r.benchStreng));
+  const bCI = stat(R.map(r => r.benchBeleidCI));
   const s20 = stat(R.map(r => r.succes20));
   const ev = stat(R.map(r => r.toetsPct));
   const sc = stat(R.map(r => r.succesPct));
@@ -1236,7 +1343,8 @@ if (RUNS && RUNS.length) {
   const tm = stat(R.map(r => r.rekentijdMs / 1000));
   const st = stat(R.map(r => r.gemStappenBijSucces));
   const c0 = R[0];
-  C.push(h2('10.2', 'Referentiemeting'));
+  const heeftB = bBel && bBel.n === s20.n;
+  C.push(h2('10.3', 'Referentiemeting'));
   C.push(body(
     'De standaardconfiguratie — ' + c0.neuronenStart + ' neuronen bij aanvang, startdichtheid ' + c0.dichtheid +
     ', ' + c0.obstakels + ' obstakels, ' + c0.maxSteps + ' stappen per poging, ' + c0.pogingen + ' pogingen — is over ' +
@@ -1248,22 +1356,47 @@ if (RUNS && RUNS.length) {
     [
       ['succes over alle pogingen', pct(sc), pctSd(sc), (100 * sc.min).toFixed(0) + '–' + (100 * sc.max).toFixed(0) + '%'],
       ['succes laatste 20 pogingen', pct(s20), pctSd(s20), (100 * s20.min).toFixed(0) + '–' + (100 * s20.max).toFixed(0) + '%'],
-      ['toets op onbekende werelden', pct(ev), pctSd(ev), (100 * ev.min).toFixed(0) + '–' + (100 * ev.max).toFixed(0) + '%'],
+      ['toets, 20 werelden (goedkoop signaal)', pct(ev), pctSd(ev), (100 * ev.min).toFixed(0) + '–' + (100 * ev.max).toFixed(0) + '%']
+    ].concat(heeftB ? [
+      ['benchmark, geleerd beleid', pct(bBel), pctSd(bBel), (100 * bBel.min).toFixed(0) + '–' + (100 * bBel.max).toFixed(0) + '%'],
+      ['benchmark, altijd de beste knop', pct(bStr), pctSd(bStr), (100 * bStr.min).toFixed(0) + '–' + (100 * bStr.max).toFixed(0) + '%']
+    ] : []).concat([
       ['stappen bij een geslaagde poging', num(st, 0), st.sd.toFixed(0), st.min.toFixed(0) + '–' + st.max.toFixed(0)],
       ['rekentijd per run (s)', num(tm, 1), tm.sd.toFixed(1), tm.min.toFixed(0) + '–' + tm.max.toFixed(0)]
-    ],
+    ]),
     [3000, 2100, 1800, 2172]
   ));
   C.push(gap(60));
   C.push(body([
     t('Het verschil tussen de laatste twintig trainingspogingen ('), bd(pct(s20)),
-    t(') en de toets op werelden die het netwerk nooit gezien heeft ('), bd(pct(ev)),
-    t(') is ' + (100 * (s20.m - ev.m)).toFixed(1) + ' procentpunt. Dat gat is de kern van de vraag waaruit dit werk ' +
-      'voortkomt. Het is klein genoeg om te concluderen dat er navigatiegedrag geleerd is en niet louter een route ' +
-      'onthouden, en groot genoeg om te laten zien dat het onthouden meespeelt. De sd van ' + pctSd(s20) +
-      ' op de trainingsscore is bovendien het getal dat bepaalt hoeveel zaden een latere vergelijking nodig heeft: ' +
-      'met deze spreiding is een verschil van tien procentpunt pas boven de ruis bij ruwweg zestien runs per conditie.')
+    t(') en ' + (heeftB ? 'de benchmarkset (' : 'de toets op werelden die het netwerk nooit gezien heeft (')),
+    bd(heeftB ? pct(bBel) : pct(ev)),
+    t(') is ' + (100 * (s20.m - (heeftB ? bBel.m : ev.m))).toFixed(1) + ' procentpunt. Dat gat is de kern van de ' +
+      'vraag waaruit dit werk voortkomt. Het is klein genoeg om te concluderen dat er navigatiegedrag geleerd is ' +
+      'en niet louter een route onthouden, en groot genoeg om te laten zien dat het onthouden meespeelt. De sd ' +
+      'van ' + pctSd(s20) + ' op de trainingsscore is bovendien het getal dat bepaalt hoeveel zaden een latere ' +
+      'vergelijking nodig heeft: met deze spreiding is een verschil van tien procentpunt pas boven de ruis bij ' +
+      'ruwweg zestien runs per conditie.')
   ]));
+  if (heeftB && BENCH && BENCH.ijkpunten) {
+    C.push(body([
+      bd('Ten opzichte van de ijkpunten. '),
+      t('Het netwerk haalt op de benchmark ' + (100 * bBel.m).toFixed(1) + '%, de reactieve agent ' +
+        (100 * BENCH.ijkpunten.reactief.pct).toFixed(1) + '% en een willekeurig beleid ' +
+        (100 * BENCH.ijkpunten.willekeurig.pct).toFixed(1) + '%. De marge op de reactieve ondergrens is ' +
+        (100 * (bBel.m - BENCH.ijkpunten.reactief.pct)).toFixed(0) + ' procentpunt, ruim buiten beide ' +
+        'intervallen. Wat het netwerk leert, is dus meer dan "naar het doel toe en van muren weg" — maar ' +
+        'daarmee is nog niets gezegd over de vraag of de graafstructuur daaraan bijdraagt of alleen de ' +
+        'leerregel; dat is wat de ablaties en de gelaagde basislijn moeten uitwijzen.'),
+    ]));
+    C.push(body([
+      bd('Twee onzekerheden, uit elkaar gehouden. '),
+      t('Het interval van ± ' + (100 * bBel.ci).toFixed(1) + ' procentpunt hierboven gaat over de zaden: het ' +
+        'zegt hoe goed dit récept is. Binnen één run is de onzekerheid over de werelden ± ' +
+        (100 * bCI.m).toFixed(1) + ' procentpunt: dat zegt hoe goed dít brein is. De eerste is de grootheid ' +
+        'waarmee condities vergeleken worden; de tweede is de reden dat er vijfhonderd werelden nodig waren.')
+    ]));
+  }
   C.push(h3('De structuur die eruit komt'));
   C.push(body(
     'Dezelfde runs, nu afgelezen met de maten uit sectie 6. Deze tabel is niet illustratief maar de nulmeting ' +
@@ -1292,7 +1425,7 @@ if (RUNS && RUNS.length) {
   ));
 }
 
-C.push(h2('10.3', 'Wat hierna gemeten wordt'));
+C.push(h2('10.4', 'Wat hierna gemeten wordt'));
 C.push(body(
   'De referentiemeting hierboven zegt op zichzelf nog niets over de vraag of de graafstructuur iets bijdraagt. ' +
   'Daarvoor zijn condities nodig die telkens één onderdeel wegnemen, en basislijnen die telkens één aanname ' +
@@ -1565,7 +1698,7 @@ function keurDocumentXml(buf) {
   const tmp = path.join(require('os').tmpdir(), 'ang-keuring.docx');
   fs.writeFileSync(tmp, buf);
   try {
-    execFileSync('python3', [path.join(__dirname, 'keur-docx.py'), tmp], { stdio: ['ignore', 'ignore', 'pipe'] });
+    execFileSync(pythonCmd(), [path.join(__dirname, 'keur-docx.py'), tmp], { stdio: ['ignore', 'ignore', 'pipe'] });
   } catch (e) {
     throw new Error('het document is niet welgevormd:\n' + (e.stderr || '').toString());
   } finally {

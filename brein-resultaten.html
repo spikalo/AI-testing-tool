@@ -113,7 +113,9 @@
           <th data-k="brein">brein</th><th data-k="tijd">tijdstip</th><th data-k="zaad">zaden b/w</th><th data-k="neuronen">neuronen</th>
           <th data-k="comp">S/W/R/M (start → eind)</th>
           <th data-k="geboren">bij</th><th data-k="omgetypt">omgetypt</th><th data-k="verb">verb.</th><th data-k="actief">actief</th>
-          <th data-k="succes">succes</th><th data-k="succes20">laatste 20</th><th data-k="toets">toets</th>
+          <th data-k="succes">succes</th><th data-k="succes20">laatste 20</th><th data-k="toets">toets (20)</th>
+          <th data-k="bench" title="vaste benchmarkset van 500 werelden, geleerd beleid">bench</th>
+          <th data-k="benchStreng" title="dezelfde werelden, maar altijd de waarschijnlijkste knop">argmax</th>
           <th data-k="stappen">stappen</th><th data-k="beloning">beloning</th>
           <th data-k="pad">pad</th><th data-k="reflex">reflex</th><th data-k="lussen">lussen</th>
           <th data-k="dood">los</th><th data-k="tijdms">rekentijd</th>
@@ -155,7 +157,9 @@
         <select id="metric">
           <option value="succes20">succes laatste 20 pogingen</option>
           <option value="succes">succes over alle pogingen</option>
-          <option value="toets">toets op onbekende werelden</option>
+          <option value="toets">toets op onbekende werelden (20)</option>
+          <option value="bench">benchmark, geloot beleid (500)</option>
+          <option value="benchStreng">benchmark, altijd de beste knop</option>
           <option value="gap">gat training − toets (overfitting)</option>
           <option value="stappen">gem. stappen bij succes</option>
           <option value="verb">aantal verbindingen</option>
@@ -216,6 +220,12 @@ function row(o,naam){
     succes:r.succesPct||0, succes20:r.succes20||0,
     toets:(r.toetsPct===null||r.toetsPct===undefined)?null:r.toetsPct,
     gap:(r.toetsPct===null||r.toetsPct===undefined)?null:(r.succes20-r.toetsPct),
+    /* de vaste benchmarkset (werkplan stap 4); oudere bestanden hebben hem niet */
+    bm:o.benchmark||null,
+    bench:o.benchmark?o.benchmark.beleid.pct:null,
+    benchCI:o.benchmark?o.benchmark.beleid.ci:null,
+    benchStreng:o.benchmark?o.benchmark.streng.pct:null,
+    conditie:o.conditie||"",
     stappen:r.gemStappenBijSucces||null, beloning:r.gemBeloningLaatste20||0,
     pad:st.kortstePad===undefined?-1:st.kortstePad, reflex:st.reflexbogen||0,
     lussen:st.lussen||0, dood:st.losgeraakt||0, tijdms:r.rekentijdMs||0,
@@ -262,6 +272,8 @@ function renderTable(){
       <td>${(r.succes*100).toFixed(0)}%</td>
       <td><span class="badge ${cls}">${(r.succes20*100).toFixed(0)}%</span></td>
       <td>${r.toets===null?"–":(r.toets*100).toFixed(0)+"%"}</td>
+      <td>${r.bench===null?"–":(r.bench*100).toFixed(1)+"% ± "+(r.benchCI*100).toFixed(1)}</td>
+      <td>${r.benchStreng===null?"–":(r.benchStreng*100).toFixed(1)+"%"}</td>
       <td>${r.stappen?fmt(r.stappen,0):"–"}</td><td>${fmt(r.beloning,1)}</td>
       <td>${r.pad<0?"géén":r.pad}</td><td>${r.reflex}</td><td>${r.lussen}</td><td>${r.dood}</td>
       <td>${fmt(r.tijdms/1000,1)}s</td>`;
@@ -397,6 +409,74 @@ function renderDetail(){
      <pre style="font-family:'IBM Plex Mono',monospace;font-size:10px;color:var(--text-dim);white-space:pre-wrap;word-break:break-word;margin:8px 0 0;">${
        JSON.stringify(cf,null,1).replace(/[<>&]/g,ch=>({"<":"&lt;",">":"&gt;","&":"&amp;"}[ch]))}</pre></details>`;
 }
+/* Gemiddelde met een 95%-interval, en Mann-Whitney U om twee groepen te vergelijken.
+   Eén run zegt niets: de spreiding tussen zaden is ongeveer 0,10, dus zonder interval
+   ziet elk toeval eruit als een verschil. */
+function meanCI(xs){
+  const v=xs.filter(x=>x!==null&&x!==undefined&&isFinite(x));
+  const n=v.length; if(!n) return null;
+  const m=v.reduce((a,b)=>a+b,0)/n;
+  if(n<2) return {n,m,sd:0,ci:0};
+  const sd=Math.sqrt(v.reduce((a,b)=>a+(b-m)*(b-m),0)/(n-1));
+  return {n,m,sd,ci:1.96*sd/Math.sqrt(n)};
+}
+function erf(x){
+  const s=Math.sign(x); x=Math.abs(x);
+  const t=1/(1+0.3275911*x);
+  return s*(1-((((1.061405429*t-1.453152027)*t+1.421413741)*t-0.284496736)*t+0.254829592)*t*Math.exp(-x*x));
+}
+function mannWhitney(a,b){
+  a=a.filter(v=>v!==null&&v!==undefined&&isFinite(v));
+  b=b.filter(v=>v!==null&&v!==undefined&&isFinite(v));
+  if(a.length<2||b.length<2) return null;
+  const all=a.map(v=>[v,0]).concat(b.map(v=>[v,1])).sort((x,y)=>x[0]-y[0]);
+  const rank=new Array(all.length);
+  for(let i=0;i<all.length;){
+    let j=i; while(j+1<all.length&&all[j+1][0]===all[i][0]) j++;
+    const r=(i+j)/2+1; for(let k=i;k<=j;k++) rank[k]=r; i=j+1;
+  }
+  let Ra=0; all.forEach((e,i)=>{ if(e[1]===0) Ra+=rank[i]; });
+  const na=a.length, nb=b.length, Ua=Ra-na*(na+1)/2, U=Math.min(Ua,na*nb-Ua);
+  const z=(U-na*nb/2+0.5)/Math.sqrt(na*nb*(na+nb+1)/12);
+  const p=2*(0.5*(1+erf(-Math.abs(z)/Math.SQRT2)));
+  return {U,z,p,oordeel:p<0.05?"verschil is er echt":"verschil valt binnen de ruis"};
+}
+function groepVan(r){
+  if(r.conditie) return r.conditie;
+  return (r.brein||"brein").replace(/[ _-]*(z(aad)?)?\s*\d+\s*$/i,"")||r.brein;
+}
+function groepStats(){
+  const per=new Map();
+  for(const r of rows){ const g=groepVan(r); if(!per.has(g)) per.set(g,[]); per.get(g).push(r); }
+  const gr=[...per.entries()];
+  if(gr.length===1&&gr[0][1].length<2) return "";
+  const heeftBench=rows.some(r=>r.bench!==null);
+  const f=x=>x===null?"–":(100*x.m).toFixed(1)+"% ± "+(100*x.ci).toFixed(1);
+  let h=`<div class="hint" style="margin-top:4px;">Gemiddelde met 95%-interval over de runs
+    per groep. De benchmark is de vaste set van 500 werelden; de toets is het goedkope
+    signaal op twintig werelden dat tijdens het leren meeloopt.</div>
+    <div class="scrollx"><table style="width:100%;border-collapse:collapse;font-size:11.5px;margin-top:6px;">
+    <thead><tr><th>groep</th><th>runs</th><th>laatste 20</th><th>toets (20)</th>`
+    +(heeftBench?`<th>benchmark</th><th>argmax</th>`:``)+`</tr></thead><tbody>`;
+  for(const [naam,rs] of gr){
+    h+=`<tr><td>${naam}</td><td>${rs.length}</td>
+      <td>${f(meanCI(rs.map(r=>r.succes20)))}</td><td>${f(meanCI(rs.map(r=>r.toets)))}</td>`
+      +(heeftBench?`<td>${f(meanCI(rs.map(r=>r.bench)))}</td><td>${f(meanCI(rs.map(r=>r.benchStreng)))}</td>`:``)
+      +`</tr>`;
+  }
+  h+=`</tbody></table></div>`;
+  if(gr.length>1){
+    const maat=heeftBench?{n:"de benchmarkscore",g:r=>r.bench}:{n:"de toets",g:r=>r.toets};
+    let t="";
+    for(let i=1;i<gr.length;i++){
+      const st=mannWhitney(gr[0][1].map(maat.g),gr[i][1].map(maat.g));
+      if(st) t+=`<div class="metric"><span class="k">${gr[i][0]} tegen ${gr[0][0]}</span>
+        <span class="v">p = ${st.p.toFixed(3)} — ${st.oordeel}</span></div>`;
+    }
+    if(t) h+=`<div class="hint" style="margin-top:8px;">Mann-Whitney U op ${maat.n}:</div>`+t;
+  }
+  return h;
+}
 function renderConclusion(){
   const el=$("conclusion");
   if(rows.length<2){ el.innerHTML='<div class="empty">Laad minstens twee breinen om te vergelijken.</div>'; return; }
@@ -420,12 +500,13 @@ function renderConclusion(){
   } else { cls="bad";
     txt=`<b>Geen van de breinen heeft het spel echt te pakken</b>De beste is ${best.brein} met ${(best.succes20*100).toFixed(0)}%. Meer pogingen, een dichter bedrade wolk of een hogere beloning voor "dichter bij doel" is meestal de eerste stap.`;
   }
+  const gs=groepStats();
   if(rows.length<4){
-    el.innerHTML=`<div class="verdict ${cls}">${txt}</div>`+
+    el.innerHTML=`<div class="verdict ${cls}">${txt}</div>`+gs+
       `<div class="hint" style="margin-top:12px;">Vanaf vier breinen wordt hier ook het verband getoond tussen bouw (neuronen, verbindingen, reflexbogen, lussen) en prestatie.</div>`;
     return;
   }
-  el.innerHTML=`<div class="verdict ${cls}">${txt}</div>`+
+  el.innerHTML=`<div class="verdict ${cls}">${txt}</div>`+gs+
     `<div class="hint" style="margin-top:12px;">Verband met het succespercentage over deze ${rows.length} breinen:</div>`+
     `<div class="metric"><span class="k">aantal neuronen</span><span class="v">${fmt(cN,2)} — ${rel(cN)}</span></div>`+
     `<div class="metric"><span class="k">aantal verbindingen</span><span class="v">${fmt(cV,2)} — ${rel(cV)}</span></div>`+

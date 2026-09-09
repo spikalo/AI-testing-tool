@@ -163,20 +163,37 @@ run wordt met alle instellingen én de volledige eindstructuur weggeschreven, zo
 `brein-resultaten.html` het netwerk opnieuw kan tekenen zonder de training over te doen.
 
 **Wat het haalt.** Met de standaardinstellingen (60 neuronen, startdichtheid 35, 7
-obstakels, 500 pogingen) gemeten over **twaalf onafhankelijke breinzaden**:
+obstakels, 500 pogingen) gemeten over **zestien onafhankelijke breinzaden**:
 
 | grootheid | gemiddelde ± 95% | spreiding |
 |---|---|---|
-| succes over alle pogingen | 63,5% ± 1,9 | sd 3,4% |
-| succes laatste 20 pogingen | 89,2% ± 5,6 | sd 10,0% |
-| toets op onbekende werelden | 67,9% ± 4,3 | sd 7,5% |
-| rekentijd per run | 12,9 s ± 0,3 | |
+| succes laatste 20 pogingen | 87,2% ± 4,6 | sd 8,7% |
+| toets op 20 onbekende werelden | 68,1% ± 3,6 | sd 6,8% |
+| **benchmark, 500 werelden, geleerd beleid** | **65,4% ± 2,0** | sd 3,8% |
+| benchmark, altijd de waarschijnlijkste knop | 52,3% ± 3,0 | sd 5,7% |
+| rekentijd per run | 11,4 s | |
 
-Ter vergelijking: een zuiver reactieve agent die recht op het doel af loopt en langs
-obstakels glijdt haalt op diezelfde werelden 57%. Let op de spreiding: **sd 10,0% op de
-trainingsscore** betekent dat een enkele run niets bewijst en dat een verschil van tien
-procentpunt pas boven de ruis uitkomt bij ruwweg zestien runs per conditie. De ruwe
-meting staat in `experimenten/runs.csv`, conditie `trace-nieuw`.
+Twee ijkpunten op diezelfde 500 werelden: een **willekeurig beleid** haalt 0,0%, een
+**zuiver reactieve agent** — dezelfde zintuigen, geen geheugen, geen leren, naar het doel
+toe en van wat vlakbij staat af — haalt 38,6% ± 4,3. Het netwerk zit daar 27 procentpunt
+boven, ruim buiten beide intervallen.
+
+Twee dingen om vast te houden. **De spreiding tussen zaden** (sd 8,7% op de
+trainingsscore) betekent dat een enkele run niets bewijst en dat een verschil van tien
+procentpunt pas boven de ruis uitkomt bij ruwweg zestien runs per conditie. En **het
+toeval hoort bij het beleid**: steeds de waarschijnlijkste knop nemen kost 13,1 ± 2,3
+procentpunt (p < 0,001) — dat is dus geen "hetzelfde beleid zonder ruis" maar een ander
+en slechter beleid. De ruwe meting staat in `experimenten/runs.csv`, conditie
+`benchmark-standaard`, met de samenvatting in `experimenten/benchmark.json`.
+
+**Waarop getoetst wordt.** Twintig toetswerelden zijn een goedkoop signaal tijdens het
+afstellen, geen bewijs: bij een score rond 70% is het 95%-interval van twintig
+trekkingen ongeveer ± 20 procentpunt. Daarom is er een **vaste benchmarkset** van 500
+werelden uit een eigen zaadreeks, gescheiden van de trainingswerelden én van die
+twintig, en nooit gebruikt om instellingen te kiezen. Elke wereld wordt drie keer
+gespeeld omdat het beleid geloot wordt; het interval gaat over de wérelden, niet over de
+speelbeurten. Daarmee zakt de onzekerheid van één meting naar ± 3,6 procentpunt. De
+verzameling ligt vast in `experimenten/benchmark-werelden.json`.
 
 ### Herhaalbaar, laadbaar, en in reeksen te draaien
 
@@ -194,9 +211,13 @@ Daaruit volgen drie dingen die de pagina nu kan:
   of opnieuw te toetsen, of alleen de instellingen terugzetten en met een vers brein
   vanaf hetzelfde punt verder experimenteren.
 - **Experimentloper** — een lijst condities × zaden achter elkaar, zonder tekenen, met
-  per run een JSON en één regel in `experimenten/runs.csv` (53 kolommen: beide zaden,
+  per run een JSON en één regel in `experimenten/runs.csv` (61 kolommen: beide zaden,
   alle parameters die tussen condities verschillen, en alle uitkomst- en structuurmaten).
-  Onderaan verschijnt per conditie het gemiddelde met een 95%-interval over de zaden.
+  Aan het eind van elke run wordt desgewenst de vaste benchmarkset gedraaid, in beide
+  beleidsvormen. Onderaan verschijnt per conditie het gemiddelde met een 95%-interval
+  over de zaden, plus een **Mann-Whitney U** van elke conditie tegen de eerste, met de
+  uitkomst in gewone taal: *"verschil is er echt"* of *"verschil valt binnen de ruis"*.
+  Dezelfde samenvatting staat onder de vergelijktabel en in `brein-resultaten.html`.
 
 ## Inhoud
 

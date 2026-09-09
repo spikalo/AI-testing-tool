@@ -2,7 +2,7 @@
 
 ## `runs.csv`
 
-Eén regel per run, 53 kolommen. Dit is de bron waaruit de tabellen in het ANG-paper
+Eén regel per run, 61 kolommen. Dit is de bron waaruit de tabellen in het ANG-paper
 worden opgebouwd — niet met de hand overgetypt, maar bij elke hergeneratie opnieuw uit
 dit bestand gelezen (`paper/paper.js`).
 
@@ -14,10 +14,34 @@ De kolommen vallen in vier groepen:
 | instellingen | `neuronenStart, dichtheid, lr, lam, decay, wmax, stepMax, memLeak, prop, noise0, lrAnneal, traceOud, structOn, structEvery, pruneT, sprout, growOn, retypeOn, inputOnlySens, obstakels, maxSteps, worldEvery, toetsModus` en de soortverdeling `sens, work, refl, mem, neut` |
 | prestatie | `succesPct, succes20, toetsPct, gemStappenBijSucces, botsingenPerPoging, rekentijdMs` |
 | structuur | `neuronenEind, verbindingen, actieveVerbindingen, gemAbsW, kortstePad, reflexbogen, lussen, meedoendeNeuronen, losgeraakt, gesnoeid, bijgegroeid, nieuweNeuronen, typeVeranderingen` |
+| benchmark *(stap 4)* | `toetsStreng, benchWerelden, benchHerhalingen, benchBeleid, benchBeleidCI, benchStreng, benchStrengCI, benchStappen` |
 
 Nieuwe reeksen worden aangevuld, niet overschreven. Wijzigen de kolommen ooit, dan
 schrijft de pagina naar een nieuw bestand `runs-<datum>.csv` in plaats van de bestaande
 tabel te bederven.
+
+De acht benchmarkkolommen zijn er op 9 september 2026 bij gekomen. Bestaande regels
+hebben ze **leeg** — dat is geen nul maar "niet gemeten": die runs dateren van vóór de
+benchmarkset. `tests/exp-stap4.js` heeft het bestand daarvoor één keer bijgewerkt.
+
+## `benchmark-werelden.json` en `benchmark.json`
+
+De vaste benchmarkset en wat erop gemeten is (werkplan stap 4).
+
+- **`benchmark-werelden.json`** — de 500 werelden zelf: per wereld het zaad, start,
+  doel en de zeven obstakels, plus een controlegetal over de hele verzameling. De pagina
+  máákt de werelden op commando opnieuw uit de zaadreeks 5 000 000 + k·101; dit bestand
+  legt vast wat daar uit hoort te komen, zodat een afwijking opvalt in plaats van
+  stilletjes de meetlat te verschuiven.
+- **`benchmark.json`** — de reeks van zestien breinzaden op de standaardconditie: per
+  maat het gemiddelde met een 95%-interval over de zaden, het gepaarde verschil tussen
+  de twee beleidsvormen met een Mann-Whitney U, de twee ijkpunten (een willekeurig
+  beleid en de reactieve agent) en, apart gehouden, de onzekerheid *binnen* één run
+  tegenover die van een toets op twintig werelden. Het paper leest dit bestand
+  rechtstreeks in de secties 5.4 en 10.2.
+
+Draaien: `node tests/exp-stap4.js` (ongeveer tien minuten). De controle dat de
+meetopstelling deugt vóórdat er iets mee gemeten wordt, is `node tests/test-stap4.js`.
 
 ## `reproduceerbaarheid.json`
 

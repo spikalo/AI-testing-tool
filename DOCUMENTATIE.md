@@ -390,6 +390,80 @@ en herstart het:
 
 ## 10. Logboek
 
+### 2026-09-09 — Een vaste benchmarkset en de onzekerheid erbij (werkplan stap 4)
+
+**Waarom.** Alle generalisatiecijfers tot nu toe kwamen van twintig toetswerelden. Bij
+een score rond 70% is het 95%-interval van twintig trekkingen ongeveer **± 20
+procentpunt**. Daarmee is geen enkel verschil tussen twee condities aan te tonen, en de
+ablatiereeks van stap 8 zou honderden runs met een onbruikbare meetlat opleveren.
+
+**Wat er gebouwd is.**
+
+- **Een vaste benchmarkset.** 500 werelden uit een eigen zaadreeks (5 000 000 + k·101),
+  met vast zeven obstakels, gescheiden van de trainingswerelden én van de twintig
+  toetswerelden. Zij wordt nooit gebruikt om instellingen te kiezen. Omdat het beleid
+  geloot wordt, speelt elke wereld drie keer. Het 95%-interval gaat over de **werelden**,
+  niet over de speelbeurten: drie keer dezelfde wereld spelen levert geen drie
+  onafhankelijke waarnemingen over generalisatie op. De verzameling ligt vast in
+  `experimenten/benchmark-werelden.json`, met een controlegetal.
+- **Beide beleidsvormen in elk resultaat.** Geloot (`beleid`) en argmax (`streng`),
+  zowel op de benchmark als op de goedkope toets van twintig werelden. Argmax is
+  deterministisch, dus daar is één speelbeurt per wereld genoeg.
+- **Een reactieve ijkagent, in de pagina.** Dezelfde zintuigen als het netwerk; hij
+  kiest van de acht richtingen die met de hoogste score `richting naar het doel − κ ·
+  (hoe dichtbij staat daar iets)²`. κ = 1, gekozen op een **aparte** afstelset van 200
+  werelden (zaadreeks 7 000 000), niet op de benchmark.
+- **Statistiek waar de getallen staan.** Mann-Whitney U in `brein-test.html` en in
+  `brein-resultaten.html`, met de uitkomst in gewone taal. De experimentloper zet elke
+  conditie af tegen de eerste; de vergelijktabel en de viewer groeperen op conditie (of
+  op naam zonder zaadnummer) en geven per groep een gemiddelde met 95%-interval.
+- **`moveAgent()` losgemaakt uit `gameTick()`**, zodat brein en ijkagent op precies
+  dezelfde spelregels lopen: dezelfde snelheid, dezelfde botsingsafhandeling, dezelfde
+  glijbeweging langs een muur.
+
+**Wat er gemeten is** (16 breinzaden, standaardconditie, 500 pogingen):
+
+| grootheid | gemiddelde ± 95% |
+|---|---|
+| succes laatste 20 pogingen | 87,2% ± 4,6 |
+| toets, 20 werelden | 68,1% ± 3,6 |
+| benchmark, geleerd (geloot) beleid | **65,4% ± 2,0** |
+| benchmark, altijd de waarschijnlijkste knop | 52,3% ± 3,0 |
+| ijkpunt: reactieve agent | 38,6% ± 4,3 |
+| ijkpunt: willekeurig beleid | 0,0% |
+
+Onzekerheid van één meting: benchmark **± 3,6 pp**, twintig werelden **± 20,2 pp**.
+
+**Twee bevindingen.**
+
+1. **Het toeval hoort bij het beleid.** Argmax kost gepaard per zaad **13,1 ± 2,3
+   procentpunt** (Mann-Whitney U, p < 0,001). Steeds de waarschijnlijkste knop nemen is
+   dus niet "het geleerde beleid zonder ruis" maar een ander en meetbaar slechter
+   beleid. Dat was in september al vermoed en is nu op 500 werelden vastgelegd.
+2. **De reactieve referentie van 57% klopt niet.** Het cijfer in
+   `claude/brein-bugs-en-standaardwaarden.md` komt uit een script dat niet in de
+   repository bewaard is en is niet te reproduceren. De reactieve agent die er nu wél
+   in staat haalt 38,6% ± 4,3 op de benchmark en 35,0% op de twintig oude toetswerelden.
+   Het ijkpunt van het paper is voortaan die agent; 57% is uit de documentatie gehaald.
+
+**Controle dat de verbouwing niets veranderd heeft.** De twaalf zaden 1000–1011 leveren
+met de nieuwe code bit voor bit dezelfde `succes20`, `toetsPct` en
+`actieveVerbindingen` als de `trace-nieuw`-runs van stap 2. Het losmaken van
+`moveAgent()` is dus rekenkundig neutraal — nagekeken, niet aangenomen.
+
+**Nieuw of gewijzigd:** `tests/test-stap4.js` (vijftien controles op de meetopstelling
+zelf: determinisme van de werelden, geen overlap met trainings- of toetswerelden, de
+benchmark laat het brein ongemoeid, het interval krimpt met meer werelden, en
+Mann-Whitney doet wat hij belooft), `tests/exp-stap4.js` (de reeks),
+`experimenten/benchmark-werelden.json`, `experimenten/benchmark.json`, acht nieuwe
+kolommen in `runs.csv` — bestaande regels houden daar een lege waarde, want die runs
+zijn niet op de benchmark gemeten. Het paper is versie 1.3: sectie 5.4 met het gemeten
+verschil tussen de beleidsvormen, een nieuwe sectie 10.2 over de benchmarkset en de
+ijkpunten, sectie 10.3 (was 10.2) met de referentiemeting erop, en twee nieuwe
+beperkingen in sectie 9. `paper/paper.js` zoekt het python-commando nu op in plaats van
+`python3` te veronderstellen, zodat de generator ook op Windows draait.
+
+
 ### 2026-09-09 — Papergenerator leverde een onopenbaar document op *(nagekomen)*
 Versie 1.2 van `ANG-paper.docx` weigerde te openen. Oorzaak: `figure()` levert **twee**
 alinea's op (de afbeelding en het onderschrift), en bij het invoegen van figuur 2 stond
