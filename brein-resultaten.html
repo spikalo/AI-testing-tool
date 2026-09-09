@@ -219,7 +219,10 @@ function row(o,naam){
     verb:st.verbindingen||0, actief:st.actieveVerbindingen||0,
     succes:r.succesPct||0, succes20:r.succes20||0,
     toets:(r.toetsPct===null||r.toetsPct===undefined)?null:r.toetsPct,
-    gap:(r.toetsPct===null||r.toetsPct===undefined)?null:(r.succes20-r.toetsPct),
+    /* Het gat training − generalisatie. Is de benchmark gemeten, dan telt die: een gat
+       tegen twintig werelden bestaat voor de helft uit meetruis. */
+    gap:(o.benchmark)?(r.succes20-o.benchmark.beleid.pct)
+       :((r.toetsPct===null||r.toetsPct===undefined)?null:(r.succes20-r.toetsPct)),
     /* de vaste benchmarkset (werkplan stap 4); oudere bestanden hebben hem niet */
     bm:o.benchmark||null,
     bench:o.benchmark?o.benchmark.beleid.pct:null,
@@ -494,7 +497,9 @@ function renderConclusion(){
   const rel=v=>Math.abs(v)<0.25?"nauwelijks verband":(v>0?"hoe meer, hoe beter":"hoe meer, hoe slechter");
   let cls="mid", txt="";
   if(overfit && overfit.gap>0.3){ cls="mid";
-    txt=`<b>Let op ${overfit.brein}</b>Dat brein scoort ${(overfit.succes20*100).toFixed(0)}% in de trainingswereld maar ${(overfit.toets*100).toFixed(0)}% op onbekende werelden — het heeft de route uit z'n hoofd geleerd in plaats van te leren navigeren.`;
+    const gen=overfit.bench!==null?overfit.bench:overfit.toets;
+    const waar=overfit.bench!==null?"op de benchmarkset":"op onbekende werelden";
+    txt=`<b>Let op ${overfit.brein}</b>Dat brein scoort ${(overfit.succes20*100).toFixed(0)}% in de trainingswereld maar ${(gen*100).toFixed(0)}% ${waar} — het heeft de route uit z'n hoofd geleerd in plaats van te leren navigeren.`;
   } else if(best.succes20>=0.6){ cls="good";
     txt=`<b>${best.brein} presteert het best</b>${(best.succes20*100).toFixed(0)}% in de laatste 20 pogingen${bestGen?`, en ${bestGen.brein} generaliseert het best met ${(bestGen.toets*100).toFixed(0)}% op onbekende werelden`:""}.`;
   } else { cls="bad";
