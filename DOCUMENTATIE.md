@@ -390,6 +390,26 @@ en herstart het:
 
 ## 10. Logboek
 
+### 2026-09-09 — Papergenerator leverde een onopenbaar document op *(nagekomen)*
+Versie 1.2 van `ANG-paper.docx` weigerde te openen. Oorzaak: `figure()` levert **twee**
+alinea's op (de afbeelding en het onderschrift), en bij het invoegen van figuur 2 stond
+er `C.push(figure(...))` in plaats van `figure(...).forEach(x => C.push(x))`. De
+`docx`-bibliotheek schrijft voor zo'n array zwijgend `<0/>` in `word/document.xml`,
+waarmee het XML niet meer welgevormd is — en Word weigert het bestand dan, zonder dat de
+generator ooit heeft geklaagd. De figuur ontbrak daardoor ook.
+
+Hersteld, en zodanig dat het niet nog eens gebeurt: `paper/keur-docx.py` controleert elk
+XML-onderdeel op welgevormdheid, en `paper.js` draait die keuring **vóór** het
+wegschrijven. Faalt zij, dan stopt de generator met een foutmelding in plaats van een
+kapot bestand op te leveren. De keuring is zelf gecontroleerd op een expres kapotgemaakte
+kopie.
+
+Meteen meegenomen: `lastModifiedBy` stond op de standaardwaarde `Un-named` (waardoor
+Word een vreemde auteur toonde) en staat nu, net als `creator`, op
+"Frank Jacobs · Claude (Opus 5), Anthropic". Er staat nu ook een PDF naast het
+Word-bestand — `soffice --headless --convert-to pdf` — handig als controle dat het
+document werkelijk rendert, en om op een telefoon te lezen. 21 pagina's.
+
 ### 2026-09-09 — De leerregel numeriek gecontroleerd (werkplan stap 3)
 De sterkste aanspraak in de paper — dat de ANG-update een schatter van de echte
 gradiënt is — was opgeschreven en nooit gemeten. Nu wel.

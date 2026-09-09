@@ -708,11 +708,11 @@ if (GRAD && GRADD) {
       `het meetbare plafond ligt daarmee op ${P.cosinusPlafond.toFixed(2)}. Een cosinus die daar tegenaan zit, is ` +
       'niet meer van een perfecte uitlijning te onderscheiden.')
   ]));
-  C.push(figure(path.join(ROOT, 'paper/fig2-gradcheck.png'), 2,
+  figure(path.join(ROOT, 'paper/fig2-gradcheck.png'), 2,
     'De ANG-update tegen de numerieke gradiënt op de miniatuurgraaf. Links: per verbinding, met één ' +
     'gemeenschappelijke schaalfactor. De verbindingen naar de knoppen liggen op de diagonaal; de verbindingen ' +
     'naar de wolk liggen plat tegen de nullijn — hun richting klopt wel, hun grootte niet. Rechts: de cosinus ' +
-    'als functie van het aantal pogingen waarover de update gemiddeld wordt.', 460));
+    'als functie van het aantal pogingen waarover de update gemiddeld wordt.', 460).forEach(x => C.push(x));
   const rij = (d, k) => [k === 'knop' ? 'naar een knop (score-functie)' : 'naar de wolk (node-perturbatie)',
     String(d.delen[k].n), d.delen[k].cos.toFixed(2), d.delen[k].schaal.toFixed(0),
     (100 * d.delen[k].aandeelNormSchatter).toFixed(0) + ' %', (100 * d.delen[k].aandeelNormGrad).toFixed(0) + ' %'];
@@ -1423,7 +1423,8 @@ C.push(body(
 
 /* ======================= document ======================= */
 const doc = new Document({
-  creator: 'Claude (Opus 5), Anthropic',
+  creator: 'Frank Jacobs · Claude (Opus 5), Anthropic',
+  lastModifiedBy: 'Frank Jacobs · Claude (Opus 5), Anthropic',
   title: 'Adaptive Neural Graph (ANG)',
   description: 'Een zelfstructurerend neuraal netwerk zonder lagen en zonder backpropagation',
   numbering: {
@@ -1464,7 +1465,24 @@ const doc = new Document({
   }]
 });
 
+/* Controle vóór het wegschrijven. Eén keer is een array alinea's per ongeluk als
+   één kind doorgegeven; docx maakt daar zwijgend <0/> van, en Word weigert het
+   bestand dan te openen. Zo'n fout mag nooit meer ongemerkt de deur uit. */
+function keurDocumentXml(buf) {
+  const { execFileSync } = require('child_process');
+  const tmp = path.join(require('os').tmpdir(), 'ang-keuring.docx');
+  fs.writeFileSync(tmp, buf);
+  try {
+    execFileSync('python3', [path.join(__dirname, 'keur-docx.py'), tmp], { stdio: ['ignore', 'ignore', 'pipe'] });
+  } catch (e) {
+    throw new Error('het document is niet welgevormd:\n' + (e.stderr || '').toString());
+  } finally {
+    fs.unlinkSync(tmp);
+  }
+}
+
 Packer.toBuffer(doc).then(b => {
+  keurDocumentXml(b);
   fs.writeFileSync(path.join(ROOT, 'ANG-paper.docx'), b);
-  console.log('geschreven:', b.length, 'bytes');
+  console.log('geschreven:', b.length, 'bytes — XML gekeurd, alle onderdelen welgevormd');
 });
