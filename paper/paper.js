@@ -428,7 +428,8 @@ C.push(body([
     'gevormd of alles door de wolk laat lopen.')
 ]));
 C.push(body([
-  t('Daarbij hoort een waarschuwing die wij pas bij het meten hebben ontdekt. Standaard mag een worker-neuron '),
+  t('Daarbij hoort een waarschuwing die pas zichtbaar wordt als men de padlengtes daadwerkelijk meet. ' +
+    'Standaard mag een worker-neuron '),
   it('wel'),
   t(' rechtstreeks aan een invoerknoop hangen. Het pad invoer → worker → knop is dan twee bogen, terwijl de ' +
     'reflexboog er drie telt — de reflex is dus niet de kortste maar juist de langere weg, en verliest daardoor ' +
@@ -583,17 +584,17 @@ C.push(body([
     'de beloning wordt uitgesmeerd. Voor de biasterm geldt dezelfde regel met de pre-activatie gelijk aan één.')
 ]));
 
-/* --- 3.5.1: het implementatiedetail, met de meting erbij ---------------------
-   Dit kader wordt uit experimenten/trace-voor-na.json opgebouwd. Ontbreekt dat
+/* --- 3.5.1: hoe gevoelig is het spoor voor de keuze van x̃? ------------------
+   Een ablatie, opgebouwd uit experimenten/trace-voor-na.json. Ontbreekt dat
    bestand, dan zegt de tekst dat de meting nog moet gebeuren in plaats van een
    getal te verzinnen. */
-C.push(h3('Een implementatiedetail dat er wél toe doet'));
+C.push(h3('Hoe gevoelig is het spoor voor de keuze van x̃?'));
 C.push(body(
-  'Tot 9 september 2026 stond in de implementatie de activatie ná de propagatie op de plaats van x̃ᵢ. De ' +
-  'leerregel die daadwerkelijk draaide was daarmee, voor elke verbinding die uit de wolk vertrok, één ' +
-  'propagatiestap uit de pas met de regel die hierboven beschreven staat. Wij melden dit niet uit ' +
-  'volledigheidsdrang: het is precies de term waarop de aanspraak van sectie 3.4 rust, en een lezer die de ' +
-  'code naast de formules legt hoort geen verschil te vinden.'
+  'De keuze hierboven is af te leiden uit de dynamiek, maar zij is niet vanzelfsprekend voor wie dit op een ' +
+  'ander substraat bouwt: in een asynchrone of hardwarematige uitvoering is "de toestand vóór de laatste ' +
+  'propagatiestap" niet zonder meer beschikbaar, en de toestand erná wel. De vraag is dus wat het kost om de ' +
+  'verkeerde te nemen. Beide varianten zijn daarom naast elkaar gemeten; in de code is de tweede beschikbaar ' +
+  'als ablatie.'
 ));
 if (TRACE) {
   const M = TRACE.maten, N = TRACE.zaden;
@@ -602,36 +603,40 @@ if (TRACE) {
   const rij = (naam, k) => [naam, v(M[k].oud), v(M[k].nieuw), vd(M[k].verschilGepaard),
     'p = ' + M[k].mannWhitney.p.toFixed(3)];
   C.push(tbl(
-    ['maat', 'oude term', 'juiste term', 'verschil (gepaard)', 'Mann-Whitney'],
+    ['maat', 'toestand ná de stap', 'toestand vóór de stap', 'verschil (gepaard)', 'Mann-Whitney'],
     [rij('succes over de laatste 20 pogingen', 'succes20'),
      rij('toets op onbekende werelden', 'toets'),
      rij('succes over de hele training', 'succes')],
     [2700, 1600, 1600, 1900, 1272]
   ));
   const b = M.toets, sig = b.mannWhitney.p < 0.05;
-  if (GRADD) C.push(body(
-    'Waarom het verschil in de praktijk klein blijft, bleek pas bij de controle van sectie 3.11: over een losse ' +
-    'tik met een willekeurige wolktoestand schelen de twee sporen tientallen procenten, maar in het ' +
-    'beloningsgewogen gemiddelde over een hele poging is het verschil ' +
-    (100 * GRADD.punten[0].verschilOudNieuw).toFixed(1) + ' %. De toestand van de wolk verandert langzaam, dus de ' +
-    'activatie van vóór en ná één propagatiestap lijken sterk op elkaar.'));
   C.push(body(
-    `De correctie is gemeten en niet aangenomen: ${N} breinzaden per conditie, ` +
-    `${TRACE.pogingenPerRun} pogingen per run, verder identieke instellingen en dezelfde wereldzaden. ` +
+    `${N} breinzaden per conditie, ${TRACE.pogingenPerRun} pogingen per run, verder identieke instellingen en ` +
+    'dezelfde wereldzaden. ' +
     (sig
-      ? 'Het verschil op de toets is groter dan de spreiding tussen zaden. De cijfers elders in dit document ' +
-        'zijn met de juiste term gemeten; oudere reeksen zijn in runs.csv herkenbaar aan de kolom traceOud.'
-      : 'Het verschil op de toets valt binnen de spreiding tussen zaden: op deze taak leerde het netwerk ook ' +
-        'met de foutieve term, en de correctie levert geen aantoonbare winst in prestatie op. Dat maakt haar ' +
-        'niet minder nodig — de formule en de code beschrijven nu hetzelfde algoritme, en de numerieke ' +
-        'controle van sectie 3.4 is pas zinvol als dat zo is — maar het is geen resultaat dat wij als ' +
-        'verbetering mogen presenteren.') +
+      ? 'Het verschil op de toets is groter dan de spreiding tussen zaden: de keuze van x̃ doet er op deze taak ' +
+        'meetbaar toe. Alle overige cijfers in dit document zijn met de afgeleide term gemeten; de kolom ' +
+        'traceOud in runs.csv zegt van elke run welke variant hij gebruikte.'
+      : 'Op geen van de maten is het verschil groter dan de spreiding tussen zaden. De leerregel is op deze ' +
+        'taak dus ongevoelig voor de keuze — wat niet betekent dat zij willekeurig is: de afgeleide term is ' +
+        'die waarop de aanspraak van sectie 3.4 rust, en de numerieke controle van sectie 3.11 meet haar en ' +
+        'niet de andere. Wie het model op een substraat bouwt waar alleen de toestand ná de stap beschikbaar ' +
+        'is, betaalt daar op deze taak echter geen meetbare prijs voor.') +
     ' Beide reeksen staan volledig in experimenten/runs.csv onder de condities trace-oud en trace-nieuw.'
+  ));
+  if (GRADD) C.push(body(
+    'De reden dat het verschil zo klein blijft, komt uit de controle van sectie 3.11. Over een losse tik met ' +
+    'een willekeurige wolktoestand schelen de twee sporen tientallen procenten, maar in het beloningsgewogen ' +
+    'gemiddelde over een hele poging is het verschil ' +
+    (100 * GRADD.punten[0].verschilOudNieuw).toFixed(1) + ' %: de toestand van de wolk verandert langzaam, dus ' +
+    'de activatie van vóór en ná één propagatiestap lijken sterk op elkaar. Bij een snellere dynamiek — een ' +
+    'kleinere geheugentraagheid, een grotere P, of een taak met scherpere overgangen — is die marge er niet, ' +
+    'en dan is de afgeleide term geen formaliteit meer.'
   ));
 } else {
   C.push(body(
-    'De voor/na-vergelijking van beide varianten is nog niet gedraaid; zodra ' +
-    'experimenten/trace-voor-na.json bestaat, verschijnt hier de gemeten tabel.'
+    'De vergelijking van beide varianten is nog niet gedraaid; zodra experimenten/trace-voor-na.json bestaat, ' +
+    'verschijnt hier de gemeten tabel.'
   ));
 }
 
@@ -1018,7 +1023,7 @@ C.push(body(
 /* ===== 6 ===== */
 C.push(h2('5.4', 'Hoe je een stochastisch beleid toetst'));
 C.push(body([
-  t('Bij het toetsen op onbekende werelden ligt een fout op de loer die wij eerst zelf gemaakt hebben. Het beleid '),
+  t('Bij het toetsen op onbekende werelden ligt een fout op de loer. Het beleid '),
   it('is'), t(' stochastisch: elke knop is een kans en de actie wordt geloot. Het is verleidelijk om bij een toets ' +
     'de loting weg te laten en steeds de waarschijnlijkste knop te nemen, want dat lijkt "het geleerde beleid ' +
     'zonder ruis". Dat is het niet — het is een ander, en meetbaar slechter beleid. Een agent die deterministisch ' +
@@ -1028,9 +1033,9 @@ C.push(body([
 C.push(body(
   'De toets draait daarom met dezelfde loting als tijdens het leren, maar zonder leren, zonder ruis in de wolk en ' +
   'met een eigen toevalsgenerator, zodat de toets reproduceerbaar is en de training niet verstoort. De strengere ' +
-  'variant wordt sinds versie 1.3 niet meer als optie bewaard maar in elke run naast de gelote variant gemeten, ' +
-  'want het verschil tussen beide is zelf een meting: het zegt hoeveel van de prestatie op de scherpte van de ' +
-  'beslissingen berust en hoeveel op het blijven bewegen.'
+  'variant wordt niet als alternatief gebruikt maar in elke run ernaast gemeten, want het verschil tussen beide ' +
+  'is zelf een grootheid: het zegt hoeveel van de prestatie op de scherpte van de beslissingen berust en hoeveel ' +
+  'op het blijven bewegen.'
 ));
 /* Het verschil tussen beide beleidsvormen, rechtstreeks uit experimenten/benchmark.json. */
 if (BENCH && BENCH.maten && BENCH.maten.benchBeleid && BENCH.maten.benchStreng) {
@@ -1058,8 +1063,8 @@ C.push(eq(33));
 C.push(body([
   t('De drempel is bewust '), it('relatief'), t(' aan het zwaarste gewicht dat er werkelijk is, en niet aan het ' +
     'plafond w'), t('max'), t('. Gewichten blijven in de praktijk ruim onder dat plafond; een absolute drempel ' +
-    'verklaart daardoor bijna elke verbinding voor inactief en laat een werkend brein structuurloos lijken. Dat is ' +
-    'geen theoretisch punt: in een eerdere versie van de meetcode gebeurde precies dat.')
+    'verklaart daardoor bijna elke verbinding voor inactief en laat een werkend brein structuurloos lijken. Bij ' +
+    'de waarden uit sectie 8 scheelt dat een orde van grootte in het aantal verbindingen dat meetelt.')
 ]));
 C.push(h3('Kortste pad van zintuig naar knop'));
 C.push(body([
@@ -1266,21 +1271,21 @@ C.push(h2('10.2', 'Waarop getoetst wordt: een vaste benchmarkset'));
 if (BENCH && BENCH.benchmark) {
   const B = BENCH.benchmark, O = BENCH.onzekerheidPerMeting;
   C.push(body([
-    t('Tot versie 1.2 werd op twintig onbekende werelden getoetst. Dat is een bruikbaar signaal tijdens het ' +
-      'afstellen en het is goedkoop, maar het draagt geen conclusie: bij een score rond 70% is het ' +
+    t('Tijdens het leren loopt elke twintig pogingen een toets mee op twintig onbekende werelden. Dat is een ' +
+      'bruikbaar en goedkoop signaal, maar het draagt geen conclusie: bij een score rond 70% is het ' +
       '95%-interval van twintig trekkingen ongeveer '),
     bd('± ' + (100 * O.toets20Binomiaal.m).toFixed(0) + ' procentpunt'),
     t('. Twee condities die in werkelijkheid tien procentpunt schelen, zijn zo niet uit elkaar te houden.')
   ]));
   C.push(body(
-    'Daarom is er nu een vaste benchmarkset: ' + B.werelden + ' werelden uit een eigen zaadreeks, met vast ' +
+    'Wat in dit document staat, komt daarom van een vaste benchmarkset: ' + B.werelden +
+    ' werelden uit een eigen zaadreeks, met vast ' +
     B.obstakels + ' obstakels, gescheiden van de trainingswerelden én van de twintig werelden die tijdens het ' +
     'leren meelopen. Zij wordt nooit gebruikt om instellingen te kiezen. Omdat het beleid geloot wordt, speelt ' +
     'elke wereld ' + B.herhalingen + ' keer; het interval gaat over de werelden en niet over de speelbeurten, ' +
     'want drie keer dezelfde wereld spelen levert geen drie onafhankelijke waarnemingen over generalisatie op. ' +
     'Daarmee zakt de onzekerheid van één meting naar ± ' + (100 * O.benchmarkBinnenRun.m).toFixed(1) +
-    ' procentpunt. De twintig werelden blijven bestaan als goedkoop signaal tijdens de training; wat in dit ' +
-    'document staat, komt van de benchmark.' +
+    ' procentpunt.' +
     (BENCHSET ? ' De verzameling ligt vast in experimenten/benchmark-werelden.json, met een controlegetal ' +
       'waarmee een afwijking direct opvalt.' : '')
   ));
@@ -1298,16 +1303,14 @@ if (BENCH && BENCH.benchmark) {
     ]));
     if (ij.reactiefOp20) {
       C.push(body([
-        bd('Terzijde, en illustratief voor waarom deze sectie er is: '),
-        t('dezelfde reactieve agent scoort op de twintig oude toetswerelden ' +
+        bd('Hoeveel dat scheelt, laat de ijkagent zelf zien. '),
+        t('Dezelfde agent, hetzelfde soort werelden: op twintig toetswerelden scoort hij ' +
           (100 * ij.reactiefOp20.pct).toFixed(1) + '% ± ' + (100 * ij.reactiefOp20.ci).toFixed(1) +
-          ' en op de vijfhonderd benchmarkwerelden ' + (100 * ij.reactief.pct).toFixed(1) + '% ± ' +
-          (100 * ij.reactief.ci).toFixed(1) + '. Hetzelfde beleid, hetzelfde soort werelden, en toch een ' +
-          'verschil van ' + Math.abs(100 * (ij.reactiefOp20.pct - ij.reactief.pct)).toFixed(0) +
-          ' procentpunt — geheel binnen wat twintig trekkingen aan speling geven. Eerdere werknotities noemen ' +
-          'voor een reactieve referentie een getal rond 57%; dat cijfer komt uit een script dat niet in de ' +
-          'repository is bewaard en is daarom hier niet overgenomen. Het ijkpunt van dit document is de agent ' +
-          'waarvan de code er wél in staat.')
+          ', op de vijfhonderd benchmarkwerelden ' + (100 * ij.reactief.pct).toFixed(1) + '% ± ' +
+          (100 * ij.reactief.ci).toFixed(1) + '. Een verschil van ' +
+          Math.abs(100 * (ij.reactiefOp20.pct - ij.reactief.pct)).toFixed(0) + ' procentpunt zonder dat er ' +
+          'iets aan het beleid veranderd is — geheel binnen wat twintig trekkingen aan speling geven. Dat is ' +
+          'de omvang van de fout die men maakt door een generalisatiecijfer op twintig werelden te baseren.')
       ]));
     }
   }
@@ -1453,7 +1456,7 @@ C.push(bullet([bd('Een tweede taak. '), t('In de huidige taak is het doel altijd
   'worden, is de eerste opzet waarin de twee soorten paden — kort en reflexmatig, lang en met geheugen — ook ' +
   'werkelijk allebei nodig zijn.')]));
 C.push(body(
-  'Bij dat laatste hoort een afbakening die dit document eerder te ruim liet. ANG is geen goedkoper alternatief ' +
+  'Bij dat laatste hoort een scherpe afbakening. ANG is geen goedkoper alternatief ' +
   'voor backpropagation, en op een taak als deze zal een klein gelaagd netwerk vermoedelijk op rekenkosten winnen. ' +
   'De verdedigbare vraag is smaller: of een lokaal lerende, zichzelf herstructurerende recurrente graaf door ' +
   'structurele spaarzaamheid en verschillende informatielatenties een gunstiger compromis tussen rekenwerk en ' +
