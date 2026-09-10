@@ -245,6 +245,35 @@ succes (sample-efficiëntie) en kanten-bezoeken tot diezelfde drempel (rekeneffi
 met wandkloktijd en actieve verbindingen ernaast. Eén kanten-bezoek is één keer een gewicht
 aanraken. Ruwe meting: `experimenten/rekenkosten.json` en `experimenten/lr-veeg-stap6.json`.
 
+### Vier varianten van de leerregel — en wat er wél uit komt
+
+De leerregel zelf heeft sinds stap 7 vier schakelaars, elk los aan te zetten in de pagina
+of via de experimentloper (`criticOn`, `perturbFrac`, `catPolicy`, `perturbGain`):
+
+| variant | benchmark geloot | argmax | stappen tot 80% |
+|---|---|---|---|
+| de regel zoals zij was | 65,6% ± 2,6 | 53,5% ± 3,5 | 15,5 k |
+| **criticus** — een lineaire *V(s)* op de 16 sensoren, TD(0), in plaats van één lopend gemiddelde | 60,9% ± 3,5 | 53,0% ± 3,6 | 27,5 k |
+| **schaarse perturbatie** — per tik maar ¼ van de wolk verstoren | 66,6% ± 2,1 | 51,8% ± 3,8 | **3,1 k** |
+| **categorisch beleid** — één softmax over 9 elkaar uitsluitende acties | 68,8% ± 1,9 | **61,3% ± 3,3** | 27,0 k |
+| **perturbGain = 10** — de ontbrekende 1/Var(ξ) uit stap 3 | 33,3% ± 6,3 | 46,6% ± 5,3 | 116,4 k |
+
+Twaalf zaden, elke variant op haar eigen leersnelheid uit een veeg van zes waarden. Twee
+dingen komen boven de ruis uit, en het zijn niet de dingen waarop gehoopt werd. **Schaarse
+perturbatie haalt dezelfde eindscore met een factor 4,9 minder ervaring** (p = 0,003): het
+is de eerste ingreep in dit project die iets oplevert in plaats van kost, en precies wat de
+theorie voorspelt, want de variantie van een perturbatieschatter groeit met het aantal
+knopen dat tegelijk beweegt. En het **categorische beleid heeft het toeval minder nodig**:
+het gat tussen geloot en argmax zakt van 12,1 naar 7,5 procentpunt (p = 0,009) — logisch,
+want met onafhankelijke knoppen is "op én neer" onder argmax een verlammende actie waar het
+gelote beleid met kans omheen komt.
+
+De **criticus levert niets op** — 4,7 pp lager, méér spreiding tussen de zaden, en bijna
+twee keer zoveel ervaring nodig — en dat staat er even hard bij: de simpelste diagnose, dat
+het probleem in de toestandsloze basislijn zat, is daarmee uitgesloten. `perturbGain` blijft
+rampzalig, ook mét een eigen leersnelheidsveeg. Ruwe meting: `experimenten/leerregel.json`
+en `experimenten/lr-veeg-stap7.json`.
+
 ### Herhaalbaar, laadbaar, en in reeksen te draaien
 
 Een run ligt volledig vast door twee zaden: het **breinzaad** (de startwolk) en het
@@ -261,9 +290,10 @@ Daaruit volgen drie dingen die de pagina nu kan:
   of opnieuw te toetsen, of alleen de instellingen terugzetten en met een vers brein
   vanaf hetzelfde punt verder experimenteren.
 - **Experimentloper** — een lijst condities × zaden achter elkaar, zonder tekenen, met
-  per run een JSON en één regel in `experimenten/runs.csv` (68 kolommen: beide zaden,
-  alle parameters die tussen condities verschillen, alle uitkomst- en structuurmaten, en
-  sinds stap 6 de rekenkosten).
+  per run een JSON en één regel in `experimenten/runs.csv` (74 kolommen: beide zaden,
+  alle parameters die tussen condities verschillen, alle uitkomst- en structuurmaten,
+  sinds stap 6 de rekenkosten en sinds stap 7 welke variant van de leerregel gedraaid
+  heeft).
   Aan het eind van elke run wordt desgewenst de vaste benchmarkset gedraaid, in beide
   beleidsvormen. Onderaan verschijnt per conditie het gemiddelde met een 95%-interval
   over de zaden, plus een **Mann-Whitney U** van elke conditie tegen de eerste, met de

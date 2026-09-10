@@ -44,9 +44,13 @@ const path = require('path');
     const cfg = W.readCfg(); cfg.nEpisodes = 80; cfg.evalOn = true;
     return JSON.stringify(W.runOne(JSON.parse(JSON.stringify(cfg)), 31337, 'proef'), null, 2);
   });
-  const fs = require('fs'); fs.writeFileSync('/tmp/proef.json', json);
+  /* Op Windows bestaat /tmp niet; os.tmpdir() geeft daar de juiste map en op Linux
+     gewoon /tmp. Dit script viel hierop om sinds de verhuizing naar frank-minipc. */
+  const fs = require('fs'), os = require('os'), pad = require('path');
+  const proefPad = pad.join(os.tmpdir(), 'proef.json');
+  fs.writeFileSync(proefPad, json);
   await p.click('#btnloadbrain');
-  await p.setInputFiles('#loadfile', '/tmp/proef.json');
+  await p.setInputFiles('#loadfile', proefPad);
   await p.waitForTimeout(400);
   out.breinGeladen = await p.evaluate(() => ({
     status: document.getElementById('loadstatus').textContent.replace(/\s+/g, ' ').slice(0, 150),
@@ -55,7 +59,7 @@ const path = require('path');
   }));
 
   await p.click('#btnloadcfg');
-  await p.setInputFiles('#loadfile', '/tmp/proef.json');
+  await p.setInputFiles('#loadfile', proefPad);
   await p.waitForTimeout(400);
   out.cfgGeladen = await p.evaluate(() => ({
     status: document.getElementById('loadstatus').textContent.replace(/\s+/g, ' ').slice(0, 130),

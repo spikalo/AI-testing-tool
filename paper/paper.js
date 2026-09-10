@@ -45,6 +45,7 @@ const BENCH = lees(path.join(EXPDIR, 'benchmark.json'));
 const BENCHSET = lees(path.join(EXPDIR, 'benchmark-werelden.json'));
 const BASIS = lees(path.join(EXPDIR, 'basislijnen.json'));
 const REKEN = lees(path.join(EXPDIR, 'rekenkosten.json'));
+const LEERREGEL = lees(path.join(EXPDIR, 'leerregel.json'));
 function stat(xs) {
   const v = xs.filter(x => typeof x === 'number' && isFinite(x));
   const n = v.length; if (!n) return null;
@@ -59,7 +60,7 @@ const num = (x, d = 0) => x === null ? '–' : x.m.toFixed(d) + ' ± ' + x.ci.to
 const kol = k => RUNS ? RUNS.map(r => r[k]) : [];
 /* een gemiddelde-met-interval uit benchmark.json in dezelfde vorm als stat() */
 const bm = o => o ? { n: o.n, m: o.m, sd: o.sd, ci: o.ci, min: o.m, max: o.m } : null;
-const VERSIE = '1.5';
+const VERSIE = LEERREGEL ? '1.6' : '1.5';
 const DATUM = '10 september 2026';
 const SERIF = 'Cambria';
 const TEXTW_PT = 448;              // bruikbare tekstbreedte in punten
@@ -853,6 +854,39 @@ if (GRAD && GRADD) {
     'verschijnen hier de figuur en de tabellen.'));
 }
 
+/* --- 3.12: de vier varianten, hier alleen benoemd; gemeten in 10.6 ----------- */
+if (LEERREGEL && LEERREGEL.tabel) {
+  C.push(h2('3.12', 'Vier varianten van de leerregel'));
+  C.push(body(
+    'De regel hierboven is de regel die in de rest van dit document “ANG” heet. Er zijn vier plekken waar zij ' +
+    'op een standaardmanier scherper gemaakt kan worden zonder haar lokale karakter op te geven, en alle vier ' +
+    'zijn ze als losse schakelaar in de implementatie aanwezig zodat ze meetbaar zijn in plaats van aangenomen. ' +
+    'Ze worden hier gedefinieerd; wat ze opleveren staat in sectie 10.6.'
+  ));
+  C.push(bullet([bd('Een toestandsafhankelijke criticus. '), t('De basislijn b in vergelijking 12 is één lopend ' +
+    'gemiddelde over spelstappen en dus toestandsloos. In de variant komt daar een lineaire schatter ' +
+    'V(s) = w·s + b voor in de plaats, op dezelfde zestien sensoren, bijgewerkt met TD(0) — ' +
+    'w ← w + η_V·δ·s met δ = r + γV(s′) − V(s) — en wordt δ de Â uit vergelijking 12. De schatter is een tweede, ' +
+    'losse leerder naast de graaf; door het netwerk wordt niets teruggepropageerd, dus de update van een ' +
+    'synaps blijft opgebouwd uit grootheden die op die synaps beschikbaar zijn. In de metingen: η_V = ' +
+    String(LEERREGEL.tabel['s7-criticus'] ? (LEERREGEL.condities['s7-criticus'].criticLr || 0.02) : 0.02).replace('.', ',') +
+    ', γ = 0,95.')]));
+  C.push(bullet([bd('Schaarse perturbatie. '), t('De ruis ξ wordt per tik aan een willekeurige deelverzameling ' +
+    'van de wolk toegevoegd in plaats van aan alle knopen. De variantie van een perturbatieschatter groeit met ' +
+    'het aantal knopen dat tegelijk beweegt; niet-verstoorde knopen krijgen die tik afwijking nul en dus geen ' +
+    'spoor.')]));
+  C.push(bullet([bd('Een categorisch beleid. '), t('In plaats van vier onafhankelijke Bernoulli-knoppen één ' +
+    'softmax over negen elkaar uitsluitende acties: de acht richtingen en stilstaan. De score van een actie is ' +
+    'de som van de netto-ingangen van de knoppen die zij indrukt, gedeeld door τ, zodat het aantal uitvoerknopen ' +
+    'vier blijft en de score-functie haar vorm behoudt: ∂log π/∂net_k = (1[k ingedrukt] − P(k)), met P(k) de ' +
+    'randkans van knop k onder de categorische verdeling. Bij onafhankelijke knoppen is P(k) de sigmoïde zelf en ' +
+    'staat er weer vergelijking 11.')]));
+  C.push(bullet([bd('De ontbrekende normalisatie g. '), t('Het wolkdeel van het spoor met een factor g ' +
+    'vermenigvuldigen, als benadering van de 1/Var(ξ) die de standaardformulering van node-perturbatie heeft en ' +
+    'die volgens sectie 3.11 in ANG ontbreekt. Anders dan in 3.11 wordt g hier gemeten met een leersnelheid die ' +
+    'op g is afgesteld.')]));
+}
+
 
 /* ===== 4 ===== */
 C.push(h1('4', 'Structurele plasticiteit'));
@@ -1503,8 +1537,8 @@ if (BASIS && BASIS.tabel) {
       'kost wel rekentijd (' + (T['ang-vol'].tijdMs.m / 1000).toFixed(1) + ' s tegen ' +
       (T['ang-vast'].tijdMs.m / 1000).toFixed(1) + ' s per run) en het vergroot de spreiding tussen zaden ' +
       '(± ' + (100 * T['ang-vol'].benchBeleid.ci).toFixed(1) + ' tegen ± ' +
-      (100 * T['ang-vast'].benchBeleid.ci).toFixed(1) + '). Sectie 10.6 splitst dit in de afzonderlijke ' +
-      'mechanismen; deze meting zegt alleen dat het geheel niets oplevert.')
+      (100 * T['ang-vast'].benchBeleid.ci).toFixed(1) + '). Sectie 10.7 kondigt de ablatiereeks aan die dit uitsplitst naar de ' +
+      'afzonderlijke mechanismen; deze meting zegt alleen dat het geheel niets oplevert.')
   ]));
   C.push(h3('Wat wél meetbaar is: padlengte'));
   C.push(body([
@@ -1515,7 +1549,7 @@ if (BASIS && BASIS.tabel) {
       'boven de ruis uitkomt. Bij propagatiediepte één is een boog een tijdstap, dus dit is geen verschil in ' +
       'capaciteit maar in '), it('reactietijd'),
     t(': het netwerk reageert een tik later op wat het ziet, en dat kost succes. Precies dat is de eigenschap ' +
-      'waarop sectie 10.6 de resterende onderzoeksvraag baseert — maar zij pleit hier evengoed voor een ondiep ' +
+      'waarop sectie 10.8 de resterende onderzoeksvraag baseert — maar zij pleit hier evengoed voor een ondiep ' +
       'gelaagd netwerk als voor een graaf.')
   ]));
   C.push(body([
@@ -1525,7 +1559,7 @@ if (BASIS && BASIS.tabel) {
       'zichzelf herstructurerende topologie iets toevoegt, heeft een omgeving nodig waarin verschillende ' +
       'informatielatenties werkelijk nodig zijn; in een taak waarin het doel altijd zichtbaar is en één ' +
       'tussenlaag volstaat, is er niets te herstructureren dat de moeite loont. Dat is de aanleiding voor de ' +
-      'tweede taak in sectie 10.6, en het is de reden dat de vraagstelling in sectie 10.7 smaller is dan waar ' +
+      'tweede taak in sectie 10.7, en het is de reden dat de vraagstelling in sectie 10.8 smaller is dan waar ' +
       'dit werk mee begon.')
   ]));
   C.push(gap(60));
@@ -1714,11 +1748,254 @@ if (REKEN && REKEN.tabel) {
   C.push(gap(60));
 }
 
-C.push(h2('10.6', 'Wat hierna gemeten wordt'));
+/* --- 10.6: vier ingrepen in de leerregel zelf --------------------------------
+   Volledig uit experimenten/leerregel.json. 10.4 varieerde de topologie binnen één
+   leerregel, 10.5 de schatter binnen één topologie; deze sectie laat allebei staan
+   en verandert de leerregel eromheen. Ook hier geldt: de tekst leest de uitkomst en
+   zegt wat er staat, ook als er niets uitkomt — een leerregel die niet beter wordt
+   van een criticus is een bevinding over die leerregel. */
+if (LEERREGEL && LEERREGEL.tabel) {
+  const L = LEERREGEL.tabel, LS = (LEERREGEL.toetsen || []).filter(Boolean);
+  const SP = LEERREGEL.spreiding || {};
+  const ln = {
+    's7-huidig': 'de regel van sectie 3',
+    's7-criticus': '+ criticus (TD(0))',
+    's7-schaars': '+ schaarse perturbatie (¼)',
+    's7-criticus-schaars': '+ criticus + schaars',
+    's7-categorisch': '+ categorisch beleid (9 acties)',
+    's7-perturbgain': '+ perturbGain (g = 10)'
+  };
+  const lvs = (a, b, m) => LS.find(x => x.tegen === a && x.conditie === b && x.maat === m);
+  const pT = o => o ? (o.p < 0.001 ? 'p < 0,001' : 'p = ' + o.p.toFixed(3)) : '';
+  const kort = v => (v === null || v === undefined || !isFinite(v)) ? '–'
+    : v >= 1e9 ? (v / 1e9).toFixed(1) + ' G' : v >= 1e6 ? (v / 1e6).toFixed(1) + ' M'
+      : v >= 1e3 ? (v / 1e3).toFixed(1) + ' k' : String(Math.round(v));
+  const namenL = Object.keys(ln).filter(k => L[k]);
+  const varianten = namenL.filter(k => k !== 's7-huidig');
+  const REF = L['s7-huidig'];
+
+  C.push(h2('10.6', 'Vier ingrepen in de leerregel zelf'));
+  C.push(body(
+    'Sectie 10.4 hield de leerregel vast en varieerde de topologie; sectie 10.5 hield de topologie vast en ' +
+    'varieerde de schatter. Deze sectie laat allebei staan — de wolk zoals zij is, node-perturbatie zoals zij is ' +
+    '— en verandert alleen wat er omheen zit. Vier ingrepen, elk klein, elk apart aan en uit te zetten, elk op ' +
+    LEERREGEL.zaden + ' breinzaden en dezelfde benchmarkset van ' + LEERREGEL.benchmark.werelden + ' werelden.'
+  ));
+  C.push(bullet([bd('Een toestandsafhankelijke criticus. '), t('De basislijn in vergelijking 12 is één lopend ' +
+    'gemiddelde over spelstappen: een getal zonder toestand. In een toestand die van zichzelf al slechter is dan ' +
+    'gemiddeld ligt de beloning structureel onder die basislijn, en wordt dus élke actie daar afgestraft — ook ' +
+    'de juiste. Daar staat hier een lineaire schatter V(s) = w·s + b tegenover, op dezelfde zestien sensoren die ' +
+    'het netwerk ziet, getraind met TD(0); het leersignaal wordt r + γV(s′) − V(s). De schatter staat náást de ' +
+    'graaf: er wordt niets door het netwerk teruggepropageerd, en de leerregel voor de verbindingen blijft woord ' +
+    'voor woord die van sectie 3.')]));
+  C.push(bullet([bd('Schaarse perturbatie. '), t('De variantie van node-perturbatie groeit met het aantal knopen ' +
+    'dat tegelijk verstoord wordt. Per tik wordt daarom nog maar een kwart van de wolk verstoord; de rest krijgt ' +
+    'die tik exact nul afwijking en dus geen spoor.')]));
+  C.push(bullet([bd('Een categorisch beleid. '), t('De vier knoppen zijn onafhankelijke Bernoulli’s, waardoor ' +
+    'acties bestaan die zichzelf opheffen: op+neer, links+rechts, alle vier. Daar staat één softmax over negen ' +
+    'elkaar uitsluitende acties tegenover — acht richtingen plus stilstaan — gescoord met de som van de ' +
+    'knopingangen die bij die actie horen. Dat houdt de score-functie in dezelfde vorm, (1[ingedrukt] − ' +
+    'randkans)/τ, en houdt het aantal uitvoerknopen op vier, zodat de conditie vergelijkbaar blijft met de rest ' +
+    'van dit document.')]));
+  C.push(bullet([bd('De ontbrekende normalisatie. '), t('Sectie 3.11 laat zien dat het wolkdeel van de update ' +
+    'twee ordes te klein is ten opzichte van het knopdeel, en dat de standaardformulering van node-perturbatie ' +
+    'daar een factor 1/Var(ξ) heeft die ANG mist. In 3.11 is die factor los bijgezet en stortte het leren in — ' +
+    'maar zonder dat de leersnelheid opnieuw was afgesteld, terwijl η en die factor per constructie samenhangen. ' +
+    'Hier krijgt g = 10 wel zijn eigen leersnelheidsveeg, over een raster dat met 1/g meeschuift.')]));
+  C.push(body([
+    t('Zoals in sectie 10.5 draait elke conditie op '), it('haar eigen'),
+    t(' leersnelheid: zes waarden, vier breinzaden per waarde, gekozen op de goedkope toets van twintig ' +
+      'werelden en nooit op de benchmarkset, met veegzaden buiten de meetzaden. Alle vier de ingrepen raken ' +
+      'precies de grootheid waar η op afgesteld is — de schaal van het leersignaal, het aantal gewichten dat ' +
+      'per tik een duw krijgt, of de vorm van de score-functie — dus zonder die veeg zou de tabel het ' +
+      'afstellen meten in plaats van de ingreep.')
+  ]));
+  C.push(tbl(
+    ['conditie', 'η', 'benchmark, geloot', 'benchmark, argmax', 'sd tussen zaden', 'stappen tot 80 %'],
+    namenL.map(k => [ln[k], String(L[k].lr).replace('.', ','), pct(L[k].benchBeleid), pct(L[k].benchStreng),
+      SP[k] && SP[k].sd !== null ? (100 * SP[k].sd).toFixed(1) + ' pp' : '–',
+      kort(L[k].stappenTot80 ? L[k].stappenTot80.m : null) +
+      (L[k].haalde80 === L[k].runs ? '' : ' (' + L[k].haalde80 + '/' + L[k].runs + ')')]),
+    [3100, 800, 1600, 1600, 1300, 1172]
+  ));
+  C.push(body([it('Stappen tot 80 %'), t(' is het aantal omgevingsstappen dat nodig was voordat het succes over ' +
+    'de laatste twintig pogingen voor het eerst boven 80 % kwam: de maat voor hoe zuinig een leerregel met ' +
+    'ervaring omgaat, los van waar zij uiteindelijk uitkomt. Waar een conditie die drempel niet in elke run ' +
+    'haalt, staat tussen haakjes hoeveel runs hem wél haalden — het gemiddelde gaat alleen over die runs en ' +
+    'vleit de conditie dus.')]));
+  C.push(gap(60));
+  {
+    const echt = varianten.map(k => lvs('s7-huidig', k, 'benchBeleid')).filter(o => o && o.p < 0.05);
+    const beter = echt.filter(o => o.verschilPp > 0), slechter = echt.filter(o => o.verschilPp <= 0);
+    C.push(h3('Wat de ingrepen opleveren'));
+    for (const k of varianten) {
+      const tb = lvs('s7-huidig', k, 'benchBeleid'), ts = lvs('s7-huidig', k, 'stappenTot80');
+      C.push(bullet([bd(ln[k].replace(/^\+ /, '').replace(/^./, c => c.toUpperCase()) + '. '),
+        t(pct(L[k].benchBeleid) + ' tegen ' + pct(REF.benchBeleid) + ' voor de ongewijzigde regel' +
+          (tb ? ' — ' + (tb.verschilPp >= 0 ? '+' : '−') + Math.abs(tb.verschilPp).toFixed(1) +
+            ' procentpunt, ' + pT(tb) + ', ' + tb.oordeel : '') +
+          '. Spreiding tussen de zaden ' + (SP[k] && SP[k].sd !== null ? (100 * SP[k].sd).toFixed(1) : '–') +
+          ' pp tegen ' + (SP['s7-huidig'] && SP['s7-huidig'].sd !== null ? (100 * SP['s7-huidig'].sd).toFixed(1) : '–') +
+          ' pp; omgevingsstappen tot 80 % succes ' + kort(L[k].stappenTot80 ? L[k].stappenTot80.m : null) +
+          ' tegen ' + kort(REF.stappenTot80 ? REF.stappenTot80.m : null) +
+          (ts ? ' (' + pT(ts) + ', ' + ts.oordeel + ')' : '') + '.')]));
+    }
+    C.push(body([
+      bd('Op de eindscore verandert er weinig. '),
+      t((beter.length ? 'Van de vier ingrepen tilt ' + (beter.length === 1 ? 'er één' : 'tillen er ' + beter.length) +
+          ' de gelote benchmarkscore boven de ruis uit: ' +
+          beter.map(o => ln[o.conditie].replace(/^\+ /, '')).join(', ') + '. ' : '') +
+        (slechter.length ? (beter.length ? 'Daar staat tegenover dat ' : 'Wat er op die maat boven de ruis uitkomt is dat ') +
+          slechter.map(o => ln[o.conditie].replace(/^\+ /, '')).join(' en ') +
+          ' de score aantoonbaar verláágt. ' : '') +
+        'De overige verschillen vallen binnen de meetruis van ' + LEERREGEL.zaden + ' zaden, en dat betekent ' +
+        'dat ze niet aan te tonen zijn — niet dat ze er niet zijn. Een geleerde basislijn, de meest voor de ' +
+        'hand liggende verbetering aan een REINFORCE-achtige regel, doet op deze taak dus niets: de beperking ' +
+        'zit niet in de basislijn. Maar de eindscore is niet de enige maat, en op twee andere gebeurt er wél ' +
+        'iets.')
+    ]));
+  }
+  {
+    /* De echte vondst van dit pakket zit niet in de eindscore maar in het aantal
+       omgevingsstappen dat nodig was om er te komen. Dat is precies wat een
+       variantiereductie hoort te doen, en het is de eerste plek in dit document waar
+       een ingreep in de leerregel iets oplevert in plaats van kost. */
+    const ss = lvs('s7-huidig', 's7-schaars', 'stappenTot80');
+    const sc = lvs('s7-huidig', 's7-criticus-schaars', 'stappenTot80');
+    const sb = lvs('s7-huidig', 's7-schaars', 'benchBeleid');
+    if (ss && L['s7-schaars'] && REF.stappenTot80) {
+      const f = REF.stappenTot80.m / L['s7-schaars'].stappenTot80.m;
+      C.push(h3('Wat er wél uitkomt: schaarse perturbatie is veel zuiniger met ervaring'));
+      C.push(body([
+        t('Per tik nog maar een kwart van de wolk verstoren levert dezelfde eindscore op (' +
+          pct(L['s7-schaars'].benchBeleid) + ' tegen ' + pct(REF.benchBeleid) +
+          (sb ? ', ' + pT(sb) + ', ' + sb.oordeel : '') + '), maar bereikt haar met ' +
+          kort(L['s7-schaars'].stappenTot80.m) + ' omgevingsstappen in plaats van ' +
+          kort(REF.stappenTot80.m) + ' — een factor ' + f.toFixed(1) + ' minder ervaring, ' + pT(ss) + ', ' +
+          ss.oordeel + '. In kanten-bezoeken is het verschil even groot (' +
+          kort(L['s7-schaars'].kbTot80.m) + ' tegen ' + kort(REF.kbTot80.m) + '), want een spelstap kost in ' +
+          'beide condities even veel rekenwerk: het masker bespaart geen werk in de propagatie, het maakt het ' +
+          'leersignaal minder ruizig. ' +
+          (sc ? 'De combinatie met de criticus laat dat effect staan (' + kort(L['s7-criticus-schaars'].stappenTot80.m) +
+            ' stappen, ' + pT(sc) + '), wat bevestigt dat het van de schaarse perturbatie komt en niet van de ' +
+            'criticus. ' : '') +
+          'Dit is de enige plek in dit document waar een ingreep in de leerregel iets oplevert in plaats van ' +
+          'kost, en het is precies waar de theorie het voorspelt: de variantie van een perturbatieschatter ' +
+          'groeit met het aantal knopen dat tegelijk beweegt, dus minder tegelijk verstoren maakt elke ' +
+          'afzonderlijke toewijzing scherper.')
+      ]));
+      C.push(body([
+        bd('Waarom het de eindscore niet raakt. '),
+        t('Vijfhonderd pogingen zijn ruim genoeg om ook met het ruizige signaal uit te leren; de zuinigere ' +
+          'variant is er alleen eerder. Dat maakt de winst niet minder echt, maar wel van een andere soort: ' +
+          'zij telt in een omgeving waarin ervaring duur is — een robot, een simulatie die traag draait, een ' +
+          'systeem dat online leert — en niet in een spel dat je een miljoen keer kunt spelen.')
+      ]));
+    }
+  }
+  {
+    /* Het categorische beleid raakt de gelote score nauwelijks maar wél het gat
+       tussen geloot en argmax. Dat gat was in sectie 10.2 een bevinding op zichzelf. */
+    const ca = lvs('s7-huidig', 's7-categorisch', 'benchStreng');
+    const cb = lvs('s7-huidig', 's7-categorisch', 'benchBeleid');
+    if (ca && L['s7-categorisch']) {
+      const gatOud = 100 * (REF.benchBeleid.m - REF.benchStreng.m);
+      const gatNieuw = 100 * (L['s7-categorisch'].benchBeleid.m - L['s7-categorisch'].benchStreng.m);
+      C.push(h3('En een tweede: het categorische beleid heeft het toeval minder nodig'));
+      C.push(body([
+        t('Sectie 10.2 rapporteert dat argmax — altijd de waarschijnlijkste knop indrukken — ' +
+          gatOud.toFixed(1) + ' procentpunt kost ten opzichte van het gelote beleid, en dat het toeval dus geen ' +
+          'ruis is die je er bij het toetsen netjes uit haalt maar onderdeel van de strategie is geworden. Met ' +
+          'negen elkaar uitsluitende acties zakt dat gat naar ' + gatNieuw.toFixed(1) + ' procentpunt: de ' +
+          'argmax-score stijgt van ' + pct(REF.benchStreng) + ' naar ' + pct(L['s7-categorisch'].benchStreng) +
+          ' (' + (ca.verschilPp >= 0 ? '+' : '−') + Math.abs(ca.verschilPp).toFixed(1) + ' pp, ' + pT(ca) + ', ' +
+          ca.oordeel + '), terwijl de gelote score ' +
+          (cb && cb.p < 0.05 ? 'meestijgt' : 'binnen de ruis gelijk blijft') +
+          (cb ? ' (' + (cb.verschilPp >= 0 ? '+' : '−') + Math.abs(cb.verschilPp).toFixed(1) + ' pp, ' +
+            pT(cb) + ')' : '') + '. Dat is precies wat je verwacht als een deel van het oude gat ontstond ' +
+          'doordat onafhankelijke knoppen elkaar kunnen opheffen: onder argmax is “op én neer” een echte, ' +
+          'volledig verlammende actie, terwijl het gelote beleid daar met kans omheen komt. Neem je die acties ' +
+          'uit de verzameling weg, dan heeft het beleid het toeval minder nodig.')
+      ]));
+      C.push(body([
+        bd('De keerzijde. '),
+        t('Het categorische beleid heeft ' + kort(L['s7-categorisch'].stappenTot80.m) + ' omgevingsstappen ' +
+          'nodig om 80 % te halen tegen ' + kort(REF.stappenTot80.m) + ' voor de onafhankelijke knoppen. Negen ' +
+          'acties tegen zestien combinaties is een kleinere ruimte, maar de exploratie erin is grover: één ' +
+          'trekking per tik in plaats van vier, en dus minder fijnmazige variatie om aan toe te schrijven.')
+      ]));
+    }
+  }
+  {
+    /* De criticus is het onderdeel waar dit pakket mee begon en het levert niets op.
+       Dat hoort er even hard in te staan als de twee dingen die wel werkten. */
+    const kb2 = lvs('s7-huidig', 's7-criticus', 'benchBeleid');
+    const ks = lvs('s7-huidig', 's7-criticus', 'stappenTot80');
+    if (kb2 && L['s7-criticus']) C.push(body([
+      bd('En de criticus, waar dit pakket mee begon, levert niets op. '),
+      t('De verwachting was minder spreiding tussen de zaden en een gelijke of hogere score. Gemeten: ' +
+        pct(L['s7-criticus'].benchBeleid) + ' tegen ' + pct(REF.benchBeleid) + ' (' +
+        (kb2.verschilPp >= 0 ? '+' : '−') + Math.abs(kb2.verschilPp).toFixed(1) + ' pp, ' + pT(kb2) + ', ' +
+        kb2.oordeel + '), een spreiding tussen de zaden die juist ' +
+        (SP['s7-criticus'].sd > SP['s7-huidig'].sd ? 'gróter' : 'kleiner') + ' is (' +
+        (100 * SP['s7-criticus'].sd).toFixed(1) + ' tegen ' + (100 * SP['s7-huidig'].sd).toFixed(1) + ' pp), en ' +
+        kort(L['s7-criticus'].stappenTot80.m) + ' omgevingsstappen tot 80 % tegen ' +
+        kort(REF.stappenTot80.m) + (ks ? ' (' + pT(ks) + ')' : '') + '. Twee verklaringen liggen voor de hand ' +
+        'en de meting kiest er niet tussen. De eerste is dat een lineaire waardefunctie op zestien ' +
+        'raycast-sensoren de waarde van een toestand in deze wereld eenvoudig niet kan uitdrukken: of een ' +
+        'positie goed is hangt af van of er een obstakel tussen agent en doel staat, en dat is geen lineaire ' +
+        'functie van de zintuigen. De tweede is dat de criticus zelf moet leren en in het begin dus ruis ' +
+        'toevoegt in plaats van weghaalt, terwijl de lopende basislijn er meteen staat. Wat de meting wél ' +
+        'uitsluit is de simpelste diagnose: dat het probleem in de toestandsloze basislijn zat. Dat zat het ' +
+        'niet.')
+    ]));
+  }
+  {
+    /* Toewijzing binnen het pakket. Zonder de losse conditie 's7-schaars' zou een
+       effect bij 'criticus + schaars' niet aan een van de twee toe te schrijven zijn. */
+    const ab = lvs('s7-criticus', 's7-criticus-schaars', 'benchBeleid');
+    const bb = lvs('s7-schaars', 's7-criticus-schaars', 'benchBeleid');
+    if (ab && bb) C.push(body([
+      bd('Toewijzing binnen het pakket. '),
+      t('De combinatie van criticus en schaarse perturbatie verschilt ' +
+        (ab.p < 0.05 ? 'aantoonbaar' : 'niet aantoonbaar') + ' van de criticus alleen (' + pT(ab) + ') en ' +
+        (bb.p < 0.05 ? 'aantoonbaar' : 'niet aantoonbaar') + ' van de schaarse perturbatie alleen (' + pT(bb) +
+        '). De twee ingrepen versterken elkaar op deze taak dus niet; ze zijn samen gemeten omdat ze in het ' +
+        'werkplan als paar stonden, en apart omdat een verschil anders niet toe te wijzen was geweest.')
+    ]));
+  }
+  {
+    const pg = L['s7-perturbgain'], pgT = lvs('s7-huidig', 's7-perturbgain', 'benchBeleid');
+    if (pg && GRADD) C.push(body([
+      bd('En de schaalfout uit sectie 3.11? '),
+      t('Met een eigen leersnelheidsveeg komt g = 10 uit op η = ' + String(pg.lr).replace('.', ',') + ' en op ' +
+        pct(pg.benchBeleid) + (pgT ? ' — ' + (pgT.verschilPp >= 0 ? '+' : '−') +
+          Math.abs(pgT.verschilPp).toFixed(1) + ' procentpunt tegen de ongewijzigde regel, ' + pT(pgT) + ', ' +
+          pgT.oordeel : '') + '. Sectie 3.11 mat dezelfde ingreep zonder eigen veeg en zag de score instorten; ' +
+        'met een leersnelheid die meeschuift is dat beeld ' +
+        (pgT && pgT.p < 0.05 && pgT.verschilPp < 0 ? 'milder maar niet anders' : 'niet meer terug te vinden') +
+        '. De les is dezelfde als daar: η, de stapbegrenzing en de schaal van het wolkdeel zijn één samenhangend ' +
+        'geheel, en één ervan verzetten terwijl de andere blijft staan meet vooral de ontregeling.')
+    ]));
+  }
+  if (LEERREGEL.ijkTegenStap6 && LEERREGEL.ijkTegenStap6.vergeleken)
+    C.push(body([
+      bd('IJk op de eerdere reeks. '),
+      t('De ongewijzigde regel is voor deze tabel opnieuw gedraaid en reproduceert ' +
+        LEERREGEL.ijkTegenStap6.identiek + ' van de ' + LEERREGEL.ijkTegenStap6.vergeleken +
+        ' runs van de referentiemeting uit sectie 10.3 tot op de zes decimalen die runs.csv bewaart. Het ' +
+        'inbouwen van de vier schakelaars heeft de leerregel met alles uit dus niet geraakt — dat is geen ' +
+        'vanzelfsprekendheid, want een schakelaar die per ongeluk één trekking uit de toevalsreeks haalt zou ' +
+        'elke run een andere kant op sturen zonder dat er iets aan mis lijkt.')
+    ]));
+  C.push(gap(60));
+}
+
+C.push(h2('10.7', 'Wat hierna gemeten wordt'));
 C.push(body(
-  'Sectie 10.4 laat zien dat de structurele plasticiteit als geheel niets oplevert, en sectie 10.5 wat de ' +
-  'leerregel kost en opbrengt. Dat zegt nog niet welk van de mechanismen aan het eerste schuldig is. De ' +
-  'volgende versie van dit document rapporteert:'
+  'Sectie 10.4 laat zien dat de structurele plasticiteit als geheel niets oplevert, sectie 10.5 wat de ' +
+  'schatter kost en opbrengt, en sectie 10.6 dat de leerregel eromheen op één punt zuiniger kan. Dat zegt nog ' +
+  'niet welk van de mechanismen aan het eerste schuldig is. De volgende versie van dit document rapporteert:'
 ));
 C.push(bullet([bd('Ablaties. '), t('Tien condities die elk één mechanisme uitzetten — geheugen-neuronen, ' +
   'reflex-neuronen, invoer-neuronen, snoeien, aangroei, neuronale groei, soortverandering, de soortregels zelf, ' +
@@ -1729,16 +2006,20 @@ C.push(bullet([bd('Een recurrente basislijn met terugpropagatie door de tijd. ')
   'gemeten in precies de vorm waarin een gepoort geheugennet zijn kracht niet kan tonen. Een GRU met echte BPTT ' +
   'hoort bij de tweede taak hieronder, waar geheugen over tientallen tikken werkelijk nodig is — op de huidige ' +
   'taak is het doel altijd zichtbaar en zou zo’n basislijn niets extra’s laten zien.')]));
-C.push(bullet([bd('De schaal van het wolkdeel van de update. '), t('Sectie 3.11 laat zien dat het ' +
+if (!LEERREGEL) C.push(bullet([bd('De schaal van het wolkdeel van de update. '), t('Sectie 3.11 laat zien dat het ' +
   'node-perturbatiedeel twee ordes te klein is ten opzichte van het score-functiedeel. De ontbrekende factor ' +
   'toevoegen is één regel code, maar vraagt om de leersnelheid en de stapbegrenzing samen opnieuw af te stellen; ' +
   'dat wordt als volwaardige conditie gemeten, niet als aanname doorgevoerd.')]));
+if (LEERREGEL) C.push(bullet([bd('Een raster van dichtheid tegen aantal neuronen. '), t('De vraag waar dit werk ' +
+  'uit voortkomt is wanneer een netwerk te klein is om het patroon te leren en wanneer het groot genoeg is om ' +
+  'de trainingswerelden uit het hoofd te leren. Met de benchmarkset als toets en de structuurmaten ernaast is ' +
+  'dat een kromme die op dit systeem te tekenen valt, en niet alleen te vermoeden.')]));
 C.push(bullet([bd('Een tweede taak. '), t('In de huidige taak is het doel altijd zichtbaar; er valt niets te ' +
   'onthouden, en elke uitspraak over de geheugen-neuronen is daarmee betekenisloos. Een tweede taak waarin het ' +
   'doel na verloop van tijd verdwijnt terwijl er tegelijk obstakels opduiken die binnen één tik ontweken moeten ' +
   'worden, is de eerste opzet waarin de twee soorten paden — kort en reflexmatig, lang en met geheugen — ook ' +
   'werkelijk allebei nodig zijn.')]));
-C.push(h2('10.7', 'De onderzoeksvraag, smaller gemaakt'));
+C.push(h2('10.8', 'De onderzoeksvraag, smaller gemaakt'));
 C.push(body(
   'Sectie 10.4 en 10.5 dwingen samen tot een scherpe afbakening. ANG is geen goedkoper alternatief ' +
   'voor backpropagation, en op een taak als deze wint een klein gelaagd netwerk met dezelfde leerregel al op ' +
@@ -1787,7 +2068,21 @@ if (REKEN && REKEN.tabel && REKEN.tabel['mlp-16-bp'] && REKEN.tabel['ang-vol']) 
       'capaciteit: ongeveer een orde van grootte meer parameters om hetzelfde te halen. Wat een lokale ' +
       'leerregel oplevert — een update die alleen grootheden gebruikt die op de synaps zelf beschikbaar zijn — ' +
       'moet dus opwegen tegen die rekening, en op deze taak doet het dat niet. De verdedigbare aanspraak van ' +
-      'ANG ligt daarmee niet bij efficiëntie, en dat is precies de afbakening die sectie 10.7 maakt.')
+      'ANG ligt daarmee niet bij efficiëntie, en dat is precies de afbakening die sectie 10.8 maakt.')
+  ]));
+}
+if (LEERREGEL && LEERREGEL.tabel && LEERREGEL.tabel['s7-schaars'] && LEERREGEL.tabel['s7-huidig']) {
+  const H = LEERREGEL.tabel['s7-huidig'], Sp = LEERREGEL.tabel['s7-schaars'];
+  const f = (H.stappenTot80 && Sp.stappenTot80) ? H.stappenTot80.m / Sp.stappenTot80.m : null;
+  C.push(body([
+    bd('Eén ding is de leerregel wél waard gebleken. '),
+    t('Van de vier standaardingrepen die in sectie 10.6 zijn gemeten, doet de meest voor de hand liggende — ' +
+      'een geleerde, toestandsafhankelijke basislijn — niets, en herstelt de schaalcorrectie uit sectie 3.11 ' +
+      'niets. Wat wél werkt is de goedkoopste: per tik nog maar een kwart van de wolk verstoren' +
+      (f ? ' haalt dezelfde eindscore met een factor ' + f.toFixed(1) + ' minder ervaring' : ' haalt dezelfde ' +
+        'eindscore met aanzienlijk minder ervaring') + '. Voor een leerregel die zichzelf verdedigt met ' +
+      'lokaliteit en online leren is dat de relevante as: niet waar zij uiteindelijk uitkomt, maar hoeveel ' +
+      'ervaring zij daarvoor nodig heeft. Dat is ook de as waarop de tweede taak haar zal moeten meten.')
   ]));
 }
 

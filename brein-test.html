@@ -311,6 +311,15 @@
           <div class="hint">De vier knoppen worden <b>geloot</b> uit hun eigen kans; deze regelaar bepaalt hoe grillig die loting is, plus hoeveel ruis er in de wolk zit. Nooit helemaal nul — zonder exploratie komt er geen leersignaal meer binnen.</div>
         </div>
         <div class="checkline"><input type="checkbox" id="lranneal" checked> leersnelheid meeschalen met de exploratie</div>
+        <div class="checkline"><input type="checkbox" id="criticus"> toestandsafhankelijke criticus (TD(0))</div>
+        <div class="hint">Uit: de basislijn is een lopend gemiddelde over spelstappen, dus in een toestand die van zichzelf al beter of slechter is dan gemiddeld wordt élke actie beloond of gestraft. Aan: een kleine lineaire schatter <b>V(s)=w·s+b</b> op de zestien sensoren, apart getraind met TD(0); het leersignaal wordt dan <b>r + &gamma;V(s&prime;) &minus; V(s)</b>. De schatter staat naast de graaf, niet erin &mdash; er wordt niets door het netwerk teruggepropageerd.</div>
+        <div class="checkline"><input type="checkbox" id="catbeleid"> categorisch beleid (negen elkaar uitsluitende acties)</div>
+        <div class="hint">Uit: de vier knoppen zijn onafhankelijke Bernoulli&#39;s, dus &quot;op+neer&quot; en &quot;alle vier&quot; zijn mogelijke acties die zichzelf opheffen. Aan: één softmax over acht richtingen plus stilstaan, gescoord met de som van de bijbehorende knopingangen.</div>
+        <div class="field" style="margin-top:10px;">
+          <label>Perturbatiefractie <span class="val" id="pfracval">1.00</span></label>
+          <input type="range" id="pfrac" min="5" max="100" step="5" value="100">
+          <div class="hint">Welk deel van de wolk per tik verstoord wordt. De variantie van node-perturbatie groeit met het aantal knopen dat je tegelijk verstoort; minder tegelijk verstoren is de standaardtruc daartegen. Bij <b>1.00</b> is dit precies de oude regel.</div>
+        </div>
         <hr style="border:none;border-top:1px solid var(--border);margin:14px 0;">
         <div class="checkline"><input type="checkbox" id="structplast" checked> structurele plasticiteit (snoeien &amp; nieuwe verbindingen)</div>
         <div class="field" style="margin-top:10px;">
@@ -627,7 +636,7 @@
   {"naam":"trace-nieuw", "traceOud":false},
   {"naam":"trace-oud",   "traceOud":true}
 ]</textarea>
-        <div class="hint">Sleutels zijn de namen uit de configuratie: <code>nNeurons, density, nObs, maxSteps, worldEvery, seed, lr, lam, decay, wmax, stepMax, memLeak, prop, noise0, lrAnneal, structOn, structEvery, pruneT, sprout, growOn, growStagnant, growMax, growN, newLinks, retypeOn, retypeN, retypeCost, rGoal, rProg, rCol, rStep, rIdle, nEpisodes, evalOn, evalMode, inputOnlySens, traceOud, benchOn, benchN, benchReps</code>. Met <code>"layered": true</code> plus <code>"layerSizes": [150]</code> draait dezelfde leerregel op een <b>gelaagd netwerk</b> in plaats van op de wolk &mdash; de basislijn die laat zien wat de graafstructuur toevoegt; zet daar <code>"structOn": false</code> bij, anders blijft er van de lagen niets over. Types uitzetten kan met <code>"types.mem.on": false</code>. <code>traceOud:true</code> zet de foutieve postsynaptische eligibility-trace van v&oacute;&oacute;r 9&nbsp;september 2026 terug &mdash; alleen bedoeld als ablatie.</div>
+        <div class="hint">Sleutels zijn de namen uit de configuratie: <code>nNeurons, density, nObs, maxSteps, worldEvery, seed, lr, lam, decay, wmax, stepMax, memLeak, prop, noise0, lrAnneal, structOn, structEvery, pruneT, sprout, growOn, growStagnant, growMax, growN, newLinks, retypeOn, retypeN, retypeCost, rGoal, rProg, rCol, rStep, rIdle, nEpisodes, evalOn, evalMode, inputOnlySens, traceOud, benchOn, benchN, benchReps</code>. Met <code>"layered": true</code> plus <code>"layerSizes": [150]</code> draait dezelfde leerregel op een <b>gelaagd netwerk</b> in plaats van op de wolk &mdash; de basislijn die laat zien wat de graafstructuur toevoegt; zet daar <code>"structOn": false</code> bij, anders blijft er van de lagen niets over. Types uitzetten kan met <code>"types.mem.on": false</code>. <code>traceOud:true</code> zet de foutieve postsynaptische eligibility-trace van v&oacute;&oacute;r 9&nbsp;september 2026 terug &mdash; alleen bedoeld als ablatie. Sinds stap&nbsp;7 ook <code>criticOn, criticLr, criticGamma, perturbFrac, catPolicy, perturbGain</code>: de vier ingrepen in de leerregel, elk los aan en uit te zetten zodat ze ook als ablatie meetbaar zijn.</div>
       </div>
       <div>
         <div class="field">
@@ -752,6 +761,10 @@ let TRACE_OUD=false;
 /* Versterking van het node-perturbatiedeel van het spoor t.o.v. het score-functiedeel.
    1 = zoals het altijd was. Zie de meting van stap 3 en `updateTraces`. */
 let PERTURB_GAIN=1;
+/* Stap 7. Twee getallen zonder eigen schuif, omdat ze bij de criticus horen en niet bij
+   het afstellen met de hand: de leersnelheid van de criticus en zijn disconteringsfactor.
+   Wie ze wil variëren doet dat via de experimentloper (`criticLr`, `criticGamma`). */
+let CRITIC_LR=0.02, CRITIC_GAMMA=0.95;
 const KIND_OF={sens:K_SENS,work:K_WORK,refl:K_REFL,mem:K_MEM};
 
 function rectHit(x,y,o,pad){ return x> o.x-pad && x< o.x+o.w+pad && y> o.y-pad && y< o.y+o.h+pad; }
@@ -931,6 +944,11 @@ function createBrain(cfg,seed){
     clean:new Float32Array(n), prev:new Float32Array(n), dev:new Float32Array(n),
     pre:new Float32Array(n),
     bias:new Float32Array(n), ebias:new Float32Array(n), press:new Uint8Array(N_OUT), rbar:0,
+    /* stap 7: de criticus (gewichten op de zestien sensoren plus bias), de netto
+       ingangen van de vier knoppen — die heeft het categorische beleid nodig, want
+       een softmax werkt op de ingangen en niet op vier losse sigmoïden — en het
+       masker dat zegt welke knopen deze tik verstoord zijn. */
+    vW:new Float32Array(N_IN), vB:0, onet:new Float32Array(N_OUT), pmask:null,
     from:[], to:[], w:[], e:[], rms:[], weakAge:[],
     pruned:0, sprouted:0, grown:0, retyped:0, born:0,
     lay:null, seed
@@ -997,6 +1015,11 @@ function createLayered(cfg,seed){
     clean:new Float32Array(n), prev:new Float32Array(n), dev:new Float32Array(n),
     pre:new Float32Array(n),
     bias:new Float32Array(n), ebias:new Float32Array(n), press:new Uint8Array(N_OUT), rbar:0,
+    /* stap 7: de criticus (gewichten op de zestien sensoren plus bias), de netto
+       ingangen van de vier knoppen — die heeft het categorische beleid nodig, want
+       een softmax werkt op de ingangen en niet op vier losse sigmoïden — en het
+       masker dat zegt welke knopen deze tik verstoord zijn. */
+    vW:new Float32Array(N_IN), vB:0, onet:new Float32Array(N_OUT), pmask:null,
     from:[], to:[], w:[], e:[], rms:[], weakAge:[],
     pruned:0, sprouted:0, grown:0, retyped:0, born:0,
     lay:null, seed, lagen:sizes.slice()
@@ -1099,8 +1122,14 @@ function propagate(B,inp,cfg,hn,tp,state,rnd){
       const k=B.kinds[j];
       if(k===K_IN){ next[j]=state[j]; continue; }
       let v=sum[j]+B.bias[j];
-      if(k===K_OUT){ next[j]=sigm(v/tp); continue; }   // kans dat deze knop ingedrukt wordt
-      if(hn>0) v+=(rnd()*2-1)*hn;
+      /* De netto ingang van een knop wordt bewaard: het categorische beleid van
+         stap 7 scoort zijn negen acties met de sóm van de ingangen van de knoppen
+         die erbij horen, en dat kan niet meer als je alleen de sigmoïde overhoudt. */
+      if(k===K_OUT){ B.onet[j-OUT0]=v; next[j]=sigm(v/tp); continue; }
+      /* Schaarse perturbatie (stap 7): staat er een masker, dan wordt alleen het
+         gemaskeerde deel van de wolk deze tik verstoord. Zonder masker is dit
+         letterlijk de oude regel. */
+      if(hn>0 && (B.pmask===null || B.pmask[j])) v+=(rnd()*2-1)*hn;
       if(k===K_MEM) next[j]=(1-cfg.memLeak)*state[j]+cfg.memLeak*tanh(v);
       else next[j]=tanh(v);
     }
@@ -1128,17 +1157,87 @@ function brainStep(B,inp,cfg,expl,rnd){
   const tp=learn? tempOf(expl) : (S.evalTemp!==undefined? S.evalTemp : tempOf(0));
   const sample=learn || S.evalSample;
   const r=learn? rnd : (S.evalRnd||rnd);
+  /* Schaarse perturbatie (stap 7b). Het masker wordt één keer per tik geloot en geldt
+     voor alle propagatiestappen van die tik, zodat "deze knoop is deze tik verstoord"
+     een eenduidige uitspraak is. Bij fractie 1 wordt er niet geloot — dan verschuift
+     de toevalsreeks niet en blijft een run bit voor bit gelijk aan die van vóór
+     stap 7. */
+  const pf=(cfg.perturbFrac===undefined||cfg.perturbFrac===null)?1:cfg.perturbFrac;
+  if(hn>0 && pf<1){
+    if(!B.pmask || B.pmask.length<B.n) B.pmask=new Uint8Array(B.n);
+    for(let j=HID0;j<B.n;j++) B.pmask[j]=(r()<pf)?1:0;
+  } else B.pmask=null;
   if(learn && !exact){ B.clean.set(B.prev); propagate(B,inp,cfg,0,tp,B.clean,r); }
   propagate(B,inp,cfg,hn,tp,B.act,r);
   B.dev.fill(0);
   if(learn && !exact) for(let j=HID0;j<B.n;j++) B.dev[j]=B.act[j]-B.clean[j];
-  for(let j=OUT0;j<HID0;j++){
+  if(cfg.catPolicy) actCategorical(B,tp,sample,r);
+  else for(let j=OUT0;j<HID0;j++){
     const pr=B.act[j];
     const a=sample ? (r()<pr?1:0) : (pr>0.5?1:0);
     B.press[j-OUT0]=a;
     B.dev[j]=a-pr;
   }
   if(learn && exact) backpropDev(B,tp);
+}
+/* ---------- categorisch beleid (stap 7c) ----------
+   De vier knoppen zijn van huis uit onafhankelijke Bernoulli's. Daardoor bestaan er
+   acties die zichzelf opheffen — op+neer, links+rechts, alle vier — en die kosten
+   exploratie zonder ooit iets te kunnen opleveren. Hier staat daar één softmax over
+   negen elkaar uitsluitende acties tegenover: acht richtingen plus stilstaan.
+
+   Waarom niet negen uitvoerknopen? Omdat het aantal uitvoerknopen de vaste
+   buitenkant van dit model is: elke eerdere run, elk opgeslagen brein en elke
+   bedradingsregel gaat uit van vier. Een negende knoop erbij maakt de conditie
+   onvergelijkbaar met alles wat we al gemeten hebben, en dan meet je twee dingen
+   tegelijk. Daarom worden de negen acties gescoord uit dezelfde vier ingangen:
+
+       score(a) = ( Σ_{j ∈ a} net_j ) / τ,      π(a) = softmax_a score(a)
+
+   met stilstaan als de lege verzameling, score 0. Dat is een gefactoriseerde softmax,
+   en de score-functie krijgt daardoor precies dezelfde vorm als bij de Bernoulli's:
+
+       ∂log π / ∂net_j = ( 1[j ingedrukt] − Σ_a π(a)·1[j ∈ a] ) / τ
+
+   dus "wat ik deed min wat ik gemiddeld zou doen", alleen is dat gemiddelde nu de
+   randkans onder de categorische verdeling in plaats van de losse sigmoïde. Het
+   spoor, de trace, de begrensde stap en de terugpropagatie van stap 6 blijven
+   daarmee ongewijzigd. De factor 1/τ wordt hier net zo behandeld als bij de
+   Bernoulli-knoppen: ANG laat hem weg (bij vaste τ verdwijnt hij in de
+   leersnelheid), en alleen `backpropDev` zet hem er voor de exacte gradiënt weer
+   in. Zou hij hier al toegepast worden, dan stond de categorische conditie op een
+   andere schaal dan de conditie waarmee zij vergeleken wordt, en dan meet je twee
+   dingen tegelijk. */
+const CAT_ACTIES=[[0],[1],[2],[3],[0,2],[0,3],[1,2],[1,3],[]];
+const CAT_SC=new Float64Array(9), CAT_MARG=new Float64Array(N_OUT);
+function actCategorical(B,tp,sample,rnd){
+  const net=B.onet, sc=CAT_SC;
+  let mx=-Infinity;
+  for(let a=0;a<9;a++){
+    let s=0; const A=CAT_ACTIES[a];
+    for(let q=0;q<A.length;q++) s+=net[A[q]];
+    sc[a]=s/tp; if(sc[a]>mx) mx=sc[a];
+  }
+  let Z=0;
+  for(let a=0;a<9;a++){ sc[a]=Math.exp(sc[a]-mx); Z+=sc[a]; }
+  let keus=8, best=-1, u=sample? rnd()*Z : 0, acc=0;
+  for(let a=0;a<9;a++){
+    if(sample){ acc+=sc[a]; if(acc>=u){ keus=a; break; } }
+    else if(sc[a]>best){ best=sc[a]; keus=a; }
+  }
+  /* de randkans per knop: hoe vaak zou deze knop onder dit beleid ingedrukt worden */
+  const marg=CAT_MARG; marg.fill(0);
+  for(let a=0;a<9;a++){ const p=sc[a]/Z, A=CAT_ACTIES[a]; for(let q=0;q<A.length;q++) marg[A[q]]+=p; }
+  const gekozen=CAT_ACTIES[keus];
+  for(let j=0;j<N_OUT;j++){
+    const a=gekozen.indexOf(j)>=0?1:0;
+    B.press[j]=a;
+    B.dev[OUT0+j]=a-marg[j];
+    /* de weergave (en alles wat B.act voor een knop leest) moet de kans laten zien
+       die dit beleid werkelijk gebruikt, niet de sigmoïde die niemand meer raadpleegt */
+    B.act[OUT0+j]=marg[j];
+  }
+  kb(9*2);
 }
 /* ---------- de exacte gradiënt als schatter (stap 6) ----------
    Node-perturbatie schát wat een verborgen knoop bijdroeg door hem te verstoren en
@@ -1223,14 +1322,44 @@ function updateTraces(B,lam,traceOud,gain){
     B.ebias[j]=lam*B.ebias[j]+k1*s*dev[j];
   }
 }
+/* ---------- de toestandsafhankelijke criticus (stap 7a) ----------
+   De basislijn is van huis uit één lopend gemiddelde over spelstappen. Dat is een
+   getal zonder toestand, en daardoor systematisch scheef: in een hoek waar het spel
+   nu eenmaal slecht loopt is élke beloning lager dan het gemiddelde, dus wordt élke
+   actie daar afgestraft — ook de juiste. Andersom in een toestand vlak bij het doel.
+
+   Wat daar tegenover staat is bewust het kleinste dat werkt: een lineaire schatter
+   V(s) = w·s + b op dezelfde zestien sensoren die het netwerk ziet, getraind met
+   TD(0). Het leersignaal wordt dan de temporele-verschilfout
+
+       δ = r + γ·V(s′) − V(s)
+
+   en die is per toestand gecentreerd in plaats van globaal. Belangrijk voor het
+   verhaal van de paper: de criticus staat naast de graaf, niet erin. Er wordt niets
+   door het netwerk teruggepropageerd — de leerregel voor de verbindingen blijft
+   woord voor woord dezelfde als in sectie 3. */
+function criticValue(B,s){
+  let v=B.vB;
+  for(let i=0;i<N_IN;i++) v+=B.vW[i]*s[i];
+  return v;
+}
+function criticUpdate(B,s,d,lr){
+  const dc=clamp(d,-10,10);
+  for(let i=0;i<N_IN;i++) B.vW[i]+=lr*dc*s[i];
+  B.vB+=lr*dc;
+}
 /* Beloning telt alleen voor zover ze afwijkt van wat het brein de laatste tijd
    gewend was (basislijn). Anders wordt bij een altijd-positieve beloning simpelweg
    alles versterkt en leert het niets. */
-function applyReward(B,r,cfg,scale){
+function applyReward(B,r,cfg,scale,adv){
   const eta=cfg.lr*(scale===undefined?1:scale), wmax=cfg.wmax, smax=cfg.stepMax;
   kb(B.nc);
+  /* De lopende basislijn wordt altijd bijgehouden — hij staat in de grafieken en hij
+     is de terugvaloptie. Staat de criticus aan, dan komt het leersignaal van hem:
+     r + γV(s′) − V(s) heeft zijn eigen basislijn al ingebouwd, en er allebei van
+     aftrekken zou twee keer hetzelfde doen. */
   B.rbar+=0.02*(r-B.rbar);
-  const rh=clamp(r-B.rbar,-10,10);
+  const rh=clamp(adv===undefined||adv===null? r-B.rbar : adv,-10,10);
   /* Meetstand (stap 3). Staat S.gradAccum aan, dan wordt het ruwe leersignaal
      Â·e opgeteld in plaats van toegepast. Zo is de schatter zelf te meten zonder
      dat het brein tijdens het meten verandert, en zonder de demping en begrenzing
@@ -1634,6 +1763,12 @@ function readCfg(){
     lrAnneal:$("lranneal").checked,
     /* alleen bedoeld als ablatie: zet de foutieve postsynaptische trace terug */
     traceOud:TRACE_OUD, perturbGain:PERTURB_GAIN,
+    /* stap 7 — de drie ingrepen in de leerregel, elk als losse schakelaar zodat ze
+       ook als ablatie meetbaar zijn in plaats van als pakket */
+    criticOn: $("criticus")? $("criticus").checked : false,
+    criticLr: CRITIC_LR, criticGamma: CRITIC_GAMMA,
+    perturbFrac: $("pfrac")? +$("pfrac").value/100 : 1,
+    catPolicy: $("catbeleid")? $("catbeleid").checked : false,
     structOn:$("structplast").checked, structEvery:+$("structevery").value,
     pruneT:+$("prune").value/1000, sprout:+$("sprout").value,
     growOn:$("grow").checked, growStagnant:$("growstag").checked,
@@ -1729,6 +1864,13 @@ function gameTick(learn,noise){
   if(learn) S.stapLeer++; else S.stapInf++;
   S.lrScale=c.lrAnneal? (c.noise0>0? noise/c.noise0 : 1) : 1;
   sense(S.ag,w,S.inp);
+  /* De criticus wordt gelezen op de toestand vóór de actie — dat is de s in
+     r + γV(s′) − V(s). Hij kost ook rekenwerk, en dat hoort net zo goed geteld te
+     worden als het rekenwerk in de graaf: drie keer zestien kanten-bezoeken per
+     leerstap (twee keer uitlezen, één keer bijwerken). */
+  const criticOn=learn && !!c.criticOn;
+  let v0=0;
+  if(criticOn){ if(!S.inpNext) S.inpNext=new Float32Array(N_IN); v0=criticValue(B,S.inp); kb(3*N_IN); }
   brainStep(B,S.inp,c,noise,S.rnd);
   const P=B.press;
   S.outPressed=[!!P[0],!!P[1],!!P[2],!!P[3]];
@@ -1751,7 +1893,19 @@ function gameTick(learn,noise){
   if(dist<GOAL_R+AGENT_R){ r+=c.rGoal*(1+0.5*(1-S.step/c.maxSteps)); S.reached=true; done=true; }
   if(collided && c.stopOnCollide) done=true;
   S.epReward+=r;
-  if(learn) applyReward(B,r,c,S.lrScale);
+  /* Bootstrappen mag alleen als het spel dóórgaat. Bij het doel en bij een botsing
+     die de poging afbreekt is er geen volgende toestand meer en is de waarde daarvan
+     nul; loopt de poging alleen op zijn tijdslimiet af, dan is er wél een volgende
+     toestand en zou nul-zetten een straf zijn die het spel niet uitdeelt. */
+  let adv=null;
+  if(criticOn){
+    const terminaal = S.reached || (collided && c.stopOnCollide);
+    sense(S.ag,w,S.inpNext);
+    const v1 = terminaal ? 0 : criticValue(B,S.inpNext);
+    adv = r + c.criticGamma*v1 - v0;
+    criticUpdate(B,S.inp,adv,c.criticLr);
+  }
+  if(learn) applyReward(B,r,c,S.lrScale,adv);
   S.step++;
   if(S.step>=c.maxSteps) done=true;
   return done;
@@ -2450,7 +2604,12 @@ function buildResult(naamOverride){
         perturbatieVersterking:S.cfg.perturbGain||1,
         /* stap 6: exacte gradiënt (terugpropagatie) in plaats van node-perturbatie,
            met verder precies hetzelfde spoor, dezelfde basislijn en dezelfde rem */
-        exacteGradient:!!S.cfg.gradExact},
+        exacteGradient:!!S.cfg.gradExact,
+        /* stap 7: de drie ingrepen in de leerregel */
+        criticus:!!S.cfg.criticOn, criticusLeersnelheid:S.cfg.criticLr,
+        criticusGamma:S.cfg.criticGamma,
+        perturbatieFractie:(S.cfg.perturbFrac===undefined?1:S.cfg.perturbFrac),
+        beleidsvorm:S.cfg.catPolicy?"categorisch":"bernoulli"},
       structureel:{aan:S.cfg.structOn, herstructureerElke:S.cfg.structEvery,
         snoeidrempel:S.cfg.pruneT, nieuweVerbindingenPerRonde:S.cfg.sprout,
         groeiAan:S.cfg.growOn, alleenBijStagnatie:S.cfg.growStagnant, maxNeuronen:S.cfg.growMax,
@@ -2659,6 +2818,12 @@ function applyCfgToUI(R){
   set("wmax",l.maxGewicht*10); set("stepmax",l.maxVeranderingPerStap*1000); set("memleak",l.geheugenlek*100);
   TRACE_OUD=!!l.oudeTrace; PERTURB_GAIN=+l.perturbatieVersterking||1;
   set("prop",l.propagatiestappen); set("noise",l.exploratieStart*100); chk("lranneal",l.leersnelheidMeeschalen);
+  /* stap 7 — ontbreken deze velden, dan komt het bestand van vóór 10 september 2026
+     en stond alles op de oude waarde; die staat hier dan ook als terugval. */
+  chk("criticus",!!l.criticus); chk("catbeleid",(l.beleidsvorm||"bernoulli")==="categorisch");
+  set("pfrac",(l.perturbatieFractie===undefined?1:l.perturbatieFractie)*100);
+  CRITIC_LR=(l.criticusLeersnelheid===undefined?0.02:+l.criticusLeersnelheid);
+  CRITIC_GAMMA=(l.criticusGamma===undefined?0.95:+l.criticusGamma);
   const st=c.structureel||{};
   chk("structplast",st.aan); set("structevery",st.herstructureerElke); set("prune",st.snoeidrempel*1000);
   set("sprout",st.nieuweVerbindingenPerRonde); chk("grow",st.groeiAan); chk("growstag",st.alleenBijStagnatie);
@@ -2704,6 +2869,11 @@ function brainFromResult(R){
     clean:new Float32Array(n), prev:new Float32Array(n), dev:new Float32Array(n),
     pre:new Float32Array(n),
     bias, ebias:new Float32Array(n), press:new Uint8Array(N_OUT), rbar:0,
+    /* stap 7: de criticus (gewichten op de zestien sensoren plus bias), de netto
+       ingangen van de vier knoppen — die heeft het categorische beleid nodig, want
+       een softmax werkt op de ingangen en niet op vier losse sigmoïden — en het
+       masker dat zegt welke knopen deze tik verstoord zijn. */
+    vW:new Float32Array(N_IN), vB:0, onet:new Float32Array(N_OUT), pmask:null,
     from:[], to:[], w:[], e:[], rms:[], weakAge:[],
     pruned:0, sprouted:0, grown:0, retyped:0, born:0,
     lay:{x:lx,y:ly}, seed:(R.breinZaad!==undefined&&R.breinZaad!==null)?R.breinZaad:0
@@ -2814,7 +2984,12 @@ const CSV_COLS=["tijdstip","conditie","brein","breinZaad","wereldZaad","pogingen
   /* stap 6: welke schatter, welke topologie, en de rekenkosten. Runs van vóór
      10 september 2026 hebben deze kolommen leeg. */
   "gradExact","terugkoppeling","kbLeerStap","kbInfStap",
-  "pogingenTot80","stappenTot80","kbTot80"];
+  "pogingenTot80","stappenTot80","kbTot80",
+  /* stap 7: welke leerregel precies. Runs van vóór 10 september 2026 hebben deze
+     kolommen leeg; dat is niet hetzelfde als "stond uit", al kwam het daar in de
+     praktijk op neer. `perturbGain` stond al wél in de resultaat-JSON maar nog niet
+     in de tabel, en hoort er vanaf nu bij omdat het een conditie geworden is. */
+  "perturbGain","criticus","criticusLr","criticusGamma","perturbFrac","beleidsvorm"];
 function csvCell(v){
   if(v===null||v===undefined) return "";
   if(typeof v==="boolean") return v?"1":"0";
@@ -2852,7 +3027,13 @@ function csvRow(r){
     gradExact:!!l.exacteGradient, terugkoppeling:!!(c.gelaagd&&c.gelaagd.terugkoppeling),
     kbLeerStap:rk?rk.kantenBezoekenLeerStap:null, kbInfStap:rk?rk.kantenBezoekenInfStap:null,
     pogingenTot80:rk?rk.pogingenTot80:null, stappenTot80:rk?rk.omgevingsstappenTot80:null,
-    kbTot80:rk?rk.kantenBezoekenTot80:null
+    kbTot80:rk?rk.kantenBezoekenTot80:null,
+    perturbGain:(l.perturbatieVersterking===undefined?1:l.perturbatieVersterking),
+    criticus:!!l.criticus,
+    criticusLr:(l.criticus?l.criticusLeersnelheid:null),
+    criticusGamma:(l.criticus?l.criticusGamma:null),
+    perturbFrac:(l.perturbatieFractie===undefined?1:l.perturbatieFractie),
+    beleidsvorm:(l.beleidsvorm||"bernoulli")
   };
   return CSV_COLS.map(k=>csvCell(v[k])).join(",");
 }
@@ -3111,6 +3292,7 @@ function initUI(){
   bindSlider("memleak","memleakval",v=>fmt(v/100,2));
   bindSlider("prop","propval",v=>v);
   bindSlider("noise","noiseval",v=>`${fmt(v/100,2)} → ${fmt(noiseEnd(v/100),2)}`);
+  bindSlider("pfrac","pfracval",v=>fmt(v/100,2));
   bindSlider("structevery","structeveryval",v=>v);
   bindSlider("prune","pruneval",v=>fmt(v/1000,3));
   bindSlider("sprout","sproutval",v=>v);
@@ -3303,7 +3485,9 @@ window.__brain={S,createBrain,analyze,makeWorld,readCfg,startTraining,stopTraini
   gameTick,applyReward,fadeWeights,noiseEnd,
   /* stap 6 */
   backpropDev,updateTracesExact,markLayers,rekenkosten,tempOf,hiddenNoiseOf,sigm,
-  K:{K_IN,K_SENS,K_WORK,K_REFL,K_MEM,K_NEUT,K_OUT,HID0,OUT0}};
+  /* stap 7 */
+  criticValue,criticUpdate,actCategorical,CAT_ACTIES,
+  K:{K_IN,K_SENS,K_WORK,K_REFL,K_MEM,K_NEUT,K_OUT,HID0,OUT0,N_IN,N_OUT}};
 </script>
 </body>
 </html>

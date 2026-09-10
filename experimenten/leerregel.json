@@ -1,0 +1,2620 @@
+{
+  "uitgevoerd": "2026-09-10T14:34:14.158Z",
+  "beschrijving": "Werkplan stap 7: vier ingrepen in de leerregel, met de topologie en de schatter ongemoeid. (a) een lineaire criticus V(s)=w·s+b op de zestien sensoren, getraind met TD(0), zodat het leersignaal r+γV(s′)−V(s) wordt in plaats van r−r̄; (b) schaarse perturbatie, per tik een kwart van de wolk; (c) een gefactoriseerde softmax over negen elkaar uitsluitende acties in plaats van vier onafhankelijke Bernoulli-knoppen; (d) perturbGain, de ontbrekende 1/Var(ξ)-normalisatie uit stap 3, nu mét eigen leersnelheidsveeg. Elke conditie draait op de leersnelheid die de veeg van stap 7a op de goedkope toets van twintig werelden voor haar koos, nooit op de benchmark van 500 werelden.",
+  "zaden": 12,
+  "eersteZaad": 1000,
+  "pogingenPerRun": 500,
+  "benchmark": {
+    "werelden": 500,
+    "herhalingen": 3
+  },
+  "condities": {
+    "s7-huidig": {},
+    "s7-criticus": {
+      "criticOn": true
+    },
+    "s7-schaars": {
+      "perturbFrac": 0.25
+    },
+    "s7-criticus-schaars": {
+      "criticOn": true,
+      "perturbFrac": 0.25
+    },
+    "s7-categorisch": {
+      "catPolicy": true
+    },
+    "s7-perturbgain": {
+      "perturbGain": 10
+    }
+  },
+  "leersnelheidVeeg": {
+    "s7-huidig": {
+      "lr": 0.008,
+      "toets": 0.75,
+      "perLeersnelheid": [
+        {
+          "lr": 0.002,
+          "n": 4,
+          "toets": 0.6375000000000001,
+          "sd": 0.17969882210706523
+        },
+        {
+          "lr": 0.004,
+          "n": 4,
+          "toets": 0.7124999999999999,
+          "sd": 0.10307764064044153
+        },
+        {
+          "lr": 0.008,
+          "n": 4,
+          "toets": 0.75,
+          "sd": 0.07071067811865477
+        },
+        {
+          "lr": 0.016,
+          "n": 4,
+          "toets": 0.6125,
+          "sd": 0.2594063736045564
+        },
+        {
+          "lr": 0.032,
+          "n": 4,
+          "toets": 0.3875,
+          "sd": 0.3145764348029479
+        },
+        {
+          "lr": 0.064,
+          "n": 4,
+          "toets": 0.0875,
+          "sd": 0.11086778913041725
+        }
+      ]
+    },
+    "s7-criticus": {
+      "lr": 0.004,
+      "toets": 0.7749999999999999,
+      "perLeersnelheid": [
+        {
+          "lr": 0.002,
+          "n": 4,
+          "toets": 0.6625,
+          "sd": 0.1181453906563152
+        },
+        {
+          "lr": 0.004,
+          "n": 4,
+          "toets": 0.7749999999999999,
+          "sd": 0.028867513459481315
+        },
+        {
+          "lr": 0.008,
+          "n": 4,
+          "toets": 0.7500000000000001,
+          "sd": 0.09128709291752768
+        },
+        {
+          "lr": 0.016,
+          "n": 4,
+          "toets": 0.7125,
+          "sd": 0.0478713553878169
+        },
+        {
+          "lr": 0.032,
+          "n": 4,
+          "toets": 0.375,
+          "sd": 0.16583123951776998
+        },
+        {
+          "lr": 0.064,
+          "n": 4,
+          "toets": 0.05,
+          "sd": 0.07071067811865475
+        }
+      ]
+    },
+    "s7-schaars": {
+      "lr": 0.016,
+      "toets": 0.75,
+      "perLeersnelheid": [
+        {
+          "lr": 0.002,
+          "n": 4,
+          "toets": 0.6,
+          "sd": 0.18257418583505536
+        },
+        {
+          "lr": 0.004,
+          "n": 4,
+          "toets": 0.7375,
+          "sd": 0.06291528696058958
+        },
+        {
+          "lr": 0.008,
+          "n": 4,
+          "toets": 0.7124999999999999,
+          "sd": 0.0478713553878169
+        },
+        {
+          "lr": 0.016,
+          "n": 4,
+          "toets": 0.75,
+          "sd": 0.17795130420052185
+        },
+        {
+          "lr": 0.032,
+          "n": 4,
+          "toets": 0.5375,
+          "sd": 0.22867371223353739
+        },
+        {
+          "lr": 0.064,
+          "n": 4,
+          "toets": 0.175,
+          "sd": 0.06454972243679027
+        }
+      ]
+    },
+    "s7-criticus-schaars": {
+      "lr": 0.008,
+      "toets": 0.7875000000000001,
+      "perLeersnelheid": [
+        {
+          "lr": 0.002,
+          "n": 4,
+          "toets": 0.6125,
+          "sd": 0.09464847243000454
+        },
+        {
+          "lr": 0.004,
+          "n": 4,
+          "toets": 0.7749999999999999,
+          "sd": 0.028867513459481315
+        },
+        {
+          "lr": 0.008,
+          "n": 4,
+          "toets": 0.7875000000000001,
+          "sd": 0.0478713553878169
+        },
+        {
+          "lr": 0.016,
+          "n": 4,
+          "toets": 0.7124999999999999,
+          "sd": 0.025000000000000022
+        },
+        {
+          "lr": 0.032,
+          "n": 4,
+          "toets": 0.5499999999999999,
+          "sd": 0.2857738033247041
+        },
+        {
+          "lr": 0.064,
+          "n": 4,
+          "toets": 0.175,
+          "sd": 0.06454972243679027
+        }
+      ]
+    },
+    "s7-categorisch": {
+      "lr": 0.002,
+      "toets": 0.8,
+      "perLeersnelheid": [
+        {
+          "lr": 0.002,
+          "n": 4,
+          "toets": 0.8,
+          "sd": 0.05773502691896256
+        },
+        {
+          "lr": 0.004,
+          "n": 4,
+          "toets": 0.7375,
+          "sd": 0.04787135538781695
+        },
+        {
+          "lr": 0.008,
+          "n": 4,
+          "toets": 0.8,
+          "sd": 0.04082482904638629
+        },
+        {
+          "lr": 0.016,
+          "n": 4,
+          "toets": 0.7375,
+          "sd": 0.09464847243000458
+        },
+        {
+          "lr": 0.032,
+          "n": 4,
+          "toets": 0.4125,
+          "sd": 0.19737865470545018
+        },
+        {
+          "lr": 0.064,
+          "n": 4,
+          "toets": 0.13749999999999998,
+          "sd": 0.04787135538781691
+        }
+      ]
+    },
+    "s7-perturbgain": {
+      "lr": 0.0008,
+      "toets": 0.4875,
+      "perLeersnelheid": [
+        {
+          "lr": 0.0002,
+          "n": 4,
+          "toets": 0.0875,
+          "sd": 0.11086778913041725
+        },
+        {
+          "lr": 0.0004,
+          "n": 4,
+          "toets": 0.25,
+          "sd": 0.14719601443879746
+        },
+        {
+          "lr": 0.0008,
+          "n": 4,
+          "toets": 0.4875,
+          "sd": 0.08539125638299663
+        },
+        {
+          "lr": 0.0016,
+          "n": 4,
+          "toets": 0.425,
+          "sd": 0.06454972243679029
+        },
+        {
+          "lr": 0.0032,
+          "n": 4,
+          "toets": 0.42499999999999993,
+          "sd": 0.14433756729740643
+        },
+        {
+          "lr": 0.008,
+          "n": 4,
+          "toets": 0.19999999999999998,
+          "sd": 0.17795130420052185
+        }
+      ]
+    }
+  },
+  "vasteBeleidsvormen": {
+    "willekeurig": {
+      "pct": 0,
+      "ci": 0,
+      "werelden": 500
+    },
+    "reactief": {
+      "pct": 0.386,
+      "ci": 0.04271531726979109,
+      "gemStappen": 64.56994818652849,
+      "werelden": 500
+    }
+  },
+  "ijkTegenStap6": {
+    "vergeleken": 12,
+    "identiek": 12,
+    "nauwkeurigheid": "6 decimalen, de precisie van runs.csv",
+    "tegen": "benchmark-standaard / ang-vol op η = 0,008 (stap 4 en 6)"
+  },
+  "tabel": {
+    "s7-huidig": {
+      "runs": 12,
+      "lr": 0.008,
+      "haalde80": 12,
+      "succes20": {
+        "n": 12,
+        "m": 0.8916666666666666,
+        "sd": 0.09962049198956219,
+        "ci": 0.056365599509637154
+      },
+      "toets20": {
+        "n": 12,
+        "m": 0.6791666666666667,
+        "sd": 0.07525210155124432,
+        "ci": 0.04257788466594204
+      },
+      "benchBeleid": {
+        "n": 12,
+        "m": 0.6560555,
+        "sd": 0.04606661396973261,
+        "ci": 0.026064640536558107
+      },
+      "benchStreng": {
+        "n": 12,
+        "m": 0.5353333333333333,
+        "sd": 0.061427463998877024,
+        "ci": 0.03475585961787994
+      },
+      "benchStappen": {
+        "n": 12,
+        "m": 156.07444124999998,
+        "sd": 13.6592690728611,
+        "ci": 7.728459022626889
+      },
+      "verbindingen": {
+        "n": 12,
+        "m": 3000.8333333333335,
+        "sd": 72.29212623205598,
+        "ci": 40.90312096956057
+      },
+      "actief": {
+        "n": 12,
+        "m": 1445.75,
+        "sd": 188.591007690765,
+        "ci": 106.70540767586584
+      },
+      "neuronen": {
+        "n": 12,
+        "m": 111,
+        "sd": 3.3574882386580707,
+        "ci": 1.8996778036224349
+      },
+      "pad": {
+        "n": 12,
+        "m": 2,
+        "sd": 0,
+        "ci": 0
+      },
+      "reflexbogen": {
+        "n": 12,
+        "m": 3.75,
+        "sd": 2.7344602259445514,
+        "ci": 1.5471665205866636
+      },
+      "tijdMs": {
+        "n": 12,
+        "m": 6626.75,
+        "sd": 208.91500011422653,
+        "ci": 118.2047889226254
+      },
+      "kbLeerStap": {
+        "n": 12,
+        "m": 10590.156664,
+        "sd": 199.23737726729112,
+        "ci": 112.72915832994744
+      },
+      "kbInfStap": {
+        "n": 12,
+        "m": 2926.3154968333333,
+        "sd": 68.81787615092179,
+        "ci": 38.937378934377165
+      },
+      "pogingenTot80": {
+        "n": 12,
+        "m": 66.5,
+        "sd": 40.007953754676876,
+        "ci": 22.63663081258902
+      },
+      "stappenTot80": {
+        "n": 12,
+        "m": 15490.5,
+        "sd": 9422.204157298767,
+        "ci": 5331.113864444533
+      },
+      "kbTot80": {
+        "n": 12,
+        "m": 163520984.08333334,
+        "sd": 98504214.28174594,
+        "ci": 55734005.93924103
+      }
+    },
+    "s7-criticus": {
+      "runs": 12,
+      "lr": 0.004,
+      "haalde80": 12,
+      "succes20": {
+        "n": 12,
+        "m": 0.8208333333333334,
+        "sd": 0.10543919689766343,
+        "ci": 0.05965784173776385
+      },
+      "toets20": {
+        "n": 12,
+        "m": 0.6708333333333333,
+        "sd": 0.07525210155124432,
+        "ci": 0.04257788466594204
+      },
+      "benchBeleid": {
+        "n": 12,
+        "m": 0.6092221666666666,
+        "sd": 0.06241379552752352,
+        "ci": 0.035313929215982726
+      },
+      "benchStreng": {
+        "n": 12,
+        "m": 0.5305,
+        "sd": 0.06299278457959219,
+        "ci": 0.03564152311135103
+      },
+      "benchStappen": {
+        "n": 12,
+        "m": 171.49402775000001,
+        "sd": 15.845147607664847,
+        "ci": 8.965236231901962
+      },
+      "verbindingen": {
+        "n": 12,
+        "m": 3086.8333333333335,
+        "sd": 60.98410125648001,
+        "ci": 34.505003531181806
+      },
+      "actief": {
+        "n": 12,
+        "m": 1669,
+        "sd": 150.85272770005008,
+        "ci": 85.35296568670097
+      },
+      "neuronen": {
+        "n": 12,
+        "m": 111.66666666666667,
+        "sd": 3.797926068822618,
+        "ci": 2.148878965433095
+      },
+      "pad": {
+        "n": 12,
+        "m": 2,
+        "sd": 0,
+        "ci": 0
+      },
+      "reflexbogen": {
+        "n": 12,
+        "m": 4.25,
+        "sd": 3.194455423784382,
+        "ci": 1.8074333048594495
+      },
+      "tijdMs": {
+        "n": 12,
+        "m": 7227.916666666667,
+        "sd": 348.6319910041463,
+        "ci": 197.2571183772719
+      },
+      "kbLeerStap": {
+        "n": 12,
+        "m": 10814.049062833334,
+        "sd": 187.34691393820253,
+        "ci": 106.00149537018555
+      },
+      "kbInfStap": {
+        "n": 12,
+        "m": 3005.910765916666,
+        "sd": 57.91125239517741,
+        "ci": 32.76637561627476
+      },
+      "pogingenTot80": {
+        "n": 12,
+        "m": 108.58333333333333,
+        "sd": 72.02961301794667,
+        "ci": 40.75459013622536
+      },
+      "stappenTot80": {
+        "n": 12,
+        "m": 27482.75,
+        "sd": 19193.729421705317,
+        "ci": 10859.874751406916
+      },
+      "kbTot80": {
+        "n": 12,
+        "m": 297621638,
+        "sd": 208110971.716473,
+        "ci": 117749867.0309839
+      }
+    },
+    "s7-schaars": {
+      "runs": 12,
+      "lr": 0.016,
+      "haalde80": 12,
+      "succes20": {
+        "n": 12,
+        "m": 0.8583333333333334,
+        "sd": 0.09252354327740621,
+        "ci": 0.0523501227652367
+      },
+      "toets20": {
+        "n": 12,
+        "m": 0.7000000000000001,
+        "sd": 0.07977240352174657,
+        "ci": 0.045135486274240154
+      },
+      "benchBeleid": {
+        "n": 12,
+        "m": 0.6657779166666666,
+        "sd": 0.037334692797251594,
+        "ci": 0.021124091037873088
+      },
+      "benchStreng": {
+        "n": 12,
+        "m": 0.5183333333333333,
+        "sd": 0.06668151349830208,
+        "ci": 0.03772861797285205
+      },
+      "benchStappen": {
+        "n": 12,
+        "m": 154.65715175,
+        "sd": 14.644850065535891,
+        "ci": 8.286103965027278
+      },
+      "verbindingen": {
+        "n": 12,
+        "m": 3039.8333333333335,
+        "sd": 63.25824895305007,
+        "ci": 35.791723720277666
+      },
+      "actief": {
+        "n": 12,
+        "m": 1568.8333333333333,
+        "sd": 131.78483381725843,
+        "ci": 74.56428909391417
+      },
+      "neuronen": {
+        "n": 12,
+        "m": 111,
+        "sd": 3.861229196653691,
+        "ci": 2.184696081769034
+      },
+      "pad": {
+        "n": 12,
+        "m": 2,
+        "sd": 0,
+        "ci": 0
+      },
+      "reflexbogen": {
+        "n": 12,
+        "m": 4.083333333333333,
+        "sd": 2.466441431158124,
+        "ci": 1.395520611735197
+      },
+      "tijdMs": {
+        "n": 12,
+        "m": 6660.5,
+        "sd": 290.93220078661875,
+        "ci": 164.6103887512829
+      },
+      "kbLeerStap": {
+        "n": 12,
+        "m": 10697.59408175,
+        "sd": 193.0288227555881,
+        "ci": 109.21633792370945
+      },
+      "kbInfStap": {
+        "n": 12,
+        "m": 2959.8698916666667,
+        "sd": 61.196915280102424,
+        "ci": 34.625414400331024
+      },
+      "pogingenTot80": {
+        "n": 12,
+        "m": 14.25,
+        "sd": 24.85274815607101,
+        "ci": 14.061766021249381
+      },
+      "stappenTot80": {
+        "n": 12,
+        "m": 3142.75,
+        "sd": 5532.399202138091,
+        "ci": 3130.2495252465196
+      },
+      "kbTot80": {
+        "n": 12,
+        "m": 33826383.75,
+        "sd": 59563312.88282659,
+        "ci": 33701116.83219132
+      }
+    },
+    "s7-criticus-schaars": {
+      "runs": 12,
+      "lr": 0.008,
+      "haalde80": 12,
+      "succes20": {
+        "n": 12,
+        "m": 0.8708333333333332,
+        "sd": 0.10326121628122917,
+        "ci": 0.05842553319647951
+      },
+      "toets20": {
+        "n": 12,
+        "m": 0.6958333333333334,
+        "sd": 0.054181233472541585,
+        "ci": 0.030655918735789888
+      },
+      "benchBeleid": {
+        "n": 12,
+        "m": 0.6427223333333334,
+        "sd": 0.0476303533366035,
+        "ci": 0.02694940937407532
+      },
+      "benchStreng": {
+        "n": 12,
+        "m": 0.5495,
+        "sd": 0.07786760325298087,
+        "ci": 0.04405774406527429
+      },
+      "benchStappen": {
+        "n": 12,
+        "m": 160.8748283333333,
+        "sd": 12.533343623322759,
+        "ci": 7.091406728476045
+      },
+      "verbindingen": {
+        "n": 12,
+        "m": 3075.5,
+        "sd": 59.70457573449763,
+        "ci": 33.781043814721315
+      },
+      "actief": {
+        "n": 12,
+        "m": 1712.8333333333333,
+        "sd": 121.16692718074616,
+        "ci": 68.55664286418991
+      },
+      "neuronen": {
+        "n": 12,
+        "m": 109.66666666666667,
+        "sd": 3.498917581542075,
+        "ci": 1.9796989874241187
+      },
+      "pad": {
+        "n": 12,
+        "m": 2,
+        "sd": 0,
+        "ci": 0
+      },
+      "reflexbogen": {
+        "n": 12,
+        "m": 4.25,
+        "sd": 3.1370223287233854,
+        "ci": 1.774937472223467
+      },
+      "tijdMs": {
+        "n": 12,
+        "m": 6928.916666666667,
+        "sd": 307.1435726861694,
+        "ci": 173.78283588281886
+      },
+      "kbLeerStap": {
+        "n": 12,
+        "m": 10818.646685999998,
+        "sd": 174.04388418605933,
+        "ci": 98.47459771791682
+      },
+      "kbInfStap": {
+        "n": 12,
+        "m": 2995.473379083333,
+        "sd": 57.13990779840016,
+        "ci": 32.32994632589919
+      },
+      "pogingenTot80": {
+        "n": 12,
+        "m": 20.166666666666668,
+        "sd": 27.623551655437176,
+        "ci": 15.629495684555382
+      },
+      "stappenTot80": {
+        "n": 12,
+        "m": 4606.583333333333,
+        "sd": 6290.208024574723,
+        "ci": 3559.0202303220217
+      },
+      "kbTot80": {
+        "n": 12,
+        "m": 50133113.166666664,
+        "sd": 68553184.2836236,
+        "ci": 38787615.41195699
+      }
+    },
+    "s7-categorisch": {
+      "runs": 12,
+      "lr": 0.002,
+      "haalde80": 12,
+      "succes20": {
+        "n": 12,
+        "m": 0.8541666666666669,
+        "sd": 0.08382431122004612,
+        "ci": 0.047428068874578025
+      },
+      "toets20": {
+        "n": 12,
+        "m": 0.7458333333333332,
+        "sd": 0.08649312461728162,
+        "ci": 0.048938092205222605
+      },
+      "benchBeleid": {
+        "n": 12,
+        "m": 0.6882776666666667,
+        "sd": 0.03388928756281476,
+        "ci": 0.019174669511095022
+      },
+      "benchStreng": {
+        "n": 12,
+        "m": 0.6128333333333333,
+        "sd": 0.05802481182975769,
+        "ci": 0.032830627914996226
+      },
+      "benchStappen": {
+        "n": 12,
+        "m": 152.757153,
+        "sd": 14.489314885345378,
+        "ci": 8.198101652438858
+      },
+      "verbindingen": {
+        "n": 12,
+        "m": 3120.5833333333335,
+        "sd": 70.13812130793112,
+        "ci": 39.68437795323689
+      },
+      "actief": {
+        "n": 12,
+        "m": 1731.4166666666667,
+        "sd": 101.15735566957356,
+        "ci": 57.235161995812234
+      },
+      "neuronen": {
+        "n": 12,
+        "m": 110.5,
+        "sd": 3.919647479510927,
+        "ci": 2.2177493368755905
+      },
+      "pad": {
+        "n": 12,
+        "m": 2,
+        "sd": 0,
+        "ci": 0
+      },
+      "reflexbogen": {
+        "n": 12,
+        "m": 4.583333333333333,
+        "sd": 3.848455022552045,
+        "ci": 2.177468412369899
+      },
+      "tijdMs": {
+        "n": 12,
+        "m": 7178.5,
+        "sd": 364.51499532691633,
+        "ci": 206.24377406213733
+      },
+      "kbLeerStap": {
+        "n": 12,
+        "m": 10803.706090083333,
+        "sd": 154.15699733609344,
+        "ci": 87.22253223126881
+      },
+      "kbInfStap": {
+        "n": 12,
+        "m": 3047.50310125,
+        "sd": 61.94307618472115,
+        "ci": 35.04759467548861
+      },
+      "pogingenTot80": {
+        "n": 12,
+        "m": 103.25,
+        "sd": 84.72750438907073,
+        "ci": 47.93909851745928
+      },
+      "stappenTot80": {
+        "n": 12,
+        "m": 26968.666666666668,
+        "sd": 22346.418583637773,
+        "ci": 12643.676568993578
+      },
+      "kbTot80": {
+        "n": 12,
+        "m": 291469950,
+        "sd": 241110247.87232164,
+        "ci": 136420965.18319306
+      }
+    },
+    "s7-perturbgain": {
+      "runs": 12,
+      "lr": 0.0008,
+      "haalde80": 2,
+      "succes20": {
+        "n": 12,
+        "m": 0.5499999999999999,
+        "sd": 0.12060453783110545,
+        "ci": 0.06823844113463355
+      },
+      "toets20": {
+        "n": 12,
+        "m": 0.38749999999999996,
+        "sd": 0.10471823666825705,
+        "ci": 0.059249920086891526
+      },
+      "benchBeleid": {
+        "n": 12,
+        "m": 0.3331665000000001,
+        "sd": 0.1107683733993844,
+        "ci": 0.06267310719583494
+      },
+      "benchStreng": {
+        "n": 12,
+        "m": 0.4658333333333334,
+        "sd": 0.09293774390646804,
+        "ci": 0.05258447883303031
+      },
+      "benchStappen": {
+        "n": 12,
+        "m": 219.4832844166667,
+        "sd": 15.587916110288365,
+        "ci": 8.819693811132687
+      },
+      "verbindingen": {
+        "n": 12,
+        "m": 2929.5,
+        "sd": 62.00806399170998,
+        "ci": 35.084364988790476
+      },
+      "actief": {
+        "n": 12,
+        "m": 1472.5,
+        "sd": 107.30034313255311,
+        "ci": 60.71088435188438
+      },
+      "neuronen": {
+        "n": 12,
+        "m": 107.5,
+        "sd": 3.2051095570553083,
+        "ci": 1.813461448237162
+      },
+      "pad": {
+        "n": 12,
+        "m": 2,
+        "sd": 0,
+        "ci": 0
+      },
+      "reflexbogen": {
+        "n": 12,
+        "m": 4.75,
+        "sd": 3.3878123807661966,
+        "ci": 1.9168353021993245
+      },
+      "tijdMs": {
+        "n": 12,
+        "m": 9161.833333333334,
+        "sd": 288.60190679560765,
+        "ci": 163.2919008055417
+      },
+      "kbLeerStap": {
+        "n": 12,
+        "m": 10406.889473166668,
+        "sd": 152.2800729749559,
+        "ci": 86.16056230182052
+      },
+      "kbInfStap": {
+        "n": 12,
+        "m": 2861.250340916666,
+        "sd": 56.57505577991173,
+        "ci": 32.01035121027113
+      },
+      "pogingenTot80": {
+        "n": 2,
+        "m": 398,
+        "sd": 8.48528137423857,
+        "ci": 11.759999999999996
+      },
+      "stappenTot80": {
+        "n": 2,
+        "m": 116413.5,
+        "sd": 2577.4042174249657,
+        "ci": 3572.1
+      },
+      "kbTot80": {
+        "n": 2,
+        "m": 1221473972,
+        "sd": 17375321.98373682,
+        "ci": 24080967.680000003
+      }
+    }
+  },
+  "spreiding": {
+    "s7-huidig": {
+      "sd": 0.04606661396973261,
+      "n": 12,
+      "fTegenHuidig": 1
+    },
+    "s7-criticus": {
+      "sd": 0.06241379552752352,
+      "n": 12,
+      "fTegenHuidig": 1.8356446151884243
+    },
+    "s7-schaars": {
+      "sd": 0.037334692797251594,
+      "n": 12,
+      "fTegenHuidig": 0.6568293962159112
+    },
+    "s7-criticus-schaars": {
+      "sd": 0.0476303533366035,
+      "n": 12,
+      "fTegenHuidig": 1.069042629125847
+    },
+    "s7-categorisch": {
+      "sd": 0.03388928756281476,
+      "n": 12,
+      "fTegenHuidig": 0.5411931548983128
+    },
+    "s7-perturbgain": {
+      "sd": 0.1107683733993844,
+      "n": 12,
+      "fTegenHuidig": 5.78174553283998
+    }
+  },
+  "toetsen": [
+    {
+      "tegen": "s7-huidig",
+      "conditie": "s7-criticus",
+      "maat": "benchBeleid",
+      "eenheid": "procentpunt",
+      "verschil": -0.04683333333333339,
+      "verschilPp": -4.683333333333339,
+      "gemiddeldeA": 0.6560555,
+      "gemiddeldeB": 0.6092221666666666,
+      "U": 38,
+      "p": 0.05309782098521676,
+      "oordeel": "verschil valt binnen de ruis"
+    },
+    {
+      "tegen": "s7-huidig",
+      "conditie": "s7-criticus",
+      "maat": "benchStreng",
+      "eenheid": "procentpunt",
+      "verschil": -0.004833333333333356,
+      "verschilPp": -0.4833333333333356,
+      "gemiddeldeA": 0.5353333333333333,
+      "gemiddeldeB": 0.5305,
+      "U": 68,
+      "p": 0.8398600252627391,
+      "oordeel": "verschil valt binnen de ruis"
+    },
+    {
+      "tegen": "s7-huidig",
+      "conditie": "s7-criticus",
+      "maat": "stappenTot80",
+      "eenheid": "absoluut",
+      "verschil": 11992.25,
+      "verschilPp": null,
+      "gemiddeldeA": 15490.5,
+      "gemiddeldeB": 27482.75,
+      "U": 38,
+      "p": 0.05309782098521676,
+      "oordeel": "verschil valt binnen de ruis"
+    },
+    {
+      "tegen": "s7-huidig",
+      "conditie": "s7-schaars",
+      "maat": "benchBeleid",
+      "eenheid": "procentpunt",
+      "verschil": 0.009722416666666622,
+      "verschilPp": 0.9722416666666622,
+      "gemiddeldeA": 0.6560555,
+      "gemiddeldeB": 0.6657779166666666,
+      "U": 62,
+      "p": 0.5833604141248271,
+      "oordeel": "verschil valt binnen de ruis"
+    },
+    {
+      "tegen": "s7-huidig",
+      "conditie": "s7-schaars",
+      "maat": "benchStreng",
+      "eenheid": "procentpunt",
+      "verschil": -0.017000000000000015,
+      "verschilPp": -1.7000000000000015,
+      "gemiddeldeA": 0.5353333333333333,
+      "gemiddeldeB": 0.5183333333333333,
+      "U": 57,
+      "p": 0.40250372291020486,
+      "oordeel": "verschil valt binnen de ruis"
+    },
+    {
+      "tegen": "s7-huidig",
+      "conditie": "s7-schaars",
+      "maat": "stappenTot80",
+      "eenheid": "absoluut",
+      "verschil": -12347.75,
+      "verschilPp": null,
+      "gemiddeldeA": 15490.5,
+      "gemiddeldeB": 3142.75,
+      "U": 20,
+      "p": 0.0029457841570657006,
+      "oordeel": "verschil is er echt"
+    },
+    {
+      "tegen": "s7-huidig",
+      "conditie": "s7-criticus-schaars",
+      "maat": "benchBeleid",
+      "eenheid": "procentpunt",
+      "verschil": -0.013333166666666618,
+      "verschilPp": -1.3333166666666618,
+      "gemiddeldeA": 0.6560555,
+      "gemiddeldeB": 0.6427223333333334,
+      "U": 62.5,
+      "p": 0.6033317486142538,
+      "oordeel": "verschil valt binnen de ruis"
+    },
+    {
+      "tegen": "s7-huidig",
+      "conditie": "s7-criticus-schaars",
+      "maat": "benchStreng",
+      "eenheid": "procentpunt",
+      "verschil": 0.01416666666666666,
+      "verschilPp": 1.416666666666666,
+      "gemiddeldeA": 0.5353333333333333,
+      "gemiddeldeB": 0.5495,
+      "U": 57.5,
+      "p": 0.41892332473825744,
+      "oordeel": "verschil valt binnen de ruis"
+    },
+    {
+      "tegen": "s7-huidig",
+      "conditie": "s7-criticus-schaars",
+      "maat": "stappenTot80",
+      "eenheid": "absoluut",
+      "verschil": -10883.916666666668,
+      "verschilPp": null,
+      "gemiddeldeA": 15490.5,
+      "gemiddeldeB": 4606.583333333333,
+      "U": 28,
+      "p": 0.012022859679530318,
+      "oordeel": "verschil is er echt"
+    },
+    {
+      "tegen": "s7-huidig",
+      "conditie": "s7-categorisch",
+      "maat": "benchBeleid",
+      "eenheid": "procentpunt",
+      "verschil": 0.03222216666666666,
+      "verschilPp": 3.2222166666666663,
+      "gemiddeldeA": 0.6560555,
+      "gemiddeldeB": 0.6882776666666667,
+      "U": 44,
+      "p": 0.11235120442114321,
+      "oordeel": "verschil valt binnen de ruis"
+    },
+    {
+      "tegen": "s7-huidig",
+      "conditie": "s7-categorisch",
+      "maat": "benchStreng",
+      "eenheid": "procentpunt",
+      "verschil": 0.07750000000000001,
+      "verschilPp": 7.750000000000002,
+      "gemiddeldeA": 0.5353333333333333,
+      "gemiddeldeB": 0.6128333333333333,
+      "U": 26,
+      "p": 0.008615635157454116,
+      "oordeel": "verschil is er echt"
+    },
+    {
+      "tegen": "s7-huidig",
+      "conditie": "s7-categorisch",
+      "maat": "stappenTot80",
+      "eenheid": "absoluut",
+      "verschil": 11478.166666666668,
+      "verschilPp": null,
+      "gemiddeldeA": 15490.5,
+      "gemiddeldeB": 26968.666666666668,
+      "U": 41,
+      "p": 0.07825213982850387,
+      "oordeel": "verschil valt binnen de ruis"
+    },
+    {
+      "tegen": "s7-huidig",
+      "conditie": "s7-perturbgain",
+      "maat": "benchBeleid",
+      "eenheid": "procentpunt",
+      "verschil": -0.3228889999999999,
+      "verschilPp": -32.28889999999999,
+      "gemiddeldeA": 0.6560555,
+      "gemiddeldeB": 0.3331665000000001,
+      "U": 0,
+      "p": 0.0000366052296585373,
+      "oordeel": "verschil is er echt"
+    },
+    {
+      "tegen": "s7-huidig",
+      "conditie": "s7-perturbgain",
+      "maat": "benchStreng",
+      "eenheid": "procentpunt",
+      "verschil": -0.06949999999999995,
+      "verschilPp": -6.949999999999995,
+      "gemiddeldeA": 0.5353333333333333,
+      "gemiddeldeB": 0.4658333333333334,
+      "U": 36,
+      "p": 0.04040398576808746,
+      "oordeel": "verschil is er echt"
+    },
+    {
+      "tegen": "s7-huidig",
+      "conditie": "s7-perturbgain",
+      "maat": "stappenTot80",
+      "eenheid": "absoluut",
+      "verschil": 100923,
+      "verschilPp": null,
+      "gemiddeldeA": 15490.5,
+      "gemiddeldeB": 116413.5,
+      "U": 0,
+      "p": 0.03576364157849221,
+      "oordeel": "verschil is er echt"
+    },
+    {
+      "tegen": "s7-criticus",
+      "conditie": "s7-criticus-schaars",
+      "maat": "benchBeleid",
+      "eenheid": "procentpunt",
+      "verschil": 0.033500166666666775,
+      "verschilPp": 3.3500166666666775,
+      "gemiddeldeA": 0.6092221666666666,
+      "gemiddeldeB": 0.6427223333333334,
+      "U": 49,
+      "p": 0.19393098805894116,
+      "oordeel": "verschil valt binnen de ruis"
+    },
+    {
+      "tegen": "s7-schaars",
+      "conditie": "s7-criticus-schaars",
+      "maat": "benchBeleid",
+      "eenheid": "procentpunt",
+      "verschil": -0.02305558333333324,
+      "verschilPp": -2.305558333333324,
+      "gemiddeldeA": 0.6657779166666666,
+      "gemiddeldeB": 0.6427223333333334,
+      "U": 49.5,
+      "p": 0.20402400802674525,
+      "oordeel": "verschil valt binnen de ruis"
+    }
+  ],
+  "perZaad": {
+    "s7-huidig": [
+      {
+        "zaad": 1000,
+        "lr": 0.008,
+        "succes20": 1,
+        "toets20": 0.7,
+        "benchBeleid": 0.698,
+        "benchStreng": 0.582,
+        "benchStappen": 137.851958,
+        "verbindingen": 3003,
+        "actief": 1547,
+        "neuronen": 112,
+        "pad": 2,
+        "reflexbogen": 0,
+        "tijdMs": 6368,
+        "kbLeerStap": 10604.895412,
+        "kbInfStap": 2932.342281,
+        "pogingenTot80": 56,
+        "stappenTot80": 13675,
+        "kbTot80": 145021945
+      },
+      {
+        "zaad": 1001,
+        "lr": 0.008,
+        "succes20": 0.8,
+        "toets20": 0.75,
+        "benchBeleid": 0.604667,
+        "benchStreng": 0.486,
+        "benchStappen": 162.961411,
+        "verbindingen": 3016,
+        "actief": 1493,
+        "neuronen": 112,
+        "pad": 2,
+        "reflexbogen": 2,
+        "tijdMs": 6631,
+        "kbLeerStap": 10601.684128,
+        "kbInfStap": 2942.269637,
+        "pogingenTot80": 63,
+        "stappenTot80": 14145,
+        "kbTot80": 149960822
+      },
+      {
+        "zaad": 1002,
+        "lr": 0.008,
+        "succes20": 0.7,
+        "toets20": 0.55,
+        "benchBeleid": 0.575333,
+        "benchStreng": 0.488,
+        "benchStappen": 170.581692,
+        "verbindingen": 2944,
+        "actief": 1416,
+        "neuronen": 108,
+        "pad": 2,
+        "reflexbogen": 4,
+        "tijdMs": 6733,
+        "kbLeerStap": 10524.150989,
+        "kbInfStap": 2878.800452,
+        "pogingenTot80": 120,
+        "stappenTot80": 27670,
+        "kbTot80": 291203258
+      },
+      {
+        "zaad": 1003,
+        "lr": 0.008,
+        "succes20": 1,
+        "toets20": 0.65,
+        "benchBeleid": 0.625333,
+        "benchStreng": 0.488,
+        "benchStappen": 161.977612,
+        "verbindingen": 2905,
+        "actief": 1245,
+        "neuronen": 106,
+        "pad": 2,
+        "reflexbogen": 7,
+        "tijdMs": 6638,
+        "kbLeerStap": 10438.868656,
+        "kbInfStap": 2841.141592,
+        "pogingenTot80": 64,
+        "stappenTot80": 15214,
+        "kbTot80": 158816948
+      },
+      {
+        "zaad": 1004,
+        "lr": 0.008,
+        "succes20": 1,
+        "toets20": 0.65,
+        "benchBeleid": 0.644667,
+        "benchStreng": 0.458,
+        "benchStappen": 158.37332,
+        "verbindingen": 2994,
+        "actief": 1153,
+        "neuronen": 108,
+        "pad": 2,
+        "reflexbogen": 2,
+        "tijdMs": 6819,
+        "kbLeerStap": 10487.37954,
+        "kbInfStap": 2915.822947,
+        "pogingenTot80": 71,
+        "stappenTot80": 16843,
+        "kbTot80": 176638934
+      },
+      {
+        "zaad": 1005,
+        "lr": 0.008,
+        "succes20": 0.95,
+        "toets20": 0.8,
+        "benchBeleid": 0.687333,
+        "benchStreng": 0.554,
+        "benchStappen": 160.373424,
+        "verbindingen": 3003,
+        "actief": 1434,
+        "neuronen": 112,
+        "pad": 2,
+        "reflexbogen": 8,
+        "tijdMs": 6658,
+        "kbLeerStap": 10643.489558,
+        "kbInfStap": 2928.470031,
+        "pogingenTot80": 73,
+        "stappenTot80": 15914,
+        "kbTot80": 169380493
+      },
+      {
+        "zaad": 1006,
+        "lr": 0.008,
+        "succes20": 0.8,
+        "toets20": 0.7,
+        "benchBeleid": 0.67,
+        "benchStreng": 0.472,
+        "benchStappen": 163.333333,
+        "verbindingen": 2940,
+        "actief": 1532,
+        "neuronen": 108,
+        "pad": 2,
+        "reflexbogen": 0,
+        "tijdMs": 6821,
+        "kbLeerStap": 10436.367277,
+        "kbInfStap": 2866.394197,
+        "pogingenTot80": 120,
+        "stappenTot80": 28934,
+        "kbTot80": 301965851
+      },
+      {
+        "zaad": 1007,
+        "lr": 0.008,
+        "succes20": 0.95,
+        "toets20": 0.6,
+        "benchBeleid": 0.685333,
+        "benchStreng": 0.592,
+        "benchStappen": 135.087549,
+        "verbindingen": 3157,
+        "actief": 1711,
+        "neuronen": 116,
+        "pad": 2,
+        "reflexbogen": 3,
+        "tijdMs": 6379,
+        "kbLeerStap": 11046.629321,
+        "kbInfStap": 3079.98483,
+        "pogingenTot80": 40,
+        "stappenTot80": 9157,
+        "kbTot80": 101153985
+      },
+      {
+        "zaad": 1008,
+        "lr": 0.008,
+        "succes20": 0.9,
+        "toets20": 0.75,
+        "benchBeleid": 0.712,
+        "benchStreng": 0.624,
+        "benchStappen": 138.565543,
+        "verbindingen": 3084,
+        "actief": 1570,
+        "neuronen": 116,
+        "pad": 2,
+        "reflexbogen": 8,
+        "tijdMs": 6449,
+        "kbLeerStap": 10856.078656,
+        "kbInfStap": 3001.930785,
+        "pogingenTot80": 1,
+        "stappenTot80": 268,
+        "kbTot80": 2909429
+      },
+      {
+        "zaad": 1009,
+        "lr": 0.008,
+        "succes20": 0.8,
+        "toets20": 0.65,
+        "benchBeleid": 0.608,
+        "benchStreng": 0.516,
+        "benchStappen": 176.953947,
+        "verbindingen": 3018,
+        "actief": 1132,
+        "neuronen": 114,
+        "pad": 2,
+        "reflexbogen": 4,
+        "tijdMs": 7004,
+        "kbLeerStap": 10631.97514,
+        "kbInfStap": 2941.267712,
+        "pogingenTot80": 74,
+        "stappenTot80": 16875,
+        "kbTot80": 179414580
+      },
+      {
+        "zaad": 1010,
+        "lr": 0.008,
+        "succes20": 0.95,
+        "toets20": 0.75,
+        "benchBeleid": 0.717333,
+        "benchStreng": 0.638,
+        "benchStappen": 144.642193,
+        "verbindingen": 2910,
+        "actief": 1426,
+        "neuronen": 108,
+        "pad": 2,
+        "reflexbogen": 4,
+        "tijdMs": 6332,
+        "kbLeerStap": 10298.563594,
+        "kbInfStap": 2834.940155,
+        "pogingenTot80": 1,
+        "stappenTot80": 191,
+        "kbTot80": 1967026
+      },
+      {
+        "zaad": 1011,
+        "lr": 0.008,
+        "succes20": 0.85,
+        "toets20": 0.6,
+        "benchBeleid": 0.644667,
+        "benchStreng": 0.526,
+        "benchStappen": 162.191313,
+        "verbindingen": 3036,
+        "actief": 1690,
+        "neuronen": 112,
+        "pad": 2,
+        "reflexbogen": 3,
+        "tijdMs": 6689,
+        "kbLeerStap": 10511.797697,
+        "kbInfStap": 2952.421343,
+        "pogingenTot80": 115,
+        "stappenTot80": 27000,
+        "kbTot80": 283818538
+      }
+    ],
+    "s7-criticus": [
+      {
+        "zaad": 1000,
+        "lr": 0.004,
+        "succes20": 0.75,
+        "toets20": 0.75,
+        "benchBeleid": 0.660667,
+        "benchStreng": 0.57,
+        "benchStappen": 157.069627,
+        "verbindingen": 3079,
+        "actief": 1807,
+        "neuronen": 112,
+        "pad": 2,
+        "reflexbogen": 1,
+        "tijdMs": 7006,
+        "kbLeerStap": 10850.072947,
+        "kbInfStap": 3001.424585,
+        "pogingenTot80": 64,
+        "stappenTot80": 15839,
+        "kbTot80": 171854305
+      },
+      {
+        "zaad": 1001,
+        "lr": 0.004,
+        "succes20": 0.9,
+        "toets20": 0.7,
+        "benchBeleid": 0.617333,
+        "benchStreng": 0.466,
+        "benchStappen": 168.846652,
+        "verbindingen": 3059,
+        "actief": 1761,
+        "neuronen": 108,
+        "pad": 2,
+        "reflexbogen": 2,
+        "tijdMs": 6870,
+        "kbLeerStap": 10671.360505,
+        "kbInfStap": 2979.429583,
+        "pogingenTot80": 75,
+        "stappenTot80": 18118,
+        "kbTot80": 193343710
+      },
+      {
+        "zaad": 1002,
+        "lr": 0.004,
+        "succes20": 0.65,
+        "toets20": 0.55,
+        "benchBeleid": 0.516,
+        "benchStreng": 0.514,
+        "benchStappen": 185.056848,
+        "verbindingen": 3069,
+        "actief": 1573,
+        "neuronen": 108,
+        "pad": 2,
+        "reflexbogen": 3,
+        "tijdMs": 7591,
+        "kbLeerStap": 10786.138252,
+        "kbInfStap": 2988.325939,
+        "pogingenTot80": 197,
+        "stappenTot80": 50500,
+        "kbTot80": 544699982
+      },
+      {
+        "zaad": 1003,
+        "lr": 0.004,
+        "succes20": 1,
+        "toets20": 0.8,
+        "benchBeleid": 0.623333,
+        "benchStreng": 0.482,
+        "benchStappen": 180.298396,
+        "verbindingen": 3012,
+        "actief": 1628,
+        "neuronen": 108,
+        "pad": 2,
+        "reflexbogen": 10,
+        "tijdMs": 7173,
+        "kbLeerStap": 10748.20177,
+        "kbInfStap": 2943.809497,
+        "pogingenTot80": 71,
+        "stappenTot80": 17505,
+        "kbTot80": 188147272
+      },
+      {
+        "zaad": 1004,
+        "lr": 0.004,
+        "succes20": 0.75,
+        "toets20": 0.65,
+        "benchBeleid": 0.643333,
+        "benchStreng": 0.422,
+        "benchStappen": 161.654922,
+        "verbindingen": 3036,
+        "actief": 1328,
+        "neuronen": 108,
+        "pad": 2,
+        "reflexbogen": 2,
+        "tijdMs": 6985,
+        "kbLeerStap": 10639.614071,
+        "kbInfStap": 2959.385302,
+        "pogingenTot80": 70,
+        "stappenTot80": 17489,
+        "kbTot80": 186076210
+      },
+      {
+        "zaad": 1005,
+        "lr": 0.004,
+        "succes20": 0.8,
+        "toets20": 0.75,
+        "benchBeleid": 0.637333,
+        "benchStreng": 0.554,
+        "benchStappen": 174.445607,
+        "verbindingen": 3076,
+        "actief": 1744,
+        "neuronen": 112,
+        "pad": 2,
+        "reflexbogen": 7,
+        "tijdMs": 7235,
+        "kbLeerStap": 10743.582946,
+        "kbInfStap": 2993.941331,
+        "pogingenTot80": 118,
+        "stappenTot80": 30107,
+        "kbTot80": 323457052
+      },
+      {
+        "zaad": 1006,
+        "lr": 0.004,
+        "succes20": 0.8,
+        "toets20": 0.6,
+        "benchBeleid": 0.596,
+        "benchStreng": 0.496,
+        "benchStappen": 188.104027,
+        "verbindingen": 3151,
+        "actief": 1684,
+        "neuronen": 118,
+        "pad": 2,
+        "reflexbogen": 0,
+        "tijdMs": 7821,
+        "kbLeerStap": 10964.085876,
+        "kbInfStap": 3061.247918,
+        "pogingenTot80": 251,
+        "stappenTot80": 65686,
+        "kbTot80": 720186945
+      },
+      {
+        "zaad": 1007,
+        "lr": 0.004,
+        "succes20": 0.95,
+        "toets20": 0.7,
+        "benchBeleid": 0.661333,
+        "benchStreng": 0.612,
+        "benchStappen": 149.344758,
+        "verbindingen": 3214,
+        "actief": 1805,
+        "neuronen": 116,
+        "pad": 2,
+        "reflexbogen": 2,
+        "tijdMs": 6931,
+        "kbLeerStap": 11204.343929,
+        "kbInfStap": 3131.396251,
+        "pogingenTot80": 65,
+        "stappenTot80": 15173,
+        "kbTot80": 170003510
+      },
+      {
+        "zaad": 1008,
+        "lr": 0.004,
+        "succes20": 0.95,
+        "toets20": 0.65,
+        "benchBeleid": 0.689333,
+        "benchStreng": 0.612,
+        "benchStappen": 147.229207,
+        "verbindingen": 3118,
+        "actief": 1636,
+        "neuronen": 112,
+        "pad": 2,
+        "reflexbogen": 7,
+        "tijdMs": 6706,
+        "kbLeerStap": 11014.28896,
+        "kbInfStap": 3038.238055,
+        "pogingenTot80": 73,
+        "stappenTot80": 16550,
+        "kbTot80": 182286482
+      },
+      {
+        "zaad": 1009,
+        "lr": 0.004,
+        "succes20": 0.75,
+        "toets20": 0.6,
+        "benchBeleid": 0.596667,
+        "benchStreng": 0.604,
+        "benchStappen": 184.260335,
+        "verbindingen": 3151,
+        "actief": 1688,
+        "neuronen": 118,
+        "pad": 2,
+        "reflexbogen": 6,
+        "tijdMs": 7550,
+        "kbLeerStap": 10936.821327,
+        "kbInfStap": 3063.617508,
+        "pogingenTot80": 120,
+        "stappenTot80": 30315,
+        "kbTot80": 331549739
+      },
+      {
+        "zaad": 1010,
+        "lr": 0.004,
+        "succes20": 0.75,
+        "toets20": 0.7,
+        "benchBeleid": 0.600667,
+        "benchStreng": 0.554,
+        "benchStappen": 165.189789,
+        "verbindingen": 3012,
+        "actief": 1501,
+        "neuronen": 110,
+        "pad": 2,
+        "reflexbogen": 8,
+        "tijdMs": 7253,
+        "kbLeerStap": 10547.849273,
+        "kbInfStap": 2929.176438,
+        "pogingenTot80": 1,
+        "stappenTot80": 261,
+        "kbTot80": 2752989
+      },
+      {
+        "zaad": 1011,
+        "lr": 0.004,
+        "succes20": 0.8,
+        "toets20": 0.6,
+        "benchBeleid": 0.468667,
+        "benchStreng": 0.48,
+        "benchStappen": 196.428165,
+        "verbindingen": 3065,
+        "actief": 1873,
+        "neuronen": 110,
+        "pad": 2,
+        "reflexbogen": 3,
+        "tijdMs": 7614,
+        "kbLeerStap": 10662.228898,
+        "kbInfStap": 2980.936784,
+        "pogingenTot80": 198,
+        "stappenTot80": 52250,
+        "kbTot80": 557101460
+      }
+    ],
+    "s7-schaars": [
+      {
+        "zaad": 1000,
+        "lr": 0.016,
+        "succes20": 0.85,
+        "toets20": 0.8,
+        "benchBeleid": 0.656667,
+        "benchStreng": 0.444,
+        "benchStappen": 137.620305,
+        "verbindingen": 3083,
+        "actief": 1692,
+        "neuronen": 114,
+        "pad": 2,
+        "reflexbogen": 1,
+        "tijdMs": 6375,
+        "kbLeerStap": 10764.835835,
+        "kbInfStap": 3002.704019,
+        "pogingenTot80": 1,
+        "stappenTot80": 252,
+        "kbTot80": 2712739
+      },
+      {
+        "zaad": 1001,
+        "lr": 0.016,
+        "succes20": 0.8,
+        "toets20": 0.75,
+        "benchBeleid": 0.72,
+        "benchStreng": 0.482,
+        "benchStappen": 149.242593,
+        "verbindingen": 3079,
+        "actief": 1775,
+        "neuronen": 112,
+        "pad": 2,
+        "reflexbogen": 4,
+        "tijdMs": 6677,
+        "kbLeerStap": 10862.32967,
+        "kbInfStap": 3000.746265,
+        "pogingenTot80": 1,
+        "stappenTot80": 250,
+        "kbTot80": 2715582
+      },
+      {
+        "zaad": 1002,
+        "lr": 0.016,
+        "succes20": 0.65,
+        "toets20": 0.65,
+        "benchBeleid": 0.627333,
+        "benchStreng": 0.574,
+        "benchStappen": 168.041445,
+        "verbindingen": 2989,
+        "actief": 1587,
+        "neuronen": 106,
+        "pad": 2,
+        "reflexbogen": 3,
+        "tijdMs": 6665,
+        "kbLeerStap": 10557.81747,
+        "kbInfStap": 2910.442587,
+        "pogingenTot80": 1,
+        "stappenTot80": 199,
+        "kbTot80": 2101006
+      },
+      {
+        "zaad": 1003,
+        "lr": 0.016,
+        "succes20": 0.85,
+        "toets20": 0.65,
+        "benchBeleid": 0.588667,
+        "benchStreng": 0.486,
+        "benchStappen": 179.369196,
+        "verbindingen": 3044,
+        "actief": 1388,
+        "neuronen": 114,
+        "pad": 2,
+        "reflexbogen": 7,
+        "tijdMs": 7063,
+        "kbLeerStap": 10738.121649,
+        "kbInfStap": 2968.263681,
+        "pogingenTot80": 1,
+        "stappenTot80": 246,
+        "kbTot80": 2641578
+      },
+      {
+        "zaad": 1004,
+        "lr": 0.016,
+        "succes20": 0.9,
+        "toets20": 0.65,
+        "benchBeleid": 0.650667,
+        "benchStreng": 0.428,
+        "benchStappen": 154.871926,
+        "verbindingen": 2967,
+        "actief": 1568,
+        "neuronen": 108,
+        "pad": 2,
+        "reflexbogen": 2,
+        "tijdMs": 6643,
+        "kbLeerStap": 10657.636324,
+        "kbInfStap": 2901.589888,
+        "pogingenTot80": 1,
+        "stappenTot80": 252,
+        "kbTot80": 2685724
+      },
+      {
+        "zaad": 1005,
+        "lr": 0.016,
+        "succes20": 0.9,
+        "toets20": 0.8,
+        "benchBeleid": 0.696667,
+        "benchStreng": 0.576,
+        "benchStappen": 158.264115,
+        "verbindingen": 2985,
+        "actief": 1666,
+        "neuronen": 106,
+        "pad": 2,
+        "reflexbogen": 6,
+        "tijdMs": 6463,
+        "kbLeerStap": 10569.357782,
+        "kbInfStap": 2910.439914,
+        "pogingenTot80": 50,
+        "stappenTot80": 10629,
+        "kbTot80": 112341704
+      },
+      {
+        "zaad": 1006,
+        "lr": 0.016,
+        "succes20": 0.85,
+        "toets20": 0.55,
+        "benchBeleid": 0.668667,
+        "benchStreng": 0.478,
+        "benchStappen": 151.793619,
+        "verbindingen": 3105,
+        "actief": 1604,
+        "neuronen": 116,
+        "pad": 2,
+        "reflexbogen": 1,
+        "tijdMs": 7043,
+        "kbLeerStap": 10877.933395,
+        "kbInfStap": 3015.35519,
+        "pogingenTot80": 1,
+        "stappenTot80": 206,
+        "kbTot80": 2240854
+      },
+      {
+        "zaad": 1007,
+        "lr": 0.016,
+        "succes20": 1,
+        "toets20": 0.65,
+        "benchBeleid": 0.703333,
+        "benchStreng": 0.624,
+        "benchStappen": 128.939336,
+        "verbindingen": 3144,
+        "actief": 1550,
+        "neuronen": 114,
+        "pad": 2,
+        "reflexbogen": 2,
+        "tijdMs": 6259,
+        "kbLeerStap": 10968.407325,
+        "kbInfStap": 3063.658152,
+        "pogingenTot80": 41,
+        "stappenTot80": 8893,
+        "kbTot80": 97542046
+      },
+      {
+        "zaad": 1008,
+        "lr": 0.016,
+        "succes20": 0.95,
+        "toets20": 0.75,
+        "benchBeleid": 0.704,
+        "benchStreng": 0.532,
+        "benchStappen": 139.283144,
+        "verbindingen": 3042,
+        "actief": 1369,
+        "neuronen": 110,
+        "pad": 2,
+        "reflexbogen": 7,
+        "tijdMs": 6422,
+        "kbLeerStap": 10818.098558,
+        "kbInfStap": 2966.055664,
+        "pogingenTot80": 1,
+        "stappenTot80": 199,
+        "kbTot80": 2152802
+      },
+      {
+        "zaad": 1009,
+        "lr": 0.016,
+        "succes20": 0.8,
+        "toets20": 0.8,
+        "benchBeleid": 0.644667,
+        "benchStreng": 0.588,
+        "benchStappen": 170.66908,
+        "verbindingen": 3010,
+        "actief": 1520,
+        "neuronen": 110,
+        "pad": 2,
+        "reflexbogen": 5,
+        "tijdMs": 6814,
+        "kbLeerStap": 10469.699513,
+        "kbInfStap": 2922.01418,
+        "pogingenTot80": 1,
+        "stappenTot80": 206,
+        "kbTot80": 2156758
+      },
+      {
+        "zaad": 1010,
+        "lr": 0.016,
+        "succes20": 0.95,
+        "toets20": 0.7,
+        "benchBeleid": 0.678,
+        "benchStreng": 0.568,
+        "benchStappen": 154.510324,
+        "verbindingen": 2936,
+        "actief": 1401,
+        "neuronen": 106,
+        "pad": 2,
+        "reflexbogen": 8,
+        "tijdMs": 6402,
+        "kbLeerStap": 10299.377917,
+        "kbInfStap": 2850.940619,
+        "pogingenTot80": 1,
+        "stappenTot80": 173,
+        "kbTot80": 1781792
+      },
+      {
+        "zaad": 1011,
+        "lr": 0.016,
+        "succes20": 0.8,
+        "toets20": 0.65,
+        "benchBeleid": 0.650667,
+        "benchStreng": 0.44,
+        "benchStappen": 163.280738,
+        "verbindingen": 3094,
+        "actief": 1706,
+        "neuronen": 116,
+        "pad": 2,
+        "reflexbogen": 3,
+        "tijdMs": 7100,
+        "kbLeerStap": 10787.513543,
+        "kbInfStap": 3006.228541,
+        "pogingenTot80": 71,
+        "stappenTot80": 16208,
+        "kbTot80": 174844020
+      }
+    ],
+    "s7-criticus-schaars": [
+      {
+        "zaad": 1000,
+        "lr": 0.008,
+        "succes20": 0.85,
+        "toets20": 0.7,
+        "benchBeleid": 0.664,
+        "benchStreng": 0.526,
+        "benchStappen": 143.62751,
+        "verbindingen": 3101,
+        "actief": 1847,
+        "neuronen": 114,
+        "pad": 2,
+        "reflexbogen": 1,
+        "tijdMs": 6730,
+        "kbLeerStap": 10883.746399,
+        "kbInfStap": 3021.383299,
+        "pogingenTot80": 39,
+        "stappenTot80": 9089,
+        "kbTot80": 98922371
+      },
+      {
+        "zaad": 1001,
+        "lr": 0.008,
+        "succes20": 0.95,
+        "toets20": 0.65,
+        "benchBeleid": 0.656667,
+        "benchStreng": 0.558,
+        "benchStappen": 155.91269,
+        "verbindingen": 3145,
+        "actief": 1786,
+        "neuronen": 112,
+        "pad": 2,
+        "reflexbogen": 2,
+        "tijdMs": 6727,
+        "kbLeerStap": 11024.379524,
+        "kbInfStap": 3065.711365,
+        "pogingenTot80": 1,
+        "stappenTot80": 317,
+        "kbTot80": 3494728
+      },
+      {
+        "zaad": 1002,
+        "lr": 0.008,
+        "succes20": 0.7,
+        "toets20": 0.6,
+        "benchBeleid": 0.594667,
+        "benchStreng": 0.56,
+        "benchStappen": 177.357623,
+        "verbindingen": 3077,
+        "actief": 1676,
+        "neuronen": 106,
+        "pad": 2,
+        "reflexbogen": 4,
+        "tijdMs": 7103,
+        "kbLeerStap": 10735.230438,
+        "kbInfStap": 2989.016448,
+        "pogingenTot80": 1,
+        "stappenTot80": 244,
+        "kbTot80": 2619396
+      },
+      {
+        "zaad": 1003,
+        "lr": 0.008,
+        "succes20": 0.95,
+        "toets20": 0.75,
+        "benchBeleid": 0.64,
+        "benchStreng": 0.548,
+        "benchStappen": 162.302083,
+        "verbindingen": 3023,
+        "actief": 1690,
+        "neuronen": 108,
+        "pad": 2,
+        "reflexbogen": 10,
+        "tijdMs": 6944,
+        "kbLeerStap": 10645.317196,
+        "kbInfStap": 2943.36363,
+        "pogingenTot80": 1,
+        "stappenTot80": 291,
+        "kbTot80": 3097787
+      },
+      {
+        "zaad": 1004,
+        "lr": 0.008,
+        "succes20": 0.95,
+        "toets20": 0.7,
+        "benchBeleid": 0.646667,
+        "benchStreng": 0.436,
+        "benchStappen": 156.738144,
+        "verbindingen": 3104,
+        "actief": 1608,
+        "neuronen": 112,
+        "pad": 2,
+        "reflexbogen": 2,
+        "tijdMs": 7176,
+        "kbLeerStap": 10930.047738,
+        "kbInfStap": 3026.274994,
+        "pogingenTot80": 70,
+        "stappenTot80": 16640,
+        "kbTot80": 181875994
+      },
+      {
+        "zaad": 1005,
+        "lr": 0.008,
+        "succes20": 0.75,
+        "toets20": 0.75,
+        "benchBeleid": 0.66,
+        "benchStreng": 0.58,
+        "benchStappen": 166.956566,
+        "verbindingen": 2978,
+        "actief": 1734,
+        "neuronen": 102,
+        "pad": 2,
+        "reflexbogen": 8,
+        "tijdMs": 6836,
+        "kbLeerStap": 10754.663568,
+        "kbInfStap": 2914.272879,
+        "pogingenTot80": 55,
+        "stappenTot80": 12583,
+        "kbTot80": 135325932
+      },
+      {
+        "zaad": 1006,
+        "lr": 0.008,
+        "succes20": 0.9,
+        "toets20": 0.65,
+        "benchBeleid": 0.625333,
+        "benchStreng": 0.528,
+        "benchStappen": 174.593817,
+        "verbindingen": 3060,
+        "actief": 1669,
+        "neuronen": 110,
+        "pad": 2,
+        "reflexbogen": 1,
+        "tijdMs": 7476,
+        "kbLeerStap": 10754.613529,
+        "kbInfStap": 2973.370431,
+        "pogingenTot80": 1,
+        "stappenTot80": 296,
+        "kbTot80": 3183366
+      },
+      {
+        "zaad": 1007,
+        "lr": 0.008,
+        "succes20": 0.95,
+        "toets20": 0.8,
+        "benchBeleid": 0.700667,
+        "benchStreng": 0.634,
+        "benchStappen": 144.114177,
+        "verbindingen": 3138,
+        "actief": 1802,
+        "neuronen": 110,
+        "pad": 2,
+        "reflexbogen": 1,
+        "tijdMs": 6340,
+        "kbLeerStap": 10966.406358,
+        "kbInfStap": 3058.71211,
+        "pogingenTot80": 61,
+        "stappenTot80": 12917,
+        "kbTot80": 141653071
+      },
+      {
+        "zaad": 1008,
+        "lr": 0.008,
+        "succes20": 1,
+        "toets20": 0.7,
+        "benchBeleid": 0.720667,
+        "benchStreng": 0.608,
+        "benchStappen": 143.487512,
+        "verbindingen": 3155,
+        "actief": 1681,
+        "neuronen": 114,
+        "pad": 2,
+        "reflexbogen": 8,
+        "tijdMs": 6646,
+        "kbLeerStap": 11116.827329,
+        "kbInfStap": 3070.604625,
+        "pogingenTot80": 1,
+        "stappenTot80": 245,
+        "kbTot80": 2723623
+      },
+      {
+        "zaad": 1009,
+        "lr": 0.008,
+        "succes20": 0.9,
+        "toets20": 0.7,
+        "benchBeleid": 0.634,
+        "benchStreng": 0.628,
+        "benchStappen": 173.835962,
+        "verbindingen": 3104,
+        "actief": 1694,
+        "neuronen": 112,
+        "pad": 2,
+        "reflexbogen": 5,
+        "tijdMs": 7278,
+        "kbLeerStap": 10850.458014,
+        "kbInfStap": 3019.8589,
+        "pogingenTot80": 10,
+        "stappenTot80": 2164,
+        "kbTot80": 23480391
+      },
+      {
+        "zaad": 1010,
+        "lr": 0.008,
+        "succes20": 0.85,
+        "toets20": 0.65,
+        "benchBeleid": 0.636,
+        "benchStreng": 0.614,
+        "benchStappen": 159.06499,
+        "verbindingen": 2989,
+        "actief": 1447,
+        "neuronen": 108,
+        "pad": 2,
+        "reflexbogen": 6,
+        "tijdMs": 6880,
+        "kbLeerStap": 10534.348683,
+        "kbInfStap": 2907.969203,
+        "pogingenTot80": 1,
+        "stappenTot80": 201,
+        "kbTot80": 2117404
+      },
+      {
+        "zaad": 1011,
+        "lr": 0.008,
+        "succes20": 0.7,
+        "toets20": 0.7,
+        "benchBeleid": 0.534,
+        "benchStreng": 0.374,
+        "benchStappen": 172.506866,
+        "verbindingen": 3032,
+        "actief": 1920,
+        "neuronen": 108,
+        "pad": 2,
+        "reflexbogen": 3,
+        "tijdMs": 7011,
+        "kbLeerStap": 10627.721456,
+        "kbInfStap": 2955.142665,
+        "pogingenTot80": 1,
+        "stappenTot80": 292,
+        "kbTot80": 3103295
+      }
+    ],
+    "s7-categorisch": [
+      {
+        "zaad": 1000,
+        "lr": 0.002,
+        "succes20": 0.8,
+        "toets20": 0.85,
+        "benchBeleid": 0.698,
+        "benchStreng": 0.636,
+        "benchStappen": 136.577841,
+        "verbindingen": 3185,
+        "actief": 1846,
+        "neuronen": 116,
+        "pad": 2,
+        "reflexbogen": 0,
+        "tijdMs": 7017,
+        "kbLeerStap": 10872.127123,
+        "kbInfStap": 3102.536107,
+        "pogingenTot80": 70,
+        "stappenTot80": 18303,
+        "kbTot80": 198992543
+      },
+      {
+        "zaad": 1001,
+        "lr": 0.002,
+        "succes20": 0.9,
+        "toets20": 0.7,
+        "benchBeleid": 0.659333,
+        "benchStreng": 0.582,
+        "benchStappen": 151.847321,
+        "verbindingen": 3088,
+        "actief": 1564,
+        "neuronen": 106,
+        "pad": 2,
+        "reflexbogen": 3,
+        "tijdMs": 6774,
+        "kbLeerStap": 10810.211538,
+        "kbInfStap": 3028.971712,
+        "pogingenTot80": 74,
+        "stappenTot80": 18463,
+        "kbTot80": 199588936
+      },
+      {
+        "zaad": 1002,
+        "lr": 0.002,
+        "succes20": 0.8,
+        "toets20": 0.6,
+        "benchBeleid": 0.670667,
+        "benchStreng": 0.612,
+        "benchStappen": 165.06163,
+        "verbindingen": 3186,
+        "actief": 1717,
+        "neuronen": 114,
+        "pad": 2,
+        "reflexbogen": 3,
+        "tijdMs": 7327,
+        "kbLeerStap": 10822.129164,
+        "kbInfStap": 3096.784262,
+        "pogingenTot80": 1,
+        "stappenTot80": 281,
+        "kbTot80": 3041018
+      },
+      {
+        "zaad": 1003,
+        "lr": 0.002,
+        "succes20": 1,
+        "toets20": 0.75,
+        "benchBeleid": 0.644,
+        "benchStreng": 0.544,
+        "benchStappen": 152.84265,
+        "verbindingen": 3000,
+        "actief": 1675,
+        "neuronen": 106,
+        "pad": 2,
+        "reflexbogen": 10,
+        "tijdMs": 7223,
+        "kbLeerStap": 10674.344241,
+        "kbInfStap": 2948.326054,
+        "pogingenTot80": 73,
+        "stappenTot80": 19108,
+        "kbTot80": 203965370
+      },
+      {
+        "zaad": 1004,
+        "lr": 0.002,
+        "succes20": 0.95,
+        "toets20": 0.75,
+        "benchBeleid": 0.683333,
+        "benchStreng": 0.486,
+        "benchStappen": 155.927805,
+        "verbindingen": 3089,
+        "actief": 1605,
+        "neuronen": 110,
+        "pad": 2,
+        "reflexbogen": 2,
+        "tijdMs": 7378,
+        "kbLeerStap": 10660.480115,
+        "kbInfStap": 3016.675318,
+        "pogingenTot80": 74,
+        "stappenTot80": 20088,
+        "kbTot80": 214147725
+      },
+      {
+        "zaad": 1005,
+        "lr": 0.002,
+        "succes20": 0.85,
+        "toets20": 0.85,
+        "benchBeleid": 0.713333,
+        "benchStreng": 0.656,
+        "benchStappen": 161.874766,
+        "verbindingen": 3127,
+        "actief": 1792,
+        "neuronen": 110,
+        "pad": 2,
+        "reflexbogen": 10,
+        "tijdMs": 7423,
+        "kbLeerStap": 10842.149826,
+        "kbInfStap": 3051.33817,
+        "pogingenTot80": 250,
+        "stappenTot80": 64130,
+        "kbTot80": 695307068
+      },
+      {
+        "zaad": 1006,
+        "lr": 0.002,
+        "succes20": 0.9,
+        "toets20": 0.6,
+        "benchBeleid": 0.687333,
+        "benchStreng": 0.588,
+        "benchStappen": 171.661494,
+        "verbindingen": 3164,
+        "actief": 1723,
+        "neuronen": 114,
+        "pad": 2,
+        "reflexbogen": 0,
+        "tijdMs": 7877,
+        "kbLeerStap": 10878.619403,
+        "kbInfStap": 3079.402115,
+        "pogingenTot80": 250,
+        "stappenTot80": 65506,
+        "kbTot80": 712614843
+      },
+      {
+        "zaad": 1007,
+        "lr": 0.002,
+        "succes20": 0.75,
+        "toets20": 0.7,
+        "benchBeleid": 0.718,
+        "benchStreng": 0.642,
+        "benchStappen": 127.247911,
+        "verbindingen": 3151,
+        "actief": 1835,
+        "neuronen": 110,
+        "pad": 2,
+        "reflexbogen": 2,
+        "tijdMs": 6632,
+        "kbLeerStap": 10974.846298,
+        "kbInfStap": 3084.203359,
+        "pogingenTot80": 64,
+        "stappenTot80": 15949,
+        "kbTot80": 175037824
+      },
+      {
+        "zaad": 1008,
+        "lr": 0.002,
+        "succes20": 0.95,
+        "toets20": 0.75,
+        "benchBeleid": 0.754,
+        "benchStreng": 0.702,
+        "benchStappen": 133.723254,
+        "verbindingen": 3174,
+        "actief": 1703,
+        "neuronen": 112,
+        "pad": 2,
+        "reflexbogen": 7,
+        "tijdMs": 6704,
+        "kbLeerStap": 11037.559589,
+        "kbInfStap": 3100.044697,
+        "pogingenTot80": 70,
+        "stappenTot80": 17275,
+        "kbTot80": 190673842
+      },
+      {
+        "zaad": 1009,
+        "lr": 0.002,
+        "succes20": 0.8,
+        "toets20": 0.85,
+        "benchBeleid": 0.705333,
+        "benchStreng": 0.658,
+        "benchStappen": 156.257089,
+        "verbindingen": 3212,
+        "actief": 1741,
+        "neuronen": 116,
+        "pad": 2,
+        "reflexbogen": 6,
+        "tijdMs": 7240,
+        "kbLeerStap": 10935.176332,
+        "kbInfStap": 3129.87769,
+        "pogingenTot80": 117,
+        "stappenTot80": 30523,
+        "kbTot80": 333774387
+      },
+      {
+        "zaad": 1010,
+        "lr": 0.002,
+        "succes20": 0.8,
+        "toets20": 0.8,
+        "benchBeleid": 0.694667,
+        "benchStreng": 0.648,
+        "benchStappen": 147.508637,
+        "verbindingen": 3019,
+        "actief": 1665,
+        "neuronen": 106,
+        "pad": 2,
+        "reflexbogen": 10,
+        "tijdMs": 7034,
+        "kbLeerStap": 10571.732133,
+        "kbInfStap": 2952.002031,
+        "pogingenTot80": 1,
+        "stappenTot80": 259,
+        "kbTot80": 2738079
+      },
+      {
+        "zaad": 1011,
+        "lr": 0.002,
+        "succes20": 0.75,
+        "toets20": 0.75,
+        "benchBeleid": 0.631333,
+        "benchStreng": 0.6,
+        "benchStappen": 172.555438,
+        "verbindingen": 3052,
+        "actief": 1911,
+        "neuronen": 106,
+        "pad": 2,
+        "reflexbogen": 2,
+        "tijdMs": 7513,
+        "kbLeerStap": 10565.097319,
+        "kbInfStap": 2979.8757,
+        "pogingenTot80": 195,
+        "stappenTot80": 53739,
+        "kbTot80": 567757765
+      }
+    ],
+    "s7-perturbgain": [
+      {
+        "zaad": 1000,
+        "lr": 0.0008,
+        "succes20": 0.7,
+        "toets20": 0.55,
+        "benchBeleid": 0.445333,
+        "benchStreng": 0.566,
+        "benchStappen": 205.269461,
+        "verbindingen": 2955,
+        "actief": 1564,
+        "neuronen": 110,
+        "pad": 2,
+        "reflexbogen": 3,
+        "tijdMs": 8957,
+        "kbLeerStap": 10434.725298,
+        "kbInfStap": 2879.612154,
+        "pogingenTot80": 404,
+        "stappenTot80": 118236,
+        "kbTot80": 1233760180
+      },
+      {
+        "zaad": 1001,
+        "lr": 0.0008,
+        "succes20": 0.65,
+        "toets20": 0.4,
+        "benchBeleid": 0.337333,
+        "benchStreng": 0.5,
+        "benchStappen": 214.434783,
+        "verbindingen": 2909,
+        "actief": 1596,
+        "neuronen": 106,
+        "pad": 2,
+        "reflexbogen": 2,
+        "tijdMs": 9027,
+        "kbLeerStap": 10384.654094,
+        "kbInfStap": 2845.412208,
+        "pogingenTot80": null,
+        "stappenTot80": null,
+        "kbTot80": null
+      },
+      {
+        "zaad": 1002,
+        "lr": 0.0008,
+        "succes20": 0.35,
+        "toets20": 0.25,
+        "benchBeleid": 0.200667,
+        "benchStreng": 0.274,
+        "benchStappen": 227.332226,
+        "verbindingen": 2870,
+        "actief": 1407,
+        "neuronen": 104,
+        "pad": 2,
+        "reflexbogen": 4,
+        "tijdMs": 9334,
+        "kbLeerStap": 10323.462455,
+        "kbInfStap": 2811.181898,
+        "pogingenTot80": null,
+        "stappenTot80": null,
+        "kbTot80": null
+      },
+      {
+        "zaad": 1003,
+        "lr": 0.0008,
+        "succes20": 0.5,
+        "toets20": 0.4,
+        "benchBeleid": 0.284667,
+        "benchStreng": 0.43,
+        "benchStappen": 233.819672,
+        "verbindingen": 2991,
+        "actief": 1445,
+        "neuronen": 114,
+        "pad": 2,
+        "reflexbogen": 10,
+        "tijdMs": 9480,
+        "kbLeerStap": 10524.595036,
+        "kbInfStap": 2916.1191,
+        "pogingenTot80": null,
+        "stappenTot80": null,
+        "kbTot80": null
+      },
+      {
+        "zaad": 1004,
+        "lr": 0.0008,
+        "succes20": 0.55,
+        "toets20": 0.4,
+        "benchBeleid": 0.331333,
+        "benchStreng": 0.432,
+        "benchStappen": 224.317907,
+        "verbindingen": 2962,
+        "actief": 1417,
+        "neuronen": 108,
+        "pad": 2,
+        "reflexbogen": 2,
+        "tijdMs": 9386,
+        "kbLeerStap": 10341.271239,
+        "kbInfStap": 2883.712762,
+        "pogingenTot80": null,
+        "stappenTot80": null,
+        "kbTot80": null
+      },
+      {
+        "zaad": 1005,
+        "lr": 0.0008,
+        "succes20": 0.35,
+        "toets20": 0.3,
+        "benchBeleid": 0.211333,
+        "benchStreng": 0.498,
+        "benchStappen": 241.350158,
+        "verbindingen": 2966,
+        "actief": 1455,
+        "neuronen": 112,
+        "pad": 2,
+        "reflexbogen": 9,
+        "tijdMs": 9616,
+        "kbLeerStap": 10654.18176,
+        "kbInfStap": 2903.700549,
+        "pogingenTot80": null,
+        "stappenTot80": null,
+        "kbTot80": null
+      },
+      {
+        "zaad": 1006,
+        "lr": 0.0008,
+        "succes20": 0.55,
+        "toets20": 0.3,
+        "benchBeleid": 0.223333,
+        "benchStreng": 0.45,
+        "benchStappen": 233.814925,
+        "verbindingen": 2838,
+        "actief": 1384,
+        "neuronen": 104,
+        "pad": 2,
+        "reflexbogen": 0,
+        "tijdMs": 9306,
+        "kbLeerStap": 10315.331315,
+        "kbInfStap": 2783.5686,
+        "pogingenTot80": null,
+        "stappenTot80": null,
+        "kbTot80": null
+      },
+      {
+        "zaad": 1007,
+        "lr": 0.0008,
+        "succes20": 0.55,
+        "toets20": 0.4,
+        "benchBeleid": 0.389333,
+        "benchStreng": 0.43,
+        "benchStappen": 209.400685,
+        "verbindingen": 2975,
+        "actief": 1530,
+        "neuronen": 106,
+        "pad": 2,
+        "reflexbogen": 2,
+        "tijdMs": 8933,
+        "kbLeerStap": 10489.072912,
+        "kbInfStap": 2903.226334,
+        "pogingenTot80": null,
+        "stappenTot80": null,
+        "kbTot80": null
+      },
+      {
+        "zaad": 1008,
+        "lr": 0.0008,
+        "succes20": 0.75,
+        "toets20": 0.5,
+        "benchBeleid": 0.547333,
+        "benchStreng": 0.384,
+        "benchStappen": 198.666261,
+        "verbindingen": 2976,
+        "actief": 1395,
+        "neuronen": 108,
+        "pad": 2,
+        "reflexbogen": 8,
+        "tijdMs": 8935,
+        "kbLeerStap": 10552.205353,
+        "kbInfStap": 2905.317095,
+        "pogingenTot80": 392,
+        "stappenTot80": 114591,
+        "kbTot80": 1209187764
+      },
+      {
+        "zaad": 1009,
+        "lr": 0.0008,
+        "succes20": 0.5,
+        "toets20": 0.25,
+        "benchBeleid": 0.333333,
+        "benchStreng": 0.572,
+        "benchStappen": 214.806,
+        "verbindingen": 2971,
+        "actief": 1462,
+        "neuronen": 108,
+        "pad": 2,
+        "reflexbogen": 5,
+        "tijdMs": 8969,
+        "kbLeerStap": 10442.869566,
+        "kbInfStap": 2897.576598,
+        "pogingenTot80": null,
+        "stappenTot80": null,
+        "kbTot80": null
+      },
+      {
+        "zaad": 1010,
+        "lr": 0.0008,
+        "succes20": 0.6,
+        "toets20": 0.55,
+        "benchBeleid": 0.461333,
+        "benchStreng": 0.618,
+        "benchStappen": 194.32659,
+        "verbindingen": 2799,
+        "actief": 1314,
+        "neuronen": 104,
+        "pad": 2,
+        "reflexbogen": 9,
+        "tijdMs": 8643,
+        "kbLeerStap": 10048.011969,
+        "kbInfStap": 2736.070397,
+        "pogingenTot80": null,
+        "stappenTot80": null,
+        "kbTot80": null
+      },
+      {
+        "zaad": 1011,
+        "lr": 0.0008,
+        "succes20": 0.55,
+        "toets20": 0.35,
+        "benchBeleid": 0.232667,
+        "benchStreng": 0.436,
+        "benchStappen": 236.260745,
+        "verbindingen": 2942,
+        "actief": 1701,
+        "neuronen": 106,
+        "pad": 2,
+        "reflexbogen": 3,
+        "tijdMs": 9356,
+        "kbLeerStap": 10372.292681,
+        "kbInfStap": 2869.506396,
+        "pogingenTot80": null,
+        "stappenTot80": null,
+        "kbTot80": null
+      }
+    ]
+  }
+}

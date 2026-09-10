@@ -1,5 +1,6 @@
-/* Eenmalige migratie: runs.csv krijgt de zeven kolommen van stap 6 erbij.
-   De 118 bestaande regels blijven staan en krijgen lege cellen — dat is geen nul
+/* Migratie: runs.csv krijgt de kolommen erbij die de pagina inmiddels schrijft
+   (zeven bij stap 6, zes bij stap 7).
+   De bestaande regels blijven staan en krijgen lege cellen — dat is geen nul
    maar "niet gemeten", en dat verschil hoort zichtbaar te blijven. De kolomnamen
    worden uit de pagina zelf gelezen, zodat het bestand en de code niet uit de pas
    kunnen lopen. Draaien mag vaker: is het bestand al gemigreerd, dan gebeurt er
@@ -24,9 +25,10 @@ const path = require('path'), fs = require('fs');
     throw new Error('de bestaande kolommen zijn geen voorvoegsel van de nieuwe — niet automatisch te migreren');
   const bij = ','.repeat(cols.length - oud.length);
   const uit = [nieuw].concat(regels.slice(1).map(r => r + bij));
-  fs.copyFileSync(pad, pad + '.voor-stap6');
+  const kopie = `${pad}.voor-${cols.length}kolommen`;
+  fs.copyFileSync(pad, kopie);
   fs.writeFileSync(pad, uit.join('\n') + '\n');
   console.log(`runs.csv gemigreerd: ${oud.length} -> ${cols.length} kolommen, ${uit.length - 1} regels behouden.`);
   console.log(`nieuw: ${cols.slice(oud.length).join(', ')}`);
-  console.log(`kopie van het oude bestand: ${path.basename(pad)}.voor-stap6`);
+  console.log(`kopie van het oude bestand: ${path.basename(kopie)}`);
 })();

@@ -1,0 +1,1757 @@
+{
+  "uitgevoerd": "2026-09-10T14:18:21.559Z",
+  "pogingenPerRun": 500,
+  "rasters": {
+    "s7-huidig": [
+      0.002,
+      0.004,
+      0.008,
+      0.016,
+      0.032,
+      0.064
+    ],
+    "s7-criticus": [
+      0.002,
+      0.004,
+      0.008,
+      0.016,
+      0.032,
+      0.064
+    ],
+    "s7-schaars": [
+      0.002,
+      0.004,
+      0.008,
+      0.016,
+      0.032,
+      0.064
+    ],
+    "s7-criticus-schaars": [
+      0.002,
+      0.004,
+      0.008,
+      0.016,
+      0.032,
+      0.064
+    ],
+    "s7-categorisch": [
+      0.002,
+      0.004,
+      0.008,
+      0.016,
+      0.032,
+      0.064
+    ],
+    "s7-perturbgain": [
+      0.0002,
+      0.0004,
+      0.0008,
+      0.0016,
+      0.0032,
+      0.008
+    ]
+  },
+  "veegZaden": [
+    3000,
+    3001,
+    3002,
+    3003
+  ],
+  "gekozenOp": "toets op 20 onbekende werelden; de benchmark van 500 werelden is hier uit",
+  "keuze": {
+    "s7-huidig": {
+      "lr": 0.008,
+      "toets": 0.75,
+      "perLeersnelheid": [
+        {
+          "lr": 0.002,
+          "n": 4,
+          "toets": 0.6375000000000001,
+          "sd": 0.17969882210706523
+        },
+        {
+          "lr": 0.004,
+          "n": 4,
+          "toets": 0.7124999999999999,
+          "sd": 0.10307764064044153
+        },
+        {
+          "lr": 0.008,
+          "n": 4,
+          "toets": 0.75,
+          "sd": 0.07071067811865477
+        },
+        {
+          "lr": 0.016,
+          "n": 4,
+          "toets": 0.6125,
+          "sd": 0.2594063736045564
+        },
+        {
+          "lr": 0.032,
+          "n": 4,
+          "toets": 0.3875,
+          "sd": 0.3145764348029479
+        },
+        {
+          "lr": 0.064,
+          "n": 4,
+          "toets": 0.0875,
+          "sd": 0.11086778913041725
+        }
+      ]
+    },
+    "s7-criticus": {
+      "lr": 0.004,
+      "toets": 0.7749999999999999,
+      "perLeersnelheid": [
+        {
+          "lr": 0.002,
+          "n": 4,
+          "toets": 0.6625,
+          "sd": 0.1181453906563152
+        },
+        {
+          "lr": 0.004,
+          "n": 4,
+          "toets": 0.7749999999999999,
+          "sd": 0.028867513459481315
+        },
+        {
+          "lr": 0.008,
+          "n": 4,
+          "toets": 0.7500000000000001,
+          "sd": 0.09128709291752768
+        },
+        {
+          "lr": 0.016,
+          "n": 4,
+          "toets": 0.7125,
+          "sd": 0.0478713553878169
+        },
+        {
+          "lr": 0.032,
+          "n": 4,
+          "toets": 0.375,
+          "sd": 0.16583123951776998
+        },
+        {
+          "lr": 0.064,
+          "n": 4,
+          "toets": 0.05,
+          "sd": 0.07071067811865475
+        }
+      ]
+    },
+    "s7-schaars": {
+      "lr": 0.016,
+      "toets": 0.75,
+      "perLeersnelheid": [
+        {
+          "lr": 0.002,
+          "n": 4,
+          "toets": 0.6,
+          "sd": 0.18257418583505536
+        },
+        {
+          "lr": 0.004,
+          "n": 4,
+          "toets": 0.7375,
+          "sd": 0.06291528696058958
+        },
+        {
+          "lr": 0.008,
+          "n": 4,
+          "toets": 0.7124999999999999,
+          "sd": 0.0478713553878169
+        },
+        {
+          "lr": 0.016,
+          "n": 4,
+          "toets": 0.75,
+          "sd": 0.17795130420052185
+        },
+        {
+          "lr": 0.032,
+          "n": 4,
+          "toets": 0.5375,
+          "sd": 0.22867371223353739
+        },
+        {
+          "lr": 0.064,
+          "n": 4,
+          "toets": 0.175,
+          "sd": 0.06454972243679027
+        }
+      ]
+    },
+    "s7-criticus-schaars": {
+      "lr": 0.008,
+      "toets": 0.7875000000000001,
+      "perLeersnelheid": [
+        {
+          "lr": 0.002,
+          "n": 4,
+          "toets": 0.6125,
+          "sd": 0.09464847243000454
+        },
+        {
+          "lr": 0.004,
+          "n": 4,
+          "toets": 0.7749999999999999,
+          "sd": 0.028867513459481315
+        },
+        {
+          "lr": 0.008,
+          "n": 4,
+          "toets": 0.7875000000000001,
+          "sd": 0.0478713553878169
+        },
+        {
+          "lr": 0.016,
+          "n": 4,
+          "toets": 0.7124999999999999,
+          "sd": 0.025000000000000022
+        },
+        {
+          "lr": 0.032,
+          "n": 4,
+          "toets": 0.5499999999999999,
+          "sd": 0.2857738033247041
+        },
+        {
+          "lr": 0.064,
+          "n": 4,
+          "toets": 0.175,
+          "sd": 0.06454972243679027
+        }
+      ]
+    },
+    "s7-categorisch": {
+      "lr": 0.002,
+      "toets": 0.8,
+      "perLeersnelheid": [
+        {
+          "lr": 0.002,
+          "n": 4,
+          "toets": 0.8,
+          "sd": 0.05773502691896256
+        },
+        {
+          "lr": 0.004,
+          "n": 4,
+          "toets": 0.7375,
+          "sd": 0.04787135538781695
+        },
+        {
+          "lr": 0.008,
+          "n": 4,
+          "toets": 0.8,
+          "sd": 0.04082482904638629
+        },
+        {
+          "lr": 0.016,
+          "n": 4,
+          "toets": 0.7375,
+          "sd": 0.09464847243000458
+        },
+        {
+          "lr": 0.032,
+          "n": 4,
+          "toets": 0.4125,
+          "sd": 0.19737865470545018
+        },
+        {
+          "lr": 0.064,
+          "n": 4,
+          "toets": 0.13749999999999998,
+          "sd": 0.04787135538781691
+        }
+      ]
+    },
+    "s7-perturbgain": {
+      "lr": 0.0008,
+      "toets": 0.4875,
+      "perLeersnelheid": [
+        {
+          "lr": 0.0002,
+          "n": 4,
+          "toets": 0.0875,
+          "sd": 0.11086778913041725
+        },
+        {
+          "lr": 0.0004,
+          "n": 4,
+          "toets": 0.25,
+          "sd": 0.14719601443879746
+        },
+        {
+          "lr": 0.0008,
+          "n": 4,
+          "toets": 0.4875,
+          "sd": 0.08539125638299663
+        },
+        {
+          "lr": 0.0016,
+          "n": 4,
+          "toets": 0.425,
+          "sd": 0.06454972243679029
+        },
+        {
+          "lr": 0.0032,
+          "n": 4,
+          "toets": 0.42499999999999993,
+          "sd": 0.14433756729740643
+        },
+        {
+          "lr": 0.008,
+          "n": 4,
+          "toets": 0.19999999999999998,
+          "sd": 0.17795130420052185
+        }
+      ]
+    }
+  },
+  "runs": [
+    {
+      "conditie": "s7-huidig",
+      "lr": 0.002,
+      "zaad": 3000,
+      "toets": 0.8,
+      "streng": 0.75,
+      "s20": 0.8,
+      "ms": 7687,
+      "actief": 2012
+    },
+    {
+      "conditie": "s7-huidig",
+      "lr": 0.002,
+      "zaad": 3001,
+      "toets": 0.4,
+      "streng": 0.3,
+      "s20": 0.6,
+      "ms": 8028,
+      "actief": 1746
+    },
+    {
+      "conditie": "s7-huidig",
+      "lr": 0.002,
+      "zaad": 3002,
+      "toets": 0.75,
+      "streng": 0.7,
+      "s20": 0.6,
+      "ms": 7220,
+      "actief": 1982
+    },
+    {
+      "conditie": "s7-huidig",
+      "lr": 0.002,
+      "zaad": 3003,
+      "toets": 0.6,
+      "streng": 0.6,
+      "s20": 0.85,
+      "ms": 7638,
+      "actief": 1810
+    },
+    {
+      "conditie": "s7-huidig",
+      "lr": 0.004,
+      "zaad": 3000,
+      "toets": 0.8,
+      "streng": 0.65,
+      "s20": 1,
+      "ms": 6790,
+      "actief": 1737
+    },
+    {
+      "conditie": "s7-huidig",
+      "lr": 0.004,
+      "zaad": 3001,
+      "toets": 0.6,
+      "streng": 0.5,
+      "s20": 0.95,
+      "ms": 7281,
+      "actief": 1732
+    },
+    {
+      "conditie": "s7-huidig",
+      "lr": 0.004,
+      "zaad": 3002,
+      "toets": 0.65,
+      "streng": 0.55,
+      "s20": 0.7,
+      "ms": 6527,
+      "actief": 1783
+    },
+    {
+      "conditie": "s7-huidig",
+      "lr": 0.004,
+      "zaad": 3003,
+      "toets": 0.8,
+      "streng": 0.5,
+      "s20": 0.85,
+      "ms": 7192,
+      "actief": 1778
+    },
+    {
+      "conditie": "s7-huidig",
+      "lr": 0.008,
+      "zaad": 3000,
+      "toets": 0.75,
+      "streng": 0.65,
+      "s20": 0.95,
+      "ms": 6781,
+      "actief": 1555
+    },
+    {
+      "conditie": "s7-huidig",
+      "lr": 0.008,
+      "zaad": 3001,
+      "toets": 0.7,
+      "streng": 0.65,
+      "s20": 0.95,
+      "ms": 6549,
+      "actief": 1593
+    },
+    {
+      "conditie": "s7-huidig",
+      "lr": 0.008,
+      "zaad": 3002,
+      "toets": 0.7,
+      "streng": 0.55,
+      "s20": 0.7,
+      "ms": 6558,
+      "actief": 1608
+    },
+    {
+      "conditie": "s7-huidig",
+      "lr": 0.008,
+      "zaad": 3003,
+      "toets": 0.85,
+      "streng": 0.55,
+      "s20": 0.9,
+      "ms": 6830,
+      "actief": 1672
+    },
+    {
+      "conditie": "s7-huidig",
+      "lr": 0.016,
+      "zaad": 3000,
+      "toets": 0.8,
+      "streng": 0.65,
+      "s20": 0.85,
+      "ms": 5925,
+      "actief": 1227
+    },
+    {
+      "conditie": "s7-huidig",
+      "lr": 0.016,
+      "zaad": 3001,
+      "toets": 0.6,
+      "streng": 0.5,
+      "s20": 0.8,
+      "ms": 6339,
+      "actief": 1126
+    },
+    {
+      "conditie": "s7-huidig",
+      "lr": 0.016,
+      "zaad": 3002,
+      "toets": 0.8,
+      "streng": 0.65,
+      "s20": 0.75,
+      "ms": 6248,
+      "actief": 906
+    },
+    {
+      "conditie": "s7-huidig",
+      "lr": 0.016,
+      "zaad": 3003,
+      "toets": 0.25,
+      "streng": 0.1,
+      "s20": 0.6,
+      "ms": 6576,
+      "actief": 1297
+    },
+    {
+      "conditie": "s7-huidig",
+      "lr": 0.032,
+      "zaad": 3000,
+      "toets": 0.15,
+      "streng": 0.15,
+      "s20": 0.75,
+      "ms": 5779,
+      "actief": 530
+    },
+    {
+      "conditie": "s7-huidig",
+      "lr": 0.032,
+      "zaad": 3001,
+      "toets": 0.1,
+      "streng": 0.05,
+      "s20": 0.6,
+      "ms": 6168,
+      "actief": 938
+    },
+    {
+      "conditie": "s7-huidig",
+      "lr": 0.032,
+      "zaad": 3002,
+      "toets": 0.55,
+      "streng": 0.45,
+      "s20": 0.7,
+      "ms": 5725,
+      "actief": 582
+    },
+    {
+      "conditie": "s7-huidig",
+      "lr": 0.032,
+      "zaad": 3003,
+      "toets": 0.75,
+      "streng": 0.45,
+      "s20": 0.65,
+      "ms": 5556,
+      "actief": 604
+    },
+    {
+      "conditie": "s7-huidig",
+      "lr": 0.064,
+      "zaad": 3000,
+      "toets": 0.05,
+      "streng": 0.15,
+      "s20": 0.55,
+      "ms": 5443,
+      "actief": 477
+    },
+    {
+      "conditie": "s7-huidig",
+      "lr": 0.064,
+      "zaad": 3001,
+      "toets": 0.05,
+      "streng": 0,
+      "s20": 0.7,
+      "ms": 5839,
+      "actief": 410
+    },
+    {
+      "conditie": "s7-huidig",
+      "lr": 0.064,
+      "zaad": 3002,
+      "toets": 0.25,
+      "streng": 0.1,
+      "s20": 0.6,
+      "ms": 5409,
+      "actief": 572
+    },
+    {
+      "conditie": "s7-huidig",
+      "lr": 0.064,
+      "zaad": 3003,
+      "toets": 0,
+      "streng": 0,
+      "s20": 0.5,
+      "ms": 6952,
+      "actief": 797
+    },
+    {
+      "conditie": "s7-criticus",
+      "lr": 0.002,
+      "zaad": 3000,
+      "toets": 0.75,
+      "streng": 0.75,
+      "s20": 0.8,
+      "ms": 7910,
+      "actief": 2076
+    },
+    {
+      "conditie": "s7-criticus",
+      "lr": 0.002,
+      "zaad": 3001,
+      "toets": 0.5,
+      "streng": 0.6,
+      "s20": 0.85,
+      "ms": 7712,
+      "actief": 1704
+    },
+    {
+      "conditie": "s7-criticus",
+      "lr": 0.002,
+      "zaad": 3002,
+      "toets": 0.75,
+      "streng": 0.6,
+      "s20": 0.7,
+      "ms": 7535,
+      "actief": 1887
+    },
+    {
+      "conditie": "s7-criticus",
+      "lr": 0.002,
+      "zaad": 3003,
+      "toets": 0.65,
+      "streng": 0.35,
+      "s20": 0.8,
+      "ms": 7896,
+      "actief": 1786
+    },
+    {
+      "conditie": "s7-criticus",
+      "lr": 0.004,
+      "zaad": 3000,
+      "toets": 0.75,
+      "streng": 0.75,
+      "s20": 0.85,
+      "ms": 7227,
+      "actief": 1941
+    },
+    {
+      "conditie": "s7-criticus",
+      "lr": 0.004,
+      "zaad": 3001,
+      "toets": 0.75,
+      "streng": 0.7,
+      "s20": 0.75,
+      "ms": 7084,
+      "actief": 1691
+    },
+    {
+      "conditie": "s7-criticus",
+      "lr": 0.004,
+      "zaad": 3002,
+      "toets": 0.8,
+      "streng": 0.6,
+      "s20": 0.65,
+      "ms": 6678,
+      "actief": 1926
+    },
+    {
+      "conditie": "s7-criticus",
+      "lr": 0.004,
+      "zaad": 3003,
+      "toets": 0.8,
+      "streng": 0.75,
+      "s20": 0.8,
+      "ms": 7190,
+      "actief": 1705
+    },
+    {
+      "conditie": "s7-criticus",
+      "lr": 0.008,
+      "zaad": 3000,
+      "toets": 0.8,
+      "streng": 0.7,
+      "s20": 0.9,
+      "ms": 6511,
+      "actief": 1651
+    },
+    {
+      "conditie": "s7-criticus",
+      "lr": 0.008,
+      "zaad": 3001,
+      "toets": 0.65,
+      "streng": 0.65,
+      "s20": 0.9,
+      "ms": 6525,
+      "actief": 1529
+    },
+    {
+      "conditie": "s7-criticus",
+      "lr": 0.008,
+      "zaad": 3002,
+      "toets": 0.7,
+      "streng": 0.5,
+      "s20": 0.65,
+      "ms": 6811,
+      "actief": 1739
+    },
+    {
+      "conditie": "s7-criticus",
+      "lr": 0.008,
+      "zaad": 3003,
+      "toets": 0.85,
+      "streng": 0.5,
+      "s20": 0.8,
+      "ms": 6949,
+      "actief": 1570
+    },
+    {
+      "conditie": "s7-criticus",
+      "lr": 0.016,
+      "zaad": 3000,
+      "toets": 0.75,
+      "streng": 0.65,
+      "s20": 0.85,
+      "ms": 6151,
+      "actief": 987
+    },
+    {
+      "conditie": "s7-criticus",
+      "lr": 0.016,
+      "zaad": 3001,
+      "toets": 0.75,
+      "streng": 0.7,
+      "s20": 0.75,
+      "ms": 6282,
+      "actief": 1240
+    },
+    {
+      "conditie": "s7-criticus",
+      "lr": 0.016,
+      "zaad": 3002,
+      "toets": 0.7,
+      "streng": 0.7,
+      "s20": 0.8,
+      "ms": 5924,
+      "actief": 1281
+    },
+    {
+      "conditie": "s7-criticus",
+      "lr": 0.016,
+      "zaad": 3003,
+      "toets": 0.65,
+      "streng": 0.7,
+      "s20": 1,
+      "ms": 6143,
+      "actief": 953
+    },
+    {
+      "conditie": "s7-criticus",
+      "lr": 0.032,
+      "zaad": 3000,
+      "toets": 0.25,
+      "streng": 0.55,
+      "s20": 0.6,
+      "ms": 5626,
+      "actief": 678
+    },
+    {
+      "conditie": "s7-criticus",
+      "lr": 0.032,
+      "zaad": 3001,
+      "toets": 0.4,
+      "streng": 0.7,
+      "s20": 0.7,
+      "ms": 5609,
+      "actief": 694
+    },
+    {
+      "conditie": "s7-criticus",
+      "lr": 0.032,
+      "zaad": 3002,
+      "toets": 0.6,
+      "streng": 0.55,
+      "s20": 0.85,
+      "ms": 5547,
+      "actief": 376
+    },
+    {
+      "conditie": "s7-criticus",
+      "lr": 0.032,
+      "zaad": 3003,
+      "toets": 0.25,
+      "streng": 0.35,
+      "s20": 0.85,
+      "ms": 5668,
+      "actief": 572
+    },
+    {
+      "conditie": "s7-criticus",
+      "lr": 0.064,
+      "zaad": 3000,
+      "toets": 0.15,
+      "streng": 0.05,
+      "s20": 0.7,
+      "ms": 5685,
+      "actief": 457
+    },
+    {
+      "conditie": "s7-criticus",
+      "lr": 0.064,
+      "zaad": 3001,
+      "toets": 0,
+      "streng": 0.05,
+      "s20": 0.45,
+      "ms": 5357,
+      "actief": 613
+    },
+    {
+      "conditie": "s7-criticus",
+      "lr": 0.064,
+      "zaad": 3002,
+      "toets": 0,
+      "streng": 0,
+      "s20": 0.65,
+      "ms": 4814,
+      "actief": 241
+    },
+    {
+      "conditie": "s7-criticus",
+      "lr": 0.064,
+      "zaad": 3003,
+      "toets": 0.05,
+      "streng": 0.05,
+      "s20": 0.65,
+      "ms": 5311,
+      "actief": 404
+    },
+    {
+      "conditie": "s7-schaars",
+      "lr": 0.002,
+      "zaad": 3000,
+      "toets": 0.8,
+      "streng": 0.7,
+      "s20": 0.9,
+      "ms": 8151,
+      "actief": 2159
+    },
+    {
+      "conditie": "s7-schaars",
+      "lr": 0.002,
+      "zaad": 3001,
+      "toets": 0.5,
+      "streng": 0.6,
+      "s20": 0.7,
+      "ms": 7694,
+      "actief": 1737
+    },
+    {
+      "conditie": "s7-schaars",
+      "lr": 0.002,
+      "zaad": 3002,
+      "toets": 0.7,
+      "streng": 0.5,
+      "s20": 0.75,
+      "ms": 8002,
+      "actief": 2026
+    },
+    {
+      "conditie": "s7-schaars",
+      "lr": 0.002,
+      "zaad": 3003,
+      "toets": 0.4,
+      "streng": 0.55,
+      "s20": 0.75,
+      "ms": 8385,
+      "actief": 1766
+    },
+    {
+      "conditie": "s7-schaars",
+      "lr": 0.004,
+      "zaad": 3000,
+      "toets": 0.75,
+      "streng": 0.7,
+      "s20": 0.95,
+      "ms": 7291,
+      "actief": 2025
+    },
+    {
+      "conditie": "s7-schaars",
+      "lr": 0.004,
+      "zaad": 3001,
+      "toets": 0.65,
+      "streng": 0.6,
+      "s20": 0.85,
+      "ms": 7312,
+      "actief": 1776
+    },
+    {
+      "conditie": "s7-schaars",
+      "lr": 0.004,
+      "zaad": 3002,
+      "toets": 0.8,
+      "streng": 0.7,
+      "s20": 0.75,
+      "ms": 6989,
+      "actief": 2037
+    },
+    {
+      "conditie": "s7-schaars",
+      "lr": 0.004,
+      "zaad": 3003,
+      "toets": 0.75,
+      "streng": 0.45,
+      "s20": 1,
+      "ms": 7372,
+      "actief": 1824
+    },
+    {
+      "conditie": "s7-schaars",
+      "lr": 0.008,
+      "zaad": 3000,
+      "toets": 0.75,
+      "streng": 0.65,
+      "s20": 0.9,
+      "ms": 7161,
+      "actief": 1782
+    },
+    {
+      "conditie": "s7-schaars",
+      "lr": 0.008,
+      "zaad": 3001,
+      "toets": 0.65,
+      "streng": 0.6,
+      "s20": 1,
+      "ms": 6940,
+      "actief": 1802
+    },
+    {
+      "conditie": "s7-schaars",
+      "lr": 0.008,
+      "zaad": 3002,
+      "toets": 0.75,
+      "streng": 0.65,
+      "s20": 0.75,
+      "ms": 6485,
+      "actief": 1861
+    },
+    {
+      "conditie": "s7-schaars",
+      "lr": 0.008,
+      "zaad": 3003,
+      "toets": 0.7,
+      "streng": 0.5,
+      "s20": 0.95,
+      "ms": 7136,
+      "actief": 1796
+    },
+    {
+      "conditie": "s7-schaars",
+      "lr": 0.016,
+      "zaad": 3000,
+      "toets": 0.85,
+      "streng": 0.6,
+      "s20": 0.75,
+      "ms": 6414,
+      "actief": 1446
+    },
+    {
+      "conditie": "s7-schaars",
+      "lr": 0.016,
+      "zaad": 3001,
+      "toets": 0.75,
+      "streng": 0.75,
+      "s20": 0.95,
+      "ms": 6381,
+      "actief": 1642
+    },
+    {
+      "conditie": "s7-schaars",
+      "lr": 0.016,
+      "zaad": 3002,
+      "toets": 0.9,
+      "streng": 0.65,
+      "s20": 0.8,
+      "ms": 6141,
+      "actief": 1528
+    },
+    {
+      "conditie": "s7-schaars",
+      "lr": 0.016,
+      "zaad": 3003,
+      "toets": 0.5,
+      "streng": 0.5,
+      "s20": 0.95,
+      "ms": 6732,
+      "actief": 1600
+    },
+    {
+      "conditie": "s7-schaars",
+      "lr": 0.032,
+      "zaad": 3000,
+      "toets": 0.2,
+      "streng": 0.2,
+      "s20": 0.8,
+      "ms": 6648,
+      "actief": 986
+    },
+    {
+      "conditie": "s7-schaars",
+      "lr": 0.032,
+      "zaad": 3001,
+      "toets": 0.65,
+      "streng": 0.6,
+      "s20": 0.7,
+      "ms": 6702,
+      "actief": 1326
+    },
+    {
+      "conditie": "s7-schaars",
+      "lr": 0.032,
+      "zaad": 3002,
+      "toets": 0.7,
+      "streng": 0.55,
+      "s20": 0.75,
+      "ms": 6058,
+      "actief": 1318
+    },
+    {
+      "conditie": "s7-schaars",
+      "lr": 0.032,
+      "zaad": 3003,
+      "toets": 0.6,
+      "streng": 0.45,
+      "s20": 0.85,
+      "ms": 6332,
+      "actief": 1541
+    },
+    {
+      "conditie": "s7-schaars",
+      "lr": 0.064,
+      "zaad": 3000,
+      "toets": 0.25,
+      "streng": 0.1,
+      "s20": 0.9,
+      "ms": 5599,
+      "actief": 796
+    },
+    {
+      "conditie": "s7-schaars",
+      "lr": 0.064,
+      "zaad": 3001,
+      "toets": 0.2,
+      "streng": 0.1,
+      "s20": 0.75,
+      "ms": 6535,
+      "actief": 428
+    },
+    {
+      "conditie": "s7-schaars",
+      "lr": 0.064,
+      "zaad": 3002,
+      "toets": 0.15,
+      "streng": 0.1,
+      "s20": 0.85,
+      "ms": 6065,
+      "actief": 920
+    },
+    {
+      "conditie": "s7-schaars",
+      "lr": 0.064,
+      "zaad": 3003,
+      "toets": 0.1,
+      "streng": 0.1,
+      "s20": 0.75,
+      "ms": 6419,
+      "actief": 993
+    },
+    {
+      "conditie": "s7-criticus-schaars",
+      "lr": 0.002,
+      "zaad": 3000,
+      "toets": 0.55,
+      "streng": 0.6,
+      "s20": 0.9,
+      "ms": 7887,
+      "actief": 2068
+    },
+    {
+      "conditie": "s7-criticus-schaars",
+      "lr": 0.002,
+      "zaad": 3001,
+      "toets": 0.55,
+      "streng": 0.6,
+      "s20": 0.75,
+      "ms": 7706,
+      "actief": 1763
+    },
+    {
+      "conditie": "s7-criticus-schaars",
+      "lr": 0.002,
+      "zaad": 3002,
+      "toets": 0.75,
+      "streng": 0.55,
+      "s20": 0.6,
+      "ms": 7788,
+      "actief": 2020
+    },
+    {
+      "conditie": "s7-criticus-schaars",
+      "lr": 0.002,
+      "zaad": 3003,
+      "toets": 0.6,
+      "streng": 0.55,
+      "s20": 0.8,
+      "ms": 8146,
+      "actief": 1859
+    },
+    {
+      "conditie": "s7-criticus-schaars",
+      "lr": 0.004,
+      "zaad": 3000,
+      "toets": 0.8,
+      "streng": 0.65,
+      "s20": 1,
+      "ms": 6938,
+      "actief": 1872
+    },
+    {
+      "conditie": "s7-criticus-schaars",
+      "lr": 0.004,
+      "zaad": 3001,
+      "toets": 0.75,
+      "streng": 0.75,
+      "s20": 0.9,
+      "ms": 7235,
+      "actief": 1744
+    },
+    {
+      "conditie": "s7-criticus-schaars",
+      "lr": 0.004,
+      "zaad": 3002,
+      "toets": 0.75,
+      "streng": 0.7,
+      "s20": 0.75,
+      "ms": 6805,
+      "actief": 1995
+    },
+    {
+      "conditie": "s7-criticus-schaars",
+      "lr": 0.004,
+      "zaad": 3003,
+      "toets": 0.8,
+      "streng": 0.5,
+      "s20": 0.8,
+      "ms": 7621,
+      "actief": 1879
+    },
+    {
+      "conditie": "s7-criticus-schaars",
+      "lr": 0.008,
+      "zaad": 3000,
+      "toets": 0.75,
+      "streng": 0.65,
+      "s20": 0.85,
+      "ms": 6594,
+      "actief": 1993
+    },
+    {
+      "conditie": "s7-criticus-schaars",
+      "lr": 0.008,
+      "zaad": 3001,
+      "toets": 0.75,
+      "streng": 0.6,
+      "s20": 1,
+      "ms": 6753,
+      "actief": 1709
+    },
+    {
+      "conditie": "s7-criticus-schaars",
+      "lr": 0.008,
+      "zaad": 3002,
+      "toets": 0.85,
+      "streng": 0.65,
+      "s20": 0.85,
+      "ms": 6781,
+      "actief": 1993
+    },
+    {
+      "conditie": "s7-criticus-schaars",
+      "lr": 0.008,
+      "zaad": 3003,
+      "toets": 0.8,
+      "streng": 0.6,
+      "s20": 0.95,
+      "ms": 6878,
+      "actief": 1819
+    },
+    {
+      "conditie": "s7-criticus-schaars",
+      "lr": 0.016,
+      "zaad": 3000,
+      "toets": 0.7,
+      "streng": 0.6,
+      "s20": 0.75,
+      "ms": 6700,
+      "actief": 1629
+    },
+    {
+      "conditie": "s7-criticus-schaars",
+      "lr": 0.016,
+      "zaad": 3001,
+      "toets": 0.7,
+      "streng": 0.65,
+      "s20": 0.95,
+      "ms": 6582,
+      "actief": 1543
+    },
+    {
+      "conditie": "s7-criticus-schaars",
+      "lr": 0.016,
+      "zaad": 3002,
+      "toets": 0.7,
+      "streng": 0.45,
+      "s20": 0.65,
+      "ms": 6509,
+      "actief": 1984
+    },
+    {
+      "conditie": "s7-criticus-schaars",
+      "lr": 0.016,
+      "zaad": 3003,
+      "toets": 0.75,
+      "streng": 0.6,
+      "s20": 0.9,
+      "ms": 6475,
+      "actief": 1627
+    },
+    {
+      "conditie": "s7-criticus-schaars",
+      "lr": 0.032,
+      "zaad": 3000,
+      "toets": 0.7,
+      "streng": 0.5,
+      "s20": 0.9,
+      "ms": 5994,
+      "actief": 1020
+    },
+    {
+      "conditie": "s7-criticus-schaars",
+      "lr": 0.032,
+      "zaad": 3001,
+      "toets": 0.55,
+      "streng": 0.7,
+      "s20": 0.75,
+      "ms": 6340,
+      "actief": 1397
+    },
+    {
+      "conditie": "s7-criticus-schaars",
+      "lr": 0.032,
+      "zaad": 3002,
+      "toets": 0.8,
+      "streng": 0.7,
+      "s20": 0.85,
+      "ms": 6208,
+      "actief": 1510
+    },
+    {
+      "conditie": "s7-criticus-schaars",
+      "lr": 0.032,
+      "zaad": 3003,
+      "toets": 0.15,
+      "streng": 0.05,
+      "s20": 0.7,
+      "ms": 6561,
+      "actief": 1347
+    },
+    {
+      "conditie": "s7-criticus-schaars",
+      "lr": 0.064,
+      "zaad": 3000,
+      "toets": 0.25,
+      "streng": 0.2,
+      "s20": 0.8,
+      "ms": 5597,
+      "actief": 677
+    },
+    {
+      "conditie": "s7-criticus-schaars",
+      "lr": 0.064,
+      "zaad": 3001,
+      "toets": 0.2,
+      "streng": 0.3,
+      "s20": 0.75,
+      "ms": 6127,
+      "actief": 730
+    },
+    {
+      "conditie": "s7-criticus-schaars",
+      "lr": 0.064,
+      "zaad": 3002,
+      "toets": 0.15,
+      "streng": 0.05,
+      "s20": 0.9,
+      "ms": 5957,
+      "actief": 709
+    },
+    {
+      "conditie": "s7-criticus-schaars",
+      "lr": 0.064,
+      "zaad": 3003,
+      "toets": 0.1,
+      "streng": 0.1,
+      "s20": 0.85,
+      "ms": 5563,
+      "actief": 853
+    },
+    {
+      "conditie": "s7-categorisch",
+      "lr": 0.002,
+      "zaad": 3000,
+      "toets": 0.75,
+      "streng": 0.75,
+      "s20": 0.9,
+      "ms": 7109,
+      "actief": 1975
+    },
+    {
+      "conditie": "s7-categorisch",
+      "lr": 0.002,
+      "zaad": 3001,
+      "toets": 0.75,
+      "streng": 0.8,
+      "s20": 0.9,
+      "ms": 7059,
+      "actief": 1747
+    },
+    {
+      "conditie": "s7-categorisch",
+      "lr": 0.002,
+      "zaad": 3002,
+      "toets": 0.85,
+      "streng": 0.8,
+      "s20": 0.65,
+      "ms": 6570,
+      "actief": 1970
+    },
+    {
+      "conditie": "s7-categorisch",
+      "lr": 0.002,
+      "zaad": 3003,
+      "toets": 0.85,
+      "streng": 0.6,
+      "s20": 0.8,
+      "ms": 6915,
+      "actief": 1805
+    },
+    {
+      "conditie": "s7-categorisch",
+      "lr": 0.004,
+      "zaad": 3000,
+      "toets": 0.7,
+      "streng": 0.65,
+      "s20": 1,
+      "ms": 6533,
+      "actief": 1821
+    },
+    {
+      "conditie": "s7-categorisch",
+      "lr": 0.004,
+      "zaad": 3001,
+      "toets": 0.75,
+      "streng": 0.75,
+      "s20": 0.95,
+      "ms": 6655,
+      "actief": 1709
+    },
+    {
+      "conditie": "s7-categorisch",
+      "lr": 0.004,
+      "zaad": 3002,
+      "toets": 0.7,
+      "streng": 0.75,
+      "s20": 0.9,
+      "ms": 6580,
+      "actief": 2003
+    },
+    {
+      "conditie": "s7-categorisch",
+      "lr": 0.004,
+      "zaad": 3003,
+      "toets": 0.8,
+      "streng": 0.7,
+      "s20": 0.85,
+      "ms": 6647,
+      "actief": 1427
+    },
+    {
+      "conditie": "s7-categorisch",
+      "lr": 0.008,
+      "zaad": 3000,
+      "toets": 0.8,
+      "streng": 0.6,
+      "s20": 0.9,
+      "ms": 5981,
+      "actief": 1546
+    },
+    {
+      "conditie": "s7-categorisch",
+      "lr": 0.008,
+      "zaad": 3001,
+      "toets": 0.75,
+      "streng": 0.7,
+      "s20": 1,
+      "ms": 6001,
+      "actief": 1573
+    },
+    {
+      "conditie": "s7-categorisch",
+      "lr": 0.008,
+      "zaad": 3002,
+      "toets": 0.85,
+      "streng": 0.75,
+      "s20": 0.85,
+      "ms": 6235,
+      "actief": 1827
+    },
+    {
+      "conditie": "s7-categorisch",
+      "lr": 0.008,
+      "zaad": 3003,
+      "toets": 0.8,
+      "streng": 0.7,
+      "s20": 1,
+      "ms": 6050,
+      "actief": 1465
+    },
+    {
+      "conditie": "s7-categorisch",
+      "lr": 0.016,
+      "zaad": 3000,
+      "toets": 0.8,
+      "streng": 0.65,
+      "s20": 0.9,
+      "ms": 5614,
+      "actief": 891
+    },
+    {
+      "conditie": "s7-categorisch",
+      "lr": 0.016,
+      "zaad": 3001,
+      "toets": 0.75,
+      "streng": 0.85,
+      "s20": 0.95,
+      "ms": 5570,
+      "actief": 1207
+    },
+    {
+      "conditie": "s7-categorisch",
+      "lr": 0.016,
+      "zaad": 3002,
+      "toets": 0.8,
+      "streng": 0.75,
+      "s20": 0.95,
+      "ms": 5660,
+      "actief": 1137
+    },
+    {
+      "conditie": "s7-categorisch",
+      "lr": 0.016,
+      "zaad": 3003,
+      "toets": 0.6,
+      "streng": 0.55,
+      "s20": 1,
+      "ms": 6049,
+      "actief": 1371
+    },
+    {
+      "conditie": "s7-categorisch",
+      "lr": 0.032,
+      "zaad": 3000,
+      "toets": 0.25,
+      "streng": 0.2,
+      "s20": 0.85,
+      "ms": 5913,
+      "actief": 700
+    },
+    {
+      "conditie": "s7-categorisch",
+      "lr": 0.032,
+      "zaad": 3001,
+      "toets": 0.65,
+      "streng": 0.7,
+      "s20": 0.8,
+      "ms": 5703,
+      "actief": 467
+    },
+    {
+      "conditie": "s7-categorisch",
+      "lr": 0.032,
+      "zaad": 3002,
+      "toets": 0.5,
+      "streng": 0.55,
+      "s20": 1,
+      "ms": 5515,
+      "actief": 360
+    },
+    {
+      "conditie": "s7-categorisch",
+      "lr": 0.032,
+      "zaad": 3003,
+      "toets": 0.25,
+      "streng": 0.2,
+      "s20": 0.95,
+      "ms": 5467,
+      "actief": 407
+    },
+    {
+      "conditie": "s7-categorisch",
+      "lr": 0.064,
+      "zaad": 3000,
+      "toets": 0.15,
+      "streng": 0.15,
+      "s20": 0.9,
+      "ms": 4994,
+      "actief": 602
+    },
+    {
+      "conditie": "s7-categorisch",
+      "lr": 0.064,
+      "zaad": 3001,
+      "toets": 0.2,
+      "streng": 0.25,
+      "s20": 0.9,
+      "ms": 4918,
+      "actief": 314
+    },
+    {
+      "conditie": "s7-categorisch",
+      "lr": 0.064,
+      "zaad": 3002,
+      "toets": 0.1,
+      "streng": 0.05,
+      "s20": 0.75,
+      "ms": 5876,
+      "actief": 328
+    },
+    {
+      "conditie": "s7-categorisch",
+      "lr": 0.064,
+      "zaad": 3003,
+      "toets": 0.1,
+      "streng": 0.1,
+      "s20": 0.7,
+      "ms": 5786,
+      "actief": 199
+    },
+    {
+      "conditie": "s7-perturbgain",
+      "lr": 0.0002,
+      "zaad": 3000,
+      "toets": 0.05,
+      "streng": 0.3,
+      "s20": 0.1,
+      "ms": 9608,
+      "actief": 1992
+    },
+    {
+      "conditie": "s7-perturbgain",
+      "lr": 0.0002,
+      "zaad": 3001,
+      "toets": 0,
+      "streng": 0.05,
+      "s20": 0,
+      "ms": 9760,
+      "actief": 1728
+    },
+    {
+      "conditie": "s7-perturbgain",
+      "lr": 0.0002,
+      "zaad": 3002,
+      "toets": 0.05,
+      "streng": 0.25,
+      "s20": 0,
+      "ms": 10161,
+      "actief": 2055
+    },
+    {
+      "conditie": "s7-perturbgain",
+      "lr": 0.0002,
+      "zaad": 3003,
+      "toets": 0.25,
+      "streng": 0,
+      "s20": 0.55,
+      "ms": 9533,
+      "actief": 1787
+    },
+    {
+      "conditie": "s7-perturbgain",
+      "lr": 0.0004,
+      "zaad": 3000,
+      "toets": 0.25,
+      "streng": 0.4,
+      "s20": 0.55,
+      "ms": 9567,
+      "actief": 2012
+    },
+    {
+      "conditie": "s7-perturbgain",
+      "lr": 0.0004,
+      "zaad": 3001,
+      "toets": 0.05,
+      "streng": 0.05,
+      "s20": 0,
+      "ms": 9756,
+      "actief": 1637
+    },
+    {
+      "conditie": "s7-perturbgain",
+      "lr": 0.0004,
+      "zaad": 3002,
+      "toets": 0.4,
+      "streng": 0.45,
+      "s20": 0.6,
+      "ms": 9937,
+      "actief": 1946
+    },
+    {
+      "conditie": "s7-perturbgain",
+      "lr": 0.0004,
+      "zaad": 3003,
+      "toets": 0.3,
+      "streng": 0.65,
+      "s20": 0.35,
+      "ms": 9474,
+      "actief": 1658
+    },
+    {
+      "conditie": "s7-perturbgain",
+      "lr": 0.0008,
+      "zaad": 3000,
+      "toets": 0.5,
+      "streng": 0.55,
+      "s20": 0.6,
+      "ms": 9191,
+      "actief": 1829
+    },
+    {
+      "conditie": "s7-perturbgain",
+      "lr": 0.0008,
+      "zaad": 3001,
+      "toets": 0.4,
+      "streng": 0.65,
+      "s20": 0.5,
+      "ms": 9004,
+      "actief": 1413
+    },
+    {
+      "conditie": "s7-perturbgain",
+      "lr": 0.0008,
+      "zaad": 3002,
+      "toets": 0.6,
+      "streng": 0.55,
+      "s20": 0.65,
+      "ms": 8884,
+      "actief": 1735
+    },
+    {
+      "conditie": "s7-perturbgain",
+      "lr": 0.0008,
+      "zaad": 3003,
+      "toets": 0.45,
+      "streng": 0.4,
+      "s20": 0.75,
+      "ms": 8933,
+      "actief": 1529
+    },
+    {
+      "conditie": "s7-perturbgain",
+      "lr": 0.0016,
+      "zaad": 3000,
+      "toets": 0.35,
+      "streng": 0.35,
+      "s20": 0.5,
+      "ms": 8432,
+      "actief": 1593
+    },
+    {
+      "conditie": "s7-perturbgain",
+      "lr": 0.0016,
+      "zaad": 3001,
+      "toets": 0.4,
+      "streng": 0.45,
+      "s20": 0.5,
+      "ms": 8820,
+      "actief": 1196
+    },
+    {
+      "conditie": "s7-perturbgain",
+      "lr": 0.0016,
+      "zaad": 3002,
+      "toets": 0.5,
+      "streng": 0.4,
+      "s20": 0.7,
+      "ms": 8343,
+      "actief": 636
+    },
+    {
+      "conditie": "s7-perturbgain",
+      "lr": 0.0016,
+      "zaad": 3003,
+      "toets": 0.45,
+      "streng": 0.65,
+      "s20": 0.75,
+      "ms": 8408,
+      "actief": 1191
+    },
+    {
+      "conditie": "s7-perturbgain",
+      "lr": 0.0032,
+      "zaad": 3000,
+      "toets": 0.45,
+      "streng": 0.55,
+      "s20": 0.55,
+      "ms": 7070,
+      "actief": 731
+    },
+    {
+      "conditie": "s7-perturbgain",
+      "lr": 0.0032,
+      "zaad": 3001,
+      "toets": 0.25,
+      "streng": 0.3,
+      "s20": 0.5,
+      "ms": 7442,
+      "actief": 504
+    },
+    {
+      "conditie": "s7-perturbgain",
+      "lr": 0.0032,
+      "zaad": 3002,
+      "toets": 0.6,
+      "streng": 0.35,
+      "s20": 0.7,
+      "ms": 6633,
+      "actief": 480
+    },
+    {
+      "conditie": "s7-perturbgain",
+      "lr": 0.0032,
+      "zaad": 3003,
+      "toets": 0.4,
+      "streng": 0.3,
+      "s20": 0.55,
+      "ms": 7230,
+      "actief": 642
+    },
+    {
+      "conditie": "s7-perturbgain",
+      "lr": 0.008,
+      "zaad": 3000,
+      "toets": 0.2,
+      "streng": 0.1,
+      "s20": 0.4,
+      "ms": 5332,
+      "actief": 301
+    },
+    {
+      "conditie": "s7-perturbgain",
+      "lr": 0.008,
+      "zaad": 3001,
+      "toets": 0.05,
+      "streng": 0.1,
+      "s20": 0.3,
+      "ms": 5962,
+      "actief": 590
+    },
+    {
+      "conditie": "s7-perturbgain",
+      "lr": 0.008,
+      "zaad": 3002,
+      "toets": 0.45,
+      "streng": 0.65,
+      "s20": 0.55,
+      "ms": 5291,
+      "actief": 114
+    },
+    {
+      "conditie": "s7-perturbgain",
+      "lr": 0.008,
+      "zaad": 3003,
+      "toets": 0.1,
+      "streng": 0.35,
+      "s20": 0.35,
+      "ms": 5698,
+      "actief": 296
+    }
+  ]
+}

@@ -50,6 +50,10 @@ kritiek chatGPT.docx
 # ---------------------------------------------------------------------------
 experimenten/runs/
 
+# De kopie die tests/migreer-runs-csv.js maakt vóór hij kolommen toevoegt: een
+# vangnet voor die ene handeling, geen data die iemand anders nodig heeft.
+experimenten/runs.csv.voor-*
+
 # Gerenderde formules van het paper: met een commando terug te maken (paper/mkeq.py)
 paper/eq/
 paper/fig*.png

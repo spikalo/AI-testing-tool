@@ -390,6 +390,119 @@ en herstart het:
 
 ## 10. Logboek
 
+### 2026-09-10 — Vier ingrepen in de leerregel (werkplan stap 7)
+
+**De vraag.** Stap 5 varieerde de topologie binnen één leerregel, stap 6 de schatter
+binnen één topologie. Dit pakket laat allebei staan en verandert de leerregel eromheen.
+Vier ingrepen, elk klein, elk als losse schakelaar zodat ze ook als ablatie meetbaar
+zijn: een toestandsafhankelijke criticus, schaarse perturbatie, een categorisch beleid,
+en de ontbrekende 1/Var(ξ)-normalisatie uit stap 3 — die laatste nu wél met een eigen
+leersnelheidsveeg.
+
+**Nieuw in `brein-test.html`.**
+
+- **Criticus.** `criticValue()` en `criticUpdate()`: een lineaire schatter
+  `V(s) = w·s + b` op de zestien sensoren, per brein opgeslagen als `B.vW`/`B.vB`,
+  bijgewerkt met TD(0). `gameTick()` leest `V(s)` vóór de actie en `V(s′)` erna en geeft
+  `δ = r + γV(s′) − V(s)` als vijfde argument aan `applyReward()`, die dan díé waarde
+  gebruikt in plaats van `r − r̄`. Bootstrappen gebeurt niet bij het doel en niet bij een
+  botsing die de poging afbreekt, wél bij het aflopen van de tijdslimiet. De criticus
+  staat náást de graaf: er wordt niets teruggepropageerd. Rekenkosten worden geteld
+  (3 × 16 kanten-bezoeken per leerstap). Knoppen: `criticOn`, `criticLr` (0,02),
+  `criticGamma` (0,95).
+- **Schaarse perturbatie.** `brainStep()` loot per tik een masker `B.pmask` en
+  `propagate()` verstoort alleen gemaskeerde knopen. Bij fractie 1 wordt er **niet**
+  geloot en is `B.pmask` null — daardoor verschuift de toevalsreeks niet en blijft een
+  run bit voor bit gelijk aan die van vóór stap 7. Knop: `perturbFrac`.
+- **Categorisch beleid.** `actCategorical()`: één softmax over negen elkaar uitsluitende
+  acties (acht richtingen + stilstaan), gescoord met de som van de netto-ingangen van de
+  betrokken knoppen — `propagate()` bewaart die nu in `B.onet`. Geen negende uitvoerknoop,
+  want dat zou elke eerdere run onvergelijkbaar maken; met vier knoppen en een
+  gefactoriseerde softmax houdt de score-functie dezelfde vorm, `1[ingedrukt] − randkans`.
+  Knop: `catPolicy`.
+- **`perturbGain`** bestond al sinds stap 3 en is nu ook een kolom in `runs.csv`.
+
+**Nieuwe meetgrootheden:** zes kolommen erbij in `experimenten/runs.csv` (nu **74**):
+`perturbGain`, `criticus`, `criticusLr`, `criticusGamma`, `perturbFrac`, `beleidsvorm`.
+De 244 bestaande regels zijn gemigreerd en houden lege cellen — dat is "niet gemeten",
+geen nul. In de resultaat-JSON staan dezelfde velden onder `config.leren`.
+
+**Bewijs vooraf** (`tests/test-stap7.js`, 25 controles, alle groen): de criticus rekent
+`V(s)` en zijn TD-update na op een tweede, met de hand geschreven berekening; het
+leersignaal dat de gewichten bereikt is exact δ en wordt niet nóg eens door de lopende
+basislijn gehaald; schaarse perturbatie verstoort precies de gevraagde fractie en geeft
+de rest exact nul afwijking; het categorische beleid is een echte kansverdeling (negen
+kansen die op 1 sommeren, nooit op+neer of links+rechts) en zijn score-functie klopt met
+eindige differenties op log π op alle 36 combinaties; en met alles uit reproduceert de
+regel de referentiemeting van stap 4 bit voor bit.
+
+**Uitkomst** (12 zaden, 500 pogingen, benchmark van 500 werelden, elke conditie op haar
+eigen leersnelheid uit een veeg van zes waarden × vier veegzaden):
+
+| conditie | η | benchmark geloot | argmax | sd tussen zaden | stappen tot 80 % |
+|---|---|---|---|---|---|
+| huidige regel | 0,008 | 65,6 % ± 2,6 | 53,5 % ± 3,5 | 4,6 pp | 15,5 k |
+| + criticus | 0,004 | 60,9 % ± 3,5 | 53,0 % ± 3,6 | 6,2 pp | 27,5 k |
+| + schaarse perturbatie (¼) | 0,016 | 66,6 % ± 2,1 | 51,8 % ± 3,8 | 3,7 pp | **3,1 k** |
+| + criticus + schaars | 0,008 | 64,3 % ± 2,7 | 54,9 % ± 4,4 | 4,8 pp | 4,6 k |
+| + categorisch beleid | 0,002 | 68,8 % ± 1,9 | **61,3 % ± 3,3** | 3,4 pp | 27,0 k |
+| + perturbGain (g = 10) | 0,0008 | 33,3 % ± 6,3 | 46,6 % ± 5,3 | 11,1 pp | 116,4 k (2/12) |
+
+Twee dingen komen boven de ruis uit, en het zijn niet de dingen waarop gehoopt werd.
+
+1. **Schaarse perturbatie is een factor 4,9 zuiniger met ervaring.** Zelfde eindscore
+   (+1,0 pp, *p* = 0,58), maar 3,1 k omgevingsstappen tot 80 % succes in plaats van
+   15,5 k (*p* = 0,003), en 33,8 M kanten-bezoeken in plaats van 163,5 M. Dat is precies
+   wat de theorie voorspelt: de variantie van een perturbatieschatter groeit met het
+   aantal knopen dat tegelijk beweegt. Het is de eerste ingreep in dit project die iets
+   oplevert in plaats van kost. Vijfhonderd pogingen zijn ruim genoeg om ook zonder de
+   ingreep uit te leren, dus de winst zit in monsterefficiëntie en niet in eindscore.
+2. **Het categorische beleid heeft het toeval minder nodig.** Het gat tussen geloot en
+   argmax was 12,1 pp (stap 4) en zakt naar 7,5 pp: argmax stijgt van 53,5 % naar
+   61,3 % (+7,8 pp, *p* = 0,009) terwijl de gelote score binnen de ruis gelijk blijft
+   (+3,2 pp, *p* = 0,11). Verklaring die past: onder argmax is "op én neer" een echte,
+   verlammende actie, en het gelote beleid komt daar met kans omheen. Kost wel
+   monsterefficiëntie (27,0 k stappen), want er wordt nog maar één keer per tik geloot.
+
+En twee dingen werken **niet**, wat net zo hard is vastgelegd:
+
+3. **De criticus levert niets op** — 4,7 pp lager (*p* = 0,053), méér spreiding tussen
+   de zaden in plaats van minder (6,2 tegen 4,6 pp) en bijna twee keer zoveel ervaring
+   nodig. Twee verklaringen liggen voor de hand en de meting kiest er niet tussen: een
+   lineaire waardefunctie op zestien raycast-sensoren kan waarschijnlijk niet uitdrukken
+   of er een obstakel tússen agent en doel staat, en de criticus moet zelf ook nog leren
+   en voegt in het begin dus ruis toe. Wat de meting wél uitsluit is de simpelste
+   diagnose: dat het probleem in de toestandsloze basislijn zat. Dat zat het niet.
+4. **`perturbGain` = 10 blijft rampzalig, ook mét eigen veeg** — 33,3 % tegen 65,6 %
+   (*p* < 0,001), twee van de twaalf runs halen de 80 % ooit. Stap 3 mat dit zonder
+   leersnelheidsveeg en zag hetzelfde; met een η die met 1/g meeschuift is het beeld
+   milder maar niet anders. De scheve schaal tussen knopdeel en wolkdeel is dus wel
+   aantoonbaar (stap 3) maar niet met deze ene knop recht te zetten.
+
+De combinatie criticus + schaars verschilt van geen van beide losse condities
+(*p* = 0,19 en *p* = 0,20); de winst in monsterefficiëntie komt aantoonbaar van de
+schaarse perturbatie.
+
+**IJk:** de ongewijzigde regel reproduceert alle twaalf runs van de referentiemeting uit
+stap 4 tot op de zes decimalen die `runs.csv` bewaart. Het inbouwen van vier schakelaars
+heeft de leerregel met alles uit dus niet geraakt.
+
+**Data:** `experimenten/leerregel.json` (tabel, spreiding, alle toetsen, per zaad),
+`experimenten/lr-veeg-stap7.json` (144 veegruns), 72 nieuwe regels in `runs.csv` en 72
+JSON's in `experimenten/runs/`.
+
+**Paper (versie 1.6):** nieuwe sectie **3.12** die de vier varianten definieert, nieuwe
+sectie **10.6** met de tabel en de bevindingen (10.6 en 10.7 zijn doorgeschoven naar 10.7
+en 10.8), en een alinea in de conclusie over de enige as waarop de leerregel wél wint.
+
+**Scripts:** `tests/stap7-condities.js` (de condities en de leersnelheidsrasters op één
+plek), `tests/exp-stap7-lr.js` (de veeg), `tests/exp-stap7.js` (de meetreeks),
+`tests/test-stap7.js` (de controles), plus twee hulpjes: `tests/wacht.js` en
+`tests/lees-sectie.js` (leest de platte tekst van een sectie uit het gegenereerde paper
+terug, zodat een datagestuurde alinea ook echt gelezen wordt voordat hij blijft staan).
+
+---
+
 ### 2026-09-10 — Wat backpropagation waard is, en wat rekenwerk kost (werkplan stap 6)
 
 **De vraag.** Stap 5 hield de leerregel vast en wisselde de topologie. Dit pakket doet
