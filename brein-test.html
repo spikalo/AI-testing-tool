@@ -1007,10 +1007,40 @@ function createLayered(cfg,seed){
   for(let i=0;i<N_IN;i++) for(const j of lagen[0]) add(i,j);
   for(let L=0;L+1<lagen.length;L++) for(const a of lagen[L]) for(const b of lagen[L+1]) add(a,b);
   for(const a of lagen[lagen.length-1]) for(let o=OUT0;o<HID0;o++) add(a,o);
+  /* Elman (stap 6): de laatste verborgen laag krijgt een terugkoppeling op zichzelf,
+     alle knopen op alle knopen, de eigen verbinding inbegrepen. Dat is het enige
+     verschil met de gelaagde basislijn, zodat "wat levert terugkoppeling op?" één
+     losse knop blijft in plaats van een ander model. */
+  if(cfg.recurrent){
+    const laatste=lagen[lagen.length-1];
+    for(const a of laatste) for(const b of laatste) add(a,b);
+  }
   finalizeConns(B);
+  markLayers(B,lagen);
   B.comp=countKinds(B); B.compStart={...B.comp};
   layoutBrain(B,300,false);
   return B;
+}
+/* Wie zit in welke laag, en welke verbinding wijst vooruit?
+   De exacte gradiënt van stap 6 loopt van achteren naar voren door de lagen en mag
+   daarbij alleen over voorwaartse verbindingen: een terugkoppeling draagt niet bij
+   aan de uitvoer van déze tik maar aan die van de volgende. Zij krijgt daarom ook
+   een andere presynaptische waarde — B.prev in plaats van B.pre. */
+function markLayers(B,lagen){
+  const laag=new Int32Array(B.n).fill(-1);
+  for(let i=0;i<N_IN;i++) laag[i]=0;
+  for(let L=0;L<lagen.length;L++) for(const j of lagen[L]) laag[j]=L+1;
+  for(let o=OUT0;o<HID0;o++) laag[o]=lagen.length+1;
+  B.laag=laag;
+  B.lagenIdx=lagen.map(a=>Int32Array.from(a));
+  B.cRec=new Uint8Array(B.nc);
+  const uit=Array.from({length:B.n},()=>[]);
+  let ff=0;
+  for(let c=0;c<B.nc;c++){
+    const a=B.cFrom[c], b=B.cTo[c];
+    if(laag[b]>laag[a]){ uit[a].push(c); ff++; } else B.cRec[c]=1;
+  }
+  B.uit=uit.map(a=>Int32Array.from(a)); B.ffCount=ff;
 }
 function finalizeConns(B){
   B.cFrom=Int32Array.from(B.from); B.cTo=Int32Array.from(B.to);
@@ -1041,6 +1071,15 @@ function resetBrainState(B){
   if(B.pre) B.pre.fill(0);
   if(B.cE) B.cE.fill(0);
 }
+/* ---------- rekenkostenteller (stap 6) ----------
+   "Efficiënt" is vier verschillende dingen die zelden hetzelfde zijn, en de paper
+   praatte erover zonder te tellen. De grondeenheid is één kanten-bezoek: één keer
+   een gewicht aanraken — lezen bij het doorrekenen, of schrijven bij het bijwerken.
+   Er wordt niet per verbinding opgehoogd maar per lus in één keer met het aantal
+   verbindingen; dat is exact hetzelfde getal en kost geen rekentijd, zodat de
+   wandkloktijd die we ernaast meten niet door de meting zelf vertekend raakt. */
+let MEET="leer";
+function kb(n){ if(MEET==="inf") S.kbInf+=n; else S.kbLeer+=n; }
 const hiddenNoiseOf = expl => 0.35*expl;
 const tempOf = expl => 0.40+2.0*expl;
 function propagate(B,inp,cfg,hn,tp,state,rnd){
@@ -1054,6 +1093,7 @@ function propagate(B,inp,cfg,hn,tp,state,rnd){
        sensorwaarden zijn ingezet, dus de invoerknopen staan er goed in. */
     if(s===cfg.prop-1 && state===B.act && B.pre) B.pre.set(state);
     sum.fill(0);
+    kb(B.nc);
     for(let c=0;c<B.nc;c++) sum[B.cTo[c]]+=B.cW[c]*state[B.cFrom[c]];
     for(let j=0;j<n;j++){
       const k=B.kinds[j];
@@ -1078,20 +1118,81 @@ function propagate(B,inp,cfg,hn,tp,state,rnd){
 function brainStep(B,inp,cfg,expl,rnd){
   B.prev.set(B.act);
   const learn=expl>0;
-  const hn=learn? hiddenNoiseOf(expl) : 0;
+  const exact=!!cfg.gradExact;
+  /* Bij de exacte gradiënt is er geen ruispas: de wolk hoeft niet verstoord te
+     worden om te weten wat zij bijdroeg, dat rekent de terugpropagatie uit. De
+     exploratie zit dan volledig in het loten van de vier knoppen — precies zoals
+     bij gewone REINFORCE. Dat scheelt ook één hele propagatie per spelstap, en dat
+     verschil hoort in de rekenkostentabel thuis. */
+  const hn=(learn && !exact)? hiddenNoiseOf(expl) : 0;
   const tp=learn? tempOf(expl) : (S.evalTemp!==undefined? S.evalTemp : tempOf(0));
   const sample=learn || S.evalSample;
   const r=learn? rnd : (S.evalRnd||rnd);
-  if(learn){ B.clean.set(B.prev); propagate(B,inp,cfg,0,tp,B.clean,r); }
+  if(learn && !exact){ B.clean.set(B.prev); propagate(B,inp,cfg,0,tp,B.clean,r); }
   propagate(B,inp,cfg,hn,tp,B.act,r);
   B.dev.fill(0);
-  if(learn) for(let j=HID0;j<B.n;j++) B.dev[j]=B.act[j]-B.clean[j];
+  if(learn && !exact) for(let j=HID0;j<B.n;j++) B.dev[j]=B.act[j]-B.clean[j];
   for(let j=OUT0;j<HID0;j++){
     const pr=B.act[j];
     const a=sample ? (r()<pr?1:0) : (pr>0.5?1:0);
     B.press[j-OUT0]=a;
     B.dev[j]=a-pr;
   }
+  if(learn && exact) backpropDev(B,tp);
+}
+/* ---------- de exacte gradiënt als schatter (stap 6) ----------
+   Node-perturbatie schát wat een verborgen knoop bijdroeg door hem te verstoren en
+   te kijken wat er van de beloning verandert. Terugpropagatie rékent het uit. Alles
+   eromheen blijft gelijk: hetzelfde spoor met dezelfde λ, dezelfde lopende
+   basislijn, dezelfde begrensde stap, dezelfde vervaging, dezelfde Bernoulli-knoppen
+   en dezelfde beloning. Zo verschilt er tussen de twee condities precies één ding,
+   en dat is de schatter.
+
+   Wat er precies berekend wordt is ∂log π / ∂(sominvoer van een knoop), zodat het
+   spoor pre[van]·dev[naar] daarna letterlijk de gradiënt naar dat gewicht is.
+   Voor een knop geldt log π = a·log p + (1−a)·log(1−p) met p = σ(net/τ), dus
+   ∂log π/∂net = (a − p)/τ. ANG laat die 1/τ weg — bij een vaste τ is dat een vaste
+   schaal die in de leersnelheid verdwijnt. Hier hoort zij er wél in, en overal op
+   dezelfde manier: τ loopt tijdens de training van 2,0 naar 0,46, dus zonder die
+   deling zou de verhouding tussen het knopdeel en het wolkdeel van de update
+   meebewegen met de exploratie. Met de deling erin is het spoor pre[van]·dev[naar]
+   voor élk gewicht exact ∂log π/∂w — en dat is precies wat tests/test-stap6.js met
+   eindige differenties nameet.
+
+   De lagen worden van achteren naar voren afgelopen; alleen voorwaartse
+   verbindingen tellen mee, want een terugkoppeling draagt bij aan de uitvoer van de
+   vólgende tik, niet aan die van deze. De afgeleide van tanh is 1 − h², met h de
+   activatie zoals zij in B.pre staat: dat is de waarde die de uitvoer van deze tik
+   werkelijk voortbracht. */
+function backpropDev(B,tp){
+  const dev=B.dev, pre=B.pre;
+  if(!B.lagenIdx) return;
+  for(let j=OUT0;j<HID0;j++) dev[j]/=tp;
+  for(let L=B.lagenIdx.length-1;L>=0;L--){
+    const idx=B.lagenIdx[L];
+    for(let q=0;q<idx.length;q++){
+      const j=idx[q], o=B.uit[j];
+      let s=0;
+      for(let k=0;k<o.length;k++){ const c=o[k]; s+=B.cW[c]*dev[B.cTo[c]]; }
+      const h=pre[j];
+      dev[j]=s*(1-h*h);
+    }
+  }
+  kb(B.ffCount);
+}
+/* Hetzelfde spoor als updateTraces, met één verschil dat er wél toe doet: een
+   terugkoppelende verbinding kreeg haar presynaptische waarde niet van B.pre maar
+   van de toestand aan het eind van de vórige tik — dat is de waarde die daar
+   werkelijk doorheen ging. Voor een zuiver voorwaarts net is B.cRec overal nul en
+   is dit exact updateTraces. */
+function updateTracesExact(B,lam){
+  const k1=1-lam, pre=B.pre, prev=B.prev, dev=B.dev, rec=B.cRec;
+  kb(B.nc);
+  for(let c=0;c<B.nc;c++){
+    const a=(rec&&rec[c])? prev[B.cFrom[c]] : pre[B.cFrom[c]];
+    B.cE[c]=lam*B.cE[c]+k1*a*dev[B.cTo[c]];
+  }
+  for(let j=N_IN;j<B.n;j++) B.ebias[j]=lam*B.ebias[j]+k1*dev[j];
 }
 /* De eligibility-trace vermenigvuldigt de presynaptische activatie met de
    postsynaptische afwijking. Tot 9 september 2026 werd daar B.act voor gebruikt: de
@@ -1101,6 +1202,7 @@ function brainStep(B,inp,cfg,expl,rnd){
 function updateTraces(B,lam,traceOud,gain){
   const act=(traceOud||!B.pre)? B.act : B.pre, dev=B.dev, k1=1-lam;
   const g=(gain===undefined||gain===null)?1:gain;
+  kb(B.nc);
   if(g===1){
     for(let c=0;c<B.nc;c++) B.cE[c]=lam*B.cE[c]+k1*act[B.cFrom[c]]*dev[B.cTo[c]];
     for(let j=N_IN;j<B.n;j++) B.ebias[j]=lam*B.ebias[j]+k1*dev[j];
@@ -1126,6 +1228,7 @@ function updateTraces(B,lam,traceOud,gain){
    alles versterkt en leert het niets. */
 function applyReward(B,r,cfg,scale){
   const eta=cfg.lr*(scale===undefined?1:scale), wmax=cfg.wmax, smax=cfg.stepMax;
+  kb(B.nc);
   B.rbar+=0.02*(r-B.rbar);
   const rh=clamp(r-B.rbar,-10,10);
   /* Meetstand (stap 3). Staat S.gradAccum aan, dan wordt het ruwe leersignaal
@@ -1155,6 +1258,7 @@ function applyReward(B,r,cfg,scale){
    poging niets heeft bijgedragen, zakt een stukje terug naar nul. */
 function fadeWeights(B,cfg){
   const f=1-cfg.decay;
+  kb(B.nc);
   for(let c=0;c<B.nc;c++) B.cW[c]*=f;
   for(let j=N_IN;j<B.n;j++) B.bias[j]*=f;
 }
@@ -1573,7 +1677,10 @@ const S={
   resultsDirHandle:null, lastResult:null, dirty:false,
   gradAccum:null, gradAccumBias:null,
   expDirHandle:null, expCsvLines:null, expCsvName:"runs.csv", expAbort:false, expRunning:false,
-  benchWorlds:null, lastBench:null, evalStreng:null
+  benchWorlds:null, lastBench:null, evalStreng:null,
+  /* rekenkosten (stap 6): kanten-bezoeken en spelstappen, gescheiden naar leren
+     en inferentie omdat dat twee verschillende kostenposten zijn */
+  kbLeer:0, kbInf:0, stapLeer:0, stapInf:0
 };
 
 /* ======================= spel ======================= */
@@ -1616,6 +1723,10 @@ function moveAgent(dx,dy,mag,w){
 /* één spelstap. learn=false → geen ruis, geen plasticiteit (toetsen/kijken) */
 function gameTick(learn,noise){
   const c=S.cfg, B=S.B, w=S.world;
+  /* Rekenkosten worden apart geteld voor leren en voor inferentie: dat zijn twee
+     verschillende getallen die allebei "efficiëntie" heten. */
+  MEET = learn ? "leer" : "inf";
+  if(learn) S.stapLeer++; else S.stapInf++;
   S.lrScale=c.lrAnneal? (c.noise0>0? noise/c.noise0 : 1) : 1;
   sense(S.ag,w,S.inp);
   brainStep(B,S.inp,c,noise,S.rnd);
@@ -1624,7 +1735,10 @@ function gameTick(learn,noise){
   let dx=P[3]-P[2], dy=P[1]-P[0];
   const mag=Math.hypot(dx,dy);
   if(mag>0){ dx=dx/mag*c.chSpeed; dy=dy/mag*c.chSpeed; }
-  if(learn) updateTraces(B,c.lam,c.traceOud,c.perturbGain);
+  if(learn){
+    if(c.gradExact) updateTracesExact(B,c.lam);
+    else updateTraces(B,c.lam,c.traceOud,c.perturbGain);
+  }
 
   const collided=moveAgent(dx,dy,mag,w);
 
@@ -1644,6 +1758,7 @@ function gameTick(learn,noise){
 }
 function finishEpisode(){
   const c=S.cfg;
+  MEET="leer";
   S.rewards.push(S.epReward);
   S.collisions+=S.epCollisions;
   if(S.reached){ S.succTotal++; S.stepsSucc.push(S.step); }
@@ -2315,7 +2430,8 @@ function buildResult(naamOverride){
       /* alles wat je in de pagina kunt instellen, precies zoals het stond */
       startNeuronen:S.cfg.layered?(S.B.n-HID0):S.cfg.nNeurons,
       /* basislijn: geen wolk maar een vaste stapel lagen */
-      gelaagd:S.cfg.layered?{lagen:S.B.lagen.slice(), verbindingen:S.B.nc}:null,
+      gelaagd:S.cfg.layered?{lagen:S.B.lagen.slice(), verbindingen:S.B.nc,
+        terugkoppeling:!!S.cfg.recurrent, voorwaartseVerbindingen:S.B.ffCount||S.B.nc}:null,
       samenstelling:S.B.comp, samenstellingStart:S.B.compStart,
       neuronenNu:S.B.n-HID0,
       types:{
@@ -2331,7 +2447,10 @@ function buildResult(naamOverride){
         maxGewicht:S.cfg.wmax, maxVeranderingPerStap:S.cfg.stepMax, geheugenlek:S.cfg.memLeak,
         propagatiestappen:S.cfg.prop, exploratieStart:S.cfg.noise0, exploratieEind:noiseEnd(S.cfg.noise0),
         leersnelheidMeeschalen:S.cfg.lrAnneal, oudeTrace:!!S.cfg.traceOud,
-        perturbatieVersterking:S.cfg.perturbGain||1},
+        perturbatieVersterking:S.cfg.perturbGain||1,
+        /* stap 6: exacte gradiënt (terugpropagatie) in plaats van node-perturbatie,
+           met verder precies hetzelfde spoor, dezelfde basislijn en dezelfde rem */
+        exacteGradient:!!S.cfg.gradExact},
       structureel:{aan:S.cfg.structOn, herstructureerElke:S.cfg.structEvery,
         snoeidrempel:S.cfg.pruneT, nieuweVerbindingenPerRonde:S.cfg.sprout,
         groeiAan:S.cfg.growOn, alleenBijStagnatie:S.cfg.growStagnant, maxNeuronen:S.cfg.growMax,
@@ -2351,7 +2470,8 @@ function buildResult(naamOverride){
       gemStappenBijSucces:S.stepsSucc.length?S.stepsSucc.reduce((a,b)=>a+b,0)/S.stepsSucc.length:null,
       gemBeloningLaatste20:S.rewards.slice(-20).reduce((a,b)=>a+b,0)/Math.max(1,S.rewards.slice(-20).length),
       besteBeloning:S.rewards.length?Math.max(...S.rewards):null,
-      botsingenPerPoging:S.ep?S.collisions/S.ep:0, rekentijdMs:Math.round(S.elapsed)
+      botsingenPerPoging:S.ep?S.collisions/S.ep:0, rekentijdMs:Math.round(S.elapsed),
+      rekenkosten:rekenkosten()
     },
     /* De vaste benchmarkset: per beleidsvorm het gemiddelde met een 95%-interval
        over de werelden, plus de uitslag per wereld. Die laatste maakt een gepaarde
@@ -2608,9 +2728,40 @@ function brainFromResult(R){
   return B;
 }
 
+/* ---------- de rekenkostentabel (stap 6) ----------
+   Vier grootheden die allemaal "efficiëntie" heten en zelden hetzelfde zijn:
+     · wat één spelstap kost tijdens het leren   — de prijs van de leerregel
+     · wat één spelstap kost bij inferentie      — de prijs van het gedrag
+     · hoeveel omgevingsstappen tot 80 % succes  — sample-efficiëntie
+     · hoeveel kanten-bezoeken tot 80 % succes   — rekenefficiëntie
+   De wandkloktijd (rekentijdMs) en de actieve verbindingen staan er los naast. Een
+   brein dat drie keer zo veel werk nodig heeft om te leren maar daarna vier keer
+   goedkoper draait is een interessant resultaat — maar alleen als je die kolommen
+   apart rapporteert. Vandaar dat ze hier apart staan.
+   De 80 %-drempel wordt afgelezen op het lopende succes over de laatste twintig
+   pogingen; haalt een run die drempel nooit, dan blijft het veld leeg. Dat is geen
+   nul maar "niet bereikt", en dat verschil moet in de tabel zichtbaar blijven. */
+function rekenkosten(){
+  const perLeerStap = S.stapLeer? S.kbLeer/S.stapLeer : null;
+  const perInfStap  = S.stapInf ? S.kbInf /S.stapInf  : null;
+  let pogingen=null, stappen=null, cum=0;
+  for(const h of S.hist){
+    cum+=h.steps;
+    if(pogingen===null && h.succ20>=0.8){ pogingen=h.ep+1; stappen=cum; }
+  }
+  return {
+    kantenBezoekenLeerStap:perLeerStap, kantenBezoekenInfStap:perInfStap,
+    kantenBezoekenLerenTotaal:S.kbLeer, spelstappenLeren:S.stapLeer,
+    kantenBezoekenInferentieTotaal:S.kbInf, spelstappenInferentie:S.stapInf,
+    pogingenTot80:pogingen, omgevingsstappenTot80:stappen,
+    kantenBezoekenTot80:(stappen!==null&&perLeerStap!==null)?Math.round(stappen*perLeerStap):null
+  };
+}
+
 function clearRunState(){
   S.hist=[]; S.evalHist=[]; S.rewards=[]; S.stepsSucc=[]; S.succTotal=0; S.collisions=0;
   S.structLog=[]; S.ep=0; S.elapsed=0; S.selected=-1; S.lastBench=null; S.evalStreng=null;
+  S.kbLeer=0; S.kbInf=0; S.stapLeer=0; S.stapInf=0;
 }
 
 function applyResult(R,mode){
@@ -2659,7 +2810,11 @@ const CSV_COLS=["tijdstip","conditie","brein","breinZaad","wereldZaad","pogingen
   /* stap 4: de vaste benchmarkset en de tweede beleidsvorm. Runs van vóór
      9 september 2026 hebben deze kolommen leeg — dat is geen nul maar "niet gemeten". */
   "toetsStreng","benchWerelden","benchHerhalingen","benchBeleid","benchBeleidCI",
-  "benchStreng","benchStrengCI","benchStappen"];
+  "benchStreng","benchStrengCI","benchStappen",
+  /* stap 6: welke schatter, welke topologie, en de rekenkosten. Runs van vóór
+     10 september 2026 hebben deze kolommen leeg. */
+  "gradExact","terugkoppeling","kbLeerStap","kbInfStap",
+  "pogingenTot80","stappenTot80","kbTot80"];
 function csvCell(v){
   if(v===null||v===undefined) return "";
   if(typeof v==="boolean") return v?"1":"0";
@@ -2670,6 +2825,7 @@ function csvCell(v){
 function csvRow(r){
   const c=r.config, w=c.wereld, l=c.leren, st=c.structureel, res=r.resultaat, s2=r.structuur, comp=c.samenstelling;
   const bm=r.benchmark||null;
+  const rk=res.rekenkosten||null;
   const v={
     tijdstip:r.tijdstip, conditie:r.conditie||"", brein:r.brein, breinZaad:r.breinZaad, wereldZaad:w.seed,
     pogingen:res.pogingen, neuronenStart:c.startNeuronen, neuronenEind:c.neuronenNu, dichtheid:c.startdichtheid,
@@ -2692,7 +2848,11 @@ function csvRow(r){
     benchWerelden:bm?bm.werelden:null, benchHerhalingen:bm?bm.herhalingen:null,
     benchBeleid:bm?bm.beleid.pct:null, benchBeleidCI:bm?bm.beleid.ci:null,
     benchStreng:bm?bm.streng.pct:null, benchStrengCI:bm?bm.streng.ci:null,
-    benchStappen:bm?bm.beleid.gemStappen:null
+    benchStappen:bm?bm.beleid.gemStappen:null,
+    gradExact:!!l.exacteGradient, terugkoppeling:!!(c.gelaagd&&c.gelaagd.terugkoppeling),
+    kbLeerStap:rk?rk.kantenBezoekenLeerStap:null, kbInfStap:rk?rk.kantenBezoekenInfStap:null,
+    pogingenTot80:rk?rk.pogingenTot80:null, stappenTot80:rk?rk.omgevingsstappenTot80:null,
+    kbTot80:rk?rk.kantenBezoekenTot80:null
   };
   return CSV_COLS.map(k=>csvCell(v[k])).join(",");
 }
@@ -3141,6 +3301,8 @@ window.__brain={S,createBrain,analyze,makeWorld,readCfg,startTraining,stopTraini
   EVAL_WORLDS,
   propagate,brainStep,updateTraces,resetBrainState,mulberry32,sense,makeWorld2:makeWorld,
   gameTick,applyReward,fadeWeights,noiseEnd,
+  /* stap 6 */
+  backpropDev,updateTracesExact,markLayers,rekenkosten,tempOf,hiddenNoiseOf,sigm,
   K:{K_IN,K_SENS,K_WORK,K_REFL,K_MEM,K_NEUT,K_OUT,HID0,OUT0}};
 </script>
 </body>

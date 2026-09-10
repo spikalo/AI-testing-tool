@@ -215,6 +215,36 @@ elke boog een tijdstap, dus dat is reactietijd, geen capaciteit. Alles boven de 
 ondergrens van 38,6% is dus toe te schrijven aan de leerregel, niet aan de graaf. Ruwe
 meting: `experimenten/basislijnen.json`.
 
+**En wat geef je op door géén backpropagation te gebruiken?** Dezelfde vraag omgekeerd:
+topologie vast, alleen de schatter wisselt. Node-perturbatie *schat* wat een verborgen
+knoop bijdroeg; terugpropagatie *rekent* het uit. Verder is alles identiek — hetzelfde
+spoor, dezelfde basislijn, dezelfde begrensde stap, dezelfde vervaging, hetzelfde
+startbrein — en elke conditie draait op de leersnelheid die een aparte veeg op de goedkope
+toets voor haar koos.
+
+| conditie | η | benchmark | gewichten | kanten tot 80% | tijd |
+|---|---|---|---|---|---|
+| ANG, de wolk | 0,004 | 63,2% ± 3,0 | 3068 | 483 M | 7,1 s |
+| MLP 16-16-4, perturbatie | 0,008 | 39,3% ± 5,3 | 320 | 180 M | 3,0 s |
+| MLP 16-16-4, **backprop** | 0,016 | **66,7% ± 0,6** | 320 | **11 M** | 1,4 s |
+| MLP 16-32-32-4, perturbatie | 0,004 | 41,7% ± 4,9 | 1664 | 1,3 G | 10,4 s |
+| MLP 16-32-32-4, backprop | 0,008 | 64,9% ± 1,1 | 1664 | 74 M | 3,5 s |
+| Elman-16, perturbatie | 0,004 | 42,3% ± 5,0 | 576 | 297 M | 2,6 s |
+| Elman-16, backprop | 0,008 | 66,3% ± 1,2 | 576 | 22 M | 1,2 s |
+
+De exacte gradiënt is op alle drie de netten meer dan **twintig procentpunt** beter
+(p < 0,001). Node-perturbatie betaalt dat in capaciteit: met 16 verborgen knopen haalt zij
+39%, met 150 knopen 67% — terwijl backprop met diezelfde 16 knopen al op 67% zit. En op
+rekenkosten is het geen wedstrijd: een MLP van 320 gewichten haalt de score van de wolk
+voor **een 43e deel van het rekenwerk**. De hypothese uit het werkplan dat een klein MLP
+hier op rekenkosten wint, is dus gemeten in plaats van vermoed, en zij komt uit.
+
+Rekenkosten worden in **vier gescheiden grootheden** gerapporteerd, want zij vallen zelden
+samen: kanten-bezoeken per lerende spelstap, per inferentiestap, omgevingsstappen tot 80%
+succes (sample-efficiëntie) en kanten-bezoeken tot diezelfde drempel (rekenefficiëntie),
+met wandkloktijd en actieve verbindingen ernaast. Eén kanten-bezoek is één keer een gewicht
+aanraken. Ruwe meting: `experimenten/rekenkosten.json` en `experimenten/lr-veeg-stap6.json`.
+
 ### Herhaalbaar, laadbaar, en in reeksen te draaien
 
 Een run ligt volledig vast door twee zaden: het **breinzaad** (de startwolk) en het
@@ -231,8 +261,9 @@ Daaruit volgen drie dingen die de pagina nu kan:
   of opnieuw te toetsen, of alleen de instellingen terugzetten en met een vers brein
   vanaf hetzelfde punt verder experimenteren.
 - **Experimentloper** — een lijst condities × zaden achter elkaar, zonder tekenen, met
-  per run een JSON en één regel in `experimenten/runs.csv` (61 kolommen: beide zaden,
-  alle parameters die tussen condities verschillen, en alle uitkomst- en structuurmaten).
+  per run een JSON en één regel in `experimenten/runs.csv` (68 kolommen: beide zaden,
+  alle parameters die tussen condities verschillen, alle uitkomst- en structuurmaten, en
+  sinds stap 6 de rekenkosten).
   Aan het eind van elke run wordt desgewenst de vaste benchmarkset gedraaid, in beide
   beleidsvormen. Onderaan verschijnt per conditie het gemiddelde met een 95%-interval
   over de zaden, plus een **Mann-Whitney U** van elke conditie tegen de eerste, met de

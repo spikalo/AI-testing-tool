@@ -44,6 +44,7 @@ const PGAINLR = lees(path.join(EXPDIR, 'perturbatie-schaal-lr.json'));
 const BENCH = lees(path.join(EXPDIR, 'benchmark.json'));
 const BENCHSET = lees(path.join(EXPDIR, 'benchmark-werelden.json'));
 const BASIS = lees(path.join(EXPDIR, 'basislijnen.json'));
+const REKEN = lees(path.join(EXPDIR, 'rekenkosten.json'));
 function stat(xs) {
   const v = xs.filter(x => typeof x === 'number' && isFinite(x));
   const n = v.length; if (!n) return null;
@@ -58,8 +59,8 @@ const num = (x, d = 0) => x === null ? '–' : x.m.toFixed(d) + ' ± ' + x.ci.to
 const kol = k => RUNS ? RUNS.map(r => r[k]) : [];
 /* een gemiddelde-met-interval uit benchmark.json in dezelfde vorm als stat() */
 const bm = o => o ? { n: o.n, m: o.m, sd: o.sd, ci: o.ci, min: o.m, max: o.m } : null;
-const VERSIE = '1.4';
-const DATUM = '9 september 2026';
+const VERSIE = '1.5';
+const DATUM = '10 september 2026';
 const SERIF = 'Cambria';
 const TEXTW_PT = 448;              // bruikbare tekstbreedte in punten
 const INK = '1A1D21', DIM = '55606B', ACC = '1F5C73';
@@ -282,7 +283,12 @@ C.push(new Paragraph({
       'leerregel op een vaste gelaagde topologie scoort binnen de meetruis gelijk aan de graaf: op deze taak ' +
       'is de prestatie toe te schrijven aan de leerregel en niet aan de structuur. Het enige structurele ' +
       'effect dat boven de ruis uitkomt is padlengte, die bij propagatiediepte één samenvalt met reactietijd. ' +
-      'De ablaties per mechanisme en de basislijnen met backpropagation volgen in een latere versie.'
+      'Een tweede reeks houdt de topologie vast en wisselt alleen de schatter: op drie vaste netten levert ' +
+      'terugpropagatie meer dan twintig procentpunt op ten opzichte van node-perturbatie, en zij bereikt de ' +
+      'score van de graaf met ongeveer een tiende van de parameters en enkele procenten van het rekenwerk. ' +
+      'De rekenkosten worden daarbij in vier gescheiden grootheden gerapporteerd, omdat sample-efficiëntie, ' +
+      'rekenefficiëntie, wandkloktijd en inferentiekosten zelden samenvallen. De ablaties per mechanisme ' +
+      'volgen in een latere versie.'
   })]
 }));
 C.push(new Paragraph({
@@ -1497,7 +1503,7 @@ if (BASIS && BASIS.tabel) {
       'kost wel rekentijd (' + (T['ang-vol'].tijdMs.m / 1000).toFixed(1) + ' s tegen ' +
       (T['ang-vast'].tijdMs.m / 1000).toFixed(1) + ' s per run) en het vergroot de spreiding tussen zaden ' +
       '(± ' + (100 * T['ang-vol'].benchBeleid.ci).toFixed(1) + ' tegen ± ' +
-      (100 * T['ang-vast'].benchBeleid.ci).toFixed(1) + '). Sectie 10.5 splitst dit in de afzonderlijke ' +
+      (100 * T['ang-vast'].benchBeleid.ci).toFixed(1) + '). Sectie 10.6 splitst dit in de afzonderlijke ' +
       'mechanismen; deze meting zegt alleen dat het geheel niets oplevert.')
   ]));
   C.push(h3('Wat wél meetbaar is: padlengte'));
@@ -1519,28 +1525,210 @@ if (BASIS && BASIS.tabel) {
       'zichzelf herstructurerende topologie iets toevoegt, heeft een omgeving nodig waarin verschillende ' +
       'informatielatenties werkelijk nodig zijn; in een taak waarin het doel altijd zichtbaar is en één ' +
       'tussenlaag volstaat, is er niets te herstructureren dat de moeite loont. Dat is de aanleiding voor de ' +
-      'tweede taak in sectie 10.5, en het is de reden dat de vraagstelling in sectie 10.6 smaller is dan waar ' +
+      'tweede taak in sectie 10.6, en het is de reden dat de vraagstelling in sectie 10.7 smaller is dan waar ' +
       'dit werk mee begon.')
   ]));
   C.push(gap(60));
 }
 
-C.push(h2('10.5', 'Wat hierna gemeten wordt'));
+/* --- 10.5: wat de schatter waard is, en wat het rekenwerk kost ----------------
+   Volledig uit experimenten/rekenkosten.json. Sectie 10.4 vergeleek topologieën
+   binnen één leerregel; deze sectie vergelijkt leerregels binnen één topologie.
+   Dat zijn twee verschillende vragen en ze hebben allebei hun eigen tabel. */
+if (REKEN && REKEN.tabel) {
+  const R = REKEN.tabel, RS = (REKEN.toetsen || []).filter(Boolean);
+  const rn = {
+    'ang-vol': 'ANG, de wolk', 'mlp-16-perturb': 'MLP 16-16-4, perturbatie',
+    'mlp-16-bp': 'MLP 16-16-4, backprop', 'mlp-32-32-perturb': 'MLP 16-32-32-4, perturbatie',
+    'mlp-32-32-bp': 'MLP 16-32-32-4, backprop', 'elman-16-perturb': 'Elman-16, perturbatie',
+    'elman-16-bp': 'Elman-16, backprop', 'mlp-16-perturb-p1': 'MLP 16-16-4, perturbatie, diepte 1'
+  };
+  const rvs = (a, b, m) => RS.find(t => t.tegen === a && t.conditie === b && t.maat === m);
+  const pT = o => o ? (o.p < 0.001 ? 'p < 0,001' : 'p = ' + o.p.toFixed(3)) : '';
+  /* kanten-bezoeken lopen in de miljoenen; rauwe getallen leest niemand */
+  const kort = v => (v === null || v === undefined || !isFinite(v)) ? '–'
+    : v >= 1e9 ? (v / 1e9).toFixed(1) + ' G' : v >= 1e6 ? (v / 1e6).toFixed(1) + ' M'
+      : v >= 1e3 ? (v / 1e3).toFixed(1) + ' k' : String(Math.round(v));
+  const kk = (n, k) => (R[n] && R[n][k]) ? kort(R[n][k].m) : '–';
+  const namenR = Object.keys(rn).filter(k => R[k]);
+  const PAREN = [['mlp-16-perturb', 'mlp-16-bp', 'MLP 16-16-4'],
+    ['mlp-32-32-perturb', 'mlp-32-32-bp', 'MLP 16-32-32-4'],
+    ['elman-16-perturb', 'elman-16-bp', 'Elman-16']].filter(([a, b]) => R[a] && R[b]);
+
+  C.push(h2('10.5', 'Wat de schatter waard is, en wat het rekenwerk kost'));
+  C.push(body(
+    'Sectie 10.4 hield de leerregel vast en varieerde de topologie. Deze sectie doet het omgekeerde: dezelfde ' +
+    'topologie, dezelfde spelregels, dezelfde ' + REKEN.zaden + ' breinzaden en dezelfde benchmarkset, maar het ' +
+    'verborgen leersignaal komt één keer uit node-perturbatie en één keer uit terugpropagatie. Alles daaromheen ' +
+    'is gelijk gehouden: hetzelfde spoor met dezelfde λ, dezelfde lopende basislijn, dezelfde begrensde stap, ' +
+    'dezelfde vervaging per poging, dezelfde Bernoulli-knoppen en dezelfde beloningen. Ook het startnetwerk is ' +
+    'bit voor bit hetzelfde. Wat overblijft is de schatter, en dat is precies de vraag die de vergelijking met ' +
+    'backpropagation hoort te beantwoorden.'
+  ));
+  C.push(body([
+    t('Twee dingen maken de vergelijking pas eerlijk. Ten eerste draait elke conditie op '), it('haar eigen'),
+    t(' leersnelheid: de exacte gradiënt heeft een andere grootte dan een perturbatieschatting, en ANG’s 0,008 ' +
+      'is met de hand op ANG afgesteld. Zes leersnelheden, vier breinzaden per leersnelheid, gekozen op de ' +
+      'goedkope toets van twintig werelden — nooit op de benchmarkset, want die is de meetlat en mag geen ' +
+      'instellingen kiezen. De veegzaden liggen bovendien buiten de zaden waarop gemeten wordt, zodat de keuze ' +
+      'niet de eigen ruis terugmeet. Ten tweede rekent elk gelaagd net zijn uitvoer binnen één spelstap uit ' +
+      '(propagatiediepte gelijk aan zijn diepte), zodat de reactielatentie die in sectie 10.4 vijf procentpunt ' +
+      'kostte hier geen rol speelt; de laatste regel van de tabel is de controle die dat nameet.')
+  ]));
+  if (R['ang-vol'] && R['ang-vol'].lr !== 0.008) C.push(body([
+    bd('Eén gevolg daarvan meteen. '),
+    t('Dezelfde veeg is ook op ANG zelf losgelaten, en die kwam niet uit op de met de hand afgestelde 0,008 ' +
+      'maar op ' + String(R['ang-vol'].lr).replace('.', ',') + '. Op de goedkope toets scheelde dat ' +
+      ((100 * (REKEN.leersnelheidVeeg['ang-vol'].toets -
+        (REKEN.leersnelheidVeeg['ang-vol'].perLeersnelheid.find(x => x.lr === 0.008) || { toets: 0 }).toets)).toFixed(0)) +
+      ' procentpunt over vier zaden — ruim binnen de ruis, dus dit is geen ontdekking maar een gevolg van ' +
+      'argmax over zes waarden. Het staat hier omdat de ANG-regel in deze tabel daardoor op een andere ' +
+      'leersnelheid draait dan die in sectie 10.3 en 10.4, en dat mag een lezer niet hoeven raden.')
+  ]));
+  C.push(tbl(
+    ['conditie', 'η', 'benchmark, geloot', 'benchmark, argmax', 'laatste 20', 'gewichten'],
+    namenR.map(k => [rn[k], String(R[k].lr).replace('.', ','), pct(R[k].benchBeleid), pct(R[k].benchStreng),
+      pct(R[k].succes20), String(Math.round(R[k].verbindingen.m))]),
+    [3000, 700, 1600, 1600, 1400, 1172]
+  ));
+  C.push(gap(60));
+  C.push(h3('Wat levert een exacte gradiënt op?'));
+  for (const [a, b, lab] of PAREN) {
+    const tb = rvs(a, b, 'benchBeleid'), ts = rvs(a, b, 'stappenTot80');
+    C.push(bullet([bd(lab + '. '),
+      t(pct(R[a].benchBeleid) + ' met node-perturbatie tegen ' + pct(R[b].benchBeleid) + ' met de exacte ' +
+        'gradiënt' + (tb ? ' — ' + (tb.verschilPp >= 0 ? '+' : '') + tb.verschilPp.toFixed(1) +
+          ' procentpunt, ' + pT(tb) + ', ' + tb.oordeel : '') + '. Omgevingsstappen tot 80 % succes: ' +
+        kk(a, 'stappenTot80') + ' tegen ' + kk(b, 'stappenTot80') +
+        (ts ? ' (' + pT(ts) + ', ' + ts.oordeel + ')' : '') + '.')]));
+  }
+  {
+    const echt = PAREN.filter(([a, b]) => { const o = rvs(a, b, 'benchBeleid'); return o && o.p < 0.05; });
+    const beter = echt.filter(([a, b]) => rvs(a, b, 'benchBeleid').verschilPp > 0);
+    C.push(body([
+      bd('Samengevat. '),
+      t(echt.length === 0
+        ? 'Op geen van de drie netten komt het verschil tussen de twee schatters boven de ruis uit. Dat is een ' +
+          'sterker resultaat voor node-perturbatie dan verwacht: op deze taak levert de exacte gradiënt geen ' +
+          'meetbaar betere score op, terwijl zij per definitie meer informatie gebruikt. Dat pleit niet voor de ' +
+          'schatter maar tegen de taak — met vier binaire knoppen, zestien zintuigen en één zinvolle tussenlaag ' +
+          'is het aantal richtingen waarin een netwerk fout kan zitten klein genoeg dat ruis er doorheen komt.'
+        : beter.length === echt.length
+          ? 'Op ' + echt.length + ' van de ' + PAREN.length + ' netten scoort de exacte gradiënt aantoonbaar ' +
+            'beter. Dat is wat er wordt opgegeven door geen backpropagation te gebruiken, uitgedrukt in de enige ' +
+            'eenheid die telt: gedrag op onbekende werelden. Het kost wel een leerregel die niet meer lokaal is.'
+          : 'Het beeld is gemengd: op ' + echt.length + ' van de ' + PAREN.length + ' netten is het verschil ' +
+            'aantoonbaar, en niet steeds in dezelfde richting. Dat is zelf een resultaat — het betekent dat de ' +
+            'keuze van de schatter op deze taak minder uitmaakt dan de keuze van het netwerk.')
+    ]));
+  }
+  {
+    /* Hoeveel runs haalden de drempel überhaupt? Bij een conditie die hem vaak mist
+       gaat het gemiddelde alleen over de runs die hem wél haalden, en dat vleit. */
+    const mist = namenR.filter(k => R[k].haalde80 < R[k].runs);
+    if (mist.length) C.push(body([
+      bd('Een detail dat de tabel hieronder vleit. '),
+      t('De drempel van 80 % wordt niet door elke run gehaald: ' +
+        mist.map(k => rn[k] + ' ' + R[k].haalde80 + ' van ' + R[k].runs).join(', ') +
+        '. De kolommen “tot 80 %” gemiddelden dus alleen over de runs die de drempel bereikten, wat de ' +
+        'condities die hem vaak missen gunstiger laat lijken dan zij zijn. Dat zijn zonder uitzondering de ' +
+        'perturbatiecondities; het aantal staat er daarom bij.')
+    ]));
+  }
+  if (BASIS && BASIS.tabel && BASIS.tabel['gelaagd-1x150'] && R['mlp-16-bp'] && R['mlp-16-perturb']) {
+    const g150 = BASIS.tabel['gelaagd-1x150'];
+    C.push(body([
+      bd('Hoeveel gewichten kost het missen van backpropagation? '),
+      t('Deze tabel en die van sectie 10.4 laten zich naast elkaar leggen, want zij delen de benchmarkset. ' +
+        'Met node-perturbatie haalt een verborgen laag van zestien knopen ' + pct(R['mlp-16-perturb'].benchBeleid) +
+        ', terwijl dezelfde leerregel op een laag van honderdvijftig — ' + Math.round(g150.verbindingen.m) +
+        ' gewichten in plaats van ' + Math.round(R['mlp-16-perturb'].verbindingen.m) + ' — op ' +
+        pct(g150.benchBeleid) + ' komt. Met terugpropagatie zijn die zestien knopen genoeg: ' +
+        pct(R['mlp-16-bp'].benchBeleid) + ' bij ' + Math.round(R['mlp-16-bp'].verbindingen.m) + ' gewichten. ' +
+        'Node-perturbatie heeft op deze taak dus ruwweg een orde van grootte meer parameters nodig om te halen ' +
+        'wat een exacte gradiënt met een tiende daarvan haalt. Dat is een scherpere formulering van wat er ' +
+        'wordt opgegeven dan een verschil in eindscore: niet zozeer het gedrag, maar de prijs in capaciteit.')
+    ]));
+  }
+  C.push(h3('Vier dingen die allemaal “efficiëntie” heten'));
+  C.push(body(
+    'De rest van dit werk sprak over efficiëntie zonder haar te tellen. Hieronder staan de vier grootheden die ' +
+    'die naam dragen, apart. De eenheid is één kanten-bezoek: één keer een gewicht aanraken, bij het doorrekenen ' +
+    'of bij het bijwerken. Een netwerk dat meer werk nodig heeft om te leren maar daarna goedkoper draait is een ' +
+    'interessant resultaat — maar alleen als die kolommen los van elkaar gerapporteerd worden.'
+  ));
+  C.push(tbl(
+    ['conditie', 'kanten per lerende stap', 'kanten per inferentiestap', 'omgevingsstappen tot 80 %',
+      'kanten tot 80 %', 'actieve verb.', 'tijd'],
+    namenR.map(k => [rn[k], kk(k, 'kbLeerStap'), kk(k, 'kbInfStap'),
+      kk(k, 'stappenTot80') + (R[k].haalde80 === R[k].runs ? '' : ' (' + R[k].haalde80 + '/' + R[k].runs + ')'),
+      kk(k, 'kbTot80'), String(Math.round(R[k].actief.m)), (R[k].tijdMs.m / 1000).toFixed(1) + ' s']),
+    [2400, 1300, 1300, 1400, 1100, 1000, 972]
+  ));
+  C.push(gap(60));
+  {
+    /* de goedkoopste conditie die het niet aantoonbaar slechter doet dan ANG */
+    const angB = R['ang-vol'] ? R['ang-vol'].benchBeleid.m : null;
+    const kand = namenR.filter(k => k !== 'ang-vol' && R[k].kbTot80 && R['ang-vol'])
+      .filter(k => { const o = rvs('ang-vol', k, 'benchBeleid'); return !o || o.p >= 0.05 || o.verschilPp > 0; })
+      .sort((a, b) => R[a].kbTot80.m - R[b].kbTot80.m);
+    const goedkoopst = kand[0];
+    C.push(body([
+      bd('De rekening. '),
+      t('ANG heeft ' + kk('ang-vol', 'kbLeerStap') + ' kanten-bezoeken nodig per lerende spelstap en ' +
+        kk('ang-vol', 'kbInfStap') + ' per inferentiestap, en komt op ' + kk('ang-vol', 'kbTot80') +
+        ' kanten-bezoeken voordat het lopende succes de 80 % raakt. ' +
+        (goedkoopst ? rn[goedkoopst] + ' doet dat met ' + kk(goedkoopst, 'kbTot80') + ' — een factor ' +
+          (R['ang-vol'].kbTot80.m / R[goedkoopst].kbTot80.m).toFixed(1) + ' goedkoper — bij ' +
+          (rvs('ang-vol', goedkoopst, 'benchBeleid') && rvs('ang-vol', goedkoopst, 'benchBeleid').p < 0.05
+            ? 'een hógere benchmarkscore' : 'een score die binnen de ruis gelijk is') + ' (' +
+          pct(R[goedkoopst].benchBeleid) + ' tegen ' + pct(R['ang-vol'].benchBeleid) + '). ' : '') +
+        'De hypothese dat een klein vast netwerk op deze taak op rekenkosten wint, is daarmee gemeten in plaats ' +
+        'van vermoed, en zij komt uit. Dat is geen mislukking van het model maar een afbakening van waar het ' +
+        'thuishoort: sectie 10.7 trekt die conclusie door naar de onderzoeksvraag zelf.')
+    ]));
+  }
+  {
+    const lat = rvs('mlp-16-perturb-p1', 'mlp-16-perturb', 'benchBeleid');
+    if (lat) C.push(body([
+      bd('De controle op de reactielatentie. '),
+      t('Hetzelfde net op propagatiediepte 1 in plaats van 2 — dus met één tijdstap vertraging tussen prikkel ' +
+        'en knop, zoals de gelaagde condities in sectie 10.4 die hadden — haalt ' +
+        pct(R['mlp-16-perturb-p1'].benchBeleid) + ' tegen ' + pct(R['mlp-16-perturb'].benchBeleid) + ' (' +
+        (lat.verschilPp >= 0 ? '+' : '') + lat.verschilPp.toFixed(1) + ' procentpunt, ' + pT(lat) + ', ' +
+        lat.oordeel + '). ' + (lat.p < 0.05
+          ? 'De latentie doet er dus werkelijk toe, en de keuze om elk gelaagd net binnen één spelstap te laten ' +
+            'rekenen was nodig om de schatter te kunnen isoleren.'
+          : 'De latentie verklaart hier dus niets van het verschil tussen de schatters; de vergelijking hierboven ' +
+            'staat op zichzelf.'))
+    ]));
+    if (REKEN.ijkTegenStap4 && REKEN.ijkTegenStap4.vergeleken)
+      C.push(body([
+        bd('IJk op de eerdere reeks. '),
+        t('De ANG-conditie is voor deze tabel opnieuw gedraaid en reproduceert ' +
+          REKEN.ijkTegenStap4.identiek + ' van de ' + REKEN.ijkTegenStap4.vergeleken +
+          ' runs uit de referentiemeting van sectie 10.3 bit voor bit. Het instrumenteren van de rekenkosten ' +
+          'en het inbouwen van de tweede schatter hebben het gedrag van ANG dus niet geraakt.')
+      ]));
+  }
+  C.push(gap(60));
+}
+
+C.push(h2('10.6', 'Wat hierna gemeten wordt'));
 C.push(body(
-  'Sectie 10.4 laat zien dat de structurele plasticiteit als geheel niets oplevert. Dat zegt nog niet welk van ' +
-  'de mechanismen daaraan schuldig is, en evenmin wat er wordt opgegeven door geen backpropagation te ' +
-  'gebruiken. De volgende versie van dit document rapporteert:'
+  'Sectie 10.4 laat zien dat de structurele plasticiteit als geheel niets oplevert, en sectie 10.5 wat de ' +
+  'leerregel kost en opbrengt. Dat zegt nog niet welk van de mechanismen aan het eerste schuldig is. De ' +
+  'volgende versie van dit document rapporteert:'
 ));
 C.push(bullet([bd('Ablaties. '), t('Tien condities die elk één mechanisme uitzetten — geheugen-neuronen, ' +
   'reflex-neuronen, invoer-neuronen, snoeien, aangroei, neuronale groei, soortverandering, de soortregels zelf, ' +
   'en als uiterste de volledig bevroren structuur waarin alleen de gewichten nog leren.')]));
 
-C.push(bullet([bd('Basislijnen met backpropagation. '), t('Twee kleine MLP\'s en een GRU, getraind met een ' +
-  'gewone policy-gradient. Dit isoleert wat er wordt opgegeven door geen backpropagation te gebruiken. Dat is een ' +
-  'andere vraag dan de vorige, en beide zijn nodig.')]));
-C.push(bullet([bd('Rekenkosten, apart geteld. '), t('Sample-efficiëntie (omgevingsstappen tot een drempel), ' +
-  'rekenefficiëntie (kanten-bezoeken tot diezelfde drempel), wandkloktijd en inferentiekosten worden los ' +
-  'gerapporteerd. Zij vallen zelden samen, en één cijfer voor "efficiëntie" verbergt meer dan het laat zien.')]));
+C.push(bullet([bd('Een recurrente basislijn met terugpropagatie door de tijd. '), t('De Elman-basislijn van ' +
+  'sectie 10.5 deelt bewust het skelet van ANG en propageert dus niet terug door de tijd; daarmee wordt zij ' +
+  'gemeten in precies de vorm waarin een gepoort geheugennet zijn kracht niet kan tonen. Een GRU met echte BPTT ' +
+  'hoort bij de tweede taak hieronder, waar geheugen over tientallen tikken werkelijk nodig is — op de huidige ' +
+  'taak is het doel altijd zichtbaar en zou zo’n basislijn niets extra’s laten zien.')]));
 C.push(bullet([bd('De schaal van het wolkdeel van de update. '), t('Sectie 3.11 laat zien dat het ' +
   'node-perturbatiedeel twee ordes te klein is ten opzichte van het score-functiedeel. De ontbrekende factor ' +
   'toevoegen is één regel code, maar vraagt om de leersnelheid en de stapbegrenzing samen opnieuw af te stellen; ' +
@@ -1550,11 +1738,11 @@ C.push(bullet([bd('Een tweede taak. '), t('In de huidige taak is het doel altijd
   'doel na verloop van tijd verdwijnt terwijl er tegelijk obstakels opduiken die binnen één tik ontweken moeten ' +
   'worden, is de eerste opzet waarin de twee soorten paden — kort en reflexmatig, lang en met geheugen — ook ' +
   'werkelijk allebei nodig zijn.')]));
-C.push(h2('10.6', 'De onderzoeksvraag, smaller gemaakt'));
+C.push(h2('10.7', 'De onderzoeksvraag, smaller gemaakt'));
 C.push(body(
-  'Sectie 10.4 dwingt tot een scherpe afbakening. ANG is geen goedkoper alternatief ' +
+  'Sectie 10.4 en 10.5 dwingen samen tot een scherpe afbakening. ANG is geen goedkoper alternatief ' +
   'voor backpropagation, en op een taak als deze wint een klein gelaagd netwerk met dezelfde leerregel al op ' +
-  'rekentijd bij gelijke score — gemeten, niet vermoed. ' +
+  'rekentijd én op kanten-bezoeken bij gelijke score — gemeten, niet vermoed. ' +
   'De verdedigbare vraag is smaller: of een lokaal lerende, zichzelf herstructurerende recurrente graaf door ' +
   'structurele spaarzaamheid en verschillende informatielatenties een gunstiger compromis tussen rekenwerk en ' +
   'gedrag vindt dan een vaste architectuur. Bij propagatiediepte één kost elke boog letterlijk één tijdstap, ' +
@@ -1588,6 +1776,20 @@ if (BASIS && BASIS.tabel) C.push(body([
     'paden allebei nodig zijn, niet uit een taak waarin het doel altijd zichtbaar is en één tussenlaag ' +
     'volstaat. Zolang die meting er niet is, is de afleesbaarheid de bijdrage en niet de prestatie.')
 ]));
+if (REKEN && REKEN.tabel && REKEN.tabel['mlp-16-bp'] && REKEN.tabel['ang-vol']) {
+  const A = REKEN.tabel['ang-vol'], M = REKEN.tabel['mlp-16-bp'];
+  C.push(body([
+    bd('En de prijs van lokaal leren is nu geteld. '),
+    t('Sectie 10.5 laat zien dat de exacte gradiënt op elk van de drie gelaagde netten een verschil van meer ' +
+      'dan twintig procentpunt maakt, en dat een netwerk van ' + Math.round(M.verbindingen.m) + ' gewichten dat ' +
+      'terugpropageert de benchmarkscore van de wolk haalt voor ongeveer een ' +
+      Math.round(A.kbTot80.m / M.kbTot80.m) + 'e deel van het rekenwerk. Node-perturbatie compenseert dat met ' +
+      'capaciteit: ongeveer een orde van grootte meer parameters om hetzelfde te halen. Wat een lokale ' +
+      'leerregel oplevert — een update die alleen grootheden gebruikt die op de synaps zelf beschikbaar zijn — ' +
+      'moet dus opwegen tegen die rekening, en op deze taak doet het dat niet. De verdedigbare aanspraak van ' +
+      'ANG ligt daarmee niet bij efficiëntie, en dat is precies de afbakening die sectie 10.7 maakt.')
+  ]));
+}
 
 /* ===== referenties ===== */
 /* =====================================================================

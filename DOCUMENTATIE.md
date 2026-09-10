@@ -390,6 +390,130 @@ en herstart het:
 
 ## 10. Logboek
 
+### 2026-09-10 — Wat backpropagation waard is, en wat rekenwerk kost (werkplan stap 6)
+
+**De vraag.** Stap 5 hield de leerregel vast en wisselde de topologie. Dit pakket doet
+het omgekeerde: dezelfde topologie, en alleen de manier waarop het verborgen leersignaal
+tot stand komt verschilt. Node-perturbatie *schat* wat een verborgen knoop bijdroeg door
+hem te verstoren; terugpropagatie *rekent* het uit. Daarnaast praatte het project over
+efficiëntie zonder haar ooit te tellen.
+
+**Wat er gebouwd is.**
+
+- `cfg.gradExact` in `brein-test.html`. Staat die aan, dan vult `backpropDev()` de
+  verborgen `B.dev` met de exacte ∂log π/∂net in plaats van met de perturbatieafwijking,
+  en pakt `updateTracesExact()` het spoor op. Er is dan géén ruispas meer nodig — de
+  exploratie zit volledig in het loten van de vier knoppen, zoals bij gewone REINFORCE.
+  Alles daaromheen is ongemoeid: hetzelfde spoor met dezelfde λ, dezelfde lopende
+  basislijn, dezelfde begrensde stap, dezelfde vervaging, dezelfde beloningen.
+- `cfg.recurrent` maakt van de laatste verborgen laag een Elman-laag (alle knopen op alle
+  knopen terug, de eigen verbinding inbegrepen). Terugkoppelende verbindingen krijgen hun
+  presynaptische waarde uit `B.prev` in plaats van `B.pre`, want dát is de waarde die er
+  werkelijk doorheen ging.
+- **De rekenkostenteller.** Grondeenheid: één kanten-bezoek — één keer een gewicht
+  aanraken, bij het doorrekenen of bij het bijwerken. De teller hoogt per lus in één keer
+  op met het aantal verbindingen; exact hetzelfde getal, maar zonder rekentijd, zodat de
+  wandkloktijd die ernaast gemeten wordt niet door de meting zelf vertekend raakt. Zeven
+  nieuwe kolommen in `runs.csv` (nu 68); de 116 bestaande regels zijn bewaard met lege
+  cellen — dat is "niet gemeten", geen nul.
+- **Een leersnelheidsveeg per conditie.** ANG's 0,008 is met de hand op ANG afgesteld;
+  een exacte gradiënt heeft een andere grootte. Zes leersnelheden × 4 zaden per conditie,
+  gekozen op de goedkope toets van twintig werelden, nooit op de benchmark, en met
+  veegzaden (2000–2003) buiten de meetzaden (1000–1015).
+- Elk gelaagd net draait op propagatiediepte gelijk aan zijn eigen diepte, zodat het zijn
+  uitvoer binnen één spelstap uitrekent. De reactielatentie die in stap 5 vijf procentpunt
+  kostte speelt daardoor geen rol; de laatste conditie is de controle die dat nameet.
+
+**Gedrag**, 8 condities × 16 zaden, dezelfde wereldzaden en dezelfde benchmarkset:
+
+| conditie | η | benchmark | argmax | laatste 20 | gewichten |
+|---|---|---|---|---|---|
+| ANG, de wolk | 0,004 | 63,2% ± 3,0 | 52,7% ± 4,0 | 82,5% ± 5,3 | 3068 |
+| MLP 16-16-4, perturbatie | 0,008 | 39,3% ± 5,3 | 37,1% ± 5,1 | 63,8% ± 4,5 | 320 |
+| MLP 16-16-4, **backprop** | 0,016 | **66,7% ± 0,6** | 42,6% ± 1,7 | 91,6% ± 4,4 | 320 |
+| MLP 16-32-32-4, perturbatie | 0,004 | 41,7% ± 4,9 | 41,1% ± 3,3 | 65,9% ± 6,1 | 1664 |
+| MLP 16-32-32-4, **backprop** | 0,008 | 64,9% ± 1,1 | 42,3% ± 1,4 | 93,8% ± 4,2 | 1664 |
+| Elman-16, perturbatie | 0,004 | 42,3% ± 5,0 | 40,1% ± 4,4 | 66,3% ± 5,0 | 576 |
+| Elman-16, **backprop** | 0,008 | 66,3% ± 1,2 | 50,7% ± 2,0 | 92,2% ± 4,1 | 576 |
+| MLP 16-16-4, perturbatie, diepte 1 | 0,008 | 46,8% ± 5,2 | 40,5% ± 3,3 | 66,3% ± 4,8 | 320 |
+| *ijkpunt: reactieve agent* | | *38,6% ± 4,3* | | | |
+
+**Rekenkosten** — vier grootheden die allemaal "efficiëntie" heten:
+
+| conditie | kanten/leerstap | kanten/infstap | stappen tot 80% | kanten tot 80% | actief | tijd |
+|---|---|---|---|---|---|---|
+| ANG, de wolk | 10,7 k | 3,0 k | 45,3 k | 483,2 M | 1664 | 7,1 s |
+| MLP 16, perturbatie | 1,9 k | 640 | 93,8 k (12/16) | 180,3 M | 114 | 3,0 s |
+| MLP 16, backprop | 1,6 k | 640 | **7,0 k** | **11,2 M** | 193 | 1,4 s |
+| MLP 32-32, perturbatie | 13,3 k | 5,0 k | 100,7 k (13/16) | 1,3 G | 915 | 10,4 s |
+| MLP 32-32, backprop | 10,0 k | 5,0 k | 7,4 k | 74,1 M | 1121 | 3,5 s |
+| Elman-16, perturbatie | 3,5 k | 1,2 k | 85,8 k (14/16) | 296,9 M | 291 | 2,6 s |
+| Elman-16, backprop | 2,6 k | 1,2 k | 8,3 k | 21,8 M | 399 | 1,2 s |
+| MLP 16, perturbatie, diepte 1 | 1,3 k | 320 | 97,6 k (13/16) | 125,1 M | 113 | 1,3 s |
+
+Let op de getallen tussen haakjes: dat is het aantal runs dat de 80 %-drempel überhaupt
+haalde. De kolommen "tot 80 %" gemiddelden alleen over die runs, wat de perturbatie-
+condities gunstiger laat lijken dan zij zijn — en het zijn zonder uitzondering de
+perturbatiecondities die de drempel missen.
+
+**Vier uitkomsten.**
+
+1. **De exacte gradiënt maakt op elk net meer dan twintig procentpunt verschil.**
+   MLP 16 +27,4 pp, MLP 32-32 +23,2 pp, Elman-16 +23,9 pp — alle drie p < 0,001. Dit is
+   het antwoord op "wat geef je op door geen backpropagation te gebruiken", en het is
+   groot.
+2. **Node-perturbatie betaalt dat verschil in capaciteit.** Met perturbatie haalt een
+   laag van 16 knopen 39,3 %, terwijl dezelfde leerregel op een laag van 150 (stap 5,
+   3000 gewichten) op 66,9 % kwam. Met terugpropagatie zijn die 16 knopen genoeg: 66,7 %
+   bij 320 gewichten. Ruwweg een orde van grootte meer parameters om hetzelfde te halen.
+3. **En op rekenkosten wint een klein backpropnet met grote marge.** ANG heeft 483 M
+   kanten-bezoeken nodig tot 80 % succes, MLP 16 met backprop 11,2 M — een factor 43 —
+   bij een benchmarkscore die *hoger* ligt (66,7 % tegen 63,2 %, p = 0,042). De hypothese
+   uit het werkplan dat een klein MLP op deze taak op rekenkosten wint, is daarmee
+   gemeten in plaats van vermoed, en zij komt uit.
+4. **De reactielatentie verklaart er niets van.** Hetzelfde net op diepte 1 haalt 46,8 %
+   tegen 39,3 % op diepte 2 (p = 0,062, binnen de ruis, en als er al een richting in zit
+   dan de andere dan verwacht). Het verschil tussen de schatters staat dus op zichzelf.
+
+Bijvangst: ANG's eigen veeg koos 0,004 in plaats van de handmatige 0,008 (72 % tegen 69 %
+op de goedkope toets, vier zaden — ruim binnen de ruis, dus een gevolg van argmax over zes
+waarden en geen ontdekking). De ANG-regel in deze tabel draait daardoor op een andere
+leersnelheid dan die in stap 4 en 5; daarom staat η in de tabel.
+
+**Wat het bewijst dat het een eerlijke vergelijking is** (`tests/test-stap6.js`,
+24 controles, alle groen):
+
+- de exacte gradiënt is écht de gradiënt: over alle gewichten cosinus 1,000000 met
+  eindige differenties op log π, en op de vijftig zwaarste termen maximaal 0,03 %
+  relatieve fout — voor een voorwaarts net, een dieper net én een net met terugkoppeling,
+  waar 31,7 % van de gradiëntmassa in de terugkoppelende gewichten zit (dus die tak wordt
+  werkelijk getoetst);
+- de rekenkostenteller klopt op de eenheid nauwkeurig met de analytische formule, in
+  beide schattervormen, en toetsen komen op de inferentieteller en niet op de leerteller;
+- tussen de perturbatie- en de backpropconditie verschilt precies één instelling
+  (`gradExact`) en het startbrein is bit voor bit hetzelfde;
+- twee runs met hetzelfde zaad zijn bit voor bit gelijk, tot en met de teller;
+- en de regressie die er het meest toe doet: `ang-vast` met zaad 1000 levert nog exact de
+  zes getallen uit stap 5 (0,686 / 0,95 / 0,80 / 0,70 / 2639 / 1281). Al het sleutelwerk
+  aan `brainStep`, het spoor en de spelstap heeft ANG dus niet geraakt.
+
+**Nieuw of gewijzigd:** `backpropDev()`, `updateTracesExact()`, `markLayers()`,
+`rekenkosten()` en de teller `kb()` in `brein-test.html`; `tests/test-stap6.js`,
+`tests/stap6-condities.js`, `tests/exp-stap6-lr.js`, `tests/exp-stap6.js`,
+`tests/migreer-runs-csv.js`; `experimenten/lr-veeg-stap6.json`,
+`experimenten/rekenkosten.json`, 128 nieuwe regels en 7 nieuwe kolommen in `runs.csv`.
+Paper naar versie 1.5: nieuwe sectie 10.5 met beide tabellen, 10.5 en 10.6 doorgenummerd
+naar 10.6 en 10.7, samenvatting en conclusie bijgesteld.
+
+**Wat er bewust níét gebeurd is.** Het werkplan noemde een GRU-16. Een GRU dankt zijn nut
+aan poortjes die over veel tijdstappen terug getraind worden, en dat skelet heeft ANG
+niet — een GRU zonder BPTT wordt gemeten in precies de vorm waarin hij zijn kracht niet
+kan tonen. De recurrente basislijn is daarom een Elman-net met hetzelfde skelet geworden;
+een GRU met echte BPTT hoort bij spel B (stap 11), waar geheugen over tientallen tikken
+werkelijk nodig is. De metingen zijn bovendien serieel gedraaid: wandkloktijd staat in de
+tabel, en twee reeksen tegelijk draaien zou die vervuilen.
+
+
 ### 2026-09-09 — Basislijnen: de leerregel doet het werk, niet de graaf (werkplan stap 5)
 
 **De vraag.** De leerregel van sectie 3 vraagt nergens om een graaf — zij werkt op elke
