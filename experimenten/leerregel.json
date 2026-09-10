@@ -1,5 +1,5 @@
 {
-  "uitgevoerd": "2026-09-10T14:34:14.158Z",
+  "uitgevoerd": "2026-09-10T18:42:26.102Z",
   "beschrijving": "Werkplan stap 7: vier ingrepen in de leerregel, met de topologie en de schatter ongemoeid. (a) een lineaire criticus V(s)=w·s+b op de zestien sensoren, getraind met TD(0), zodat het leersignaal r+γV(s′)−V(s) wordt in plaats van r−r̄; (b) schaarse perturbatie, per tik een kwart van de wolk; (c) een gefactoriseerde softmax over negen elkaar uitsluitende acties in plaats van vier onafhankelijke Bernoulli-knoppen; (d) perturbGain, de ontbrekende 1/Var(ξ)-normalisatie uit stap 3, nu mét eigen leersnelheidsveeg. Elke conditie draait op de leersnelheid die de veeg van stap 7a op de goedkope toets van twintig werelden voor haar koos, nooit op de benchmark van 500 werelden.",
   "zaden": 12,
   "eersteZaad": 1000,
@@ -385,21 +385,21 @@
       },
       "pogingenTot80": {
         "n": 12,
-        "m": 66.5,
-        "sd": 40.007953754676876,
-        "ci": 22.63663081258902
+        "m": 82,
+        "sd": 28.145724687451523,
+        "ci": 15.924942890340489
       },
       "stappenTot80": {
         "n": 12,
-        "m": 15490.5,
-        "sd": 9422.204157298767,
-        "ci": 5331.113864444533
+        "m": 18978.916666666668,
+        "sd": 6741.2725054268685,
+        "ci": 3814.233985775049
       },
       "kbTot80": {
         "n": 12,
-        "m": 163520984.08333334,
-        "sd": 98504214.28174594,
-        "ci": 55734005.93924103
+        "m": 200140724.75,
+        "sd": 68844970.97116302,
+        "ci": 38952709.27210188
       }
     },
     "s7-criticus": {
@@ -486,21 +486,21 @@
       },
       "pogingenTot80": {
         "n": 12,
-        "m": 108.58333333333333,
-        "sd": 72.02961301794667,
-        "ci": 40.75459013622536
+        "m": 129.66666666666666,
+        "sd": 74.65597867227481,
+        "ci": 42.24059639539177
       },
       "stappenTot80": {
         "n": 12,
-        "m": 27482.75,
-        "sd": 19193.729421705317,
-        "ci": 10859.874751406916
+        "m": 32853.333333333336,
+        "sd": 19888.254461242985,
+        "ci": 11252.839285572205
       },
       "kbTot80": {
         "n": 12,
-        "m": 297621638,
-        "sd": 208110971.716473,
-        "ci": 117749867.0309839
+        "m": 354269741.5,
+        "sd": 213011087.05180645,
+        "ci": 120522368.28074056
       }
     },
     "s7-schaars": {
@@ -587,21 +587,21 @@
       },
       "pogingenTot80": {
         "n": 12,
-        "m": 14.25,
-        "sd": 24.85274815607101,
-        "ci": 14.061766021249381
+        "m": 62.583333333333336,
+        "sd": 19.161791211268387,
+        "ci": 10.841804007701583
       },
       "stappenTot80": {
         "n": 12,
-        "m": 3142.75,
-        "sd": 5532.399202138091,
-        "ci": 3130.2495252465196
+        "m": 13537.583333333334,
+        "sd": 3916.160491147451,
+        "ci": 2215.776387478683
       },
       "kbTot80": {
         "n": 12,
-        "m": 33826383.75,
-        "sd": 59563312.88282659,
-        "ci": 33701116.83219132
+        "m": 144876494.5,
+        "sd": 42395765.129925184,
+        "ci": 23987662.282057203
       }
     },
     "s7-criticus-schaars": {
@@ -688,21 +688,21 @@
       },
       "pogingenTot80": {
         "n": 12,
-        "m": 20.166666666666668,
-        "sd": 27.623551655437176,
-        "ci": 15.629495684555382
+        "m": 63.916666666666664,
+        "sd": 19.89727406333629,
+        "ci": 11.257942605874826
       },
       "stappenTot80": {
         "n": 12,
-        "m": 4606.583333333333,
-        "sd": 6290.208024574723,
-        "ci": 3559.0202303220217
+        "m": 14568.083333333334,
+        "sd": 4600.038625496596,
+        "ci": 2602.7168679388733
       },
       "kbTot80": {
         "n": 12,
-        "m": 50133113.166666664,
-        "sd": 68553184.2836236,
-        "ci": 38787615.41195699
+        "m": 157249667,
+        "sd": 48121034.84298036,
+        "ci": 27227038.571872514
       }
     },
     "s7-categorisch": {
@@ -789,21 +789,21 @@
       },
       "pogingenTot80": {
         "n": 12,
-        "m": 103.25,
-        "sd": 84.72750438907073,
-        "ci": 47.93909851745928
+        "m": 118.16666666666667,
+        "sd": 72.19649114280647,
+        "ci": 40.84901032392883
       },
       "stappenTot80": {
         "n": 12,
-        "m": 26968.666666666668,
-        "sd": 22346.418583637773,
-        "ci": 12643.676568993578
+        "m": 30658.333333333332,
+        "sd": 19211.840436816485,
+        "ci": 10870.122022867654
       },
       "kbTot80": {
         "n": 12,
-        "m": 291469950,
-        "sd": 241110247.87232164,
-        "ci": 136420965.18319306
+        "m": 330779974.4166667,
+        "sd": 207175445.8503162,
+        "ci": 117220543.44253759
       }
     },
     "s7-perturbgain": {
@@ -972,13 +972,13 @@
       "conditie": "s7-criticus",
       "maat": "stappenTot80",
       "eenheid": "absoluut",
-      "verschil": 11992.25,
+      "verschil": 13874.416666666668,
       "verschilPp": null,
-      "gemiddeldeA": 15490.5,
-      "gemiddeldeB": 27482.75,
-      "U": 38,
-      "p": 0.05309782098521676,
-      "oordeel": "verschil valt binnen de ruis"
+      "gemiddeldeA": 18978.916666666668,
+      "gemiddeldeB": 32853.333333333336,
+      "U": 34,
+      "p": 0.0303827143302996,
+      "oordeel": "verschil is er echt"
     },
     {
       "tegen": "s7-huidig",
@@ -1011,12 +1011,12 @@
       "conditie": "s7-schaars",
       "maat": "stappenTot80",
       "eenheid": "absoluut",
-      "verschil": -12347.75,
+      "verschil": -5441.333333333334,
       "verschilPp": null,
-      "gemiddeldeA": 15490.5,
-      "gemiddeldeB": 3142.75,
-      "U": 20,
-      "p": 0.0029457841570657006,
+      "gemiddeldeA": 18978.916666666668,
+      "gemiddeldeB": 13537.583333333334,
+      "U": 25,
+      "p": 0.007260049598708074,
       "oordeel": "verschil is er echt"
     },
     {
@@ -1050,12 +1050,12 @@
       "conditie": "s7-criticus-schaars",
       "maat": "stappenTot80",
       "eenheid": "absoluut",
-      "verschil": -10883.916666666668,
+      "verschil": -4410.833333333334,
       "verschilPp": null,
-      "gemiddeldeA": 15490.5,
-      "gemiddeldeB": 4606.583333333333,
-      "U": 28,
-      "p": 0.012022859679530318,
+      "gemiddeldeA": 18978.916666666668,
+      "gemiddeldeB": 14568.083333333334,
+      "U": 37,
+      "p": 0.04638645490667437,
       "oordeel": "verschil is er echt"
     },
     {
@@ -1089,13 +1089,13 @@
       "conditie": "s7-categorisch",
       "maat": "stappenTot80",
       "eenheid": "absoluut",
-      "verschil": 11478.166666666668,
+      "verschil": 11679.416666666664,
       "verschilPp": null,
-      "gemiddeldeA": 15490.5,
-      "gemiddeldeB": 26968.666666666668,
-      "U": 41,
-      "p": 0.07825213982850387,
-      "oordeel": "verschil valt binnen de ruis"
+      "gemiddeldeA": 18978.916666666668,
+      "gemiddeldeB": 30658.333333333332,
+      "U": 35,
+      "p": 0.03508899280795175,
+      "oordeel": "verschil is er echt"
     },
     {
       "tegen": "s7-huidig",
@@ -1128,9 +1128,9 @@
       "conditie": "s7-perturbgain",
       "maat": "stappenTot80",
       "eenheid": "absoluut",
-      "verschil": 100923,
+      "verschil": 97434.58333333333,
       "verschilPp": null,
-      "gemiddeldeA": 15490.5,
+      "gemiddeldeA": 18978.916666666668,
       "gemiddeldeB": 116413.5,
       "U": 0,
       "p": 0.03576364157849221,
@@ -1341,9 +1341,9 @@
         "tijdMs": 6449,
         "kbLeerStap": 10856.078656,
         "kbInfStap": 3001.930785,
-        "pogingenTot80": 1,
-        "stappenTot80": 268,
-        "kbTot80": 2909429
+        "pogingenTot80": 71,
+        "stappenTot80": 15207,
+        "kbTot80": 165088388
       },
       {
         "zaad": 1009,
@@ -1381,9 +1381,9 @@
         "tijdMs": 6332,
         "kbLeerStap": 10298.563594,
         "kbInfStap": 2834.940155,
-        "pogingenTot80": 1,
-        "stappenTot80": 191,
-        "kbTot80": 1967026
+        "pogingenTot80": 117,
+        "stappenTot80": 27113,
+        "kbTot80": 279224955
       },
       {
         "zaad": 1011,
@@ -1623,9 +1623,9 @@
         "tijdMs": 7253,
         "kbLeerStap": 10547.849273,
         "kbInfStap": 2929.176438,
-        "pogingenTot80": 1,
-        "stappenTot80": 261,
-        "kbTot80": 2752989
+        "pogingenTot80": 254,
+        "stappenTot80": 64708,
+        "kbTot80": 682530231
       },
       {
         "zaad": 1011,
@@ -1665,9 +1665,9 @@
         "tijdMs": 6375,
         "kbLeerStap": 10764.835835,
         "kbInfStap": 3002.704019,
-        "pogingenTot80": 1,
-        "stappenTot80": 252,
-        "kbTot80": 2712739
+        "pogingenTot80": 57,
+        "stappenTot80": 12506,
+        "kbTot80": 134625037
       },
       {
         "zaad": 1001,
@@ -1685,9 +1685,9 @@
         "tijdMs": 6677,
         "kbLeerStap": 10862.32967,
         "kbInfStap": 3000.746265,
-        "pogingenTot80": 1,
-        "stappenTot80": 250,
-        "kbTot80": 2715582
+        "pogingenTot80": 61,
+        "stappenTot80": 12388,
+        "kbTot80": 134562540
       },
       {
         "zaad": 1002,
@@ -1705,9 +1705,9 @@
         "tijdMs": 6665,
         "kbLeerStap": 10557.81747,
         "kbInfStap": 2910.442587,
-        "pogingenTot80": 1,
-        "stappenTot80": 199,
-        "kbTot80": 2101006
+        "pogingenTot80": 55,
+        "stappenTot80": 11558,
+        "kbTot80": 122027254
       },
       {
         "zaad": 1003,
@@ -1725,9 +1725,9 @@
         "tijdMs": 7063,
         "kbLeerStap": 10738.121649,
         "kbInfStap": 2968.263681,
-        "pogingenTot80": 1,
-        "stappenTot80": 246,
-        "kbTot80": 2641578
+        "pogingenTot80": 118,
+        "stappenTot80": 24500,
+        "kbTot80": 263083980
       },
       {
         "zaad": 1004,
@@ -1745,9 +1745,9 @@
         "tijdMs": 6643,
         "kbLeerStap": 10657.636324,
         "kbInfStap": 2901.589888,
-        "pogingenTot80": 1,
-        "stappenTot80": 252,
-        "kbTot80": 2685724
+        "pogingenTot80": 58,
+        "stappenTot80": 13020,
+        "kbTot80": 138762425
       },
       {
         "zaad": 1005,
@@ -1785,9 +1785,9 @@
         "tijdMs": 7043,
         "kbLeerStap": 10877.933395,
         "kbInfStap": 3015.35519,
-        "pogingenTot80": 1,
-        "stappenTot80": 206,
-        "kbTot80": 2240854
+        "pogingenTot80": 70,
+        "stappenTot80": 14961,
+        "kbTot80": 162744762
       },
       {
         "zaad": 1007,
@@ -1825,9 +1825,9 @@
         "tijdMs": 6422,
         "kbLeerStap": 10818.098558,
         "kbInfStap": 2966.055664,
-        "pogingenTot80": 1,
-        "stappenTot80": 199,
-        "kbTot80": 2152802
+        "pogingenTot80": 57,
+        "stappenTot80": 12797,
+        "kbTot80": 138439207
       },
       {
         "zaad": 1009,
@@ -1845,9 +1845,9 @@
         "tijdMs": 6814,
         "kbLeerStap": 10469.699513,
         "kbInfStap": 2922.01418,
-        "pogingenTot80": 1,
-        "stappenTot80": 206,
-        "kbTot80": 2156758
+        "pogingenTot80": 56,
+        "stappenTot80": 12642,
+        "kbTot80": 132357941
       },
       {
         "zaad": 1010,
@@ -1865,9 +1865,9 @@
         "tijdMs": 6402,
         "kbLeerStap": 10299.377917,
         "kbInfStap": 2850.940619,
-        "pogingenTot80": 1,
-        "stappenTot80": 173,
-        "kbTot80": 1781792
+        "pogingenTot80": 57,
+        "stappenTot80": 12349,
+        "kbTot80": 127187018
       },
       {
         "zaad": 1011,
@@ -1927,9 +1927,9 @@
         "tijdMs": 6727,
         "kbLeerStap": 11024.379524,
         "kbInfStap": 3065.711365,
-        "pogingenTot80": 1,
-        "stappenTot80": 317,
-        "kbTot80": 3494728
+        "pogingenTot80": 47,
+        "stappenTot80": 10111,
+        "kbTot80": 111467501
       },
       {
         "zaad": 1002,
@@ -1947,9 +1947,9 @@
         "tijdMs": 7103,
         "kbLeerStap": 10735.230438,
         "kbInfStap": 2989.016448,
-        "pogingenTot80": 1,
-        "stappenTot80": 244,
-        "kbTot80": 2619396
+        "pogingenTot80": 57,
+        "stappenTot80": 13016,
+        "kbTot80": 139729759
       },
       {
         "zaad": 1003,
@@ -1967,9 +1967,9 @@
         "tijdMs": 6944,
         "kbLeerStap": 10645.317196,
         "kbInfStap": 2943.36363,
-        "pogingenTot80": 1,
-        "stappenTot80": 291,
-        "kbTot80": 3097787
+        "pogingenTot80": 71,
+        "stappenTot80": 16047,
+        "kbTot80": 170825405
       },
       {
         "zaad": 1004,
@@ -2027,9 +2027,9 @@
         "tijdMs": 7476,
         "kbLeerStap": 10754.613529,
         "kbInfStap": 2973.370431,
-        "pogingenTot80": 1,
-        "stappenTot80": 296,
-        "kbTot80": 3183366
+        "pogingenTot80": 72,
+        "stappenTot80": 17178,
+        "kbTot80": 184742751
       },
       {
         "zaad": 1007,
@@ -2067,9 +2067,9 @@
         "tijdMs": 6646,
         "kbLeerStap": 11116.827329,
         "kbInfStap": 3070.604625,
-        "pogingenTot80": 1,
-        "stappenTot80": 245,
-        "kbTot80": 2723623
+        "pogingenTot80": 56,
+        "stappenTot80": 12713,
+        "kbTot80": 141328226
       },
       {
         "zaad": 1009,
@@ -2087,9 +2087,9 @@
         "tijdMs": 7278,
         "kbLeerStap": 10850.458014,
         "kbInfStap": 3019.8589,
-        "pogingenTot80": 10,
-        "stappenTot80": 2164,
-        "kbTot80": 23480391
+        "pogingenTot80": 56,
+        "stappenTot80": 13401,
+        "kbTot80": 145406988
       },
       {
         "zaad": 1010,
@@ -2107,9 +2107,9 @@
         "tijdMs": 6880,
         "kbLeerStap": 10534.348683,
         "kbInfStap": 2907.969203,
-        "pogingenTot80": 1,
-        "stappenTot80": 201,
-        "kbTot80": 2117404
+        "pogingenTot80": 64,
+        "stappenTot80": 14085,
+        "kbTot80": 148376301
       },
       {
         "zaad": 1011,
@@ -2127,9 +2127,9 @@
         "tijdMs": 7011,
         "kbLeerStap": 10627.721456,
         "kbInfStap": 2955.142665,
-        "pogingenTot80": 1,
-        "stappenTot80": 292,
-        "kbTot80": 3103295
+        "pogingenTot80": 119,
+        "stappenTot80": 27037,
+        "kbTot80": 287341705
       }
     ],
     "s7-categorisch": [
@@ -2189,9 +2189,9 @@
         "tijdMs": 7327,
         "kbLeerStap": 10822.129164,
         "kbInfStap": 3096.784262,
-        "pogingenTot80": 1,
-        "stappenTot80": 281,
-        "kbTot80": 3041018
+        "pogingenTot80": 62,
+        "stappenTot80": 14843,
+        "kbTot80": 160632863
       },
       {
         "zaad": 1003,
@@ -2349,9 +2349,9 @@
         "tijdMs": 7034,
         "kbLeerStap": 10571.732133,
         "kbInfStap": 2952.002031,
-        "pogingenTot80": 1,
-        "stappenTot80": 259,
-        "kbTot80": 2738079
+        "pogingenTot80": 119,
+        "stappenTot80": 29973,
+        "kbTot80": 316866527
       },
       {
         "zaad": 1011,

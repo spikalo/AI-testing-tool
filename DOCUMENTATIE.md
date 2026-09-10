@@ -390,6 +390,122 @@ en herstart het:
 
 ## 10. Logboek
 
+### 2026-09-10 — De ablatiereeks, en twee meetfouten (werkplan stap 8)
+
+**De vraag.** Stap 5 vroeg wat de graaf waard is, stap 6 wat de schatter waard is, stap 7
+wat er aan de leerregel te verbeteren valt. Deze reeks vraagt van elk onderdeel
+afzonderlijk: wat gebeurt er als het er niet is? Tien condities, 16 breinzaden, 500
+pogingen, benchmark van 500 werelden, alles verder gelijk. Twee condities zijn niet
+opnieuw gedraaid maar hergebruikt uit `runs.csv` — het volle model is
+`benchmark-standaard` uit stap 4, de vaste structuur is `ang-vast` uit stap 5 — dus 128
+nieuwe runs, ongeveer 25 minuten.
+
+**Eén leersnelheid voor alle tien** (η = 0,008), anders dan in stap 7. Daar kreeg elke
+conditie een eigen veeg omdat alle vier de ingrepen precies de grootheid raakten waar η
+op afgesteld is; een ablatie verandert de graaf en niet de schaal van de update.
+Redelijk, maar niet gemeten, en dus als beperking in de paper opgenomen.
+
+**Nieuw: Holm-correctie.** Negen condities tegen dezelfde referentie is een familie
+toetsen; bij negen toetsen op p < 0,05 is er ongeveer 37 % kans dat er eentje toevallig
+uitkomt. Elke maat krijgt daarom een Holm-Bonferroni-correctie over de negen, en
+`experimenten/ablatie.json` bewaart de ruwe en de gecorrigeerde p naast elkaar.
+
+**Uitkomst.**
+
+| conditie | benchmark geloot | Δ | Holm | argmax | stappen tot 80 % |
+|---|---|---|---|---|---|
+| volle model | 65,4 % ± 2,0 | — | — | 52,3 % ± 3,0 | 18,3 k |
+| geen geheugen-neuronen | 65,9 % ± 1,1 | +0,5 | 1,00 | **44,8 % ± 2,2** | 16,9 k |
+| geen reflex-neuronen | 65,2 % ± 1,9 | −0,2 | 1,00 | 49,4 % ± 3,3 | 20,8 k |
+| geen invoer-neuronen | 60,4 % ± 6,0 | −5,0 | 1,00 | 48,4 % ± 4,8 | 24,7 k (15/16) |
+| geen snoeien | 66,6 % ± 2,0 | +1,2 | 1,00 | 49,3 % ± 3,2 | 14,6 k |
+| geen aangroei van verbindingen | 63,9 % ± 2,5 | −1,5 | 1,00 | 51,7 % ± 3,6 | 20,1 k |
+| geen neuronale groei | 64,4 % ± 2,6 | −1,0 | 1,00 | 52,0 % ± 3,4 | 16,3 k |
+| geen hertypering | 65,1 % ± 2,0 | −0,3 | 1,00 | 48,8 % ± 3,7 | 18,3 k |
+| **strenge invoer** | **41,5 % ± 8,5** | **−23,9** | **0,0002** | 43,1 % ± 7,0 | 58,1 k (12/16) |
+| vaste structuur | 67,5 % ± 1,3 | +2,1 | 0,91 | 50,3 % ± 2,7 | 15,9 k |
+
+- **De bedradingsgrammatica is het enige onderdeel dat er echt toe doet, en hij kost.**
+  Alles via een invoer-neuron laten lopen zakt 23,9 procentpunt (p < 0,001, Holm 0,0002)
+  en heeft ruim drie keer zoveel ervaring nodig. De oorzaak is capaciteit, niet latentie:
+  het aantal kanten vanaf een invoer-node zakt van 627 naar 165, want zestien zintuigen
+  moeten door gemiddeld negen invoer-neuronen. Als middel om de reflexboog even kort te
+  maken als de directe weg is deze optie daarmee afgeschreven.
+- **Geheugen-neuronen weglaten raakt niet de gelote score maar de vorm van het beleid:**
+  geloot niets, onder argmax −7,6 pp (p = 0,0019, Holm 0,017). Zonder terugkoppeling
+  wordt de voorkeur vlakker terwijl de verdeling eromheen even goed presteert.
+- **Verder komt er niets boven de ruis uit**, ook niet op monsterefficiëntie. Snoeien,
+  aangroei, groei en hertypering: alle Holm-waarden op 1,00. Stap 5 mat dat al voor het
+  geheel; nu is het per mechanisme uitgesplitst en is er niemand aan te wijzen.
+- **Neuronale groei is de duidelijkste kostenpost zonder opbrengst:** uitzetten scheelt
+  niets op de score maar houdt het net op 60 neuronen in plaats van 111, met een kwart
+  minder rekentijd.
+- **Dat alles hoort bij deze taak, niet bij het model.** Het doel is altijd zichtbaar en
+  niets hoeft binnen één tik; geheugen en reflex hebben er per constructie niets te doen.
+
+**Nieuwe controle: deed de ablatie wat zij zegt?** Per run is uit de weggeschreven
+kolommen nagerekend dat het weggelaten onderdeel er ook echt niet is — nul geheugen-,
+reflex- of invoerneuronen, nul gesnoeid, nul bijgegroeid, nul nieuwe neuronen, nul
+hertyperingen, al naar gelang de conditie. Alle acht controleerbare condities: 16/16.
+Het blok staat als `controle` in `experimenten/ablatie.json`. Zonder die controle is een
+tabelregel "dit doet er niet toe" niet te onderscheiden van "dit stond nooit aan" — en
+dat was hier geen theoretisch bezwaar, zie fout 12.
+
+**Fout 12: een conditie die de code nooit bereikte.** `INPUT_ONLY_SENS` is een globale
+die `canConnect()` leest maar die alleen `readCfg()` zette, uit het vinkje in de pagina.
+De experimentloper roept `readCfg()` aan (vinkje uit) en legt daar zijn overrides
+overheen; die zetten `cfg.inputOnlySens`, wat niemand meer las. `"inputOnlySens": true`
+als conditie deed dus niets, terwijl de kolom in `runs.csv` netjes op 1 stond. Hersteld:
+`createBrain()` zet de vlag uit `cfg`. Voor een run uit de pagina verandert er niets, en
+dat is nagemeten — het volle model reproduceert de meting van stap 4 nog steeds bit voor
+bit.
+
+**Fout 13: "stappen tot 80 %" telde een gelukkige eerste poging mee.** De drempel werd
+afgelezen op het lopende succes over de laatste twintig pogingen, ook wanneer er nog geen
+twintig pogingen wáren — dan is dat gemiddelde er een over één of twee. Een run waarvan
+de allereerste poging toevallig slaagde kreeg "80 % gehaald na 1 poging". Dat gebeurde in
+**35 van de 256 runs**, en niet gelijk verdeeld: bij `s7-schaars` in negen van de twaalf,
+precies de conditie waar de hoofdbevinding van stap 7 op rustte.
+
+- **Hersteld:** de drempel telt pas bij twintig pogingen (`rekenkosten()` in
+  `brein-test.html`).
+- **Gemigreerd:** `tests/migreer-tot80.js` rekent de maat voor élke bestaande run opnieuw
+  uit de bewaarde historie — per poging staan het aantal stappen en het lopende succes
+  daar allebei in — en schrijft `runs.csv` en de run-JSON's bij. 121 regels gewijzigd,
+  niets hertraind. De oude tabel staat in `experimenten/runs.csv.voor-tot80`.
+- **Bijvangst:** de migratie vult de maat meteen in voor de runs van stap 4 en 5, die van
+  vóór de rekenkostenkolommen zijn maar wél een historie hebben. Daardoor heeft de
+  ablatiereeks een referentie op monsterefficiëntie zonder één run extra.
+- **Gevolg:** de analyses van stap 6, 7 en 8 zijn opnieuw afgeleid uit `runs.csv` — de
+  lopers zijn hervatbaar, dus dat kostte drie keer een halve minuut. **Schaarse
+  perturbatie is een factor 1,4 zuiniger met ervaring in plaats van 4,9** (13,5 k tegen
+  19,0 k omgevingsstappen, p = 0,007, dus nog steeds aantoonbaar). De criticus is nu
+  aantoonbaar trager (32,9 k, p = 0,030) waar dat eerder een indruk was. De richting van
+  alle conclusies blijft staan; de maatvoering van de enige positieve bevinding niet.
+
+**Bewijs:** `tests/test-stap8.js`, 22 controles, alle groen. Soorten uitzetten laat er
+nul van over en houdt het brein heel; strenge invoer laat élke invoerkant op een
+invoer-neuron landen (165 van 165) terwijl het zonder de vlag 127 van 627 is; de vlag
+komt aantoonbaar uit `cfg` en niet uit het vinkje; hertypering kan een uitgezette soort
+niet terugbrengen (nul geheugen-neuronen na 120 pogingen, mét 12 hertyperingen in die
+run); de vier vormen van plasticiteit gaan los uit terwijl het volle model ze alle vier
+doet; en het volle model reproduceert op zaad 1000 en 1001 de meting van stap 4 bit voor
+bit, inclusief het aantal verbindingen.
+
+**Bestanden:** `tests/stap8-condities.js` (de tien condities op één plek),
+`tests/exp-stap8.js` (de meetreeks, hervatbaar, met Holm-correctie),
+`tests/test-stap8.js`, `tests/migreer-tot80.js`, `experimenten/ablatie.json`.
+
+**Paper (versie 1.7):** nieuwe sectie 10.7 met de ablatietabel, het controleblok en de
+Holm-correctie; de oude 10.7 en 10.8 zijn doorgeschoven naar 10.8 en 10.9. Sectie 9 heeft
+een beperking erbij over de ene leersnelheid, sectie 10.6 een uitleg van de herstelde
+drempelmaat, en de conclusie een alinea over wat de reeks per onderdeel oplevert.
+`tests/lees-sectie.js` ving drie zinnen die op de nieuwe data ontspoorden: een dubbele
+ontkenning, een kop die "veel zuiniger" beloofde bij factor 1,4, en "weglaten kost
+succes" over een conditie die niets weglaat maar juist iets toevoegt.
+
+---
+
 ### 2026-09-10 — Vier ingrepen in de leerregel (werkplan stap 7)
 
 **De vraag.** Stap 5 varieerde de topologie binnen één leerregel, stap 6 de schatter

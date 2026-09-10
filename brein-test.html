@@ -928,6 +928,13 @@ const PREFIX={[K_SENS]:"S",[K_WORK]:"W",[K_REFL]:"R",[K_MEM]:"M",[K_NEUT]:"N"};
 function createBrain(cfg,seed){
   const rnd=mulberry32(seed*104729+7);
   const comp=composeTypes(cfg,rnd);
+  /* De strenge invoerregel stond alleen in deze globale en werd alleen door readCfg
+     uit het vinkje gezet. Een `"inputOnlySens": true` uit de experimentloper kwam
+     daardoor nooit bij canConnect aan: de conditie stond in het bestand maar niet in
+     het brein. Vanaf hier is cfg de bron, precies zoals bij alle andere knoppen.
+     Voor een run uit de pagina verandert dit niets — readCfg schrijft dezelfde
+     waarde in beide — dus eerdere metingen blijven reproduceerbaar. */
+  INPUT_ONLY_SENS=!!cfg.inputOnlySens;
   if(INPUT_ONLY_SENS && comp.sens===0) INPUT_ONLY_SENS=false;   // anders is er geen enkele legale invoerverbinding
   const kinds=[], labels=[];
   for(let i=0;i<8;i++){ kinds.push(K_IN); labels.push("obst "+DIRNAME[i]); }
@@ -2917,7 +2924,13 @@ function rekenkosten(){
   let pogingen=null, stappen=null, cum=0;
   for(const h of S.hist){
     cum+=h.steps;
-    if(pogingen===null && h.succ20>=0.8){ pogingen=h.ep+1; stappen=cum; }
+    /* Pas tellen als er werkelijk twintig pogingen achter succ20 zitten. Zonder die
+       eis is het gemiddelde aan het begin van een run een gemiddelde over één of twee
+       pogingen, en kreeg een run waarvan de eerste poging toevallig slaagde "de 80 %
+       gehaald na 1 poging" — geluk, geen leren. Dat gebeurde in 35 van de 256 runs en
+       niet gelijk verdeeld over de condities, dus het vervuilde juist de vergelijking
+       waarvoor deze maat bestaat. Zie tests/migreer-tot80.js. */
+    if(pogingen===null && h.ep+1>=20 && h.succ20>=0.8){ pogingen=h.ep+1; stappen=cum; }
   }
   return {
     kantenBezoekenLeerStap:perLeerStap, kantenBezoekenInfStap:perInfStap,

@@ -1,5 +1,5 @@
 {
-  "uitgevoerd": "2026-09-10T05:43:37.531Z",
+  "uitgevoerd": "2026-09-10T18:42:32.589Z",
   "beschrijving": "Werkplan stap 6: basislijnen mét backpropagation, en de rekenkostentabel. Elk gelaagd net draait twee keer — met node-perturbatie en met de exacte gradiënt — met verder exact hetzelfde skelet: hetzelfde spoor met dezelfde lambda, dezelfde lopende basislijn, dezelfde begrensde stap, dezelfde vervaging per poging, dezelfde Bernoulli-knoppen, dezelfde beloningen, dezelfde wereldzaden en dezelfde benchmarkset. Elke conditie draait op de leersnelheid die de veeg van stap 6a op de goedkope toets voor haar koos, nooit op de benchmark. De rekenkosten worden geteld in kanten-bezoeken: één keer een gewicht aanraken.",
   "zaden": 16,
   "eersteZaad": 1000,
@@ -439,21 +439,21 @@
       },
       "pogingenTot80": {
         "n": 16,
-        "m": 175.1875,
-        "sd": 131.0583680400963,
-        "ci": 64.21860033964718
+        "m": 187.5625,
+        "sd": 122.58872637128314,
+        "ci": 60.06847592192874
       },
       "stappenTot80": {
         "n": 16,
-        "m": 45279.9375,
-        "sd": 35108.96508010217,
-        "ci": 17203.392889250063
+        "m": 48465.3125,
+        "sd": 33001.32942719884,
+        "ci": 16170.651419327432
       },
       "kbTot80": {
         "n": 16,
-        "m": 483224643.25,
-        "sd": 372128031.809787,
-        "ci": 182342735.58679563
+        "m": 516351738.1875,
+        "sd": 349403024.1151845,
+        "ci": 171207481.8164404
       }
     },
     "mlp-16-perturb": {
@@ -534,21 +534,21 @@
       },
       "pogingenTot80": {
         "n": 12,
-        "m": 336.9166666666667,
-        "sd": 133.91887526228388,
-        "ci": 75.77173670860648
+        "m": 369.8333333333333,
+        "sd": 82.53135308732217,
+        "ci": 46.696508943118516
       },
       "stappenTot80": {
         "n": 12,
-        "m": 93841.83333333333,
-        "sd": 37697.419064857946,
-        "ci": 21329.32274395287
+        "m": 102648.5,
+        "sd": 23538.374044023592,
+        "ci": 13318.08885879106
       },
       "kbTot80": {
         "n": 12,
-        "m": 180286565.41666666,
-        "sd": 72422484.87450089,
-        "ci": 40976878.31492119
+        "m": 197206164,
+        "sd": 45220050.64637918,
+        "ci": 25585652.245186422
       }
     },
     "mlp-16-bp": {
@@ -629,21 +629,21 @@
       },
       "pogingenTot80": {
         "n": 16,
-        "m": 33.375,
-        "sd": 12.810802733110313,
-        "ci": 6.2772933392240535
+        "m": 37.9375,
+        "sd": 2.112463017427761,
+        "ci": 1.035106878539603
       },
       "stappenTot80": {
         "n": 16,
-        "m": 6965.4375,
-        "sd": 2666.288355717238,
-        "ci": 1306.4812943014467
+        "m": 7934.0625,
+        "sd": 597.2571159057044,
+        "ci": 292.65598679379514
       },
       "kbTot80": {
         "n": 16,
-        "m": 11158374.3125,
-        "sd": 4271279.202578758,
-        "ci": 2092926.8092635914
+        "m": 12710067.6875,
+        "sd": 956714.0017375251,
+        "ci": 468789.8608513873
       }
     },
     "mlp-32-32-perturb": {
@@ -914,21 +914,21 @@
       },
       "pogingenTot80": {
         "n": 14,
-        "m": 299.14285714285717,
-        "sd": 148.59229566054336,
-        "ci": 77.83740449463573
+        "m": 345.7142857142857,
+        "sd": 83.18970773195127,
+        "ci": 43.57743382143491
       },
       "stappenTot80": {
         "n": 14,
-        "m": 85843.64285714286,
-        "sd": 42772.50008269538,
-        "ci": 22405.605723928864
+        "m": 99111.35714285714,
+        "sd": 24140.548918643228,
+        "ci": 12645.592845510677
       },
       "kbTot80": {
         "n": 14,
-        "m": 296852992.28571427,
-        "sd": 147908233.4468536,
-        "ci": 77479070.7937546
+        "m": 342734253.78571427,
+        "sd": 83475992.2793677,
+        "ci": 43727398.83825329
       }
     },
     "elman-16-bp": {
@@ -1141,12 +1141,12 @@
       "conditie": "mlp-16-bp",
       "maat": "stappenTot80",
       "eenheid": "absoluut",
-      "verschil": -86876.39583333333,
+      "verschil": -94714.4375,
       "verschilPp": null,
-      "gemiddeldeA": 93841.83333333333,
-      "gemiddeldeB": 6965.4375,
-      "U": 16,
-      "p": 0.00022370433259988332,
+      "gemiddeldeA": 102648.5,
+      "gemiddeldeB": 7934.0625,
+      "U": 0,
+      "p": 0.000009280451228721454,
       "oordeel": "verschil is er echt"
     },
     {
@@ -1193,12 +1193,12 @@
       "conditie": "elman-16-bp",
       "maat": "stappenTot80",
       "eenheid": "absoluut",
-      "verschil": -77543.14285714286,
+      "verschil": -90810.85714285714,
       "verschilPp": null,
-      "gemiddeldeA": 85843.64285714286,
+      "gemiddeldeA": 99111.35714285714,
       "gemiddeldeB": 8300.5,
-      "U": 32,
-      "p": 0.0009503591486970109,
+      "U": 0,
+      "p": 0.0000035712161001733023,
       "oordeel": "verschil is er echt"
     },
     {
@@ -1513,9 +1513,9 @@
         "tijdMs": 6891,
         "kbLeerStap": 10399.747253,
         "kbInfStap": 2908.706527,
-        "pogingenTot80": 1,
-        "stappenTot80": 265,
-        "kbTot80": 2755933
+        "pogingenTot80": 199,
+        "stappenTot80": 51231,
+        "kbTot80": 532789452
       },
       {
         "zaad": 1011,
@@ -1724,9 +1724,9 @@
         "tijdMs": 2850,
         "kbLeerStap": 1921.226185,
         "kbInfStap": 640,
-        "pogingenTot80": 1,
-        "stappenTot80": 281,
-        "kbTot80": 539865
+        "pogingenTot80": 396,
+        "stappenTot80": 105961,
+        "kbTot80": 203575048
       },
       {
         "zaad": 1006,
@@ -2182,9 +2182,9 @@
         "tijdMs": 1375,
         "kbLeerStap": 1601.930246,
         "kbInfStap": 640,
-        "pogingenTot80": 1,
-        "stappenTot80": 304,
-        "kbTot80": 486987
+        "pogingenTot80": 38,
+        "stappenTot80": 7802,
+        "kbTot80": 12498260
       },
       {
         "zaad": 1014,
@@ -2201,9 +2201,9 @@
         "tijdMs": 1332,
         "kbLeerStap": 1601.977628,
         "kbInfStap": 640,
-        "pogingenTot80": 1,
-        "stappenTot80": 303,
-        "kbTot80": 485399
+        "pogingenTot80": 37,
+        "stappenTot80": 8303,
+        "kbTot80": 13301220
       },
       {
         "zaad": 1015,
@@ -2948,9 +2948,9 @@
         "tijdMs": 2465,
         "kbLeerStap": 3458.136847,
         "kbInfStap": 1152,
-        "pogingenTot80": 1,
-        "stappenTot80": 290,
-        "kbTot80": 1002860
+        "pogingenTot80": 258,
+        "stappenTot80": 73138,
+        "kbTot80": 252921213
       },
       {
         "zaad": 1006,
@@ -3062,9 +3062,9 @@
         "tijdMs": 2561,
         "kbLeerStap": 3458.098391,
         "kbInfStap": 1152,
-        "pogingenTot80": 1,
-        "stappenTot80": 231,
-        "kbTot80": 798821
+        "pogingenTot80": 396,
+        "stappenTot80": 113131,
+        "kbTot80": 391218129
       },
       {
         "zaad": 1012,

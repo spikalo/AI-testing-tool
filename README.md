@@ -252,15 +252,15 @@ of via de experimentloper (`criticOn`, `perturbFrac`, `catPolicy`, `perturbGain`
 
 | variant | benchmark geloot | argmax | stappen tot 80% |
 |---|---|---|---|
-| de regel zoals zij was | 65,6% ± 2,6 | 53,5% ± 3,5 | 15,5 k |
-| **criticus** — een lineaire *V(s)* op de 16 sensoren, TD(0), in plaats van één lopend gemiddelde | 60,9% ± 3,5 | 53,0% ± 3,6 | 27,5 k |
-| **schaarse perturbatie** — per tik maar ¼ van de wolk verstoren | 66,6% ± 2,1 | 51,8% ± 3,8 | **3,1 k** |
-| **categorisch beleid** — één softmax over 9 elkaar uitsluitende acties | 68,8% ± 1,9 | **61,3% ± 3,3** | 27,0 k |
+| de regel zoals zij was | 65,6% ± 2,6 | 53,5% ± 3,5 | 19,0 k |
+| **criticus** — een lineaire *V(s)* op de 16 sensoren, TD(0), in plaats van één lopend gemiddelde | 60,9% ± 3,5 | 53,0% ± 3,6 | 32,9 k |
+| **schaarse perturbatie** — per tik maar ¼ van de wolk verstoren | 66,6% ± 2,1 | 51,8% ± 3,8 | **13,5 k** |
+| **categorisch beleid** — één softmax over 9 elkaar uitsluitende acties | 68,8% ± 1,9 | **61,3% ± 3,3** | 30,7 k |
 | **perturbGain = 10** — de ontbrekende 1/Var(ξ) uit stap 3 | 33,3% ± 6,3 | 46,6% ± 5,3 | 116,4 k |
 
 Twaalf zaden, elke variant op haar eigen leersnelheid uit een veeg van zes waarden. Twee
 dingen komen boven de ruis uit, en het zijn niet de dingen waarop gehoopt werd. **Schaarse
-perturbatie haalt dezelfde eindscore met een factor 4,9 minder ervaring** (p = 0,003): het
+perturbatie haalt dezelfde eindscore met een factor 1,4 minder ervaring** (p = 0,007): het
 is de eerste ingreep in dit project die iets oplevert in plaats van kost, en precies wat de
 theorie voorspelt, want de variantie van een perturbatieschatter groeit met het aantal
 knopen dat tegelijk beweegt. En het **categorische beleid heeft het toeval minder nodig**:
@@ -273,6 +273,57 @@ twee keer zoveel ervaring nodig — en dat staat er even hard bij: de simpelste 
 het probleem in de toestandsloze basislijn zat, is daarmee uitgesloten. `perturbGain` blijft
 rampzalig, ook mét een eigen leersnelheidsveeg. Ruwe meting: `experimenten/leerregel.json`
 en `experimenten/lr-veeg-stap7.json`.
+
+> **Herzien na stap 8.** In de eerste versie van deze tabel stond "factor 4,9". Die kwam
+> voort uit een fout in de maat *stappen tot 80%*: de drempel werd afgelezen op het succes
+> over de laatste twintig pogingen, óók wanneer er nog geen twintig pogingen waren, zodat
+> een run met een gelukkige eerste poging "80% gehaald na 1 poging" kreeg. Dat gebeurde in
+> negen van de twaalf runs van juist deze conditie. De maat is hersteld en voor alle runs
+> opnieuw uit de bewaarde historie afgeleid (`tests/migreer-tot80.js`), zonder te
+> hertrainen. De bevinding blijft staan, maar kleiner.
+
+### Wat elk onderdeel bijdraagt — de ablatiereeks
+
+Tien condities die elk één onderdeel weglaten en de rest laten staan; 16 zaden, 500
+pogingen, benchmark van 500 werelden, één leersnelheid voor alle tien. Omdat negen
+condities tegen dezelfde referentie een familie toetsen is, krijgt elke maat een
+**Holm-correctie** over die negen — zonder correctie is er bij negen toetsen ongeveer 37%
+kans dat er eentje toevallig uitkomt.
+
+| conditie | benchmark geloot | Δ | Holm | argmax |
+|---|---|---|---|---|
+| volle model | 65,4% ± 2,0 | — | — | 52,3% ± 3,0 |
+| geen geheugen-neuronen | 65,9% ± 1,1 | +0,5 | 1,00 | **44,8% ± 2,2** |
+| geen reflex-neuronen | 65,2% ± 1,9 | −0,2 | 1,00 | 49,4% ± 3,3 |
+| geen invoer-neuronen | 60,4% ± 6,0 | −5,0 | 1,00 | 48,4% ± 4,8 |
+| geen snoeien | 66,6% ± 2,0 | +1,2 | 1,00 | 49,3% ± 3,2 |
+| geen aangroei van verbindingen | 63,9% ± 2,5 | −1,5 | 1,00 | 51,7% ± 3,6 |
+| geen neuronale groei | 64,4% ± 2,6 | −1,0 | 1,00 | 52,0% ± 3,4 |
+| geen hertypering | 65,1% ± 2,0 | −0,3 | 1,00 | 48,8% ± 3,7 |
+| **strenge invoer** | **41,5% ± 8,5** | **−23,9** | **0,0002** | 43,1% ± 7,0 |
+| vaste structuur | 67,5% ± 1,3 | +2,1 | 0,91 | 50,3% ± 2,7 |
+
+**Eén onderdeel doet er aantoonbaar toe, en het is de bedradingsgrammatica — die kost.**
+Alles via een invoer-neuron laten lopen zakt 23,9 procentpunt en heeft ruim drie keer
+zoveel ervaring nodig. De oorzaak is capaciteit, niet latentie: het aantal kanten vanaf
+een invoer-node zakt van 627 naar 165, want zestien zintuigen moeten door gemiddeld negen
+invoer-neuronen.
+
+**Geheugen-neuronen weglaten raakt niet de gelote score maar de vorm van het beleid:**
+geloot niets, onder argmax −7,6 pp (p = 0,0019, Holm 0,017). **Verder komt er niets boven
+de ruis uit** — snoeien, aangroei, groei en hertypering staan alle vier op Holm 1,00, ook
+op monsterefficiëntie. Stap 5 mat dat al voor de plasticiteit als geheel; nu is het per
+mechanisme uitgesplitst en is er niemand aan te wijzen.
+
+Dat hoort bij *deze taak*: het doel is altijd zichtbaar en niets hoeft binnen één tik, dus
+geheugen en reflex hebben er per constructie niets te doen. De ablaties krijgen pas
+betekenis op een taak met twee tijdschalen.
+
+Elke conditie bewijst in het resultaatbestand dat zij is wat zij zegt te zijn — nul
+geheugen-, reflex- of invoerneuronen, nul gesnoeid, nul bijgegroeid, en zo verder, 16/16
+runs per conditie. Dat is geen formaliteit: bij het schrijven van deze reeks bleek dat de
+strenge-invoerconditie tot dan toe alleen vanuit het vinkje in de pagina werkte en niet
+vanuit de experimentloper. Ruwe meting: `experimenten/ablatie.json`.
 
 ### Herhaalbaar, laadbaar, en in reeksen te draaien
 

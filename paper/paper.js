@@ -46,6 +46,7 @@ const BENCHSET = lees(path.join(EXPDIR, 'benchmark-werelden.json'));
 const BASIS = lees(path.join(EXPDIR, 'basislijnen.json'));
 const REKEN = lees(path.join(EXPDIR, 'rekenkosten.json'));
 const LEERREGEL = lees(path.join(EXPDIR, 'leerregel.json'));
+const ABLATIE = lees(path.join(EXPDIR, 'ablatie.json'));
 function stat(xs) {
   const v = xs.filter(x => typeof x === 'number' && isFinite(x));
   const n = v.length; if (!n) return null;
@@ -60,7 +61,7 @@ const num = (x, d = 0) => x === null ? '–' : x.m.toFixed(d) + ' ± ' + x.ci.to
 const kol = k => RUNS ? RUNS.map(r => r[k]) : [];
 /* een gemiddelde-met-interval uit benchmark.json in dezelfde vorm als stat() */
 const bm = o => o ? { n: o.n, m: o.m, sd: o.sd, ci: o.ci, min: o.m, max: o.m } : null;
-const VERSIE = LEERREGEL ? '1.6' : '1.5';
+const VERSIE = ABLATIE ? '1.7' : LEERREGEL ? '1.6' : '1.5';
 const DATUM = '10 september 2026';
 const SERIF = 'Cambria';
 const TEXTW_PT = 448;              // bruikbare tekstbreedte in punten
@@ -1285,6 +1286,12 @@ C.push(bullet([bd('Alle instellingen zijn op de trainingsverdeling gekozen. '), 
   'nooit gebruikt om iets te kiezen, maar de instellingen die zij beoordeelt zijn wel met een minder ' +
   'betrouwbaar signaal tot stand gekomen. Het raster van dichtheid tegen aantal neuronen wordt daarom opnieuw ' +
   'gedraaid met de benchmark als toets.')]));
+if (ABLATIE) C.push(bullet([bd('De ablatiereeks draait op één leersnelheid. '), t('Elke conditie in sectie 10.7 ' +
+  'gebruikt η = ' + String(ABLATIE.leersnelheid).replace('.', ',') + ', de waarde die voor het volle model is ' +
+  'afgesteld. Het argument daarvoor is dat een ablatie de graaf verandert en niet de schaal van het ' +
+  'leersignaal, zodat meesturen van η zou meten hoe goed een conditie opnieuw af te stellen is. Dat argument ' +
+  'is redelijk maar niet gemeten: een conditie die het slechter doet zou in beginsel een andere η kunnen ' +
+  'willen, en de reeks kan dat niet uitsluiten.')]));
 
 /* ===== 10 ===== */
 C.push(h1('10', 'Evaluatie'));
@@ -1292,7 +1299,9 @@ C.push(body(
   'De meetopzet is met opzet niet ingericht om te laten zien dat het model werkt, maar om uit elkaar te trekken ' +
   'wáár een eventuele prestatie vandaan komt. Deze versie van het document bevat de benchmarkset, de ' +
   'referentiemeting daarop en de reproduceerbaarheidscontrole, en sectie 3.11 de numerieke controle van de ' +
-  'leerregel zelf; de ablaties en de basislijnen volgen in een latere versie.'
+  'leerregel zelf' +
+  (ABLATIE ? '; sectie 10.4 tot en met 10.7 bevatten de basislijnen, de rekenkostentabel, de varianten van ' +
+    'de leerregel en de ablatiereeks.' : '; de ablaties en de basislijnen volgen in een latere versie.')
 ));
 C.push(h2('10.1', 'Twee meetassen'));
 C.push(body(
@@ -1537,8 +1546,9 @@ if (BASIS && BASIS.tabel) {
       'kost wel rekentijd (' + (T['ang-vol'].tijdMs.m / 1000).toFixed(1) + ' s tegen ' +
       (T['ang-vast'].tijdMs.m / 1000).toFixed(1) + ' s per run) en het vergroot de spreiding tussen zaden ' +
       '(± ' + (100 * T['ang-vol'].benchBeleid.ci).toFixed(1) + ' tegen ± ' +
-      (100 * T['ang-vast'].benchBeleid.ci).toFixed(1) + '). Sectie 10.7 kondigt de ablatiereeks aan die dit uitsplitst naar de ' +
-      'afzonderlijke mechanismen; deze meting zegt alleen dat het geheel niets oplevert.')
+      (100 * T['ang-vast'].benchBeleid.ci).toFixed(1) + '). Deze meting zegt alleen dat het geheel niets oplevert; ' +
+      (ABLATIE ? 'sectie 10.7 splitst dat uit naar de afzonderlijke mechanismen.'
+        : 'sectie 10.8 kondigt de ablatiereeks aan die dat uitsplitst naar de afzonderlijke mechanismen.'))
   ]));
   C.push(h3('Wat wél meetbaar is: padlengte'));
   C.push(body([
@@ -1549,7 +1559,7 @@ if (BASIS && BASIS.tabel) {
       'boven de ruis uitkomt. Bij propagatiediepte één is een boog een tijdstap, dus dit is geen verschil in ' +
       'capaciteit maar in '), it('reactietijd'),
     t(': het netwerk reageert een tik later op wat het ziet, en dat kost succes. Precies dat is de eigenschap ' +
-      'waarop sectie 10.8 de resterende onderzoeksvraag baseert — maar zij pleit hier evengoed voor een ondiep ' +
+      'waarop sectie ' + (ABLATIE ? '10.9' : '10.8') + ' de resterende onderzoeksvraag baseert — maar zij pleit hier evengoed voor een ondiep ' +
       'gelaagd netwerk als voor een graaf.')
   ]));
   C.push(body([
@@ -1559,8 +1569,8 @@ if (BASIS && BASIS.tabel) {
       'zichzelf herstructurerende topologie iets toevoegt, heeft een omgeving nodig waarin verschillende ' +
       'informatielatenties werkelijk nodig zijn; in een taak waarin het doel altijd zichtbaar is en één ' +
       'tussenlaag volstaat, is er niets te herstructureren dat de moeite loont. Dat is de aanleiding voor de ' +
-      'tweede taak in sectie 10.7, en het is de reden dat de vraagstelling in sectie 10.8 smaller is dan waar ' +
-      'dit werk mee begon.')
+      'tweede taak in sectie ' + (ABLATIE ? '10.8' : '10.7') + ', en het is de reden dat de vraagstelling in ' +
+      'sectie ' + (ABLATIE ? '10.9' : '10.8') + ' smaller is dan waar dit werk mee begon.')
   ]));
   C.push(gap(60));
 }
@@ -1719,7 +1729,7 @@ if (REKEN && REKEN.tabel) {
           pct(R[goedkoopst].benchBeleid) + ' tegen ' + pct(R['ang-vol'].benchBeleid) + '). ' : '') +
         'De hypothese dat een klein vast netwerk op deze taak op rekenkosten wint, is daarmee gemeten in plaats ' +
         'van vermoed, en zij komt uit. Dat is geen mislukking van het model maar een afbakening van waar het ' +
-        'thuishoort: sectie 10.7 trekt die conclusie door naar de onderzoeksvraag zelf.')
+        'thuishoort: sectie ' + (ABLATIE ? '10.9' : '10.8') + ' trekt die conclusie door naar de onderzoeksvraag zelf.')
     ]));
   }
   {
@@ -1822,7 +1832,11 @@ if (LEERREGEL && LEERREGEL.tabel) {
     'de laatste twintig pogingen voor het eerst boven 80 % kwam: de maat voor hoe zuinig een leerregel met ' +
     'ervaring omgaat, los van waar zij uiteindelijk uitkomt. Waar een conditie die drempel niet in elke run ' +
     'haalt, staat tussen haakjes hoeveel runs hem wél haalden — het gemiddelde gaat alleen over die runs en ' +
-    'vleit de conditie dus.')]));
+    'vleit de conditie dus. De drempel telt pas zodra er werkelijk twintig pogingen achter dat gemiddelde ' +
+    'zitten; zonder die eis is het aan het begin van een run een gemiddelde over één of twee pogingen, en ' +
+    'kreeg een run waarvan de allereerste poging toevallig slaagde "de drempel gehaald na één poging". Dat ' +
+    'gebeurde in 35 van de 256 runs en niet gelijk verdeeld over de condities. De maat is voor alle metingen ' +
+    'in dit document opnieuw uit de bewaarde historie afgeleid, zonder iets opnieuw te trainen.')]));
   C.push(gap(60));
   {
     const echt = varianten.map(k => lvs('s7-huidig', k, 'benchBeleid')).filter(o => o && o.p < 0.05);
@@ -1865,7 +1879,8 @@ if (LEERREGEL && LEERREGEL.tabel) {
     const sb = lvs('s7-huidig', 's7-schaars', 'benchBeleid');
     if (ss && L['s7-schaars'] && REF.stappenTot80) {
       const f = REF.stappenTot80.m / L['s7-schaars'].stappenTot80.m;
-      C.push(h3('Wat er wél uitkomt: schaarse perturbatie is veel zuiniger met ervaring'));
+      C.push(h3('Wat er wél uitkomt: schaarse perturbatie is ' + (f >= 2 ? 'veel ' : '') +
+        'zuiniger met ervaring'));
       C.push(body([
         t('Per tik nog maar een kwart van de wolk verstoren levert dezelfde eindscore op (' +
           pct(L['s7-schaars'].benchBeleid) + ' tegen ' + pct(REF.benchBeleid) +
@@ -1991,15 +2006,170 @@ if (LEERREGEL && LEERREGEL.tabel) {
   C.push(gap(60));
 }
 
-C.push(h2('10.7', 'Wat hierna gemeten wordt'));
+/* --- 10.7: de ablatiereeks -----------------------------------------------------
+   Volledig uit experimenten/ablatie.json. 10.4 vroeg wat de graaf waard is, 10.5 wat
+   de schatter waard is, 10.6 wat er aan de leerregel te verbeteren valt. Deze sectie
+   vraagt van elk onderdeel afzonderlijk: wat gebeurt er als het er niet is? Dat is
+   de enige vorm waarin een model met vijf soorten neuronen en vier vormen van
+   plasticiteit per onderdeel verantwoording aflegt. */
+if (ABLATIE && ABLATIE.tabel) {
+  const A = ABLATIE.tabel, AT = ABLATIE.toetsen || [];
+  const an = {
+    'ang-vol': 'het volle model',
+    's8-geen-mem': 'geen geheugen-neuronen',
+    's8-geen-refl': 'geen reflex-neuronen',
+    's8-geen-sens': 'geen invoer-neuronen',
+    's8-geen-snoeien': 'geen snoeien',
+    's8-geen-sprout': 'geen aangroei van verbindingen',
+    's8-geen-groei': 'geen neuronale groei',
+    's8-geen-hertypering': 'geen hertypering',
+    's8-strenge-invoer': 'strenge invoer',
+    'ang-vast': 'vaste structuur, alleen gewichten'
+  };
+  const at = (k, m) => AT.find(x => x.conditie === k && x.maat === m);
+  const pA = o => o ? (o.p < 0.001 ? 'p < 0,001' : 'p = ' + o.p.toFixed(3)) : '–';
+  const pHt = o => o ? (o.pHolm < 0.001 ? '< 0,001' : o.pHolm.toFixed(3)) : '–';
+  const dpp = o => o ? (o.verschilPp >= 0 ? '+' : '−') + Math.abs(o.verschilPp).toFixed(1) : '–';
+  const kortA = v => (v === null || v === undefined || !isFinite(v)) ? '–'
+    : v >= 1e6 ? (v / 1e6).toFixed(1) + ' M' : v >= 1e3 ? (v / 1e3).toFixed(1) + ' k' : String(Math.round(v));
+  const namenA = Object.keys(an).filter(k => A[k]);
+  const anderen = namenA.filter(k => k !== 'ang-vol');
+  const REFA = A['ang-vol'];
+
+  C.push(h2('10.7', 'Wat elk onderdeel bijdraagt: de ablatiereeks'));
+  C.push(body(
+    'Sectie 10.4 laat zien dat de structurele plasticiteit als geheel niets oplevert, maar niet welk van de ' +
+    'mechanismen daaraan schuldig is; sectie 10.5 en 10.6 zeggen niets over de soorten neuronen. Deze reeks ' +
+    'haalt er één onderdeel tegelijk uit en laat de rest staan: de drie gespecialiseerde soorten neuronen, de ' +
+    'vier vormen van structurele plasticiteit, de bedradingsgrammatica, en als uiterste de volledig bevroren ' +
+    'structuur waarin alleen de gewichten nog leren. ' + ABLATIE.zaden + ' breinzaden per conditie, ' +
+    ABLATIE.pogingenPerRun + ' pogingen per run, dezelfde benchmarkset van ' + ABLATIE.benchmark.werelden +
+    ' werelden, en dezelfde wereldzaden.'
+  ));
+  C.push(body([
+    bd('Anders dan in sectie 10.6 krijgt geen enkele conditie hier een eigen leersnelheid. '),
+    t('Daar was die veeg nodig omdat alle vier de ingrepen precies de grootheid raakten waar η op afgesteld ' +
+      'is. Een ablatie doet dat niet: een soort neuronen weglaten of het snoeien uitzetten verandert de graaf, ' +
+      'niet de schaal van de update. η staat dus voor alle tien condities op ' +
+      String(ABLATIE.leersnelheid).replace('.', ',') + '. Dat is een keuze met een prijs — het blijft ' +
+      'denkbaar dat een ablatie met eigen afstelling beter uitkomt — en die prijs staat in sectie 9.')
+  ]));
+  C.push(body([
+    bd('Negen condities tegen dezelfde referentie is een familie. '),
+    t('Bij negen onafhankelijke toetsen op p < 0,05 is de kans dat er minstens één toevallig uitkomt ongeveer ' +
+      '37 %, en dan is de tabel een lijst met valse vondsten. Elke maat krijgt daarom een Holm-correctie over ' +
+      'de negen vergelijkingen; hieronder staan de ruwe en de gecorrigeerde waarde naast elkaar, en de tekst ' +
+      'baseert zich op de gecorrigeerde.')
+  ]));
+  C.push(tbl(
+    ['conditie', 'benchmark, geloot', 'Δ (pp)', 'p', 'Holm', 'stappen tot 80 %'],
+    namenA.map(k => [an[k], pct(A[k].benchBeleid),
+      k === 'ang-vol' ? '–' : dpp(at(k, 'benchBeleid')),
+      k === 'ang-vol' ? '–' : pA(at(k, 'benchBeleid')),
+      k === 'ang-vol' ? '–' : pHt(at(k, 'benchBeleid')),
+      kortA(A[k].stappenTot80 ? A[k].stappenTot80.m : null) +
+      (A[k].haalde80 === A[k].runs ? '' : ' (' + A[k].haalde80 + '/' + A[k].runs + ')')]),
+    [3000, 1500, 900, 1200, 1000, 1372]
+  ));
+  C.push(body([
+    bd('Elke conditie is nagerekend op de vraag of zij werkelijk weglaat wat zij belooft. '),
+    t('Dat is bij een ablatiereeks geen formaliteit: een conditie die het onderdeel niet echt uitzet levert ' +
+      'een nette tabelregel op die zegt dat het onderdeel er niet toe doet. Per run is uit de weggeschreven ' +
+      'kolommen gecontroleerd dat er nul geheugen-, reflex- of invoer-neuronen zijn, nul verbindingen ' +
+      'gesnoeid, nul bijgegroeid, nul neuronen bijgekomen of nul hertyperingen — al naar gelang de conditie. ' +
+      'De strenge invoerregel is niet uit die kolommen af te lezen en is op de graaf zelf gecontroleerd: met ' +
+      'de vlag aan landt élke kant vanaf een invoer-node op een invoer-neuron, met de vlag uit een klein deel. ' +
+      'Bij het schrijven van deze reeks bleek dat die vlag tot dan toe alleen uit het scherm kwam en niet uit ' +
+      'de configuratie van de experimentloper; de conditie was met andere woorden meetbaar leeg geweest. Dat ' +
+      'is hersteld, en de reeks van sectie 10.2 reproduceert daarna nog steeds bit voor bit.')
+  ]));
+  C.push(gap(60));
+  {
+    const bov = anderen.map(k => at(k, 'benchBeleid')).filter(o => o && o.pHolm < 0.05);
+    const slechter = bov.filter(o => o.verschilPp < 0), beter = bov.filter(o => o.verschilPp >= 0);
+    const ruw = anderen.map(k => at(k, 'benchBeleid')).filter(o => o && o.p < 0.05 && o.pHolm >= 0.05);
+    const st = anderen.map(k => at(k, 'stappenTot80')).filter(o => o && o.pHolm < 0.05);
+    C.push(h3('Wat de reeks laat zien'));
+    for (const k of anderen) {
+      const tb = at(k, 'benchBeleid'), ts = at(k, 'stappenTot80'), ta = at(k, 'benchStreng');
+      C.push(bullet([bd(an[k].replace(/^./, c => c.toUpperCase()) + '. '),
+        t(pct(A[k].benchBeleid) + ' tegen ' + pct(REFA.benchBeleid) + ' voor het volle model' +
+          (tb ? ' — ' + dpp(tb) + ' procentpunt, ' + pA(tb) + ', na Holm ' + pHt(tb) + ': ' + tb.oordeelHolm : '') +
+          '. Onder argmax ' + pct(A[k].benchStreng) + ' tegen ' + pct(REFA.benchStreng) +
+          (ta ? ' (' + dpp(ta) + ' pp, na Holm ' + pHt(ta) + ')' : '') +
+          '. Actieve verbindingen ' + (A[k].actief ? Math.round(A[k].actief.m) : '–') + ' tegen ' +
+          (REFA.actief ? Math.round(REFA.actief.m) : '–') + ', kortste pad ' +
+          (A[k].pad ? A[k].pad.m.toFixed(2) : '–') + ' tegen ' + (REFA.pad ? REFA.pad.m.toFixed(2) : '–') +
+          '; omgevingsstappen tot 80 % succes ' + kortA(A[k].stappenTot80 ? A[k].stappenTot80.m : null) +
+          ' tegen ' + kortA(REFA.stappenTot80 ? REFA.stappenTot80.m : null) +
+          (ts ? ' (' + pA(ts) + ', na Holm ' + pHt(ts) + ')' : '') + '.')]));
+    }
+    C.push(body([
+      bd(bov.length ? 'Van de negen onderdelen laat ' + (bov.length === 1 ? 'er één' : 'laten er ' + bov.length) +
+        ' na correctie een spoor na op de eindscore. ' : 'Geen enkel onderdeel laat na correctie een spoor na op de eindscore. '),
+      t((slechter.length ? 'Aantoonbaar slechter dan het volle model: ' +
+          slechter.map(o => an[o.conditie]).join(', ') + '. ' : '') +
+        (beter.length ? 'Aantoonbaar béter dan het volle model: ' +
+          beter.map(o => an[o.conditie]).join(', ') + '. ' : '') +
+        (ruw.length ? 'Bij ' + ruw.map(o => an[o.conditie]).join(', ') +
+          ' haalt de ruwe p-waarde het wel en de gecorrigeerde niet; met negen vergelijkingen naast elkaar is ' +
+          'dat precies het geval waarvoor de correctie bestaat, en de eerlijke lezing is dat het niet is ' +
+          'aangetoond. ' : '') +
+        (st.length ? 'Op het aantal omgevingsstappen tot 80 % succes komt daar ' +
+          st.map(o => an[o.conditie]).join(', ') + ' bij: daar zit het effect niet in waar het model uitkomt ' +
+          'maar in hoe duur de weg erheen is. ' : 'Op het aantal omgevingsstappen tot 80 % succes komt na ' +
+          'correctie niets boven de ruis uit. ') +
+        'Wat er binnen de ruis valt is niet aantoonbaar afwezig, alleen niet aantoonbaar aanwezig: bij ' +
+        ABLATIE.zaden + ' zaden en een spreiding van enkele procentpunten tussen zaden is een effect van een ' +
+        'paar procentpunt niet te zien.')
+    ]));
+    {
+      /* De gelote score is het gemiddelde over een kansverdeling; argmax legt het
+         beleid vast op zijn eigen voorkeur. Een onderdeel kan het eerste ongemoeid
+         laten en het tweede wél raken, en dan gaat het niet over hoe goed het model
+         is maar over hoe scherp zijn voorkeur is. */
+      const arg = anderen.map(k => at(k, 'benchStreng')).filter(o => o && o.pHolm < 0.05);
+      if (arg.length) C.push(body([
+        bd('Eén onderdeel raakt niet de gelote score maar de vorm van het beleid. '),
+        t('De conditie ' + arg.map(o => an[o.conditie]).join(' en ') + ' scoort onder het gelote beleid gelijk ' +
+          'aan het volle model, maar onder argmax ' +
+          arg.map(o => Math.abs(o.verschilPp).toFixed(1) + ' procentpunt').join(' respectievelijk ') +
+          ' lager (na Holm ' + arg.map(o => pHt(o)).join(', ') + '). Argmax legt het beleid vast op zijn eigen ' +
+          'voorkeur; de gelote score middelt daaroverheen. Een verschil dat alleen onder argmax zichtbaar is, ' +
+          'zegt dus dat de voorkeur zelf minder scherp is geworden terwijl de verdeling eromheen even goed ' +
+          'blijft presteren. Dat past bij wat sectie 10.6 al liet zien: op deze taak is het toeval onderdeel ' +
+          'van de strategie geworden, en een maat die dat toeval wegneemt meet iets anders dan de gemiddelde ' +
+          'prestatie.')
+      ]));
+    }
+    C.push(body([
+      bd('De uitkomst hoort bij de taak, niet bij het model in het algemeen. '),
+      t('In deze taak is het doel altijd zichtbaar, dus er valt niets te onthouden; dat de geheugen-neuronen ' +
+        'weglaten weinig kost is daarmee geen uitspraak over geheugen maar over deze omgeving. Hetzelfde geldt ' +
+        'voor de reflex-neuronen: er is geen prikkel die binnen één tik beantwoord moet worden, dus een korte ' +
+        'boog levert niets op wat een lange niet ook levert. Precies daarom is de tweede taak in sectie 10.8 ' +
+        'geen bijzaak: zij is de eerste opzet waarin deze ablaties een uitslag kunnen geven die iets over het ' +
+        'model zegt in plaats van over het spel.')
+    ]));
+  }
+  C.push(gap(60));
+}
+
+C.push(h2(ABLATIE ? '10.8' : '10.7', 'Wat hierna gemeten wordt'));
 C.push(body(
   'Sectie 10.4 laat zien dat de structurele plasticiteit als geheel niets oplevert, sectie 10.5 wat de ' +
-  'schatter kost en opbrengt, en sectie 10.6 dat de leerregel eromheen op één punt zuiniger kan. Dat zegt nog ' +
-  'niet welk van de mechanismen aan het eerste schuldig is. De volgende versie van dit document rapporteert:'
+  'schatter kost en opbrengt, sectie 10.6 dat de leerregel eromheen op één punt zuiniger kan' +
+  (ABLATIE ? ', en sectie 10.7 wat elk onderdeel afzonderlijk bijdraagt' : '') +
+  '. De volgende versie van dit document rapporteert:'
 ));
-C.push(bullet([bd('Ablaties. '), t('Tien condities die elk één mechanisme uitzetten — geheugen-neuronen, ' +
+if (!ABLATIE) C.push(bullet([bd('Ablaties. '), t('Tien condities die elk één mechanisme uitzetten — geheugen-neuronen, ' +
   'reflex-neuronen, invoer-neuronen, snoeien, aangroei, neuronale groei, soortverandering, de soortregels zelf, ' +
   'en als uiterste de volledig bevroren structuur waarin alleen de gewichten nog leren.')]));
+if (ABLATIE) C.push(bullet([bd('Elke ablatie met haar eigen leersnelheid. '), t('De reeks van sectie 10.7 draait ' +
+  'op één η voor alle condities, met het argument dat een ablatie de graaf verandert en niet de schaal van de ' +
+  'update. Dat argument is redelijk maar niet gemeten. Op de twee of drie condities waar het verschil het ' +
+  'grootst is, is een leersnelheidsveeg zoals in sectie 10.5 en 10.6 de manier om uit te sluiten dat de tabel ' +
+  'het afstellen meet.')]));
 
 C.push(bullet([bd('Een recurrente basislijn met terugpropagatie door de tijd. '), t('De Elman-basislijn van ' +
   'sectie 10.5 deelt bewust het skelet van ANG en propageert dus niet terug door de tijd; daarmee wordt zij ' +
@@ -2019,7 +2189,7 @@ C.push(bullet([bd('Een tweede taak. '), t('In de huidige taak is het doel altijd
   'doel na verloop van tijd verdwijnt terwijl er tegelijk obstakels opduiken die binnen één tik ontweken moeten ' +
   'worden, is de eerste opzet waarin de twee soorten paden — kort en reflexmatig, lang en met geheugen — ook ' +
   'werkelijk allebei nodig zijn.')]));
-C.push(h2('10.8', 'De onderzoeksvraag, smaller gemaakt'));
+C.push(h2(ABLATIE ? '10.9' : '10.8', 'De onderzoeksvraag, smaller gemaakt'));
 C.push(body(
   'Sectie 10.4 en 10.5 dwingen samen tot een scherpe afbakening. ANG is geen goedkoper alternatief ' +
   'voor backpropagation, en op een taak als deze wint een klein gelaagd netwerk met dezelfde leerregel al op ' +
@@ -2068,7 +2238,8 @@ if (REKEN && REKEN.tabel && REKEN.tabel['mlp-16-bp'] && REKEN.tabel['ang-vol']) 
       'capaciteit: ongeveer een orde van grootte meer parameters om hetzelfde te halen. Wat een lokale ' +
       'leerregel oplevert — een update die alleen grootheden gebruikt die op de synaps zelf beschikbaar zijn — ' +
       'moet dus opwegen tegen die rekening, en op deze taak doet het dat niet. De verdedigbare aanspraak van ' +
-      'ANG ligt daarmee niet bij efficiëntie, en dat is precies de afbakening die sectie 10.8 maakt.')
+      'ANG ligt daarmee niet bij efficiëntie, en dat is precies de afbakening die sectie ' +
+  (ABLATIE ? '10.9' : '10.8') + ' maakt.')
   ]));
 }
 if (LEERREGEL && LEERREGEL.tabel && LEERREGEL.tabel['s7-schaars'] && LEERREGEL.tabel['s7-huidig']) {
@@ -2083,6 +2254,24 @@ if (LEERREGEL && LEERREGEL.tabel && LEERREGEL.tabel['s7-schaars'] && LEERREGEL.t
         'eindscore met aanzienlijk minder ervaring') + '. Voor een leerregel die zichzelf verdedigt met ' +
       'lokaliteit en online leren is dat de relevante as: niet waar zij uiteindelijk uitkomt, maar hoeveel ' +
       'ervaring zij daarvoor nodig heeft. Dat is ook de as waarop de tweede taak haar zal moeten meten.')
+  ]));
+}
+if (ABLATIE && ABLATIE.tabel && ABLATIE.tabel['ang-vol']) {
+  const AT2 = ABLATIE.toetsen || [];
+  const raak = AT2.filter(x => x.maat === 'benchBeleid' && x.pHolm < 0.05);
+  C.push(body([
+    bd('En per onderdeel is de rekening opgemaakt. '),
+    t('De ablatiereeks in sectie 10.7 haalt er één onderdeel tegelijk uit — de drie gespecialiseerde soorten ' +
+      'neuronen, de vier vormen van structurele plasticiteit, de bedradingsgrammatica — en meet wat dat kost. ' +
+      (raak.length
+        ? 'Na correctie voor negen vergelijkingen blijven er ' + raak.length + ' over die aantoonbaar iets ' +
+          'uitmaken; de rest valt binnen de ruis. '
+        : 'Na correctie voor negen vergelijkingen blijft er geen enkel onderdeel over dat op deze taak ' +
+          'aantoonbaar iets uitmaakt. ') +
+      'Dat is een hard resultaat over dit spel en een zacht resultaat over het model: in een omgeving waarin ' +
+      'het doel altijd zichtbaar is en niets binnen één tik beantwoord hoeft te worden, hebben geheugen en ' +
+      'reflex per constructie niets te doen. De ablaties krijgen pas betekenis op een taak waarin de twee ' +
+      'tijdschalen werkelijk allebei nodig zijn, en dat is precies wat de tweede taak moet leveren.')
   ]));
 }
 
