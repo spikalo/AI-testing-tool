@@ -390,6 +390,126 @@ en herstart het:
 
 ## 10. Logboek
 
+### 2026-09-10 — De taakas: het doel verdwijnt (werkplan stap 12, koerswijziging)
+
+**Waarom de koers om is.** Acht stappen lang is netjes de vraag beantwoord of ANG beter
+presteert, en het antwoord is vier keer nee. De ernstigste zwakte zat bovendien niet in
+het model maar in de maten: een geheugen-neuron heeft in dit model *per definitie* een
+zelfverbinding, dus zelfverbindingen tellen meet de bedradingsregel en niet het gedrag.
+Elke uitspraak over emergente specialisatie die op die tellingen rust is circulair. De
+onderzoeksvraag is daarom verlegd naar: **onder welke omgevingsdruk betaalt structurele
+plasticiteit binnen één leven zich terug ten opzichte van dezelfde graaf met bevroren
+structuur?** Zie `claude/ang-koerswijziging.md`.
+
+**Nieuw in `brein-test.html` — twee knoppen in de omgeving.**
+
+- `goalBlink`: het doel is tien spelstappen te zien, dan k stappen niet, en zo door.
+  Dit is de hoofdas.
+- `goalHide`: het doel gaat permanent uit na k stappen. Deze is gedraaid en meteen weer
+  weggelegd — bij k = 80 zakte ANG naar 0,3–6 %. **Permanent verbergen vraagt geen
+  geheugen maar koppelnavigatie:** blind een punt raken met de precisie van een
+  doelstraal is een ander en veel moeilijker probleem dan informatie vasthouden, en een
+  vloer van nul meet niets. Hij blijft bestaan als uiterste en als conditie van de proef.
+- Allebei op 0 is de taak van stap 1 t/m 8, **bit voor bit** — nagemeten tegen de
+  referentiemeting van stap 4. De beloning verandert niet mee: het spel weet nog steeds
+  waar het doel staat, dus wat verandert is uitsluitend de waarneembaarheid.
+- De reactieve ijkagent gebruikt dezelfde `doelZichtbaar()` als het brein en is dus even
+  blind: van 40 % naar 0 % bij permanent verbergen, 3 % bij knipperen.
+- Beide waarden komen uit `cfg` en niet uit een globale — de fout van stap 8 (fout 12).
+
+**Nieuw: de blinderingsproef.** Dezelfde getrainde agent speelt honderd verse werelden
+(eigen zaadreeks, los van de benchmark) twee keer met dezelfde toevalsreeks: één keer met
+het doel de eerste twintig stappen zichtbaar en daarna niet meer, één keer met het doel
+dat nooit zichtbaar is geweest. Het enige verschil is informatie die de agent ooit gehad
+heeft. Per stap na het blinderen wordt cos(verplaatsing, richting naar het doel) gemeten;
+de **geheugenhorizon** is het aantal stappen dat de proef de controle blijft verslaan,
+**per vertraging gepaard** en met een marge van 0,05. Nul betekent niet "geen
+geheugen-neuronen" maar "geen gedrag dat op onthouden lijkt". Die maat hangt aan geen
+enkele neuronsoort en is op een GRU of Elman met exact dezelfde code te meten.
+
+**Pre-registratie.** `tests/stap12-condities.js` staat in git gecommit vóórdat de eerste
+run gedraaid heeft (commit 5214342), met vijf voorspellingen die elk een uitgeschreven
+waar- én onwaar-tak hebben.
+
+**Opzet.** Vier architecturen × vier standen × 12 breinzaden. ANG en ANG-bevroren kregen
+per stand een eigen leersnelheidsveeg (vier waarden × drie veegzaden, op de goedkope
+toets); de vaste basislijnen staan op hun waarde uit stap 6, wat in het voordeel van ANG
+werkt. Dat de veeg per stand moest, is zelf een waarneming: één veeg in het midden van de
+as gaf een waarde die op een andere stand slechter was dan de oorspronkelijke.
+
+**Uitkomst — benchmark (geloot), 12 zaden:**
+
+| architectuur | altijd zicht | 10 donker | 20 donker | 40 donker |
+|---|---|---|---|---|
+| ANG, plasticiteit aan | 65,6 % ± 2,6 | 27,4 % ± 6,1 | 9,9 % ± 1,9 | 2,8 % ± 1,0 |
+| ANG, structuur bevroren | 67,5 % ± 1,2 | 31,2 % ± 5,2 | **13,7 % ± 2,4** | **5,4 % ± 1,5** |
+| vast net, geen terugkoppeling, backprop | 66,7 % ± 0,6 | 65,2 % ± 2,5 | 26,1 % ± 2,0 | 14,5 % ± 1,6 |
+| vast recurrent net, BPTT | 66,6 % ± 1,5 | **77,8 % ± 1,5** | **75,4 % ± 3,5** | **39,8 % ± 5,3** |
+
+**Geheugenhorizon (stappen):**
+
+| architectuur | altijd zicht | 10 donker | 20 donker | 40 donker |
+|---|---|---|---|---|
+| ANG | 25,3 | 17,5 | 7,5 | 2,3 |
+| ANG bevroren | 16,3 | 15,1 | 8,1 | 3,7 |
+| vast net zonder terugkoppeling | 0,0 | 0,0 | 0,0 | 0,0 |
+| vast recurrent net | 21,5 | 43,3 | 41,7 | 29,3 |
+
+**Wat eruit komt.**
+
+- **Op de taak zonder knipperen liggen alle vier binnen de ruis** (Holm 1,00 op elke
+  vergelijking). De as is dus een geldige voortzetting van stap 1 t/m 8 — voorspelling
+  V1 uit.
+- **De maat werkt.** Het geheugenloze net haalt op élke stand exact horizon 0; het vaste
+  recurrente net 21–43 (Holm < 0,001). Een instrument dat een geheugenloze architectuur
+  betrouwbaar op nul zet en een recurrente niet, is bruikbaar los van dit model — V2 en
+  V3 uit.
+- **ANG stort in, en erger dan een net zonder enig geheugen.** Bij 10 donker −37,7 pp
+  tegen het geheugenloze net, bij 20 donker −16,3, bij 40 donker −11,7, alle p < 0,0001.
+  Dat blijft staan ná een eigen leersnelheidsveeg per stand.
+- **Structurele plasticiteit is een kostenpost.** De bevroren variant scoort hóger bij
+  20 donker (+3,8 pp, Holm 0,024) en 40 donker (+2,5 pp, Holm 0,010); zonder knipperen
+  is het verschil er niet. **Voorspelling V4 komt uit in haar onwaar-tak, en scherper
+  dan verwacht:** niet "geen voordeel" maar "een nadeel".
+- **Wat er níét uit volgt:** dat het verschil meegroeit met de druk. De gepaarde
+  interactietoets geeft p = 0,37 / 0,19 / 0,62. Met twaalf zaden is die uitspraak niet
+  te doen, en zij staat dus ook niet in de paper.
+- **Het scherpste detail.** ANG's geheugenhorizon is 25,3 op de taak waar onthouden
+  niets oplevert en zakt naar 2,3 zodra de taak het vraagt. Het vaste recurrente net
+  doet het omgekeerde: van 21,5 naar 43,3. **De architectuur met geheugen-neuronen
+  verliest haar geheugengedrag juist onder geheugendruk.** Dat is de duidelijkste
+  aanwijzing tot nu toe dat de neuronsoorten van dit model namen zijn en geen functies.
+- **Een anomalie die om verklaring vraagt:** het vaste recurrente net gaat bij 10 donker
+  vooruit (66,6 % → 77,8 %). Vermoeden: het wegvallen van de doelinvoer dwingt tot een
+  koers in plaats van voortdurend bijsturen. Staat als hypothese in de paper, niet als
+  bevinding.
+
+**Welke vergelijking de conclusie draagt.** ANG tegen het vaste recurrente net is verward
+met twee andere verschillen (propagatiediepte 1 tegen 2, node-perturbatie tegen
+terugpropagatie) die stap 6 al beziferd heeft. De vergelijking die de conclusie draagt is
+**ANG tegen dezelfde graaf met bevroren structuur**: zelfde topologie, diepte, schatter en
+zaden, en als enig verschil of de structuur nog mag veranderen.
+
+**Bewijs:** `tests/test-stap12.js`, 26 controles, alle groen — waaronder dat de knop op de
+juiste stap schakelt, dat de obstakelkanalen ongemoeid blijven, dat de conditie uit `cfg`
+komt en niet uit een vinkje, dat de proef de gewichten en de verbergstand met rust laat,
+dat twee keer dezelfde proef hetzelfde getal geeft, en dat taak A bit voor bit de meting
+van stap 4 reproduceert.
+
+**Bestanden:** `tests/stap12-condities.js` (condities + pre-registratie),
+`tests/exp-stap12-lr.js` (de veeg per stand), `tests/exp-stap12.js` (de reeks, met
+Holm-correctie, interactietoetsen en Spearman), `tests/test-stap12.js`,
+`tests/migreer-memhorizon.js`, `experimenten/taakas.json`,
+`experimenten/lr-veeg-stap12.json`. `runs.csv` heeft vijf kolommen erbij (nu **79**):
+`goalHide`, `goalBlink`, `memHorizon`, `memCos`, `memCosBlind`.
+
+**Paper (versie 1.8):** nieuwe sectie 10.8, nieuwe ondertitel ("Wanneer betaalt
+structurele plasticiteit zich terug? Een gecontroleerde grens en een functionele
+geheugenmaat"), samenvatting en onderzoeksvraag herschreven, en de twee slotsecties
+doorgeschoven naar 10.9 en 10.10.
+
+---
+
 ### 2026-09-10 — De ablatiereeks, en twee meetfouten (werkplan stap 8)
 
 **De vraag.** Stap 5 vroeg wat de graaf waard is, stap 6 wat de schatter waard is, stap 7

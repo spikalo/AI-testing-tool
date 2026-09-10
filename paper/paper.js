@@ -47,6 +47,7 @@ const BASIS = lees(path.join(EXPDIR, 'basislijnen.json'));
 const REKEN = lees(path.join(EXPDIR, 'rekenkosten.json'));
 const LEERREGEL = lees(path.join(EXPDIR, 'leerregel.json'));
 const ABLATIE = lees(path.join(EXPDIR, 'ablatie.json'));
+const TAAKAS = lees(path.join(EXPDIR, 'taakas.json'));
 function stat(xs) {
   const v = xs.filter(x => typeof x === 'number' && isFinite(x));
   const n = v.length; if (!n) return null;
@@ -61,7 +62,11 @@ const num = (x, d = 0) => x === null ? '–' : x.m.toFixed(d) + ' ± ' + x.ci.to
 const kol = k => RUNS ? RUNS.map(r => r[k]) : [];
 /* een gemiddelde-met-interval uit benchmark.json in dezelfde vorm als stat() */
 const bm = o => o ? { n: o.n, m: o.m, sd: o.sd, ci: o.ci, min: o.m, max: o.m } : null;
-const VERSIE = ABLATIE ? '1.7' : LEERREGEL ? '1.6' : '1.5';
+const VERSIE = TAAKAS ? '1.8' : ABLATIE ? '1.7' : LEERREGEL ? '1.6' : '1.5';
+/* De twee laatste secties schuiven mee met wat er gemeten is, zodat een verwijzing in
+   de tekst nooit naar een verkeerd nummer wijst. */
+const SEC_HIERNA = TAAKAS ? '10.9' : ABLATIE ? '10.8' : '10.7';
+const SEC_VRAAG = TAAKAS ? '10.10' : ABLATIE ? '10.9' : '10.8';
 const DATUM = '10 september 2026';
 const SERIF = 'Cambria';
 const TEXTW_PT = 448;              // bruikbare tekstbreedte in punten
@@ -222,7 +227,15 @@ C.push(new Paragraph({
 C.push(new Paragraph({
   spacing: { after: 240 },
   children: [new TextRun({
-    text: 'Een zelfstructurerend neuraal netwerk zonder lagen en zonder backpropagation',
+    /* De ondertitel is met versie 1.8 veranderd. "Zonder lagen en zonder
+       backpropagation" beschrijft wat het model níét doet en belooft daarmee een
+       vergelijking die het niet wint — sectie 10.5 laat zien wat lokaal leren kost.
+       Wat dit document werkelijk levert is een grens: tot waar is structurele
+       plasticiteit opgerekt, en waar houdt het op. */
+    text: TAAKAS
+      ? 'Wanneer betaalt structurele plasticiteit zich terug? Een gecontroleerde grens '
+        + 'en een functionele geheugenmaat'
+      : 'Een zelfstructurerend neuraal netwerk zonder lagen en zonder backpropagation',
     font: SERIF, size: 26, color: ACC
   })]
 }));
@@ -289,8 +302,18 @@ C.push(new Paragraph({
       'terugpropagatie meer dan twintig procentpunt op ten opzichte van node-perturbatie, en zij bereikt de ' +
       'score van de graaf met ongeveer een tiende van de parameters en enkele procenten van het rekenwerk. ' +
       'De rekenkosten worden daarbij in vier gescheiden grootheden gerapporteerd, omdat sample-efficiëntie, ' +
-      'rekenefficiëntie, wandkloktijd en inferentiekosten zelden samenvallen. De ablaties per mechanisme ' +
-      'volgen in een latere versie.'
+      'rekenefficiëntie, wandkloktijd en inferentiekosten zelden samenvallen. ' +
+      (ABLATIE ? 'Een ablatiereeks van tien condities, elk met een controle per run dat het weggelaten ' +
+        'mechanisme werkelijk uit stond en met een Holm-correctie over de familie vergelijkingen, wijst ' +
+        'geen enkel afzonderlijk structureel mechanisme aan dat op deze taak aantoonbaar bijdraagt. ' : '') +
+      (TAAKAS ? 'Omdat een taak waarin het doel altijd zichtbaar is per constructie niets te onthouden ' +
+        'geeft, wordt de waarneembaarheid vervolgens als as gevarieerd: het doel is tien spelstappen te ' +
+        'zien en daarna een instelbaar aantal stappen niet. Naast de prestatie staat een functionele ' +
+        'geheugenmaat die niet aan de neuronsoorten van dit model hangt en op elke architectuur te meten ' +
+        'is: dezelfde getrainde agent speelt dezelfde wereld twee keer, één keer met en één keer zonder ' +
+        'dat hij het doel ooit gezien heeft, en de horizon is het aantal stappen dat de eerste de tweede ' +
+        'blijft verslaan op koers. Wat die as oplevert staat in sectie 10.8 en het is geen bevestiging ' +
+        'van de hypothese waarmee dit werk begon.' : 'De as van waarneembaarheid volgt in een latere versie.')
   })]
 }));
 C.push(new Paragraph({
@@ -300,7 +323,8 @@ C.push(new Paragraph({
     new TextRun({ text: 'Trefwoorden: ', font: SERIF, size: 18, bold: true, color: DIM }),
     new TextRun({
       text: 'zelfstructurerende netwerken · reward-gemoduleerde plasticiteit · node-perturbatie · ' +
-        'beleidsgradiënt · structurele plasticiteit · interpreteerbaarheid',
+        'beleidsgradiënt · structurele plasticiteit · interpreteerbaarheid' +
+        (TAAKAS ? ' · deels waarneembare omgevingen · negatieve resultaten' : ''),
       font: SERIF, size: 18, color: DIM
     })
   ]
@@ -1559,7 +1583,7 @@ if (BASIS && BASIS.tabel) {
       'boven de ruis uitkomt. Bij propagatiediepte één is een boog een tijdstap, dus dit is geen verschil in ' +
       'capaciteit maar in '), it('reactietijd'),
     t(': het netwerk reageert een tik later op wat het ziet, en dat kost succes. Precies dat is de eigenschap ' +
-      'waarop sectie ' + (ABLATIE ? '10.9' : '10.8') + ' de resterende onderzoeksvraag baseert — maar zij pleit hier evengoed voor een ondiep ' +
+      'waarop sectie ' + SEC_VRAAG + ' de resterende onderzoeksvraag baseert — maar zij pleit hier evengoed voor een ondiep ' +
       'gelaagd netwerk als voor een graaf.')
   ]));
   C.push(body([
@@ -1569,8 +1593,8 @@ if (BASIS && BASIS.tabel) {
       'zichzelf herstructurerende topologie iets toevoegt, heeft een omgeving nodig waarin verschillende ' +
       'informatielatenties werkelijk nodig zijn; in een taak waarin het doel altijd zichtbaar is en één ' +
       'tussenlaag volstaat, is er niets te herstructureren dat de moeite loont. Dat is de aanleiding voor de ' +
-      'tweede taak in sectie ' + (ABLATIE ? '10.8' : '10.7') + ', en het is de reden dat de vraagstelling in ' +
-      'sectie ' + (ABLATIE ? '10.9' : '10.8') + ' smaller is dan waar dit werk mee begon.')
+      'tweede taak in sectie ' + (TAAKAS ? '10.8' : SEC_HIERNA) + ', en het is de reden dat de vraagstelling in ' +
+      'sectie ' + SEC_VRAAG + ' smaller is dan waar dit werk mee begon.')
   ]));
   C.push(gap(60));
 }
@@ -1729,7 +1753,7 @@ if (REKEN && REKEN.tabel) {
           pct(R[goedkoopst].benchBeleid) + ' tegen ' + pct(R['ang-vol'].benchBeleid) + '). ' : '') +
         'De hypothese dat een klein vast netwerk op deze taak op rekenkosten wint, is daarmee gemeten in plaats ' +
         'van vermoed, en zij komt uit. Dat is geen mislukking van het model maar een afbakening van waar het ' +
-        'thuishoort: sectie ' + (ABLATIE ? '10.9' : '10.8') + ' trekt die conclusie door naar de onderzoeksvraag zelf.')
+        'thuishoort: sectie ' + SEC_VRAAG + ' trekt die conclusie door naar de onderzoeksvraag zelf.')
     ]));
   }
   {
@@ -2155,7 +2179,219 @@ if (ABLATIE && ABLATIE.tabel) {
   C.push(gap(60));
 }
 
-C.push(h2(ABLATIE ? '10.8' : '10.7', 'Wat hierna gemeten wordt'));
+/* --- 10.8: de as van waarneembaarheid ------------------------------------------
+   Volledig uit experimenten/taakas.json. Alle voorgaande secties meten op een taak
+   waarin het doel altijd zichtbaar is; daar valt per constructie niets te onthouden,
+   en elke uitspraak over geheugen is er betekenisloos. Deze sectie verandert dat met
+   één knop, en meet naast de prestatie een geheugenmaat die niet aan de neuronsoorten
+   van dít model hangt. */
+if (TAAKAS && TAAKAS.tabel) {
+  const T = TAAKAS.tabel, TT = TAAKAS.toetsen || [], TI = TAAKAS.interacties || [];
+  const AS = TAAKAS.taakas, ARCH = Object.keys(TAAKAS.architecturen);
+  const an = {
+    'ang': 'ANG, met structurele plasticiteit',
+    'ang-vast': 'ANG, structuur bevroren',
+    'mlp-16-bp': 'vast net zonder terugkoppeling, backprop',
+    'elman-16-bp': 'vast recurrent net, backprop door de tijd'
+  };
+  const cel = (a, b) => T[`s12-${a}-b${b}`];
+  const tt = (c, tegen, taak, maat) => TT.find(x => x.conditie === c && x.tegen === tegen &&
+    x.taak === taak && x.maat === maat);
+  const pT = o => o ? (o.p < 0.001 ? 'p < 0,001' : 'p = ' + o.p.toFixed(3)) : '–';
+  const pH = o => o ? (o.pHolm < 0.001 ? '< 0,001' : o.pHolm.toFixed(3)) : '–';
+  const g1 = x => (x === null || x === undefined) ? '–' : x.m.toFixed(1);
+
+  C.push(h2('10.8', 'De as van waarneembaarheid: wat er gebeurt als het doel wegvalt'));
+  C.push(body(
+    'Elke meting tot hier gebruikt een taak waarin het doel de hele poging zichtbaar is. In zo’n taak valt ' +
+    'er niets te onthouden, en dus zegt geen van de voorgaande secties iets over geheugen — ook sectie 10.7 ' +
+    'niet, waar het weglaten van de geheugen-neuronen op de gelote score niets kostte. Dat is geen resultaat ' +
+    'over geheugen maar over deze omgeving. Deze sectie verandert daarom de omgeving, en wel met één knop in ' +
+    'dezelfde omgeving in plaats van met een tweede spel: het doel is tien spelstappen te zien, daarna een ' +
+    'instelbaar aantal stappen niet, en zo door. Op nul is het de taak van alle voorgaande secties, letterlijk ' +
+    'ongewijzigd — dat is bit voor bit nagemeten tegen de referentiemeting van sectie 10.3. De beloning ' +
+    'verandert niet mee: het spel weet nog steeds waar het doel staat. Wat er verandert is uitsluitend de ' +
+    'waarneembaarheid, en daarmee wordt de opgave deels waarneembaar.'
+  ));
+  C.push(body([
+    bd('Eerst een variant die is afgevallen, want dat hoort erbij. '),
+    t('De eerste opzet verborg het doel permanent na k stappen. Bij k = 80 zakte ANG naar enkele procenten ' +
+      'en was er niets meer te vergelijken. De diagnose is de moeite van het vasthouden waard: permanent ' +
+      'verbergen vraagt geen geheugen maar koppelnavigatie. Na tachtig blinde stappen een punt raken met de ' +
+      'precisie van een doelstraal is een ander en veel moeilijker probleem dan informatie vasthouden, en een ' +
+      'vloer van nul meet niets. De knipperende vorm houdt de opgave oplosbaar: de agent moet een ' +
+      'onderbreking overbruggen en krijgt daarna weer een ijkpunt.')
+  ]));
+  C.push(h3('Een geheugenmaat die niet aan dit model hangt'));
+  C.push(body([
+    t('De structuurmaten van sectie 6 zijn ongeschikt om te bewijzen dat er geheugen ontstaat. Een ' +
+      'geheugen-neuron heeft in dit model per definitie een zelfverbinding, dus zelfverbindingen tellen meet ' +
+      'de bedradingsregel en niet het gedrag. Daarom wordt hier een '), it('interventie'),
+    t(' gemeten. Dezelfde getrainde agent speelt honderd verse werelden twee keer met dezelfde toevalsreeks: ' +
+      'één keer met het doel de eerste twintig stappen zichtbaar en daarna niet meer, en één keer met het ' +
+      'doel dat nooit zichtbaar is geweest. Het enige verschil tussen de twee is informatie die de agent ooit ' +
+      'gehad heeft. Per stap na het blinderen wordt de cosinus gemeten tussen de werkelijke verplaatsing en ' +
+      'de richting waarin het doel staat; de '), it('geheugenhorizon'),
+    t(' is het aantal stappen dat de eerste run de tweede blijft verslaan, per vertraging gepaard en met een ' +
+      'marge van ' + String(TAAKAS.voorspellingen ? 0.05 : 0.05).replace('.', ',') + '. Nul betekent niet ' +
+      '"geen geheugen-neuronen" maar "geen gedrag dat op onthouden lijkt" — een uitspraak die te weerleggen ' +
+      'is, en die op een vast recurrent net met exact dezelfde code te meten valt.')
+  ]));
+  C.push(tbl(
+    ['architectuur'].concat(AS.map(a => a.naam + (a.blink ? ' (' + a.blink + ' donker)' : ' (altijd zicht)'))),
+    ARCH.map(a => [an[a] || a].concat(AS.map(x => {
+      const c = cel(a, x.blink);
+      return c ? pct(c.benchBeleid) : '–';
+    }))),
+    [2600, 1600, 1600, 1600, 1572]
+  ));
+  C.push(tbl(
+    ['geheugenhorizon (stappen)'].concat(AS.map(a => a.naam)),
+    ARCH.map(a => [an[a] || a].concat(AS.map(x => {
+      const c = cel(a, x.blink);
+      return c ? g1(c.memHorizon) : '–';
+    }))),
+    [2600, 1600, 1600, 1600, 1572]
+  ));
+  C.push(body([
+    bd('Welke vergelijking de conclusie draagt. '),
+    t('De vier architecturen verschillen op meer dan één as tegelijk: de vaste netten rekenen hun uitvoer in ' +
+      'twee propagatiestappen uit en leren met terugpropagatie, ANG doet één stap en schat het verborgen ' +
+      'leersignaal met node-perturbatie. Het gat tussen ANG en het vaste recurrente net is dus verward met ' +
+      'die twee verschillen, en sectie 10.5 heeft ze allebei al beziferd. De vergelijking die de conclusie ' +
+      'van deze sectie draagt is een andere en is wél schoon: '), it('ANG tegen dezelfde graaf met bevroren ' +
+      'structuur'), t('. Zelfde topologie, zelfde propagatiediepte, zelfde schatter, zelfde zaden — het ' +
+      'enige verschil is of de structuur nog mag veranderen.')
+  ]));
+  C.push(body([
+    bd('Over de leersnelheden. '),
+    t('Op de stand zonder knipperen draait elke architectuur op de waarde die de veeg van sectie 10.5 of ' +
+      '10.6 voor haar koos. Op elke knipperstand hebben ANG en de bevroren variant een eigen veeg gekregen — ' +
+      'apart per stand, op de goedkope toets van twintig werelden en nooit op de benchmark, met veegzaden ' +
+      'buiten de meetzaden — omdat de uitkomst hieronder in het nadeel van ANG uitvalt en zo’n uitkomst niet ' +
+      'op andermans afstelling mag rusten. Dat het per stand moest, is zelf een waarneming: één veeg in het ' +
+      'midden van de as leverde een waarde op die op een andere stand slechter was dan de oorspronkelijke. ' +
+      'De vaste basislijnen hebben die veeg niet gekregen en staan dus mogelijk onder hun beste waarde. Dat ' +
+      'werkt in het voordeel van ANG en maakt de conclusie hieronder conservatief.')
+  ]));
+  C.push(gap(60));
+  {
+    const laatste = AS[AS.length - 1];
+    const mlpH = cel('mlp-16-bp', laatste.blink), elmH = cel('elman-16-bp', laatste.blink);
+    C.push(h3('De maat werkt: een net zonder terugkoppeling haalt horizon nul'));
+    C.push(body([
+      t('De blinderingsproef geeft het geheugenloze net op élke stand van de as een horizon van exact ' +
+        (mlpH ? g1(mlpH.memHorizon) : '–') + ' stappen, en het vaste recurrente net ' +
+        AS.map(x => { const c = cel('elman-16-bp', x.blink); return c ? g1(c.memHorizon) : '–'; }).join(', ') +
+        ' stappen over de vier standen. Dat is precies wat een geheugenmaat hoort te doen: een ' +
+        'architectuur die per constructie geen toestand meedraagt kan de controle niet verslaan, en een ' +
+        'architectuur die dat wel doet, doet het meetbaar. De maat is daarmee bruikbaar als instrument, ' +
+        'los van dit model — zij vraagt niets over hoe het geheugen geïmplementeerd is en telt geen ' +
+        'zelfverbindingen.')
+    ]));
+  }
+  {
+    C.push(h3('Wat de as laat zien'));
+    for (const x of AS) {
+      if (!x.blink) continue;
+      const p = tt('ang', 'ang-vast', x.naam, 'benchBeleid');
+      const q = tt('ang', 'elman-16-bp', x.naam, 'benchBeleid');
+      const a = cel('ang', x.blink), v = cel('ang-vast', x.blink), e = cel('elman-16-bp', x.blink);
+      C.push(bullet([bd(x.blink + ' stappen donker. '),
+        t('ANG ' + (a ? pct(a.benchBeleid) : '–') + ', dezelfde graaf met bevroren structuur ' +
+          (v ? pct(v.benchBeleid) : '–') + (p ? ' (' + pT(p) + ', na Holm ' + pH(p) + ')' : '') +
+          '; het vaste recurrente net ' + (e ? pct(e.benchBeleid) : '–') +
+          (q ? ' (ANG tegen dat net: ' + pT(q) + ', na Holm ' + pH(q) + ')' : '') + '.')]));
+    }
+    {
+      const standen = AS.filter(x => x.blink > 0);
+      const raak = standen.map(x => ({ x, o: tt('ang', 'ang-vast', x.naam, 'benchBeleid') }))
+        .filter(y => y.o && y.o.pHolm < 0.05 && y.o.verschil < 0);
+      const inter = TI.filter(x => x.paar === 'ang − ang-vast');
+      const interRaak = inter.filter(x => x.p < 0.05);
+      C.push(body([
+        bd('De uitkomst gaat de andere kant op dan de hypothese. '),
+        t('De verwachting, vooraf in de repository vastgelegd, was dat het voordeel van structurele ' +
+          'plasticiteit zou groeien zodra de taak iets te onthouden geeft. Gemeten wordt het omgekeerde. ' +
+          (raak.length
+            ? 'Op ' + raak.map(y => y.x.blink + ' stappen donker').join(' en ') + ' scoort de bevroren ' +
+              'variant aantoonbaar hóger dan dezelfde graaf met plasticiteit (' +
+              raak.map(y => Math.abs(y.o.verschil * 100).toFixed(1) + ' procentpunt, na Holm ' + pH(y.o)).join('; ') +
+              '), terwijl het verschil zonder knipperen binnen de ruis valt. '
+            : 'Op geen enkele stand komt een voordeel van plasticiteit boven de ruis uit. ') +
+          'Structurele plasticiteit is op deze as dus geen voordeel dat nog moest opduiken, maar een ' +
+          'kostenpost die zichtbaar wordt zodra de invoer niet meer voortdurend beschikbaar is.')
+      ]));
+      C.push(body([
+        bd('Wat hier niet uit volgt. '),
+        t('Dat het verschil ' + (interRaak.length ? 'op sommige standen ' : '') + 'groter wórdt naarmate de ' +
+          'donkere periode langer duurt, is met deze aantallen ' +
+          (interRaak.length ? 'niet overal ' : 'niet ') + 'aan te tonen: de gepaarde vergelijking van het ' +
+          'verschil per zaad tussen de stand zonder knipperen en de knipperstanden geeft ' +
+          inter.map(x => pT(x)).join(', ') + '. De uitspraak die de data draagt is daarom de zwakkere en de ' +
+          'preciezere: het verschil is er op de standen waar het gemeten is, en niet dat het meegroeit met de ' +
+          'druk. Wie dat laatste wil weten heeft meer zaden nodig.')
+      ]));
+    }
+    {
+      const a0 = cel('ang', 0), aL = cel('ang', AS[AS.length - 1].blink);
+      C.push(body([
+        bd('Het scherpste detail zit in de geheugenmaat zelf. '),
+        t('ANG haalt op de taak zonder knipperen een geheugenhorizon van ' + (a0 ? g1(a0.memHorizon) : '–') +
+          ' stappen — hoger dan het vaste recurrente net, en dat is opmerkelijk voor een taak waarin ' +
+          'onthouden niets oplevert. Zodra de taak het wél vraagt, zakt die horizon naar ' +
+          (aL ? g1(aL.memHorizon) : '–') + '. Het vaste recurrente net doet precies het omgekeerde: daar ' +
+          'stijgt de horizon zodra de informatie wegvalt. De architectuur met geheugen-neuronen verliest ' +
+          'haar geheugengedrag dus juist onder geheugendruk, en de architectuur zonder zulke neuronen ' +
+          'ontwikkelt het. Dat is de duidelijkste aanwijzing in dit hele document dat de neuronsoorten van ' +
+          'dit model namen zijn en geen functies.')
+      ]));
+    }
+    {
+      const e0 = cel('elman-16-bp', 0), eB = cel('elman-16-bp', AS[1] ? AS[1].blink : 0);
+      C.push(body([
+        bd('Een tweede waarneming die om verklaring vraagt. '),
+        t('Het vaste recurrente net gaat op de milde knipperstand niet achteruit maar vooruit: ' +
+          (e0 ? pct(e0.benchBeleid) : '–') + ' met permanent zicht tegen ' +
+          (eB ? pct(eB.benchBeleid) : '–') + ' met tien stappen donker. Een plausibele verklaring is dat ' +
+          'het wegvallen van de doelinvoer het beleid dwingt tot een koers in plaats van tot voortdurend ' +
+          'bijsturen; sectie 10.2 en 10.6 lieten al zien dat het toeval in dit beleid onderdeel van de ' +
+          'strategie is geworden. Dat is een hypothese en geen bevinding. Zij is te toetsen door de ' +
+          'gemiddelde padlengte per geslaagde poging tussen de standen te vergelijken, en dat gebeurt in ' +
+          'een volgende versie.')
+      ]));
+    }
+  }
+  if (TAAKAS.correlaties) {
+    const co = TAAKAS.correlaties;
+    const rij = Object.keys(co).filter(k => co[k] && co[k].rho !== null)
+      .sort((a, b) => Math.abs(co[b].rho) - Math.abs(co[a].rho));
+    const naam = { memHorizon: 'geheugenhorizon (functioneel)', memCos: 'koersbehoud na blindering (functioneel)',
+      lussen: 'aantal lussen (structureel)', mem: 'aantal geheugen-neuronen (structureel)',
+      reflexbogen: 'aantal reflexbogen (structureel)', actief: 'actieve verbindingen (structureel)',
+      pad: 'kortste pad (structureel)' };
+    C.push(h3('Zegt de functionele maat meer dan de structurele telling?'));
+    C.push(tbl(['maat', 'Spearman ρ met de benchmarkscore', 'n'],
+      rij.map(k => [naam[k] || k, co[k].rho.toFixed(2), String(co[k].n)]),
+      [4200, 3200, 1572]));
+    C.push(body([
+      bd('Deze tabel moet met zorg gelezen worden. '),
+      t('Zij gaat over alle runs op de knipperstanden samen, en die runs komen uit vier architecturen die ' +
+        'op meer dan één as tegelijk verschillen. Een structurele telling als het aantal geheugen-neuronen ' +
+        'correleert hier negatief met de score, maar dat komt doordat alleen ANG zulke neuronen heeft en ' +
+        'ANG op deze standen het laagst scoort: de correlatie meet welke architectuur een run is, niet wat ' +
+        'de structuur doet. Datzelfde voorbehoud geldt voor de positieve correlatie van de geheugenhorizon. ' +
+        'Wat de tabel wél laat zien is dat de functionele maat de enige is die in de goede richting wijst ' +
+        'zonder van de neuronsoorten af te hangen — en dat is precies de reden dat het meetprogramma ' +
+        'ernaartoe verschoven is. De ablatiereeks van sectie 10.7 blijft de interventie naast deze ' +
+        'correlatie; correlatie en ablatie samen zeggen meer dan elk apart, en een correlatie binnen één ' +
+        'architectuur is de volgende stap.')
+    ]));
+  }
+  C.push(gap(60));
+}
+
+C.push(h2(SEC_HIERNA, 'Wat hierna gemeten wordt'));
 C.push(body(
   'Sectie 10.4 laat zien dat de structurele plasticiteit als geheel niets oplevert, sectie 10.5 wat de ' +
   'schatter kost en opbrengt, sectie 10.6 dat de leerregel eromheen op één punt zuiniger kan' +
@@ -2184,13 +2420,45 @@ if (LEERREGEL) C.push(bullet([bd('Een raster van dichtheid tegen aantal neuronen
   'uit voortkomt is wanneer een netwerk te klein is om het patroon te leren en wanneer het groot genoeg is om ' +
   'de trainingswerelden uit het hoofd te leren. Met de benchmarkset als toets en de structuurmaten ernaast is ' +
   'dat een kromme die op dit systeem te tekenen valt, en niet alleen te vermoeden.')]));
-C.push(bullet([bd('Een tweede taak. '), t('In de huidige taak is het doel altijd zichtbaar; er valt niets te ' +
+if (!TAAKAS) C.push(bullet([bd('Een tweede taak. '), t('In de huidige taak is het doel altijd zichtbaar; er valt niets te ' +
   'onthouden, en elke uitspraak over de geheugen-neuronen is daarmee betekenisloos. Een tweede taak waarin het ' +
   'doel na verloop van tijd verdwijnt terwijl er tegelijk obstakels opduiken die binnen één tik ontweken moeten ' +
   'worden, is de eerste opzet waarin de twee soorten paden — kort en reflexmatig, lang en met geheugen — ook ' +
   'werkelijk allebei nodig zijn.')]));
-C.push(h2(ABLATIE ? '10.9' : '10.8', 'De onderzoeksvraag, smaller gemaakt'));
-C.push(body(
+if (TAAKAS) C.push(bullet([bd('Een omslag binnen één leven. '), t('De as van sectie 10.8 traint elke agent op ' +
+  'één stand. Wat een vaste architectuur principieel niet kan, is haar rekenstructuur verbouwen wanneer de ' +
+  'eisen halverwege veranderen — en dat is het enige verkoopargument dat na sectie 10.4 tot en met 10.8 nog ' +
+  'overeind staat. Eén doorlopend leven waarin de omgeving na een derde van de pogingen omslaat en er later ' +
+  'weer terugkeert, met hersteltijd, behoud van de eerste vaardigheid en interferentie als maten, is de ' +
+  'meting die dat kan uitwijzen. Ook daar geldt: als de vrije graaf niet sneller herstelt dan diezelfde ' +
+  'graaf bevroren, dan is dát het resultaat.')]));
+if (TAAKAS) C.push(bullet([bd('Waarom de vrije graaf onder knipperen verliest. '), t('Sectie 10.8 stelt vast ' +
+  'dát het gebeurt, niet waardoor. De voor de hand liggende verdachte is de herstructurering zelf: die loopt ' +
+  'door terwijl de invoerstatistiek heen en weer schakelt, en snoeit dan mogelijk juist de verbindingen weg ' +
+  'die de informatie over de donkere periode heen dragen. Dat is te toetsen door de herstructurering ' +
+  'gefaseerd uit te zetten en door de gesnoeide verbindingen te vergelijken met de verbindingen die de ' +
+  'geheugenhorizon dragen.')]));
+C.push(h2(SEC_VRAAG, 'De onderzoeksvraag, smaller gemaakt'));
+if (TAAKAS) C.push(body(
+  'Dit document is begonnen met de vraag of een netwerk zonder lagen en zonder backpropagation beter kan ' +
+  'zijn dan een vast netwerk. Vier meetreeksen later is die vraag beantwoord, en het antwoord is nee: de ' +
+  'graaf voegt op deze taak niets toe aan de leerregel (10.4), lokaal leren kost meer dan twintig ' +
+  'procentpunt en ongeveer een factor veertig aan rekenwerk (10.5), geen enkel structureel mechanisme ' +
+  'draagt afzonderlijk aantoonbaar bij (10.7), en zodra de omgeving deels waarneembaar wordt verliest de ' +
+  'vrije graaf méér dan diezelfde graaf bevroren (10.8). Dat laatste is het scherpste: het mechanisme is ' +
+  'getest in precies de richting waarvoor het bedoeld is, en het werd slechter.\n\n' +
+  'De vraag die overblijft is daarom geen vergelijkingsvraag maar een grensvraag: ' +
+  'onder welke omgevingsdruk betaalt structurele plasticiteit binnen één leven zich terug ten opzichte van ' +
+  'dezelfde graaf met bevroren structuur? Dit document levert daar drie dingen voor. Een systeem waarvan ' +
+  'elke schroef gecontroleerd is, tot en met de numerieke controle van de leerregel zelf. Een as waarlangs ' +
+  'is gezocht naar de druk waaronder het mechanisme zich zou terugbetalen, met het resultaat dat die druk ' +
+  'op deze as niet bestaat. En een meetinstrument dat losstaat van dit model: een interventiemaat voor ' +
+  'geheugen die op elke architectuur werkt en die niet de eigen bedradingsregels terugmeet. ' +
+  'Wat er dan nog te onderzoeken valt, staat in sectie ' + SEC_HIERNA + ', en de kern daarvan is de enige ' +
+  'eigenschap die een vaste architectuur principieel niet heeft: het vermogen om de eigen rekenstructuur te ' +
+  'verbouwen terwijl het leven doorloopt.'
+));
+if (!TAAKAS) C.push(body(
   'Sectie 10.4 en 10.5 dwingen samen tot een scherpe afbakening. ANG is geen goedkoper alternatief ' +
   'voor backpropagation, en op een taak als deze wint een klein gelaagd netwerk met dezelfde leerregel al op ' +
   'rekentijd én op kanten-bezoeken bij gelijke score — gemeten, niet vermoed. ' +
@@ -2239,7 +2507,7 @@ if (REKEN && REKEN.tabel && REKEN.tabel['mlp-16-bp'] && REKEN.tabel['ang-vol']) 
       'leerregel oplevert — een update die alleen grootheden gebruikt die op de synaps zelf beschikbaar zijn — ' +
       'moet dus opwegen tegen die rekening, en op deze taak doet het dat niet. De verdedigbare aanspraak van ' +
       'ANG ligt daarmee niet bij efficiëntie, en dat is precies de afbakening die sectie ' +
-  (ABLATIE ? '10.9' : '10.8') + ' maakt.')
+  SEC_VRAAG + ' maakt.')
   ]));
 }
 if (LEERREGEL && LEERREGEL.tabel && LEERREGEL.tabel['s7-schaars'] && LEERREGEL.tabel['s7-huidig']) {

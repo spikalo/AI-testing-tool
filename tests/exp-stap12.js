@@ -1,13 +1,13 @@
-/* Stap 12 – de taakas: wat gebeurt er als het doel verdwijnt?
+/* Stap 12 – de taakas: wat gebeurt er als het doel verdwijnt?
 
-   Vier architecturen – vier standen van de taakas – twaalf breinzaden = 192 runs.
+   Vier architecturen – vier standen van de taakas – twaalf breinzaden = 192 runs.
    De voorspellingen staan in tests/stap12-condities.js en zijn gecommit voordat deze
    loper voor het eerst gedraaid heeft.
 
    Drie soorten vergelijking, en ze meten alle drie iets anders:
-     binnen een taakstand   ang tegen ang-vast – de onderzoeksvraag zelf;
-                            elman tegen mlp    – wat terugkoppeling waard is;
-     over de taakas heen    groeit het verschil ang − ang-vast naarmate het doel
+     binnen een taakstand   ang tegen ang-vast – de onderzoeksvraag zelf;
+                            elman tegen mlp    – wat terugkoppeling waard is;
+     over de taakas heen    groeit het verschil ang − ang-vast naarmate het doel
                             eerder verdwijnt? Dat is een interactie, en die wordt
                             gepaard per zaad getoetst: dezelfde breinzaden in beide
                             standen, dus het verschil per zaad is een waarneming.
@@ -36,8 +36,8 @@ const mci = xs => {
   const sd = n > 1 ? Math.sqrt(v.reduce((a, b) => a + (b - m) ** 2, 0) / (n - 1)) : 0;
   return { n, m, sd, ci: 1.96 * sd / Math.sqrt(n) };
 };
-const pct = o => o ? `${(100 * o.m).toFixed(1)}% ± ${(100 * o.ci).toFixed(1)}` : '–';
-const g2 = o => o ? o.m.toFixed(2) : '–';
+const pct = o => o ? `${(100 * o.m).toFixed(1)}% ± ${(100 * o.ci).toFixed(1)}` : '–';
+const g2 = o => o ? o.m.toFixed(2) : '–';
 const leeg = v => (v === '' || v === undefined) ? null : v;
 function ontleed(H, regel) {
   const c = regel.split(','), o = {};
@@ -83,19 +83,19 @@ function holm(ps) {
   const H = hdr.split(',');
   const csvPad = path.join(OUT, 'runs.csv');
   let lines = fs.readFileSync(csvPad, 'utf8').trim().split(/\r?\n/);
-  if (lines[0] !== hdr) throw new Error('runs.csv heeft andere kolommen dan de pagina – draai tests/migreer-runs-csv.js');
+  if (lines[0] !== hdr) throw new Error('runs.csv heeft andere kolommen dan de pagina – draai tests/migreer-runs-csv.js');
 
   /* Leersnelheden. Op taak A (blink 0) draait elke architectuur op de waarde die de
-     veeg van stap 6 of 7 voor haar koos – dat is per definitie de goede waarde voor
+     veeg van stap 6 of 7 voor haar koos – dat is per definitie de goede waarde voor
      die taak, en het houdt de kolom vergelijkbaar met alles wat er al gemeten is. Op
      de knipperstanden gebruikt ANG de waarde uit de veeg van stap 12a, want een
      uitspraak ten nadele van ANG mag niet op andermans afstelling rusten. De vaste
      basislijnen blijven op hun waarde van stap 6; dat werkt in het voordeel van ANG
      en maakt een negatieve conclusie over ANG dus conservatief. */
-  const veegPad = path.join(OUT, 'lr-veeg-stap12-b20.json');
+  const veegPad = path.join(OUT, 'lr-veeg-stap12.json');
   const veeg = fs.existsSync(veegPad) ? JSON.parse(fs.readFileSync(veegPad, 'utf8')) : null;
-  const lrVoor = (arch, blink) => (blink > 0 && veeg && veeg.keuze[arch.naam])
-    ? veeg.keuze[arch.naam].lr : arch.lr;
+  const lrVoor = (arch, blink) => (blink > 0 && veeg && veeg.keuze[blink] && veeg.keuze[blink][arch.naam])
+    ? veeg.keuze[blink][arch.naam].lr : arch.lr;
 
   const per = {};
   for (const taak of TAAKAS) for (const arch of ARCHITECTUREN) {
@@ -194,7 +194,7 @@ function holm(ps) {
       if (!hier.length) continue;
       const t = await mw(basis, hier);
       if (t) interacties.push(Object.assign(t, {
-        paar: `${c} − ${a}`, waarom, taak: taak.naam, tegenTaak: 'A',
+        paar: `${c} − ${a}`, waarom, taak: taak.naam, tegenTaak: 'A',
         verschilBijA: mci(basis).m, verschilHier: mci(hier).m
       }));
     }
@@ -226,8 +226,8 @@ function holm(ps) {
 
   fs.writeFileSync(path.join(OUT, 'taakas.json'), JSON.stringify({
     uitgevoerd: new Date().toISOString(),
-    beschrijving: 'Werkplan stap 12: de taakas. Eén taak met een knop – het doel is nog maar de eerste ' +
-      'tien spelstappen zichtbaar en dan goalBlink stappen niet, en zo door – over vier standen ' +
+    beschrijving: 'Werkplan stap 12: de taakas. Eén taak met een knop – het doel is nog maar de eerste ' +
+      'tien spelstappen zichtbaar en dan goalBlink stappen niet, en zo door – over vier standen ' +
       '(0 = de taak van stap 1 t/m 8, dan 10, 20 en 40 stappen donker) en vier architecturen. De beloning verandert niet ' +
       'mee, dus wat er verandert is uitsluitend de waarneembaarheid. Naast de benchmarkscore staat de ' +
       'geheugenhorizon uit de blinderingsproef: dezelfde getrainde agent speelt dezelfde wereld twee keer, ' +
@@ -237,7 +237,8 @@ function holm(ps) {
     zaden: NSEEDS, eersteZaad: SEED0, pogingenPerRun: NEP,
     benchmark: { werelden: BENCHN, herhalingen: BENCHREPS }, geheugenProef: { werelden: MEMN },
     architecturen: Object.fromEntries(ARCHITECTUREN.map(a => [a.naam,
-      { lrTaakA: a.lr, lrKnipper: lrVoor(a, 1), ov: a.ov, rol: a.rol }])),
+      { lrTaakA: a.lr, lrPerStand: Object.fromEntries(TAAKAS.map(x => [x.blink, lrVoor(a, x.blink)])),
+        ov: a.ov, rol: a.rol }])),
     leersnelheidVeeg: veeg ? veeg.keuze : null,
     taakas: TAAKAS, voorspellingen: VOORSPELLINGEN,
     tabel, toetsen, interacties, correlaties, perZaad: per
@@ -254,13 +255,13 @@ function holm(ps) {
   console.log('architectuur'.padEnd(15) + TAAKAS.map(t => t.naam.padEnd(19)).join(''));
   for (const a of archNamen) console.log(a.padEnd(15) +
     TAAKAS.map(t => { const T = tabel[naamVan(a, t.blink)];
-      return (T ? g2(T.memHorizon) + '  (cos ' + g2(T.memCos) + ')' : '–').padEnd(19); }).join(''));
+      return (T ? g2(T.memHorizon) + '  (cos ' + g2(T.memCos) + ')' : '–').padEnd(19); }).join(''));
 
   console.log('\n--- structuur: actieve verbindingen / lussen / geheugen-neuronen ---');
   console.log('architectuur'.padEnd(15) + TAAKAS.map(t => t.naam.padEnd(19)).join(''));
   for (const a of archNamen) console.log(a.padEnd(15) +
     TAAKAS.map(t => { const T = tabel[naamVan(a, t.blink)];
-      return (T ? `${Math.round(T.actief.m)} / ${g2(T.lussen)} / ${g2(T.mem)}` : '–').padEnd(19); }).join(''));
+      return (T ? `${Math.round(T.actief.m)} / ${g2(T.lussen)} / ${g2(T.mem)}` : '–').padEnd(19); }).join(''));
 
   console.log('\n--- herstructurering per run: gesnoeid / bijgegroeid / hertypeerd ---');
   console.log('architectuur'.padEnd(15) + TAAKAS.map(t => t.naam.padEnd(19)).join(''));
@@ -272,7 +273,7 @@ function holm(ps) {
   console.log('\n--- Mann-Whitney binnen elke taakstand, Holm per maat ---');
   for (const t of toetsen) console.log(
     `${t.taak.padEnd(6)} ${t.maat.padEnd(12)} ${(t.conditie + ' vs ' + t.tegen).padEnd(28)} ` +
-    `${(t.verschil >= 0 ? '+' : '−') + Math.abs(t.maat === 'benchBeleid' ? 100 * t.verschil : t.verschil).toFixed(1)}`.padEnd(8) +
+    `${(t.verschil >= 0 ? '+' : '−') + Math.abs(t.maat === 'benchBeleid' ? 100 * t.verschil : t.verschil).toFixed(1)}`.padEnd(8) +
     `   p = ${t.p.toFixed(4)}   Holm ${t.pHolm.toFixed(4)}   ${t.oordeelHolm}`);
 
   console.log('\n--- interactie: groeit het verschil naarmate het doel eerder verdwijnt? ---');
@@ -282,7 +283,7 @@ function holm(ps) {
 
   console.log('\n--- Spearman met de benchmarkscore op de verborgen standen ---');
   for (const k of kandidaten) console.log(`${k.padEnd(14)} rho = ` +
-    (correlaties[k].rho === null ? '–' : correlaties[k].rho.toFixed(3)) + `   (n = ${correlaties[k].n})`);
+    (correlaties[k].rho === null ? '–' : correlaties[k].rho.toFixed(3)) + `   (n = ${correlaties[k].n})`);
 
   if (fouten.length) { console.error(fouten.join('\n')); process.exitCode = 1; }
   await b.close();

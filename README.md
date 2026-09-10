@@ -282,6 +282,47 @@ en `experimenten/lr-veeg-stap7.json`.
 > opnieuw uit de bewaarde historie afgeleid (`tests/migreer-tot80.js`), zonder te
 > hertrainen. De bevinding blijft staan, maar kleiner.
 
+### Het doel verdwijnt — de taakas, en waar het ophoudt
+
+Alle metingen hierboven gebruiken een taak waarin het doel de hele poging zichtbaar is.
+Daar valt niets te onthouden, dus ze zeggen ook niets over geheugen. Sinds september 2026
+zit er een knop op de wereld: **het doel is tien stappen te zien en daarna k stappen niet,
+en zo door**. Op 0 is het spel bit voor bit het oude spel. De beloning verandert niet mee —
+alleen de wáárneming valt weg. De reactieve ijkagent wordt even blind en zakt van 40% naar
+3%.
+
+Daarnaast is er een geheugenmaat die **niet aan de neuronsoorten van dit model hangt**.
+Dezelfde getrainde agent speelt honderd verse werelden twee keer met dezelfde toevalsreeks:
+één keer met het doel de eerste twintig stappen zichtbaar, één keer nooit zichtbaar. Het
+enige verschil is informatie die de agent ooit gehad heeft. De **geheugenhorizon** is het
+aantal stappen dat de eerste run de tweede blijft verslaan op koers naar het doel. Nul
+betekent niet "geen geheugen-neuronen" maar "geen gedrag dat op onthouden lijkt" — en dat
+is op een GRU of Elman met exact dezelfde code te meten.
+
+| architectuur | altijd zicht | 10 donker | 20 donker | 40 donker |
+|---|---|---|---|---|
+| ANG, plasticiteit aan | 65,6% | 27,4% | 9,9% | 2,8% |
+| ANG, structuur bevroren | 67,5% | 31,2% | **13,7%** | **5,4%** |
+| vast net zónder terugkoppeling, backprop | 66,7% | 65,2% | 26,1% | 14,5% |
+| vast recurrent net, BPTT | 66,6% | **77,8%** | **75,4%** | **39,8%** |
+
+*geheugenhorizon in stappen: ANG 25 → 2, ANG bevroren 16 → 4, vast net zonder
+terugkoppeling 0 op elke stand, vast recurrent net 22 → 43 → 42 → 29.*
+
+Drie dingen. **De maat werkt**: een net zonder enige terugkoppeling haalt op élke stand
+exact nul, een recurrent net niet (p < 0,001). **ANG stort in**, en erger dan een net dat
+helemaal geen geheugen heeft (−37,7 pp bij 10 donker) — ook ná een eigen
+leersnelheidsveeg per stand. En **structurele plasticiteit is hier een kostenpost**: de
+bevroren variant scoort hóger bij 20 en 40 donker (+3,8 en +2,5 pp, Holm 0,024 en 0,010).
+
+Het scherpste detail zit in de geheugenmaat: ANG haalt horizon 25 op de taak waar
+onthouden niets oplevert, en 2 zodra de taak het vraagt. Het vaste recurrente net doet het
+omgekeerde. De architectuur mét geheugen-neuronen verliest haar geheugengedrag juist onder
+geheugendruk — een aanwijzing dat die neuronsoorten namen zijn en geen functies. De
+voorspellingen stonden vóór de meting in git (`tests/stap12-condities.js`); dit is de
+onwaar-tak van voorspelling 4, en die stond er uitgeschreven bij. Ruwe meting:
+`experimenten/taakas.json` en `experimenten/lr-veeg-stap12.json`.
+
 ### Wat elk onderdeel bijdraagt — de ablatiereeks
 
 Tien condities die elk één onderdeel weglaten en de rest laten staan; 16 zaden, 500

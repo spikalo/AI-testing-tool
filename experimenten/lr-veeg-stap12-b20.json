@@ -1,0 +1,156 @@
+{
+  "uitgevoerd": "2026-09-10T19:43:17.328Z",
+  "knipper": 20,
+  "pogingen": 500,
+  "raster": [
+    0.001,
+    0.002,
+    0.004,
+    0.008,
+    0.016,
+    0.032
+  ],
+  "veegzaden": [
+    3000,
+    4
+  ],
+  "toelichting": "Gekozen op de goedkope toets van twintig werelden, met veegzaden buiten de meetzaden. Alleen ANG en ANG-bevroren zijn geveegd; de vaste basislijnen staan op hun leersnelheid uit stap 6, wat in het voordeel van ANG werkt.",
+  "perArchitectuur": {
+    "ang": [
+      {
+        "lr": 0.001,
+        "toets": 0.037500000000000006,
+        "perZaad": [
+          0.05,
+          0.05,
+          0.05,
+          0
+        ]
+      },
+      {
+        "lr": 0.002,
+        "toets": 0.05,
+        "perZaad": [
+          0.05,
+          0,
+          0.05,
+          0.1
+        ]
+      },
+      {
+        "lr": 0.004,
+        "toets": 0.1375,
+        "perZaad": [
+          0.1,
+          0.1,
+          0.25,
+          0.1
+        ]
+      },
+      {
+        "lr": 0.008,
+        "toets": 0.1,
+        "perZaad": [
+          0.1,
+          0,
+          0.2,
+          0.1
+        ]
+      },
+      {
+        "lr": 0.016,
+        "toets": 0.0875,
+        "perZaad": [
+          0.05,
+          0.05,
+          0.15,
+          0.1
+        ]
+      },
+      {
+        "lr": 0.032,
+        "toets": 0.0625,
+        "perZaad": [
+          0.05,
+          0.05,
+          0.1,
+          0.05
+        ]
+      }
+    ],
+    "ang-vast": [
+      {
+        "lr": 0.001,
+        "toets": 0.0625,
+        "perZaad": [
+          0.1,
+          0.05,
+          0.05,
+          0.05
+        ]
+      },
+      {
+        "lr": 0.002,
+        "toets": 0.175,
+        "perZaad": [
+          0.1,
+          0.15,
+          0.25,
+          0.2
+        ]
+      },
+      {
+        "lr": 0.004,
+        "toets": 0.17500000000000002,
+        "perZaad": [
+          0.1,
+          0.2,
+          0.3,
+          0.1
+        ]
+      },
+      {
+        "lr": 0.008,
+        "toets": 0.23750000000000002,
+        "perZaad": [
+          0.2,
+          0.2,
+          0.45,
+          0.1
+        ]
+      },
+      {
+        "lr": 0.016,
+        "toets": 0.125,
+        "perZaad": [
+          0.15,
+          0.05,
+          0.25,
+          0.05
+        ]
+      },
+      {
+        "lr": 0.032,
+        "toets": 0.05,
+        "perZaad": [
+          0.05,
+          0.05,
+          0.05,
+          0.05
+        ]
+      }
+    ]
+  },
+  "keuze": {
+    "ang": {
+      "lr": 0.004,
+      "toets": 0.1375,
+      "opTaakA": 0.008
+    },
+    "ang-vast": {
+      "lr": 0.008,
+      "toets": 0.23750000000000002,
+      "opTaakA": 0.008
+    }
+  }
+}
