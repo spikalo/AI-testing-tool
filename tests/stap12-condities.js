@@ -8,13 +8,22 @@
    uitkomst waarin het model niets bijzonders doet — is de enige manier waarop deze
    reeks iets kan weerleggen in plaats van iets kan illustreren.
 
-   DE AS. Niet twee taken maar één taak met een knop: `goalHide` is het aantal
-   spelstappen waarna de acht doelkanalen op nul gaan. 0 is de taak van stap 1 t/m 8,
-   ongewijzigd. Bij 80, 40 en 20 moet de agent de richting van het doel steeds langer
-   zelf vasthouden. De beloning verandert niet mee — het spel weet nog steeds waar het
-   doel staat — dus wat er verandert is uitsluitend de waarneembaarheid. Dat maakt van
-   de opgave een deels waarneembaar probleem, en dat is precies de eigenschap waarvan
-   de literatuur zegt dat terugkoppeling ervoor nodig is.
+   DE AS. Niet twee taken maar één taak met een knop. De eerste opzet gebruikte
+   `goalHide`: het doel gaat na k stappen uit en komt niet meer terug. Die is
+   gedraaid en meteen weer weggelegd, want bij k = 80 zakte ANG naar 0,3–6 % — ver
+   onder alles wat er nog te vergelijken valt. De diagnose staat in de paper en is de
+   moeite van het onthouden waard: **permanent verbergen vraagt geen geheugen maar
+   koppelnavigatie**. Na tachtig blinde stappen een punt raken met de precisie van een
+   doelstraal is een ander en veel moeilijker probleem dan informatie vasthouden, en
+   een vloer van nul procent meet niets.
+
+   De as is daarom `goalBlink`: het doel is tien stappen te zien, dan k stappen niet,
+   en zo door. De agent moet een onderbreking overbruggen en krijgt daarna weer een
+   ijkpunt. 0 is de taak van stap 1 t/m 8, ongewijzigd. De beloning verandert niet mee
+   — het spel weet nog steeds waar het doel staat — dus wat er verandert is uitsluitend
+   de waarneembaarheid. Dat maakt van de opgave een deels waarneembaar probleem, en
+   dat is precies de eigenschap waarvan de literatuur zegt dat terugkoppeling ervoor
+   nodig is.
 
    VIER ARCHITECTUREN, want er zijn drie dingen tegelijk te scheiden:
      wat de taak vraagt        — kan een geheugenloos net het überhaupt?
@@ -45,10 +54,10 @@ const ARCHITECTUREN = [
    überhaupt iets te zien is. Zodra er signaal is, komt de veeg. */
 
 const TAAKAS = [
-  { goalHide: 0,  naam: 'A',    omschrijving: 'doel altijd zichtbaar' },
-  { goalHide: 80, naam: 'B-80', omschrijving: 'doel verdwijnt na 80 stappen' },
-  { goalHide: 40, naam: 'B-40', omschrijving: 'doel verdwijnt na 40 stappen' },
-  { goalHide: 20, naam: 'B-20', omschrijving: 'doel verdwijnt na 20 stappen' }
+  { blink: 0,  naam: 'A',    omschrijving: 'doel altijd zichtbaar — de taak van stap 1 t/m 8' },
+  { blink: 10, naam: 'B-10', omschrijving: '10 stappen zichtbaar, 10 stappen donker' },
+  { blink: 20, naam: 'B-20', omschrijving: '10 zichtbaar, 20 donker' },
+  { blink: 40, naam: 'B-40', omschrijving: '10 zichtbaar, 40 donker — een vijfde van de tijd zicht' }
 ];
 
 const MEET_SEED0 = 1000, MEET_N = 12;
@@ -62,7 +71,7 @@ const MEET_SEED0 = 1000, MEET_N = 12;
 const VOORSPELLINGEN = [
   {
     id: 'V1', over: 'taak A blijft zoals hij was',
-    voorspelling: 'Bij goalHide = 0 liggen alle vier de architecturen binnen de ruis van elkaar, ' +
+    voorspelling: 'Bij geen knippering liggen alle vier de architecturen binnen de ruis van elkaar, ' +
       'en reproduceert ang de referentiemeting van stap 4 bit voor bit.',
     waar: 'de bestaande conclusies van stap 5 en 6 blijven staan en deze reeks is er een geldige voortzetting van',
     onwaar: 'er is iets aan de taak veranderd door het inbouwen van de knop, en dan is de hele as ongeldig ' +
@@ -70,7 +79,7 @@ const VOORSPELLINGEN = [
   },
   {
     id: 'V2', over: 'vraagt de taak werkelijk geheugen?',
-    voorspelling: 'Naarmate goalHide daalt, zakt mlp-16-bp — een net zonder enige terugkoppeling — het ' +
+    voorspelling: 'Naarmate de donkere periode langer wordt, zakt mlp-16-bp — een net zonder enige terugkoppeling — het ' +
       'sterkst van de vier, en zijn geheugenhorizon blijft op of vlak boven nul.',
     waar: 'de taakas meet wat zij belooft te meten: deels waarneembaarheid, niet alleen moeilijkheid',
     onwaar: 'een geheugenloos net lost het ook op, en dan is de taak geen geheugentaak maar een taak die ' +
@@ -78,8 +87,8 @@ const VOORSPELLINGEN = [
   },
   {
     id: 'V3', over: 'wat terugkoppeling waard is',
-    voorspelling: 'elman-16-bp houdt bij dalende goalHide een aantoonbaar hogere score én een ' +
-      'geheugenhorizon boven nul, en het gat met mlp-16-bp groeit naarmate het doel eerder verdwijnt.',
+    voorspelling: 'elman-16-bp houdt bij een langere donkere periode een aantoonbaar hogere score én een ' +
+      'geheugenhorizon boven nul, en het gat met mlp-16-bp groeit naarmate de donkere periode langer wordt.',
     waar: 'de blinderingsproef meet gedrag dat aan terugkoppeling hangt, en is dus bruikbaar als maat ' +
       'voor élke architectuur — ook voor ANG',
     onwaar: 'de maat vangt niet wat zij hoort te vangen, en moet herzien worden vóór er een uitspraak ' +
@@ -87,8 +96,8 @@ const VOORSPELLINGEN = [
   },
   {
     id: 'V4', over: 'DE ONDERZOEKSVRAAG: wat is structurele plasticiteit waard?',
-    voorspelling: 'Het verschil tussen ang en ang-vast is bij goalHide = 0 nul (dat is stap 5 en 8 al), ' +
-      'en groeit naarmate het doel eerder verdwijnt — omdat een taak met twee informatielatenties iets ' +
+    voorspelling: 'Het verschil tussen ang en ang-vast is bij geen knippering nul (dat is stap 5 en 8 al), ' +
+      'en groeit naarmate de donkere periode langer wordt — omdat een taak met twee informatielatenties iets ' +
       'te herstructureren geeft wat een zuiver reactieve taak niet heeft.',
     waar: 'er is voor het eerst een omgeving aan te wijzen waarin zelfherstructurering zich terugbetaalt, ' +
       'en dat is een bevinding waar de rest van het onderzoek op gebouwd kan worden',

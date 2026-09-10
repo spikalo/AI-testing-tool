@@ -509,6 +509,24 @@
           <input type="range" id="maxsteps" min="80" max="2000" step="20" value="320">
         </div>
         <div class="field">
+          <label>Doel knippert: 10 aan, <span class="val" id="goalblinkval">0</span> uit</label>
+          <input type="range" id="goalblink" min="0" max="60" step="5" value="0">
+          <div class="hint">Op <b>0</b> is dit het spel zoals het altijd was. Zet je hem op bijvoorbeeld 20,
+            dan is het doel tien stappen te zien, twintig stappen niet, tien stappen wel, enzovoort. De
+            obstakels blijft het brein gewoon zien en de beloning verandert niet mee — alleen de
+            wáárneming valt weg. Het brein moet de richting dus over de donkere periode heen vasthouden,
+            en dat is precies waar terugkoppeling voor dient. Op <b>0</b> valt er niets te onthouden, en
+            dat is de reden dat alle metingen tot september 2026 niets over geheugen zeggen.</div>
+        </div>
+        <div class="field">
+          <label>Doel verdwijnt na <span class="val" id="goalhideval">nooit</span></label>
+          <input type="range" id="goalhide" min="0" max="160" step="10" value="0">
+          <div class="hint">De zwaardere variant: het doel gaat op de gekozen stap uit en komt niet meer
+            terug. Dat vraagt geen geheugen maar koppelnavigatie — blind een punt raken — en dat blijkt
+            veel te moeilijk: bij 80 zakt het brein naar een paar procent. Gebruik het knipperen hierboven
+            als je geheugen wilt testen; deze schuif staat er als uiterste van de schaal.</div>
+        </div>
+        <div class="field">
           <label>Nieuwe wereld elke <span class="val" id="worldeveryval">4</span> pogingen</label>
           <input type="range" id="worldevery" min="1" max="200" step="1" value="4">
           <div class="hint">Start en doel liggen elke wereld tegen twee andere randen — links→rechts, boven→onder, en alles daartussen — met de obstakels in het midden. Zet je dit hoog, dan traint het brein lang in dezelfde wereld: de klassieke manier om te laten zien hoe iets een route uit z'n hoofd leert zonder te snappen wat het doet.</div>
@@ -761,6 +779,11 @@ let TRACE_OUD=false;
 /* Versterking van het node-perturbatiedeel van het spoor t.o.v. het score-functiedeel.
    1 = zoals het altijd was. Zie de meting van stap 3 en `updateTraces`. */
 let PERTURB_GAIN=1;
+/* Taak B, stap 12. Aantal spelstappen waarna de doelkanalen op nul gaan; 0 = nooit,
+   wat taak A is. Bewaard als globale zodat het terugladen van een resultaat hem kan
+   zetten, maar `sense()` leest hem uit S.cfg — de globale is alleen de brug naar
+   readCfg, nooit de bron voor de code zelf. */
+let GOAL_HIDE=0, GOAL_BLINK=0;
 /* Stap 7. Twee getallen zonder eigen schuif, omdat ze bij de criticus horen en niet bij
    het afstellen met de hand: de leersnelheid van de criticus en zijn disconteringsfactor.
    Wie ze wil variëren doet dat via de experimentloper (`criticLr`, `criticGamma`). */
@@ -853,12 +876,51 @@ function rayDist(px,py,dx,dy,obs){
   }
   return clamp(best,0,RAY_MAX);
 }
-function sense(ag,world,out){
+/* ======================= taak B: het doel is niet altijd te zien =======================
+   Eén regel, op één plek, gebruikt door zowel het brein als de reactieve ijkagent —
+   zou dit twee keer los opgeschreven staan, dan is het ijkpunt geen ijkpunt meer.
+
+   Twee vormen van onzichtbaarheid, en ze meten iets anders:
+
+   `goalBlink` — knipperen. Het doel is `GOAL_VIS` stappen te zien, dan `goalBlink`
+   stappen niet, en zo door. Dit is de as waar het onderzoek op rust: de agent moet
+   een onderbreking overbruggen, maar krijgt daarna weer een ijkpunt. Wat er gevraagd
+   wordt is informatie vasthouden, niet blind navigeren op een punt.
+
+   `goalHide` — permanent verbergen na k stappen. Dat is de zwaardere variant, en de
+   eerste meetreeks liet zien hoe zwaar: bij k = 80 zakt ANG naar een paar procent,
+   ver onder alles wat er nog te vergelijken valt. De reden is dat die vorm niet om
+   geheugen vraagt maar om koppelnavigatie — na tachtig stappen blind een punt raken
+   met de precisie van een doelstraal. Hij blijft bestaan als uiterste van de as en
+   als de conditie van de blinderingsproef, maar hij is niet de hoofdas.
+
+   Beide op nul is de taak van stap 1 t/m 8, letterlijk ongewijzigd. De belóning
+   verandert in geen van beide gevallen mee: het spel weet nog steeds waar het doel
+   staat, dus wat er verandert is uitsluitend de waarneembaarheid.
+
+   De waarden komen uit S.cfg en niet uit een globale: een conditie die alleen in een
+   globale staat bereikt de experimentloper niet (zie DOCUMENTATIE.md, fout 12).   */
+const GOAL_VIS=10;
+function doelZichtbaar(stap){
+  const c=S.cfg; if(!c) return true;
+  const verberg=c.goalHide|0, knipper=c.goalBlink|0;
+  /* −1 betekent "nooit zichtbaar" en bestaat voor de blinderingsproef: dezelfde agent
+     in dezelfde wereld die het doel nooit heeft gezien is de controle waartegen
+     "hij onthoudt het nog" wordt afgemeten. */
+  if(verberg<0) return false;
+  if(verberg>0 && stap>=verberg) return false;
+  if(knipper>0 && (stap%(GOAL_VIS+knipper))>=GOAL_VIS) return false;
+  return true;
+}
+function sense(ag,world,out,stap){
   for(let i=0;i<8;i++){
     const [dx,dy]=DIRV[i];
     const d=rayDist(ag.x,ag.y,dx,dy,world.obs);
     out[i]=1-d/RAY_MAX;                       // 1 = obstakel vlakbij
   }
+  /* Taak B: de doelkanalen gaan op nul volgens de regel in doelZichtbaar(). */
+  const nu = (stap===undefined) ? S.step : stap;
+  if(!doelZichtbaar(nu)){ for(let i=0;i<8;i++) out[8+i]=0; return out; }
   const gx=world.goal.x-ag.x, gy=world.goal.y-ag.y;
   const gd=Math.hypot(gx,gy)||1e-6;
   const ux=gx/gd, uy=gy/gd;
@@ -1762,6 +1824,10 @@ function readCfg(){
     nNeurons:+$("nneurons").value,
     types:{sens:t("sens"),work:t("work"),refl:t("refl"),mem:t("mem")},
     density:+$("density").value/10, inputOnlySens:INPUT_ONLY_SENS,
+    /* Taak B: na hoeveel stappen de doelkanalen op nul gaan. 0 is de taak zoals zij
+       altijd was. Wie hem in een reeks wil variëren gebruikt de sleutel `goalHide`. */
+    goalHide: $("goalhide") ? +$("goalhide").value : GOAL_HIDE,
+    goalBlink: $("goalblink") ? +$("goalblink").value : GOAL_BLINK,
     nObs:+$("nobs").value, maxSteps:+$("maxsteps").value, worldEvery:+$("worldevery").value,
     chSpeed:+$("chspeed").value/10, seed:+$("seed").value, stopOnCollide:$("botsstop").checked,
     lr:+$("lr").value/1000, lam:+$("elam").value/100, decay:+$("dec").value/10000,
@@ -1907,7 +1973,10 @@ function gameTick(learn,noise){
   let adv=null;
   if(criticOn){
     const terminaal = S.reached || (collided && c.stopOnCollide);
-    sense(S.ag,w,S.inpNext);
+    /* s′ hoort bij de vólgende spelstap; S.step wordt pas onderaan deze tik
+       opgehoogd, dus hier expliciet meegeven — anders ziet de criticus het doel
+       op taak B één stap langer dan het beleid. */
+    sense(S.ag,w,S.inpNext,S.step+1);
     const v1 = terminaal ? 0 : criticValue(B,S.inpNext);
     adv = r + c.criticGamma*v1 - v0;
     criticUpdate(B,S.inp,adv,c.criticLr);
@@ -2050,6 +2119,116 @@ function benchBrain(mode,n,reps){
   out.modus=mode;
   return out;
 }
+/* ======================= de blinderingsproef ======================= */
+/* Waarom deze maat bestaat. "Er ontstaan geheugenstructuren" is in dit model een
+   gevaarlijke uitspraak: geheugen-neuronen hébben per definitie een zelfverbinding,
+   dus zelfverbindingen tellen meet mijn eigen bedradingsregel en niet het gedrag van
+   het systeem. Deze proef meet in plaats daarvan een gevolg dat elk model kan hebben,
+   ook een GRU of een vaste Elman: houdt de agent na het wegvallen van de
+   doelinformatie zijn koers naar het doel vast, en hoe lang?
+
+   De opzet is een interventie, geen correlatie. Dezelfde getrainde agent speelt
+   dezelfde wereld twee keer met exact dezelfde toevalsreeks:
+     - proef:    het doel is de eerste `blindAt` stappen zichtbaar en daarna niet meer;
+     - controle: het doel is nooit zichtbaar geweest.
+   Het enige verschil tussen de twee is dus informatie die de agent ooit heeft gehad.
+   Per stap ná het blinderen wordt de cosinus gemeten tussen de werkelijke verplaatsing
+   en de richting waarin het doel staat. Blijft die in de proef boven de controle, dan
+   stuurt er iets binnen de agent nog op informatie die er niet meer is — en dat is
+   precies wat "geheugen" hoort te betekenen.
+
+   De horizon is het aantal stappen dat dat volhoudt: de grootste L waarvoor het
+   gemiddelde over de eerste L stappen na blinderen nog boven de controle plus een
+   marge ligt. Nul betekent niet "geen geheugen-neuronen" maar "geen aantoonbaar
+   gedrag dat op onthouden lijkt", en dat is een uitspraak die je kunt weerleggen. */
+const MEM_N=100, MEM_SEED0=8000000, MEM_STRIDE=53, MEM_BLIND=20, MEM_H=60, MEM_MARGE=0.05;
+function memWorlds(n){
+  const N=n||MEM_N;
+  if(!S.memWorlds || S.memWorlds.length<N){
+    const out=[];
+    for(let k=0;k<Math.max(N,MEM_N);k++) out.push(makeWorld(MEM_SEED0+k*MEM_STRIDE,BENCH_OBS));
+    S.memWorlds=out;
+  }
+  return S.memWorlds.slice(0,N);
+}
+/* Speel elke wereld af met de gegeven verbergstand en geef per vertraging het
+   gemiddelde van cos(verplaatsing, richting naar het doel) terug. Alleen stappen
+   vanaf `blindAt` tellen mee, in beide condities, zodat proef en controle over
+   hetzelfde stuk van de poging gaan. */
+function memLoop(worlds,verberg,blindAt,H){
+  const som=new Float64Array(H), tel=new Int32Array(H);
+  /* De proef legt haar eigen zichtbaarheidsregime op, dus het knipperen gaat uit:
+     anders meet de horizon deels de knippercyclus waarop de agent getraind is en
+     niet wat hij vasthoudt. Beide standen worden na afloop teruggezet. */
+  const bewaardHide=S.cfg.goalHide, bewaardBlink=S.cfg.goalBlink;
+  S.cfg.goalHide=verberg; S.cfg.goalBlink=0;
+  for(let k=0;k<worlds.length;k++){
+    S.evalRnd=mulberry32(MEM_SEED0+k*911);
+    S.world=worlds[k];
+    S.ag.x=S.world.start.x; S.ag.y=S.world.start.y; S.trail=[];
+    S.step=0; S.epReward=0; S.epCollisions=0; S.epIdle=0; S.reached=false;
+    S.prevDist=Math.hypot(S.world.goal.x-S.ag.x,S.world.goal.y-S.ag.y);
+    if(S.B) resetBrainState(S.B);
+    let done=false;
+    while(!done && S.step<blindAt+H){
+      const vx=S.ag.x, vy=S.ag.y;
+      const gx=S.world.goal.x-vx, gy=S.world.goal.y-vy;
+      const gd=Math.hypot(gx,gy)||1e-6;
+      const lag=S.step-blindAt;
+      done=gameTick(false,0);
+      if(lag>=0 && lag<H){
+        const dx=S.ag.x-vx, dy=S.ag.y-vy, dl=Math.hypot(dx,dy);
+        /* Stilstaan is geen richting; die stap telt als nul en niet als fout, want
+           een agent die niets doet stuurt ook niet de verkeerde kant op. */
+        som[lag]+= dl>1e-9 ? (dx*gx+dy*gy)/(dl*gd) : 0;
+        tel[lag]++;
+      }
+    }
+  }
+  S.cfg.goalHide=bewaardHide; S.cfg.goalBlink=bewaardBlink;
+  const uit=new Array(H);
+  for(let i=0;i<H;i++) uit[i]= tel[i]? som[i]/tel[i] : null;
+  return uit;
+}
+function geheugenProef(n,blindAt,H){
+  const N=n||MEM_N, BA=blindAt||MEM_BLIND, HH=H||MEM_H, B=S.B;
+  const saveW=Float32Array.from(B.cW), saveE=Float32Array.from(B.cE), saveB=Float32Array.from(B.bias);
+  const saveWorld=S.world, saveAg={x:S.ag.x,y:S.ag.y}, saveTrail=S.trail, saveStep=S.step,
+        savePrev=S.prevDist, saveR=S.epReward, saveCol=S.epCollisions, saveReach=S.reached,
+        saveIdle=S.epIdle;
+  const wasSample=S.evalSample, wasTemp=S.evalTemp, wasRnd=S.evalRnd;
+  /* Geloot beleid, zoals overal waar dit document een getal rapporteert. */
+  S.evalSample=true; S.evalTemp=tempOf(noiseEnd(S.cfg.noise0));
+  const W=memWorlds(N);
+  const proef=memLoop(W,BA,BA,HH);
+  const controle=memLoop(W,-1,BA,HH);
+  B.cW.set(saveW); B.cE.set(saveE); B.bias.set(saveB);
+  S.world=saveWorld; S.ag=saveAg; S.trail=saveTrail; S.step=saveStep; S.epIdle=saveIdle;
+  S.prevDist=savePrev; S.epReward=saveR; S.epCollisions=saveCol; S.reached=saveReach;
+  S.evalSample=wasSample; S.evalTemp=wasTemp; S.evalRnd=wasRnd;
+  resetBrainState(B);
+  const gem=a=>{ const v=a.filter(x=>x!==null); return v.length? v.reduce((p,q)=>p+q,0)/v.length : null; };
+  const mProef=gem(proef), mCtrl=gem(controle);
+  /* Gepaard per vertraging, niet tegen één gemiddelde. Een traject heeft fases: vlak
+     na de start staat het doel gemiddeld anders ten opzichte van de agent dan
+     zeventig stappen later, en dat geldt voor de proef en de controle allebei. Zou de
+     horizon de proef tegen het gemiddelde van de héle controle afzetten, dan meet hij
+     die fase mee. Het verschil per vertraging haalt dat eruit: proef en controle
+     staan op datzelfde moment in dezelfde wereld met dezelfde toevalsreeks, en het
+     enige waarin ze verschillen is of de agent het doel ooit gezien heeft. */
+  let horizon=0, som=0, n2=0;
+  for(let i=0;i<HH;i++){
+    if(proef[i]===null||controle[i]===null) break;
+    som+=proef[i]-controle[i]; n2++;
+    if(som/n2 > MEM_MARGE) horizon=i+1; else break;
+  }
+  const voorsprong=(mProef!==null&&mCtrl!==null)? mProef-mCtrl : null;
+  return {werelden:N, blindeerStap:BA, horizonStappen:HH, marge:MEM_MARGE,
+    horizon, voorsprong, cosProef:mProef, cosControle:mCtrl,
+    perStapProef:proef.map(x=>x===null?null:+x.toFixed(4)),
+    perStapControle:controle.map(x=>x===null?null:+x.toFixed(4))};
+}
+
 /* De reactieve ijkagent: geen brein, geen geheugen, geen leren, en precies dezelfde
    zintuigen als het brein — de acht straalafstanden en de richting van het doel.
    Elke tik kiest hij van de acht richtingen die met de hoogste score
@@ -2069,11 +2248,17 @@ function reactiefDir(){
   const w=S.world, ag=S.ag;
   const gx=w.goal.x-ag.x, gy=w.goal.y-ag.y;
   const gd=Math.hypot(gx,gy)||1e-6;
+  /* Op taak B moet de ijkagent net zo blind zijn als het brein, anders is hij geen
+     ondergrens meer maar een agent met een informatievoorsprong. Zodra het doel
+     verborgen is valt de aantrekkingsterm weg en blijft alleen het ontwijken over —
+     precies wat een geheugenloze agent met deze waarneming nog kan. Dezelfde regel
+     als het brein gebruikt, en niet een tweede opgeschreven versie ervan. */
+  const blind = !doelZichtbaar(S.step);
   let best=0, bs=-Infinity;
   for(let i=0;i<8;i++){
     const d=DIRV[i];
     const nabij=1-rayDist(ag.x,ag.y,d[0],d[1],w.obs)/RAY_MAX;
-    const s=(d[0]*gx+d[1]*gy)/gd - REACT_KAPPA*nabij*nabij;
+    const s=(blind?0:(d[0]*gx+d[1]*gy)/gd) - REACT_KAPPA*nabij*nabij;
     if(s>bs){ bs=s; best=i; }
   }
   return DIRV[best];
@@ -2603,7 +2788,10 @@ function buildResult(naamOverride){
       },
       startdichtheid:S.cfg.density, invoerAlleenViaSens:!!S.cfg.inputOnlySens,
       wereld:{obstakels:S.cfg.nObs, stappenPerPoging:S.cfg.maxSteps, nieuweWereldElke:S.cfg.worldEvery,
-        seed:S.cfg.seed, snelheidKarakter:S.cfg.chSpeed, stoptNaBotsing:S.cfg.stopOnCollide},
+        seed:S.cfg.seed, snelheidKarakter:S.cfg.chSpeed, stoptNaBotsing:S.cfg.stopOnCollide,
+        /* stap 12: de twee vormen van onzichtbaarheid; allebei 0 = altijd zichtbaar */
+        doelVerbergenNa:(S.cfg.goalHide|0), doelKnipperUit:(S.cfg.goalBlink|0),
+        doelKnipperAan:GOAL_VIS},
       leren:{leersnelheid:S.cfg.lr, sporenVervaging:S.cfg.lam, vervagingPerPoging:S.cfg.decay,
         maxGewicht:S.cfg.wmax, maxVeranderingPerStap:S.cfg.stepMax, geheugenlek:S.cfg.memLeak,
         propagatiestappen:S.cfg.prop, exploratieStart:S.cfg.noise0, exploratieEind:noiseEnd(S.cfg.noise0),
@@ -2639,6 +2827,9 @@ function buildResult(naamOverride){
       botsingenPerPoging:S.ep?S.collisions/S.ep:0, rekentijdMs:Math.round(S.elapsed),
       rekenkosten:rekenkosten()
     },
+    /* stap 12: de blinderingsproef. Null als hij niet gedraaid heeft — dat is geen
+       nul-horizon maar "niet gemeten", en dat verschil moet zichtbaar blijven. */
+    geheugen:S.lastMem||null,
     /* De vaste benchmarkset: per beleidsvorm het gemiddelde met een 95%-interval
        over de werelden, plus de uitslag per wereld. Die laatste maakt een gepaarde
        vergelijking tussen twee condities mogelijk — dezelfde werelden, dus veel
@@ -2825,6 +3016,12 @@ function applyCfgToUI(R){
   set("wmax",l.maxGewicht*10); set("stepmax",l.maxVeranderingPerStap*1000); set("memleak",l.geheugenlek*100);
   TRACE_OUD=!!l.oudeTrace; PERTURB_GAIN=+l.perturbatieVersterking||1;
   set("prop",l.propagatiestappen); set("noise",l.exploratieStart*100); chk("lranneal",l.leersnelheidMeeschalen);
+  /* stap 12 — ontbreekt het veld, dan komt het bestand van vóór de taakas en stond
+     het doel dus de hele poging aan */
+  set("goalhide",(w.doelVerbergenNa===undefined?0:w.doelVerbergenNa));
+  GOAL_HIDE=(w.doelVerbergenNa===undefined?0:w.doelVerbergenNa);
+  set("goalblink",(w.doelKnipperUit===undefined?0:w.doelKnipperUit));
+  GOAL_BLINK=(w.doelKnipperUit===undefined?0:w.doelKnipperUit);
   /* stap 7 — ontbreken deze velden, dan komt het bestand van vóór 10 september 2026
      en stond alles op de oude waarde; die staat hier dan ook als terugval. */
   chk("criticus",!!l.criticus); chk("catbeleid",(l.beleidsvorm||"bernoulli")==="categorisch");
@@ -2944,6 +3141,7 @@ function rekenkosten(){
 function clearRunState(){
   S.hist=[]; S.evalHist=[]; S.rewards=[]; S.stepsSucc=[]; S.succTotal=0; S.collisions=0;
   S.structLog=[]; S.ep=0; S.elapsed=0; S.selected=-1; S.lastBench=null; S.evalStreng=null;
+  S.lastMem=null;
   S.kbLeer=0; S.kbInf=0; S.stapLeer=0; S.stapInf=0;
 }
 
@@ -3002,7 +3200,11 @@ const CSV_COLS=["tijdstip","conditie","brein","breinZaad","wereldZaad","pogingen
      kolommen leeg; dat is niet hetzelfde als "stond uit", al kwam het daar in de
      praktijk op neer. `perturbGain` stond al wél in de resultaat-JSON maar nog niet
      in de tabel, en hoort er vanaf nu bij omdat het een conditie geworden is. */
-  "perturbGain","criticus","criticusLr","criticusGamma","perturbFrac","beleidsvorm"];
+  "perturbGain","criticus","criticusLr","criticusGamma","perturbFrac","beleidsvorm",
+  /* stap 12: de taakas. `goalHide` is het aantal stappen waarna de doelkanalen op
+     nul gaan (0 = taak A), en de drie geheugenmaten komen uit de blinderingsproef.
+     Runs van vóór 10 september 2026 hebben deze kolommen leeg. */
+  "goalHide","goalBlink","memHorizon","memCos","memCosBlind"];
 function csvCell(v){
   if(v===null||v===undefined) return "";
   if(typeof v==="boolean") return v?"1":"0";
@@ -3046,7 +3248,12 @@ function csvRow(r){
     criticusLr:(l.criticus?l.criticusLeersnelheid:null),
     criticusGamma:(l.criticus?l.criticusGamma:null),
     perturbFrac:(l.perturbatieFractie===undefined?1:l.perturbatieFractie),
-    beleidsvorm:(l.beleidsvorm||"bernoulli")
+    beleidsvorm:(l.beleidsvorm||"bernoulli"),
+    goalHide:(w.doelVerbergenNa===undefined?null:w.doelVerbergenNa),
+    goalBlink:(w.doelKnipperUit===undefined?null:w.doelKnipperUit),
+    memHorizon:(r.geheugen?r.geheugen.horizon:null),
+    memCos:(r.geheugen?r.geheugen.cosProef:null),
+    memCosBlind:(r.geheugen?r.geheugen.cosControle:null)
   };
   return CSV_COLS.map(k=>csvCell(v[k])).join(",");
 }
@@ -3070,6 +3277,8 @@ function runOne(cfg,brainSeed,naam){
   else S.evalStreng=null;
   /* En dan de meetlat waar het paper op steunt. */
   if(cfg.benchOn) runBenchmark(cfg.benchN,cfg.benchReps);
+  /* En de blinderingsproef: houdt de agent koers als de doelinformatie wegvalt? */
+  S.lastMem = cfg.memOn ? geheugenProef(cfg.memN,cfg.memBlind,cfg.memH) : null;
   const row=buildResult();
   row.conditie=naam;
   return row;
@@ -3294,6 +3503,8 @@ function initUI(){
   bindSlider("density","densval",v=>fmt(v/10,1));
   bindSlider("nobs","nobsval",v=>v);
   bindSlider("maxsteps","maxstepsval",v=>v);
+  bindSlider("goalhide","goalhideval",v=>+v===0?"nooit":v+" stappen");
+  bindSlider("goalblink","goalblinkval",v=>v);
   bindSlider("worldevery","worldeveryval",v=>v);
   bindSlider("chspeed","speedval",v=>fmt(v/10,1));
   bindSlider("seed","seedval",v=>v);
@@ -3500,6 +3711,8 @@ window.__brain={S,createBrain,analyze,makeWorld,readCfg,startTraining,stopTraini
   backpropDev,updateTracesExact,markLayers,rekenkosten,tempOf,hiddenNoiseOf,sigm,
   /* stap 7 */
   criticValue,criticUpdate,actCategorical,CAT_ACTIES,
+  /* stap 12 */
+  geheugenProef,memWorlds,MEM:{N:MEM_N,SEED0:MEM_SEED0,STRIDE:MEM_STRIDE,BLIND:MEM_BLIND,H:MEM_H,MARGE:MEM_MARGE},
   K:{K_IN,K_SENS,K_WORK,K_REFL,K_MEM,K_NEUT,K_OUT,HID0,OUT0,N_IN,N_OUT}};
 </script>
 </body>
