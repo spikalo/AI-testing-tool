@@ -3283,6 +3283,76 @@ function runOne(cfg,brainSeed,naam){
   row.conditie=naam;
   return row;
 }
+/* ======================= stap 13: één leven, meerdere omgevingen =======================
+   Waarom dit een aparte loper is en niet drie runs achter elkaar. Twee taken apart
+   trainen en de uitkomsten vergelijken bewijst niets over aanpassingsvermogen: een
+   vast net dat je apart op A en op B traint krijgt óók twee verschillende
+   gewichtssets, en niemand noemt dat zelforganisatie. Wat een vaste architectuur
+   principieel niet heeft, is de mogelijkheid om haar rekenstructuur te verbouwen
+   terwijl het leven doorloopt. Dat is alleen te meten in één doorlopend leven waarin
+   de omgeving omslaat zonder waarschuwing, zonder reset en zonder dat het brein
+   ergens te horen krijgt dat er iets veranderd is.
+
+   Wat er tussen de fasen wél en niet verandert:
+   - wél: de omgeving, via dezelfde overrides als elke andere conditie;
+   - niet: het brein, de gewichten, de sporen, de lopende basislijn, de wereldzaad-
+     reeks, en `nEpisodes`. Dat laatste is bewust: de exploratie loopt over het héle
+     leven terug en begint niet per fase opnieuw. Zou zij dat wel doen, dan kreeg
+     elke omslag er gratis een portie exploratiedrift bij en meet de hersteltijd
+     die portie in plaats van het aanpassingsvermogen.
+
+   Op elke fasegrens wordt gemeten, niet alleen aan het eind: een benchmark op de
+   taak van dat moment én op taak A. Die tweede is het behoud — hoeveel er van de
+   eerste vaardigheid nog over is nadat er iets anders geleerd is. Meten onderbreekt
+   het leven niet: benchBrain zet alles wat het aanraakt daarna weer terug. */
+function runLeven(cfg,brainSeed,fasen,naam,meet){
+  const M = meet || {};
+  S.cfg=cfg;
+  S.B=cfg.layered? createLayered(cfg,brainSeed) : createBrain(cfg,brainSeed);
+  clearRunState();
+  resetBrainState(S.B);
+  S.rnd=mulberry32(cfg.seed*7717+991);
+  S.startTime=performance.now();
+  newWorld(0); startEpisode();
+  const grenzen=[];
+  let tot=0;
+  for(const f of fasen){
+    const van=S.ep;
+    tot+=f.pogingen;
+    S.cfg=cfgOverride(S.cfg,f.ov||{});
+    while(S.ep<tot){ if(gameTick(true,noiseNow())) finishEpisode(); }
+    /* meten op de grens: de taak van dit moment, en taak A als maat voor behoud.
+       Eerst de toestand van het brein leegmaken, want benchBrain doet dat alleen
+       achteraf: zonder deze regel begint de eerste meting met de activaties van de
+       laatst gespeelde poging en de tweede met een lege toestand, en dan verschillen
+       twee metingen van dezelfde taak zonder dat er iets veranderd is. */
+    resetBrainState(S.B);
+    const hier=M.benchN? benchBrain("beleid",M.benchN,M.benchReps||1) : null;
+    const bewaardBlink=S.cfg.goalBlink, bewaardHide=S.cfg.goalHide;
+    S.cfg.goalBlink=0; S.cfg.goalHide=0;
+    const opA=M.benchN? benchBrain("beleid",M.benchN,M.benchReps||1) : null;
+    const geheugen=M.memN? geheugenProef(M.memN,M.memBlind,M.memH) : null;
+    S.cfg.goalBlink=bewaardBlink; S.cfg.goalHide=bewaardHide;
+    grenzen.push({fase:f.naam, vanPoging:van, totPoging:tot, ov:f.ov||{},
+      opEigenTaak: hier? {pct:hier.pct, ci:hier.ci} : null,
+      opTaakA: opA? {pct:opA.pct, ci:opA.ci} : null,
+      geheugenhorizon: geheugen? geheugen.horizon : null,
+      geheugenVoorsprong: geheugen? geheugen.voorsprong : null});
+  }
+  S.elapsed=performance.now()-S.startTime;
+  if(cfg.evalOn) S.evalStreng=evalWorlds(EVAL_WORLDS,"streng").pct; else S.evalStreng=null;
+  /* De rij in runs.csv beschrijft de eindtoestand op taak A: dat is de enige stand
+     die in élke fase voorkomt en dus de enige die over de fasen heen vergelijkbaar is. */
+  const bewaardBlink=S.cfg.goalBlink, bewaardHide=S.cfg.goalHide;
+  S.cfg.goalBlink=0; S.cfg.goalHide=0;
+  if(cfg.benchOn) runBenchmark(cfg.benchN,cfg.benchReps);
+  S.lastMem = cfg.memOn ? geheugenProef(cfg.memN,cfg.memBlind,cfg.memH) : null;
+  S.cfg.goalBlink=bewaardBlink; S.cfg.goalHide=bewaardHide;
+  const row=buildResult();
+  row.conditie=naam;
+  row.leven={fasen:grenzen, meetpunten:M};
+  return row;
+}
 function cfgOverride(base,ov){
   const c=JSON.parse(JSON.stringify(base));
   for(const k in ov){
@@ -3700,7 +3770,7 @@ function runHeadless(nEp,brainSeed,evalOn){
 }
 window.__brain={S,createBrain,analyze,makeWorld,readCfg,startTraining,stopTraining,runHeadless,genBrain,evalWorlds,
   canConnect,countKinds,restructure,buildResult,brainFromResult,applyCfgToUI,applyResult,repeatRun,
-  runOne,cfgOverride,runExperiments,csvRow,CSV_COLS,meanCI,mannWhitney,
+  runOne,runLeven,cfgOverride,runExperiments,csvRow,CSV_COLS,meanCI,mannWhitney,
   benchmarkWorlds,benchWorldSeed,playWorlds,benchBrain,benchReactief,runBenchmark,createLayered,
   reactiefDir,reactiefTick,moveAgent,rayDist,blocked,DIRV,
   BENCH:{N:BENCH_N,REPS:BENCH_REPS,SEED0:BENCH_SEED0,STRIDE:BENCH_STRIDE,OBS:BENCH_OBS,RNG:BENCH_RNG},

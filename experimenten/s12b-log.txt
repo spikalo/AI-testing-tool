@@ -1,0 +1,148 @@
+s12-ang-typeloos-b0  zaad 1000: benchmark 65.9%  horizon 12  cos -0.009 (blind 0.003)  (12s)
+s12-ang-typeloos-b0  zaad 1001: benchmark 39.3%  horizon  3  cos 0.034 (blind 0.053)  (14s)
+s12-ang-typeloos-b0  zaad 1002: benchmark 63.2%  horizon  6  cos 0.005 (blind 0.033)  (13s)
+s12-ang-typeloos-b0  zaad 1003: benchmark 66.0%  horizon  8  cos 0.017 (blind 0.027)  (12s)
+s12-ang-typeloos-b0  zaad 1004: benchmark 61.9%  horizon  5  cos 0.017 (blind 0.045)  (12s)
+s12-ang-typeloos-b0  zaad 1005: benchmark 63.7%  horizon  5  cos 0.017 (blind 0.044)  (12s)
+s12-ang-typeloos-b0  zaad 1006: benchmark 59.8%  horizon  6  cos 0.020 (blind 0.041)  (12s)
+s12-ang-typeloos-b0  zaad 1007: benchmark 56.6%  horizon  4  cos 0.039 (blind 0.064)  (12s)
+s12-ang-typeloos-b0  zaad 1008: benchmark 60.8%  horizon  8  cos 0.004 (blind 0.014)  (12s)
+s12-ang-typeloos-b0  zaad 1009: benchmark 62.9%  horizon  6  cos 0.036 (blind 0.050)  (12s)
+s12-ang-typeloos-b0  zaad 1010: benchmark 47.5%  horizon  6  cos 0.004 (blind 0.013)  (13s)
+s12-ang-typeloos-b0  zaad 1011: benchmark 54.1%  horizon  3  cos 0.065 (blind 0.092)  (12s)
+s12-ang-typeloos-b10 zaad 1000: benchmark 23.9%  horizon  9  cos 0.024 (blind 0.038)  (15s)
+s12-ang-typeloos-b10 zaad 1001: benchmark 7.2%  horizon  0  cos 0.067 (blind 0.076)  (15s)
+s12-ang-typeloos-b10 zaad 1002: benchmark 12.3%  horizon  4  cos 0.041 (blind 0.063)  (15s)
+s12-ang-typeloos-b10 zaad 1003: benchmark 21.1%  horizon  4  cos 0.040 (blind 0.068)  (14s)
+s12-ang-typeloos-b10 zaad 1004: benchmark 14.2%  horizon  4  cos 0.050 (blind 0.061)  (15s)
+s12-ang-typeloos-b10 zaad 1005: benchmark 18.5%  horizon  4  cos 0.052 (blind 0.073)  (14s)
+s12-ang-typeloos-b10 zaad 1006: benchmark 11.9%  horizon  4  cos 0.051 (blind 0.063)  (14s)
+s12-ang-typeloos-b10 zaad 1007: benchmark 11.9%  horizon  1  cos 0.062 (blind 0.071)  (14s)
+s12-ang-typeloos-b10 zaad 1008: benchmark 16.2%  horizon  6  cos 0.043 (blind 0.061)  (14s)
+s12-ang-typeloos-b10 zaad 1009: benchmark 18.3%  horizon  5  cos 0.052 (blind 0.059)  (14s)
+s12-ang-typeloos-b10 zaad 1010: benchmark 6.5%  horizon  1  cos 0.064 (blind 0.070)  (14s)
+s12-ang-typeloos-b10 zaad 1011: benchmark 17.1%  horizon  3  cos 0.068 (blind 0.091)  (14s)
+s12-ang-typeloos-b20 zaad 1000: benchmark 12.3%  horizon  6  cos 0.040 (blind 0.062)  (14s)
+s12-ang-typeloos-b20 zaad 1001: benchmark 8.0%  horizon  0  cos 0.072 (blind 0.087)  (14s)
+s12-ang-typeloos-b20 zaad 1002: benchmark 9.8%  horizon  4  cos 0.059 (blind 0.078)  (14s)
+s12-ang-typeloos-b20 zaad 1003: benchmark 11.7%  horizon  3  cos 0.059 (blind 0.077)  (14s)
+s12-ang-typeloos-b20 zaad 1004: benchmark 8.5%  horizon  3  cos 0.055 (blind 0.074)  (14s)
+s12-ang-typeloos-b20 zaad 1005: benchmark 10.5%  horizon  3  cos 0.064 (blind 0.079)  (14s)
+s12-ang-typeloos-b20 zaad 1006: benchmark 10.6%  horizon  4  cos 0.051 (blind 0.072)  (14s)
+s12-ang-typeloos-b20 zaad 1007: benchmark 10.4%  horizon  2  cos 0.063 (blind 0.082)  (14s)
+s12-ang-typeloos-b20 zaad 1008: benchmark 10.5%  horizon  3  cos 0.058 (blind 0.074)  (14s)
+s12-ang-typeloos-b20 zaad 1009: benchmark 6.7%  horizon  3  cos 0.054 (blind 0.070)  (14s)
+s12-ang-typeloos-b20 zaad 1010: benchmark 10.1%  horizon  0  cos 0.083 (blind 0.087)  (14s)
+s12-ang-typeloos-b20 zaad 1011: benchmark 12.5%  horizon  4  cos 0.066 (blind 0.084)  (14s)
+s12-ang-typeloos-b40 zaad 1000: benchmark 4.8%  horizon  3  cos 0.063 (blind 0.078)  (15s)
+s12-ang-typeloos-b40 zaad 1001: benchmark 3.4%  horizon  0  cos 0.083 (blind 0.085)  (15s)
+s12-ang-typeloos-b40 zaad 1002: benchmark 2.3%  horizon  3  cos 0.058 (blind 0.068)  (15s)
+s12-ang-typeloos-b40 zaad 1003: benchmark 6.6%  horizon  3  cos 0.066 (blind 0.080)  (14s)
+s12-ang-typeloos-b40 zaad 1004: benchmark 4.9%  horizon  0  cos 0.073 (blind 0.080)  (15s)
+s12-ang-typeloos-b40 zaad 1005: benchmark 6.1%  horizon  1  cos 0.074 (blind 0.086)  (14s)
+s12-ang-typeloos-b40 zaad 1006: benchmark 5.5%  horizon  0  cos 0.065 (blind 0.081)  (15s)
+s12-ang-typeloos-b40 zaad 1007: benchmark 5.1%  horizon  1  cos 0.080 (blind 0.087)  (14s)
+s12-ang-typeloos-b40 zaad 1008: benchmark 4.6%  horizon  0  cos 0.080 (blind 0.089)  (15s)
+s12-ang-typeloos-b40 zaad 1009: benchmark 6.1%  horizon  2  cos 0.066 (blind 0.078)  (14s)
+s12-ang-typeloos-b40 zaad 1010: benchmark 2.7%  horizon  0  cos 0.082 (blind 0.081)  (14s)
+s12-ang-typeloos-b40 zaad 1011: benchmark 7.5%  horizon  3  cos 0.082 (blind 0.089)  (14s)
+
+--- benchmark (geloot) over de taakas ---
+architectuur   A (uit 0)          B-10 (uit 10)      B-20 (uit 20)      B-40 (uit 40)      
+ang            65.6% ± 2.6        27.4% ± 6.1        9.9% ± 1.9         2.8% ± 1.0         
+ang-vast       67.5% ± 1.2        31.2% ± 5.2        13.7% ± 2.4        5.4% ± 1.5         
+mlp-16-bp      66.7% ± 0.6        65.2% ± 2.5        26.1% ± 2.0        14.5% ± 1.6        
+elman-16-bp    66.6% ± 1.5        77.8% ± 1.5        75.4% ± 3.5        39.8% ± 5.3        
+ang-typeloos   58.5% ± 4.5        14.9% ± 3.0        10.1% ± 1.0        5.0% ± 0.9         
+
+--- geheugenhorizon (stappen dat de agent koers houdt zonder doelinformatie) ---
+architectuur   A                  B-10               B-20               B-40               
+ang            25.25  (cos 0.05)  17.50  (cos 0.07)  7.50  (cos 0.09)   2.25  (cos 0.08)   
+ang-vast       16.33  (cos 0.03)  15.08  (cos 0.06)  8.08  (cos 0.07)   3.67  (cos 0.09)   
+mlp-16-bp      0.00  (cos -0.03)  0.00  (cos -0.04)  0.00  (cos -0.03)  0.00  (cos -0.00)  
+elman-16-bp    21.50  (cos 0.12)  43.33  (cos 0.21)  41.67  (cos 0.20)  29.25  (cos 0.16)  
+ang-typeloos   6.00  (cos 0.02)   3.75  (cos 0.05)   2.92  (cos 0.06)   1.33  (cos 0.07)   
+
+--- structuur: actieve verbindingen / lussen / geheugen-neuronen ---
+architectuur   A                  B-10               B-20               B-40               
+ang            1446 / 11.00 / 10.001499 / 11.00 / 10.001642 / 11.00 / 10.001285 / 11.00 / 10.00
+ang-vast       1287 / 6.92 / 5.92 1424 / 6.92 / 5.92 1278 / 6.92 / 5.92 1279 / 6.92 / 5.92 
+mlp-16-bp      196 / 0.00 / 0.00  202 / 0.00 / 0.00  230 / 0.00 / 0.00  248 / 0.00 / 0.00  
+elman-16-bp    401 / 14.50 / 0.00 406 / 15.92 / 0.00 401 / 16.25 / 0.00 411 / 16.58 / 0.00 
+ang-typeloos   1286 / 1.00 / 0.00 1997 / 1.00 / 0.00 1847 / 1.00 / 0.00 2255 / 1.00 / 0.00 
+
+--- herstructurering per run: gesnoeid / bijgegroeid / hertypeerd ---
+architectuur   A                  B-10               B-20               B-40               
+ang            879 / 300 / 53     888 / 300 / 49     803 / 300 / 46     1073 / 300 / 48    
+ang-vast       0 / 0 / 0          0 / 0 / 0          0 / 0 / 0          0 / 0 / 0          
+mlp-16-bp      0 / 0 / 0          0 / 0 / 0          0 / 0 / 0          0 / 0 / 0          
+elman-16-bp    0 / 0 / 0          0 / 0 / 0          0 / 0 / 0          0 / 0 / 0          
+ang-typeloos   839 / 300 / 46     779 / 300 / 44     835 / 300 / 42     771 / 300 / 44     
+
+--- Mann-Whitney binnen elke taakstand, Holm per maat ---
+A      benchBeleid  ang vs ang-vast              −1.9       p = 0.4357   Holm 1.0000   binnen de ruis
+A      benchBeleid  elman-16-bp vs mlp-16-bp     −0.1       p = 0.8852   Holm 1.0000   binnen de ruis
+A      benchBeleid  ang vs elman-16-bp           −1.0       p = 0.7075   Holm 1.0000   binnen de ruis
+A      benchBeleid  ang vs mlp-16-bp             −1.1       p = 0.7950   Holm 1.0000   binnen de ruis
+A      benchBeleid  ang-typeloos vs ang          −7.1       p = 0.0179   Holm 0.0179   significant
+A      memHorizon   ang vs ang-vast              +8.9       p = 0.1489   Holm 0.2978   binnen de ruis
+A      memHorizon   elman-16-bp vs mlp-16-bp     +21.5      p = 0.0000   Holm 0.0001   sterk
+A      memHorizon   ang vs elman-16-bp           +3.8       p = 0.8852   Holm 0.8852   binnen de ruis
+A      memHorizon   ang vs mlp-16-bp             +25.3      p = 0.0000   Holm 0.0001   sterk
+A      memHorizon   ang-typeloos vs ang          −19.3      p = 0.0005   Holm 0.0005   sterk
+B-10   benchBeleid  ang vs ang-vast              −3.8       p = 0.2145   Holm 0.2145   binnen de ruis
+B-10   benchBeleid  elman-16-bp vs mlp-16-bp     +12.6      p = 0.0000   Holm 0.0001   sterk
+B-10   benchBeleid  ang vs elman-16-bp           −50.3      p = 0.0000   Holm 0.0001   sterk
+B-10   benchBeleid  ang vs mlp-16-bp             −37.7      p = 0.0000   Holm 0.0001   sterk
+B-10   benchBeleid  ang-typeloos vs ang          −12.5      p = 0.0014   Holm 0.0014   sterk
+B-10   memHorizon   ang vs ang-vast              +2.4       p = 0.7075   Holm 0.7075   binnen de ruis
+B-10   memHorizon   elman-16-bp vs mlp-16-bp     +43.3      p = 0.0000   Holm 0.0001   sterk
+B-10   memHorizon   ang vs elman-16-bp           −25.8      p = 0.0007   Holm 0.0013   sterk
+B-10   memHorizon   ang vs mlp-16-bp             +17.5      p = 0.0000   Holm 0.0001   sterk
+B-10   memHorizon   ang-typeloos vs ang          −13.8      p = 0.0002   Holm 0.0002   sterk
+B-20   benchBeleid  ang vs ang-vast              −3.8       p = 0.0243   Holm 0.0243   significant
+B-20   benchBeleid  elman-16-bp vs mlp-16-bp     +49.2      p = 0.0000   Holm 0.0001   sterk
+B-20   benchBeleid  ang vs elman-16-bp           −65.5      p = 0.0000   Holm 0.0001   sterk
+B-20   benchBeleid  ang vs mlp-16-bp             −16.3      p = 0.0000   Holm 0.0001   sterk
+B-20   benchBeleid  ang-typeloos vs ang          +0.3       p = 0.8399   Holm 0.8399   binnen de ruis
+B-20   memHorizon   ang vs ang-vast              −0.6       p = 0.2482   Holm 0.2482   binnen de ruis
+B-20   memHorizon   elman-16-bp vs mlp-16-bp     +41.7      p = 0.0000   Holm 0.0001   sterk
+B-20   memHorizon   ang vs elman-16-bp           −34.2      p = 0.0001   Holm 0.0003   sterk
+B-20   memHorizon   ang vs mlp-16-bp             +7.5       p = 0.0020   Holm 0.0040   sterk
+B-20   memHorizon   ang-typeloos vs ang          −4.6       p = 0.6650   Holm 0.6650   binnen de ruis
+B-40   benchBeleid  ang vs ang-vast              −2.5       p = 0.0102   Holm 0.0102   significant
+B-40   benchBeleid  elman-16-bp vs mlp-16-bp     +25.3      p = 0.0000   Holm 0.0001   sterk
+B-40   benchBeleid  ang vs elman-16-bp           −37.0      p = 0.0000   Holm 0.0001   sterk
+B-40   benchBeleid  ang vs mlp-16-bp             −11.7      p = 0.0000   Holm 0.0001   sterk
+B-40   benchBeleid  ang-typeloos vs ang          +2.1       p = 0.0051   Holm 0.0051   sterk
+B-40   memHorizon   ang vs ang-vast              −1.4       p = 0.0496   Holm 0.0496   significant
+B-40   memHorizon   elman-16-bp vs mlp-16-bp     +29.3      p = 0.0000   Holm 0.0001   sterk
+B-40   memHorizon   ang vs elman-16-bp           −27.0      p = 0.0000   Holm 0.0001   sterk
+B-40   memHorizon   ang vs mlp-16-bp             +2.3       p = 0.0002   Holm 0.0003   sterk
+B-40   memHorizon   ang-typeloos vs ang          −0.9       p = 0.1572   Holm 0.1572   binnen de ruis
+
+--- interactie: groeit het verschil naarmate het doel eerder verdwijnt? ---
+ang − ang-vast         B-10   -1.9 pp bij A -> -3.8 pp   p = 0.3708   verschil valt binnen de ruis
+ang − ang-vast         B-20   -1.9 pp bij A -> -3.8 pp   p = 0.1939   verschil valt binnen de ruis
+ang − ang-vast         B-40   -1.9 pp bij A -> -2.5 pp   p = 0.6236   verschil valt binnen de ruis
+elman-16-bp − mlp-16-bp B-10   -0.1 pp bij A -> 12.6 pp   p = 0.0000   verschil is er echt
+elman-16-bp − mlp-16-bp B-20   -0.1 pp bij A -> 49.2 pp   p = 0.0000   verschil is er echt
+elman-16-bp − mlp-16-bp B-40   -0.1 pp bij A -> 25.3 pp   p = 0.0000   verschil is er echt
+ang − elman-16-bp      B-10   -1.0 pp bij A -> -50.3 pp   p = 0.0000   verschil is er echt
+ang − elman-16-bp      B-20   -1.0 pp bij A -> -65.5 pp   p = 0.0000   verschil is er echt
+ang − elman-16-bp      B-40   -1.0 pp bij A -> -37.0 pp   p = 0.0000   verschil is er echt
+ang − mlp-16-bp        B-10   -1.1 pp bij A -> -37.7 pp   p = 0.0000   verschil is er echt
+ang − mlp-16-bp        B-20   -1.1 pp bij A -> -16.3 pp   p = 0.0000   verschil is er echt
+ang − mlp-16-bp        B-40   -1.1 pp bij A -> -11.7 pp   p = 0.0001   verschil is er echt
+ang-typeloos − ang     B-10   -7.1 pp bij A -> -12.5 pp   p = 0.3708   verschil valt binnen de ruis
+ang-typeloos − ang     B-20   -7.1 pp bij A -> 0.3 pp   p = 0.0262   verschil is er echt
+ang-typeloos − ang     B-40   -7.1 pp bij A -> 2.1 pp   p = 0.0111   verschil is er echt
+
+--- Spearman met de benchmarkscore op de verborgen standen ---
+memHorizon     rho = 0.476   (n = 180)
+memCos         rho = 0.101   (n = 180)
+lussen         rho = 0.245   (n = 180)
+mem            rho = -0.395   (n = 180)
+reflexbogen    rho = -0.338   (n = 180)
+actief         rho = -0.555   (n = 180)
+pad            rho = –   (n = 180)

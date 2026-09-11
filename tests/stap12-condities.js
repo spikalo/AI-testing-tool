@@ -43,7 +43,20 @@ const ARCHITECTUREN = [
   { naam: 'mlp-16-bp', lr: 0.016, ov: { layered: true, layerSizes: [16], prop: 2, gradExact: true, ...VAST },
     rol: 'geheugenloos net met backprop — de controle dat de taak werkelijk geheugen vraagt' },
   { naam: 'elman-16-bp', lr: 0.008, ov: { layered: true, layerSizes: [16], prop: 2, recurrent: true, gradExact: true, ...VAST },
-    rol: 'vast recurrent net met echte terugpropagatie — de sterke basislijn' }
+    rol: 'vast recurrent net met echte terugpropagatie — de sterke basislijn' },
+
+  /* Stap 12b. De vier neuronsoorten zijn een ontwerpkeuze van mij, en stap 8 en 12
+     lieten zien dat zij aantoonbaar niets doen — het geheugen-neuron verliest zijn
+     geheugengedrag zelfs juist onder geheugendruk. De vraag of ze eruit kunnen is
+     geen smaakkwestie maar een meting: zet de drie gespecialiseerde soorten uit en
+     elk verborgen neuron is een worker, oftewel een vrij bedrade recurrente graaf
+     waarin alles met alles mag verbinden behalve met zichzelf. Plasticiteit blijft
+     áán, want de vraag is wat de soorten doen en niet wat de plasticiteit doet.
+     Drie uitkomsten, alle drie bruikbaar: beter (de soorten zijn een rem), gelijk
+     (decoratie) of slechter (ze doen voor het eerst iets). */
+  { naam: 'ang-typeloos', lr: 0.008,
+    ov: { 'types.sens.on': false, 'types.refl.on': false, 'types.mem.on': false },
+    rol: 'dezelfde wolk zonder gespecialiseerde soorten — alleen workers' }
 ];
 
 /* De leersnelheden komen uit de vegen van stap 6 en 7 en zijn dus op taak A gekozen.

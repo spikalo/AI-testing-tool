@@ -1,0 +1,19 @@
+uit 10  ang-typeloos lr 0.002   toets 16.7%   20 15 15
+uit 10  ang-typeloos lr 0.004   toets 31.7%   25 45 25
+uit 10  ang-typeloos lr 0.008   toets 31.7%   15 50 30
+uit 10  ang-typeloos lr 0.016   toets 28.3%   5 45 35
+   -> uit 10, ang-typeloos: 0.004 (was 0.008 op taak A), toets 31.7%
+
+uit 20  ang-typeloos lr 0.002   toets 16.7%   15 20 15
+uit 20  ang-typeloos lr 0.004   toets 18.3%   10 20 25
+uit 20  ang-typeloos lr 0.008   toets 20.0%   10 30 20
+uit 20  ang-typeloos lr 0.016   toets 10.0%   10 15 5
+   -> uit 20, ang-typeloos: 0.008 (was 0.008 op taak A), toets 20.0%
+
+uit 40  ang-typeloos lr 0.002   toets 1.7%   5 0 0
+uit 40  ang-typeloos lr 0.004   toets 13.3%   15 15 10
+uit 40  ang-typeloos lr 0.008   toets 11.7%   10 20 5
+uit 40  ang-typeloos lr 0.016   toets 6.7%   10 5 5
+   -> uit 40, ang-typeloos: 0.004 (was 0.008 op taak A), toets 13.3%
+
+geschreven: experimenten/lr-veeg-stap12.json

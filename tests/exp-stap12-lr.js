@@ -44,6 +44,10 @@ const gem = a => a.length ? a.reduce((x, y) => x + y, 0) / a.length : null;
   await p.goto('file://' + path.resolve('brein-test.html'));
   await p.waitForFunction(() => window.__brain && window.__brain.S.B);
 
+  /* Samenvoegen, niet overschrijven: een tweede aanroep voor een nieuwe architectuur
+     mag de keuzes van de eerste niet wissen. */
+  const uitPad = path.join(OUT, 'lr-veeg-stap12.json');
+  const bestaand = fs.existsSync(uitPad) ? JSON.parse(fs.readFileSync(uitPad, 'utf8')) : null;
   const uit = { uitgevoerd: new Date().toISOString(), knipperstanden: BLINKS, pogingen: NEP,
     raster: LR_GRID, veegzaden: [VEEG_SEED0, VEEG_N],
     toelichting: 'Per knipperstand apart gekozen, op de goedkope toets van twintig werelden en met ' +
@@ -52,8 +56,12 @@ const gem = a => a.length ? a.reduce((x, y) => x + y, 0) / a.length : null;
       'ANG dus conservatief maakt.',
     perStand: {}, keuze: {} };
 
+  if (bestaand) {
+    uit.perStand = bestaand.perStand || {}; uit.keuze = bestaand.keuze || {};
+    uit.eerdereRonde = bestaand.uitgevoerd;
+  }
   for (const BLINK of BLINKS) {
-    uit.perStand[BLINK] = {}; uit.keuze[BLINK] = {};
+    uit.perStand[BLINK] = uit.perStand[BLINK] || {}; uit.keuze[BLINK] = uit.keuze[BLINK] || {};
     for (const arch of ARCHITECTUREN) {
       if (!WIE.includes(arch.naam)) continue;
       const rij = [];
@@ -85,7 +93,7 @@ const gem = a => a.length ? a.reduce((x, y) => x + y, 0) / a.length : null;
     }
   }
 
-  fs.writeFileSync(path.join(OUT, 'lr-veeg-stap12.json'), JSON.stringify(uit, null, 2));
+  fs.writeFileSync(uitPad, JSON.stringify(uit, null, 2));
   console.log('geschreven: experimenten/lr-veeg-stap12.json');
   if (fouten.length) { console.error(fouten.join('\n')); process.exitCode = 1; }
   await b.close();

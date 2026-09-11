@@ -151,28 +151,38 @@ function holm(ps) {
 
   /* Binnen elke taakstand: de drie vergelijkingen die iets betekenen, per maat een
      familie met Holm-correctie. */
+  /* Twee families, en met opzet gescheiden. De kernfamilie beantwoordt de vraag van
+     stap 12 en stond er vanaf het begin in; de typefamilie is er in stap 12b bij
+     gekomen. Zou die erbij in dezelfde familie zitten, dan zouden alle eerder
+     gerapporteerde Holm-waarden verschuiven door een vraag die er niets mee te maken
+     heeft — en dan zou een latere toevoeging met terugwerkende kracht een eerdere
+     conclusie kunnen wegcorrigeren. */
   const PAREN = [
-    ['ang-vast', 'ang', 'wat structurele plasticiteit oplevert'],
-    ['mlp-16-bp', 'elman-16-bp', 'wat terugkoppeling oplevert'],
-    ['elman-16-bp', 'ang', 'ANG tegen een vast recurrent net met BPTT'],
-    ['mlp-16-bp', 'ang', 'ANG tegen een geheugenloos net met BPTT']
+    ['ang-vast', 'ang', 'wat structurele plasticiteit oplevert', 'kern'],
+    ['mlp-16-bp', 'elman-16-bp', 'wat terugkoppeling oplevert', 'kern'],
+    ['elman-16-bp', 'ang', 'ANG tegen een vast recurrent net met BPTT', 'kern'],
+    ['mlp-16-bp', 'ang', 'ANG tegen een geheugenloos net met BPTT', 'kern'],
+    ['ang', 'ang-typeloos', 'wat de vier neuronsoorten opleveren', 'types']
   ];
   const toetsen = [];
   for (const taak of TAAKAS) {
     for (const maat of ['benchBeleid', 'memHorizon']) {
-      const rij = [];
-      for (const [a, c, waarom] of PAREN) {
-        const na = naamVan(a, taak.blink), nc = naamVan(c, taak.blink);
-        if (!per[na] || !per[nc] || !per[na].length || !per[nc].length) continue;
-        const t = await mw(per[na].map(r => r[maat]), per[nc].map(r => r[maat]));
-        if (t) rij.push(Object.assign(t, { taak: taak.naam, goalBlink: taak.blink, maat, tegen: a, conditie: c, waarom }));
+      for (const groep of ['kern', 'types']) {
+        const rij = [];
+        for (const [a, c, waarom, g] of PAREN) {
+          if (g !== groep) continue;
+          const na = naamVan(a, taak.blink), nc = naamVan(c, taak.blink);
+          if (!per[na] || !per[nc] || !per[na].length || !per[nc].length) continue;
+          const t = await mw(per[na].map(r => r[maat]), per[nc].map(r => r[maat]));
+          if (t) rij.push(Object.assign(t, { taak: taak.naam, goalBlink: taak.blink, maat, tegen: a, conditie: c, waarom, groep }));
+        }
+        const hp = holm(rij.map(t => t.p));
+        rij.forEach((t, i) => {
+          t.familie = `${taak.naam}/${maat}/${groep}`; t.familiegrootte = rij.length; t.pHolm = hp[i];
+          t.oordeelHolm = hp[i] < 0.01 ? 'sterk' : hp[i] < 0.05 ? 'significant' : 'binnen de ruis';
+        });
+        toetsen.push(...rij);
       }
-      const hp = holm(rij.map(t => t.p));
-      rij.forEach((t, i) => {
-        t.familie = `${taak.naam}/${maat}`; t.familiegrootte = rij.length; t.pHolm = hp[i];
-        t.oordeelHolm = hp[i] < 0.01 ? 'sterk' : hp[i] < 0.05 ? 'significant' : 'binnen de ruis';
-      });
-      toetsen.push(...rij);
     }
   }
 
