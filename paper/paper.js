@@ -48,6 +48,8 @@ const REKEN = lees(path.join(EXPDIR, 'rekenkosten.json'));
 const LEERREGEL = lees(path.join(EXPDIR, 'leerregel.json'));
 const ABLATIE = lees(path.join(EXPDIR, 'ablatie.json'));
 const TAAKAS = lees(path.join(EXPDIR, 'taakas.json'));
+const OMSLAG = lees(path.join(EXPDIR, 'omslag.json'));
+const SGEDRAG = lees(path.join(EXPDIR, 'structuurgedrag.json'));
 function stat(xs) {
   const v = xs.filter(x => typeof x === 'number' && isFinite(x));
   const n = v.length; if (!n) return null;
@@ -62,12 +64,13 @@ const num = (x, d = 0) => x === null ? '–' : x.m.toFixed(d) + ' ± ' + x.ci.to
 const kol = k => RUNS ? RUNS.map(r => r[k]) : [];
 /* een gemiddelde-met-interval uit benchmark.json in dezelfde vorm als stat() */
 const bm = o => o ? { n: o.n, m: o.m, sd: o.sd, ci: o.ci, min: o.m, max: o.m } : null;
-const VERSIE = TAAKAS ? '1.8' : ABLATIE ? '1.7' : LEERREGEL ? '1.6' : '1.5';
+const VERSIE = SGEDRAG ? '2.0' : OMSLAG ? '1.9' : TAAKAS ? '1.8' : ABLATIE ? '1.7' : LEERREGEL ? '1.6' : '1.5';
 /* De twee laatste secties schuiven mee met wat er gemeten is, zodat een verwijzing in
    de tekst nooit naar een verkeerd nummer wijst. */
-const SEC_HIERNA = TAAKAS ? '10.9' : ABLATIE ? '10.8' : '10.7';
-const SEC_VRAAG = TAAKAS ? '10.10' : ABLATIE ? '10.9' : '10.8';
-const DATUM = '10 september 2026';
+const SEC_OMSLAG = '10.9', SEC_SG = OMSLAG ? '10.10' : '10.9';
+const SEC_HIERNA = SGEDRAG ? (OMSLAG ? '10.11' : '10.10') : OMSLAG ? '10.10' : TAAKAS ? '10.9' : ABLATIE ? '10.8' : '10.7';
+const SEC_VRAAG = SGEDRAG ? (OMSLAG ? '10.12' : '10.11') : OMSLAG ? '10.11' : TAAKAS ? '10.10' : ABLATIE ? '10.9' : '10.8';
+const DATUM = '15 september 2026';
 const SERIF = 'Cambria';
 const TEXTW_PT = 448;              // bruikbare tekstbreedte in punten
 const INK = '1A1D21', DIM = '55606B', ACC = '1F5C73';
@@ -232,10 +235,13 @@ C.push(new Paragraph({
        vergelijking die het niet wint — sectie 10.5 laat zien wat lokaal leren kost.
        Wat dit document werkelijk levert is een grens: tot waar is structurele
        plasticiteit opgerekt, en waar houdt het op. */
-    text: TAAKAS
-      ? 'Wanneer betaalt structurele plasticiteit zich terug? Een gecontroleerde grens '
-        + 'en een functionele geheugenmaat'
-      : 'Een zelfstructurerend neuraal netwerk zonder lagen en zonder backpropagation',
+    text: OMSLAG
+      ? 'Wanneer betaalt structurele plasticiteit zich terug? Een gecontroleerde grens, '
+        + 'een functionele geheugenmaat en een aanwijsbare oorzaak'
+      : TAAKAS
+        ? 'Wanneer betaalt structurele plasticiteit zich terug? Een gecontroleerde grens '
+          + 'en een functionele geheugenmaat'
+        : 'Een zelfstructurerend neuraal netwerk zonder lagen en zonder backpropagation',
     font: SERIF, size: 26, color: ACC
   })]
 }));
@@ -313,7 +319,16 @@ C.push(new Paragraph({
         'is: dezelfde getrainde agent speelt dezelfde wereld twee keer, één keer met en één keer zonder ' +
         'dat hij het doel ooit gezien heeft, en de horizon is het aantal stappen dat de eerste de tweede ' +
         'blijft verslaan op koers. Wat die as oplevert staat in sectie 10.8 en het is geen bevestiging ' +
-        'van de hypothese waarmee dit werk begon.' : 'De as van waarneembaarheid volgt in een latere versie.')
+        'van de hypothese waarmee dit werk begon.' : 'De as van waarneembaarheid volgt in een latere versie.') +
+      (OMSLAG ? ' Ten slotte wordt de laatste aanspraak gemeten die een vaste architectuur principieel niet ' +
+        'kan waarmaken: één doorlopend leven waarin de omgeving twee keer omslaat zonder waarschuwing. De ' +
+        'vrije graaf herstelt daarin niet sneller dan dezelfde graaf met bevroren structuur. Belangrijker ' +
+        'dan dat negatieve resultaat is de oorzaak, want die is aanwijsbaar: de herstructurering piekt niet ' +
+        'na een omslag maar loopt op een vaste klok' +
+        (SGEDRAG ? ', en waar zij wél op een signaal reageert is dat de stagnatie van het eigen leren en ' +
+          'niet een verandering in de omgeving' : '') + '. Een mechanisme dat de omslag niet waarneemt kan ' +
+        'er niet op reageren, en daarmee gaat de negatieve bevinding niet over structurele plasticiteit als ' +
+        'idee maar over deze aansturing ervan — een uitspraak die te repareren en opnieuw te toetsen valt.' : '')
   })]
 }));
 C.push(new Paragraph({
@@ -1325,7 +1340,11 @@ C.push(body(
   'referentiemeting daarop en de reproduceerbaarheidscontrole, en sectie 3.11 de numerieke controle van de ' +
   'leerregel zelf' +
   (ABLATIE ? '; sectie 10.4 tot en met 10.7 bevatten de basislijnen, de rekenkostentabel, de varianten van ' +
-    'de leerregel en de ablatiereeks.' : '; de ablaties en de basislijnen volgen in een latere versie.')
+    'de leerregel en de ablatiereeks.' : '; de ablaties en de basislijnen volgen in een latere versie.') +
+  (TAAKAS ? ' Sectie 10.8 varieert vervolgens de waarneembaarheid van de omgeving' +
+    (OMSLAG ? ', sectie ' + SEC_OMSLAG + ' laat de omgeving binnen één leven omslaan' : '') +
+    (SGEDRAG ? ', en sectie ' + SEC_SG + ' stelt vier vragen aan al dat materiaal samen zonder nieuwe ' +
+      'metingen te doen' : '') + '.' : '')
 ));
 C.push(h2('10.1', 'Twee meetassen'));
 C.push(body(
@@ -2388,6 +2407,389 @@ if (TAAKAS && TAAKAS.tabel) {
         'correlatie; correlatie en ablatie samen zeggen meer dan elk apart, en een correlatie binnen één ' +
         'architectuur is de volgende stap.')
     ]));
+    if (SGEDRAG && SGEDRAG.deel1) C.push(body([
+      bd('Dat voorbehoud is inmiddels gemeten, en het was terecht. '),
+      t('Sectie ' + SEC_SG + ' herhaalt deze correlaties binnen alleen de ang-runs van deze as — dezelfde ' +
+        'architectuur, alleen de taakstand verschilt — en daar valt het grootste verband grotendeels weg: ' +
+        'wat hier als een stevige samenhang oogt, is voor een flink deel de taakstand die zowel de structuur ' +
+        'als de score meebeweegt. De tabel hierboven blijft dus staan als beschrijving van deze verzameling ' +
+        'runs, maar zij mag niet als bewijs voor een structuur-gedragrelatie gelezen worden, ook niet in de ' +
+        'regels waar het teken toevallig klopt.')
+    ]));
+  }
+  C.push(gap(60));
+}
+
+/* --- 10.9: de omslagproef -------------------------------------------------------
+   Volledig uit experimenten/omslag.json. Sectie 10.8 traint elke architectuur apart
+   op elke stand en vergelijkt eindprestaties; daarmee valt over aanpassen niets te
+   zeggen, want een vast net dat je apart op twee taken traint krijgt óók twee
+   gewichtssets. Deze sectie meet het enige dat een vaste architectuur principieel
+   niet heeft: de rekenstructuur verbouwen terwijl het leven doorloopt. */
+if (OMSLAG && OMSLAG.tabel) {
+  const T = OMSLAG.tabel, TT = OMSLAG.toetsen || [], CT = OMSLAG.churnToetsen || [];
+  const CN = Object.keys(OMSLAG.condities || {});
+  const an = {
+    'ang': 'ANG, met structurele plasticiteit',
+    'ang-vast': 'ANG, structuur bevroren',
+    'ang-geensnoei': 'ANG, wel plasticiteit maar niet snoeien',
+    'mlp-16-bp': 'vast net zonder terugkoppeling, backprop',
+    'elman-16-bp': 'vast recurrent net, backprop door de tijd'
+  };
+  const r = c => T['s13-' + c];
+  const ts = (conditie, tegen, maat) => TT.find(x => x.conditie === conditie && x.tegen === tegen && x.maat === maat);
+  const pT = o => o ? (o.p < 0.001 ? 'p < 0.001' : 'p = ' + o.p.toFixed(3)) : '–';
+  const pH = o => o ? (o.pHolm < 0.001 ? '< 0.001' : o.pHolm.toFixed(3)) : '–';
+  const pK = p => p === null || p === undefined ? '–' : (p < 0.001 ? 'p < 0.001' : 'p = ' + p.toFixed(3));
+  const g1 = x => (x === null || x === undefined) ? '–' : x.m.toFixed(1);
+  const pp = x => (x === null || x === undefined) ? '–' : (100 * x.m).toFixed(1);
+  /* Een zin als "verliest X procentpunt" mag het teken niet nóg een keer dragen, en
+     moet iets anders zeggen zodra de waarde de andere kant op wijst. */
+  const absPp = x => (x === null || x === undefined) ? '–' : Math.abs(100 * x.m).toFixed(1);
+  const verliesZin = x => (x === null || x === undefined) ? '–'
+    : x.m < -0.005 ? absPp(x) + ' procentpunt verliest'
+      : x.m > 0.005 ? 'er ' + absPp(x) + ' procentpunt bij wint'
+        : 'er niets van verliest';
+  const F = OMSLAG.fasen || [], OM = OMSLAG.omslagpogingen || [];
+  const TOT = F.reduce((a, f) => a + f.pogingen, 0);
+  const MID = F[1] && F[1].ov ? F[1].ov.goalBlink : 20;
+  const HR = OMSLAG.herstelregel || {};
+  const gecens = CN.reduce((a, c) => a + ((r(c) && r(c).gecensureerd) || 0), 0);
+  const nLevens = CN.reduce((a, c) => a + ((r(c) && r(c).runs) || 0), 0);
+
+  C.push(h2(SEC_OMSLAG, 'De omslagproef: een omslag binnen één leven'));
+  C.push(body(
+    'Sectie 10.8 traint elke architectuur apart op elke stand van de as en vergelijkt eindprestaties. Over ' +
+    'aanpassingsvermogen zegt dat niets: een vast netwerk dat je apart op twee taken traint krijgt óók twee ' +
+    'verschillende gewichtssets. Wat een vaste architectuur principieel niet heeft, is de mogelijkheid haar ' +
+    'rekenstructuur te verbouwen terwijl het leven doorloopt — en na de secties 10.4 tot en met 10.8 is dat ' +
+    'het laatste argument voor dit model dat nog niet gemeten was. Deze sectie meet het, in de enige opzet ' +
+    'waarin het meetbaar is: één doorlopend leven van ' + TOT + ' pogingen waarin de omgeving twee keer ' +
+    'omslaat, zonder waarschuwing, zonder reset, en zonder dat het brein te horen krijgt dat er iets ' +
+    'veranderd is.'
+  ));
+  C.push(tbl(['pogingen', 'omgeving'],
+    F.map((f, i) => [
+      (i === 0 ? '0' : String(OM[i - 1])) + '–' + String(OM[i] !== undefined ? OM[i] - 1 : TOT - 1),
+      f.ov && f.ov.goalBlink ? 'het doel knippert: 10 stappen zichtbaar, ' + f.ov.goalBlink + ' stappen niet'
+        : 'het doel is altijd zichtbaar'
+    ]),
+    [2400, 7272]));
+  C.push(body([
+    t('Het brein, de gewichten, de sporen, de lopende basislijn en de exploratieafbouw lopen over alle drie ' +
+      'de fasen door; alleen de omgeving schakelt. De exploratie loopt over het '), it('héle'),
+    t(' leven terug en begint niet per fase opnieuw — zou zij dat wel doen, dan kreeg elke omslag er gratis ' +
+      'een portie exploratiedrift bij en zou de hersteltijd die portie meten in plaats van het ' +
+      'aanpassingsvermogen. Om dezelfde reden schakelt ook de leersnelheid niet mee: het brein weet niet dat ' +
+      'de omgeving omslaat, dus mag de afstelling dat ook niet weten. Dat ANG de middenfase niet gaat ' +
+      'beheersen is uit sectie 10.8 al bekend en is hier geen bezwaar: de middenfase is een verstoring, en ' +
+      'de vraag is hoe het systeem ermee omgaat en ervan herstelt — niet of het haar leert.')
+  ]));
+  C.push(body([
+    bd('Vooraf vastgelegd. '),
+    t('De fasen, de condities en vijf voorspellingen met een uitgeschreven waar- én onwaar-tak staan in de ' +
+      'repository, gecommit vóórdat de eerste run gedraaid had. Dat is hier extra nodig, want dit is de ' +
+      'laatste meting waarin het model nog iets kon laten zien wat een vaste architectuur niet heeft — en ' +
+      'juist dan is de verleiding het grootst om achteraf een gunstige lezing te kiezen. ' +
+      (OMSLAG.voorspellingen ? 'Alle voorspellingen kwamen uit in hun onwaar-tak.' : ''))
+  ]));
+  C.push(h3('Het leven in vier meetpunten'));
+  C.push(tbl(
+    ['conditie', 'einde A1', 'op B tijdens B', 'op A tijdens B', 'einde A2'],
+    CN.map(c => [an[c] || c, pct(r(c) && r(c).aEind1), pct(r(c) && r(c).bScore),
+      pct(r(c) && r(c).aEind2), pct(r(c) && r(c).aEind3)]),
+    [2472, 1800, 1800, 1800, 1800]));
+  C.push(body([
+    bd('Hoe hersteltijd gedefinieerd is. '),
+    t('Het plateau van de eerste fase is het gemiddelde succes over de laatste ' + (HR.plateauVenster || 50) +
+      ' pogingen van die fase. Hersteld heet een leven op de eerste poging ná de terugslag waar dat succes ' +
+      'weer boven ' + Math.round(100 * (HR.drempel || 0.95)) + ' % van dat plateau ligt. Wordt dat binnen de ' +
+      'derde fase niet gehaald, dan is de waarneming gecensureerd: zij krijgt in de rangtoets een waarde ' +
+      'boven alles wat wél hersteld is en telt in geen enkel gemiddelde mee. ' +
+      (gecens === 0
+        ? 'In deze reeks is dat niet voorgekomen — alle ' + nLevens + ' levens herstellen binnen de derde fase, ' +
+          'er is dus niets gecensureerd.'
+        : 'In deze reeks zijn ' + gecens + ' van de ' + nLevens + ' levens gecensureerd.'))
+  ]));
+  C.push(tbl(
+    ['conditie', 'hersteltijd (pogingen)', 'behoud (procentpunt)', 'terugwinst (procentpunt)'],
+    CN.map(c => [an[c] || c, g1(r(c) && r(c).hersteltijd), pp(r(c) && r(c).behoud), pp(r(c) && r(c).terugwinst)]),
+    [3272, 2200, 2100, 2100]));
+  C.push(body([
+    t('Behoud is wat er van taak A over is na de knipperfase: de benchmark op A aan het eind van fase B min ' +
+      'die aan het eind van fase A1. Negatief is vergeten. Terugwinst is waar het leven aan het eind staat ' +
+      'ten opzichte van vóór de omslag.')
+  ]));
+  {
+    const v1 = ts('ang', 'ang-vast', 'hersteltijd');
+    const v3 = ts('ang', 'ang-vast', 'behoud');
+    const v4 = ts('ang-geensnoei', 'ang', 'hersteltijd');
+    const v5 = ts('ang', 'elman-16-bp', 'hersteltijd');
+    C.push(h3('Wat de proef laat zien'));
+    C.push(body([
+      bd('1. Er is geen herstelvoordeel. '),
+      t('De vergelijking die de vraag beantwoordt is ANG tegen dezelfde graaf met bevroren structuur: ' +
+        g1(r('ang') && r('ang').hersteltijd) + ' tegen ' + g1(r('ang-vast') && r('ang-vast').hersteltijd) +
+        ' pogingen' + (v1 ? ' (' + pT(v1) + ', na Holm ' + pH(v1) + ')' : '') + ' — en het verschil wijst ' +
+        'niet eens de goede kant op. Structurele plasticiteit levert ook bij een omslag binnen één leven ' +
+        'geen aantoonbare aanpassingssnelheid op. Daarmee strekt de conclusie van sectie 10.8 zich uit tot ' +
+        'niet-stationaire omgevingen.')
+    ]));
+    {
+      const angC = CT.filter(x => x.conditie === 'ang');
+      const omlaag = CT.filter(x => x.tekentoets && x.tekentoets.p < 0.05 && x.verschil && x.verschil.m < 0);
+      C.push(body([
+        bd('2. De herstructurering piekt niet na een omslag — en dit is de bevinding. '),
+        t('Als plasticiteit ergens moet aanslaan, dan in de vijftig pogingen nadat de omgeving verandert. ' +
+          'Gemeten wordt het tegendeel: het aantal herstructureringsgebeurtenissen per poging bij ANG gaat ' +
+          angC.map(x => x.voor.m.toFixed(2).replace('.', ',') + ' → ' + x.na.m.toFixed(2).replace('.', ',') +
+            ' rond poging ' + x.omslag + ' (' + x.tekentoets.positief + ' van ' + x.tekentoets.n +
+            ' zaden omhoog, ' + pK(x.tekentoets.p) + ')').join(' en ') + '. ' +
+          (omlaag.length
+            ? 'Bij één conditie gaat de activiteit rond de tweede omslag zelfs aantoonbaar omláág (' +
+              omlaag.map(x => x.conditie + ', ' + pK(x.tekentoets.p)).join('; ') + '). '
+            : '') +
+          'De herstructurering loopt op een vaste klok en merkt niet dat de omgeving verandert. Dat is de ' +
+          'nuttigste uitkomst van deze sectie, want zij verklaart alle andere: een mechanisme dat verbouwt ' +
+          'op een klok kan per constructie niet reageren op een omslag die het niet waarneemt. De vraag is ' +
+          'daarmee niet langer "levert structurele plasticiteit iets op?" maar "levert '),
+        it('deze'), t(' aansturing van structurele plasticiteit iets op?" — en dat is een vraag met een ' +
+          'aanwijsbaar en herstelbaar antwoord.')
+      ]));
+    }
+    C.push(body([
+      bd('3. Het vergeten zit niet in de plasticiteit, maar het zit er wel. '),
+      t('ANG verliest tijdens de knipperfase ' + absPp(r('ang') && r('ang').behoud) + ' procentpunt van taak ' +
+        'A, en de bevroren variant ' + absPp(r('ang-vast') && r('ang-vast').behoud) + ' procentpunt' +
+        (v3 ? ' (' + pT(v3) + ')' : '') + ': het verbouwen maakt het vergeten niet erger. Maar beide ' +
+        'ANG-varianten verliezen ruim tien procentpunt, terwijl het geheugenloze vaste net ' +
+        verliesZin(r('mlp-16-bp') && r('mlp-16-bp').behoud) + ' en het recurrente net ' +
+        verliesZin(r('elman-16-bp') && r('elman-16-bp').behoud) + '. De interferentie is dus een eigenschap ' +
+        'van de leerregel en de graaf, niet van de structurele plasticiteit.')
+    ]));
+    C.push(body([
+      bd('4. Het snoeien is vrijgesproken. '),
+      t('De voor de hand liggende verdachte uit sectie 10.8 was het snoeien: dat gooit tijdens de moeilijke ' +
+        'fase capaciteit weg die daarna terug moet groeien. Zonder snoeien herstelt het leven in ' +
+        g1(r('ang-geensnoei') && r('ang-geensnoei').hersteltijd) + ' pogingen, tegen ' +
+        g1(r('ang') && r('ang').hersteltijd) + ' pogingen mét snoeien' + (v4 ? ' (' + pT(v4) + ')' : '') +
+        ' — het verschil valt binnen de ruis. Het verlies zit niet in het snoeien.')
+    ]));
+    C.push(body([
+      bd('5. De vaste netten herstellen sneller omdat zij niets kwijtraakten. '),
+      t('Het vaste recurrente net herstelt in ' + g1(r('elman-16-bp') && r('elman-16-bp').hersteltijd) +
+        ' pogingen tegen ' + g1(r('ang') && r('ang').hersteltijd) + ' voor ANG' +
+        (v5 ? ' (' + pT(v5) + ', na Holm ' + pH(v5) + ')' : '') + ', en dat getal betekent iets anders dan ' +
+        'het lijkt. Datzelfde net haalt ' + pct(r('elman-16-bp') && r('elman-16-bp').bScore) +
+        ' tijdens de knipperfase zelf en ' + pct(r('elman-16-bp') && r('elman-16-bp').aEind2) +
+        ' op taak A tijdens die fase: voor hem is de omslag geen verstoring. Hersteltijd meet daar de ' +
+        'afwezigheid van een verstoring en niet de snelheid van aanpassing. Hetzelfde geldt in zwakkere ' +
+        'vorm voor het geheugenloze net, dat de knipperfase niet kan maar er ook niets door verliest. Dat ' +
+        'maakt de getallen niet ongeldig, maar het bepaalt wel wat je ermee mag beweren.')
+    ]));
+  }
+  C.push(body([
+    bd('Eén ding moet erbij, en het werkt in het voordeel van ANG. '),
+    t('Het plateau van de eerste fase is niet uitgeleerd: ANG staat daar na ' + (F[0] ? F[0].pogingen : 300) +
+      ' pogingen op ' + pct(r('ang') && r('ang').aEind1) + ', terwijl sectie 10.8 na 500 pogingen op een ' +
+      'hogere waarde uitkomt. De hersteldrempel ligt daardoor lager dan het uiteindelijke kunnen, en de ' +
+      'derde fase profiteert van leren dat sowieso nog liep — zichtbaar in de positieve terugwinst. Dat ' +
+      'werkt in het voordeel van ANG, en ANG wint er nog steeds niets mee; de negatieve conclusie van deze ' +
+      'sectie is dus conservatief. Bij de vaste netten werkt het de andere kant op: die waren al uitgeleerd ' +
+      'en zakken over het leven licht weg.')
+  ]));
+  C.push(gap(60));
+}
+
+/* --- 10.10: structuur tegen gedrag ----------------------------------------------
+   Volledig uit experimenten/structuurgedrag.json. Deze sectie meet niets nieuws: zij
+   stelt vier vragen aan de metingen die er al liggen, en die vragen konden binnen de
+   afzonderlijke secties niet gesteld worden. De eerste is een zelfcorrectie op
+   sectie 10.8. */
+if (SGEDRAG) {
+  const D1 = SGEDRAG.deel1, D2 = SGEDRAG.deel2, D3 = SGEDRAG.deel3, D4 = SGEDRAG.deel4;
+  const rho = x => (x === null || x === undefined) ? 'geen variatie' : x.toFixed(2);
+  const g2 = (x, d = 1) => (x === null || x === undefined) ? '–' : x.m.toFixed(d);
+  const pK = p => p === null || p === undefined ? '–' : (p < 0.001 ? 'p < 0.001' : 'p = ' + p.toFixed(3));
+  /* kleine telwoorden horen in lopende tekst voluit */
+  const TW = ['nul', 'één', 'twee', 'drie', 'vier', 'vijf', 'zes', 'zeven', 'acht', 'negen', 'tien',
+    'elf', 'twaalf', 'dertien', 'veertien', 'vijftien', 'zestien'];
+  const woord = n => (Number.isInteger(n) && n >= 0 && n < TW.length) ? TW[n] : String(n);
+  const opsom = a => a.length < 2 ? (a[0] || '') : a.slice(0, -1).join(', ') + ' en ' + a[a.length - 1];
+
+  C.push(h2(SEC_SG, 'Structuur tegen gedrag, over alle metingen heen'));
+  C.push(body(
+    'Alle voorgaande secties meten één reeks tegelijk. Deze sectie doet iets anders: zij stelt vier vragen ' +
+    'aan het materiaal dat er na de secties 10.7 tot en met ' + SEC_OMSLAG + ' al ligt — 128 runs met bekende ' +
+    'structurele ingrepen, 240 runs over een taakas, en zestig levens met twee omslagen — zonder ook maar ' +
+    'één run opnieuw te draaien. Dat maakt deze sectie exploratief: de vragen zijn ná de metingen gesteld, ' +
+    'niet ervoor, en er staan dan ook geen p-waarden bij de correlaties. Waar zij toe dient is iets anders ' +
+    'dan bevestiging, namelijk de vraag of de structuurmaten van sectie 6 überhaupt iets over gedrag zeggen.'
+  ));
+  if (D1 && D1.gepoold) {
+    const STANDEN = Object.keys(D1.perStand || {});
+    const kort = { 'verbindingen': 'verbindingen', 'actieveVerbindingen': 'actieve verbindingen',
+      'neuronenEind': 'neuronen', 'kortstePad': 'kortste pad', 'lussen': 'lussen',
+      'reflexbogen': 'reflexbogen', 'mem': 'geheugen-neuronen', 'gesnoeid': 'gesnoeid',
+      'bijgegroeid': 'bijgegroeid', 'typeVeranderingen': 'hertyperingen' };
+    const sleutels = Object.keys(D1.gepoold).filter(k => k.endsWith('~benchBeleid'));
+    const varieert = sleutels.filter(k => D1.gepoold[k].rho !== null);
+    const constant = sleutels.filter(k => D1.gepoold[k].rho === null).map(k => kort[k.split('~')[0]] || k.split('~')[0]);
+    C.push(h3('Correleert structuur met gedrag binnen één architectuur?'));
+    C.push(body([
+      t('De correlatietabel aan het eind van sectie 10.8 loopt over vier architecturen tegelijk, en het ' +
+        'voorbehoud daarbij was dat zij vooral meet wélke architectuur een run is. Die tabel is hier ' +
+        'herhaald binnen alleen de ang-runs van diezelfde as: ' + D1.n + ' runs, één architectuur, ' +
+        'alleen de taakstand verschilt. En omdat een correlatie over vier taakstanden precies hetzelfde ' +
+        'euvel kan hebben — de stand beweegt zowel de structuur als de score mee — staat elke stand er ook ' +
+        'afzonderlijk naast.')
+    ]));
+    C.push(tbl(
+      ['structuurmaat tegen benchmarkscore', 'gepoold'].concat(STANDEN.map(s => s.replace('s12-ang-b', 'b '))),
+      varieert.map(k => [kort[k.split('~')[0]] || k.split('~')[0], rho(D1.gepoold[k].rho)]
+        .concat(STANDEN.map(s => rho(D1.perStand[s][k] ? D1.perStand[s][k].rho : null)))),
+      [3072, 1400, 1300, 1300, 1300, 1300]));
+    C.push(body([
+      bd('Het voorbehoud was terecht, en de omvang ervan is het vermelden waard. '),
+      t('De sterkste gepoolde samenhang — het aantal verbindingen tegen de benchmarkscore, ' +
+        rho(D1.gepoold['verbindingen~benchBeleid'].rho) + ' — houdt binnen de afzonderlijke standen geen ' +
+        'stand: daar loopt hij van ' +
+        (() => { const v = STANDEN.map(s => D1.perStand[s]['verbindingen~benchBeleid'].rho).filter(x => x !== null);
+          return rho(Math.min(...v)) + ' tot ' + rho(Math.max(...v)); })() +
+        ', en het teken wisselt. Een gepoolde correlatie over standen meet hier dus grotendeels dat een ' +
+        'makkelijker stand zowel meer verbindingen als een hogere score oplevert, en niet dat meer ' +
+        'verbindingen iets voorspellen. Dat is dezelfde fout als de architectuurfout uit sectie 10.8, één ' +
+        'niveau lager, en zij is precies daarom hier opgeschreven: het is de fout die dit type tabel vanzelf ' +
+        'maakt als niemand hem uitsplitst.')
+    ]));
+    if (constant.length) C.push(body([
+      bd('Vier structuurmaten hebben geen variatie om mee te correleren. '),
+      t('Over alle ' + D1.n + ' runs heen — twaalf breinzaden, vier taakstanden — zijn ' +
+        opsom(constant) + ' in elke run identiek. Dat is geen meetfout maar een eigenschap van het ' +
+        'model: deze maten liggen vast aan de architectuur en de startconfiguratie, niet aan de taak en ' +
+        'niet aan het toeval van het zaad. Voor sectie 6 betekent dat iets ongemakkelijks. Een structuurmaat ' +
+        'die onder geen enkele omgevingsdruk beweegt, kan geen verklaring zijn voor gedrag dat wél beweegt.')
+    ]));
+  }
+  if (D2 && D2.perConditie) {
+    const CN2 = Object.keys(D2.perConditie).filter(c => D2.perConditie[c].n);
+    const naam2 = { 'ang': 'ANG', 'ang-vast': 'ANG, structuur bevroren', 'ang-geensnoei': 'ANG zonder snoeien' };
+    const A = D2.perConditie['ang'];
+    C.push(h3('Wat stabiliseert er eerst, de structuur of het gedrag?'));
+    C.push(body(
+      'De levens van sectie ' + SEC_OMSLAG + ' leggen per poging vast hoe groot het netwerk is en hoe goed ' +
+      'het speelt. Daarmee is te bepalen wat er eerder tot rust komt. Per blok van ' + D2.blok + ' pogingen ' +
+      'wordt het laatste blok bepaald waarna de blok-op-blok-verandering nooit meer boven een tiende van de ' +
+      'grootste sprong in dat leven komt — voor de netwerkgrootte en voor het succes afzonderlijk, en per ' +
+      'zaad gepaard vergeleken.'
+    ));
+    C.push(tbl(
+      ['conditie', 'structuur komt tot rust op blok', 'gedrag op blok', 'verschil', 'zaden'],
+      CN2.map(c => { const d = D2.perConditie[c];
+        return [naam2[c] || c, g2(d.settleStruct), g2(d.settleGedrag), g2(d.verschil),
+          d.tekentoets && d.tekentoets.n ? d.tekentoets.n - d.tekentoets.positief + ' van ' +
+            d.tekentoets.n + ' negatief, ' + pK(d.tekentoets.p) : 'geen verschil']; }),
+      [2472, 2400, 1600, 1400, 1800]));
+    C.push(body([
+      bd('Eerst hoe deze tabel gelezen moet worden. '),
+      t('Een leven telt ' + Math.round(900 / D2.blok) + ' blokken, genummerd 0 tot en met ' +
+        (Math.round(900 / D2.blok) - 1) + '. Een waarde van ' + (Math.round(900 / D2.blok) - 1) + ' betekent ' +
+        'dus niet "hier kwam het tot rust" maar "binnen dit leven is het niet tot rust gekomen". Het gedrag ' +
+        'haalt die rand in elke conditie, en dat is te verwachten: geen van de drie fasen van driehonderd ' +
+        'pogingen is uitgeleerd, zoals sectie ' + SEC_OMSLAG + ' al meldt. De absolute settelwaarde van het ' +
+        'gedrag zegt daarom weinig; het '), it('verschil'),
+      t(' tussen structuur en gedrag zegt wél iets, en dat verschil is per zaad gepaard.')
+    ]));
+    if (A) C.push(body([
+      bd('De structuur komt eerder tot rust dan het gedrag, in elk leven. '),
+      t('Bij ANG settelt de netwerkgrootte gemiddeld ' + g2({ m: Math.abs(A.verschil.m) }) + ' blokken — ' +
+        'ongeveer ' + (10 * Math.round(Math.abs(A.verschil.m) * D2.blok / 10)) + ' pogingen — vóór het ' +
+        'succes dat doet, en dat geldt ' +
+        'voor alle ' + woord(A.tekentoets.n) + ' zaden afzonderlijk (' + pK(A.tekentoets.p) + '). De richting is ' +
+        'daarmee eenduidig: het verbouwen is klaar terwijl het leren doorgaat. De bevroren variant levert de ' +
+        'controle dat de maat doet wat hij zegt — daar is geen sprong om te settelen, en de maat geeft ' +
+        'dan ook blok nul.')
+    ]));
+    if (D2.perConditie['ang-geensnoei']) C.push(body([
+      bd('Zonder snoeien komt de structuur helemaal niet tot rust. '),
+      t('Bij de conditie zonder snoeien groeit het aantal verbindingen het hele leven vrijwel monotoon door ' +
+        'en bereikt binnen ' + (900) + ' pogingen geen vast punt; de maat loopt daar tegen de rand van het ' +
+        'meetvenster aan en is dus niet zinvol te vergelijken. Dat is zelf het resultaat: snoeien is wat een ' +
+        'groeiende graaf een stabiele grootte geeft. Sectie ' + SEC_OMSLAG + ' sprak het snoeien vrij van ' +
+        'het herstelprobleem; deze waarneming geeft het meteen een functie terug die het wél heeft.')
+    ]));
+  }
+  if (D3 && D3.n) {
+    const soort = { sens: 'zintuig', work: 'werker', refl: 'reflex', mem: 'geheugen', neut: 'neutraal' };
+    const CP = D3.compositiePerType || {};
+    C.push(h3('Komen twaalf beginwolken op dezelfde organisatie uit?'));
+    C.push(body(
+      'De ' + woord(D3.n) + ' eindnetwerken van de ang-levens uit sectie ' + SEC_OMSLAG + ' verschillen alleen in ' +
+      'hun breinzaad: dezelfde regels, dezelfde omgeving, een ander toeval bij de start. De vraag is of zij ' +
+      'op vergelijkbare functionele organisaties uitkomen, of op verschillende oplossingen met dezelfde ' +
+      'score. Per netwerk is daarvoor het aandeel van elke neuronsoort genomen samen met de verdeling van ' +
+      'de verbindingen over de soortenparen.'
+    ));
+    C.push(tbl(['soort', 'aandeel van de verborgen neuronen'],
+      Object.keys(CP).filter(k => CP[k]).map(k => [soort[k] || k,
+        CP[k].m.toFixed(3) + ' ± ' + CP[k].ci.toFixed(3)]),
+      [3400, 6272]));
+    C.push(body([
+      bd('De twaalf komen op een smalle band uit, en de score hangt er nauwelijks mee samen. '),
+      t('Over de ' + D3.paren + ' paren zaden correleert de onderlinge organisatie-afstand met het ' +
+        'verschil in eindscore met ρ = ' +
+        rho(D3.correlatieAfstandTegenScoreverschil && D3.correlatieAfstandTegenScoreverschil.rho) +
+        '. Twee netwerken die organisatorisch verder uit elkaar liggen presteren dus nauwelijks ' +
+        'verschillender dan twee die dicht bij elkaar liggen. Dat is eerder het beeld van lichte variatie ' +
+        'rond één organisatie dan van werkelijk verschillende oplossingen: het aandeel geheugen-neuronen is ' +
+        'over alle twaalf zaden zelfs exact gelijk. Voor de vraag waar dit werk uit voortkomt is dat een ' +
+        'bruikbaar negatief resultaat — de bedradingsgrammatica laat kennelijk maar weinig speelruimte, en ' +
+        'wat er aan structuur ontstaat is meer voorgeschreven dan gevonden.')
+    ]));
+  }
+  if (D4) {
+    C.push(h3('Waar reageert de herstructurering dan wél op?'));
+    C.push(body(
+      'Sectie ' + SEC_OMSLAG + ' stelt vast dat de herstructurering niet reageert op de twee omslagen. Dat ' +
+      'laat open waar zij dan wél op reageert. De configuratie belooft iets concreets: herstructureren ' +
+      'gebeurt elke tien pogingen, en dan nog alleen bij stagnatie. Dat is hier fijnmaziger getoetst, met ' +
+      'de verandering van het succes over de tien voorgaande pogingen als stagnatiesignaal, op elke klokslag ' +
+      'van elk leven met plasticiteit.'
+    ));
+    C.push(bullet([bd('De stagnatievoorwaarde filtert niets. '),
+      t('Op ' + (D4.fractieActief ? (100 * D4.fractieActief.m).toFixed(1) : '–') +
+        ' % van alle klokslagen gebeurt er iets. Als poort is de voorwaarde dus zo goed als altijd open, en ' +
+        'in dat opzicht gedraagt het mechanisme zich inderdaad als een klok.')]));
+    C.push(bullet([bd('Maar de hoeveelheid herstructurering hangt er wél mee samen. '),
+      t('Op klokslagen waar het succes daalt of vlak ligt vinden gemiddeld ' +
+        g2(D4.verschilDalendMinStijgend) + ' gebeurtenissen meer plaats dan op klokslagen waar het stijgt, ' +
+        'en dat geldt in ' + (D4.tekentoetsDalendBovenStijgend ? D4.tekentoetsDalendBovenStijgend.positief +
+          ' van de ' + D4.tekentoetsDalendBovenStijgend.n : '–') + ' levens dezelfde kant op (' +
+        pK(D4.tekentoetsDalendBovenStijgend && D4.tekentoetsDalendBovenStijgend.p) + '). De ' +
+        'rangcorrelatie tussen churn en die trend is gemiddeld ' + g2(D4.rhoChurnTrendGemiddeld, 2) + '.')]));
+    if (D4.rhoPerFaseGemiddeld) C.push(bullet([bd('En dat is geen tijdsdrift. '),
+      t('Churn neemt over een leven geleidelijk af (ρ = ' + g2(D4.rhoChurnEpGemiddeld, 2) + ' met het ' +
+        'pogingnummer), dus het verband met de trend zou een gedeeld verloop met de tijd kunnen zijn. Binnen ' +
+        'elke fase afzonderlijk — een venster van driehonderd pogingen — blijft het echter staan: ' +
+        D4.rhoPerFaseGemiddeld.map(f => g2(f.rho, 2)).join(', ') + ' voor de drie fasen.')]));
+    C.push(body([
+      bd('Dat maakt de bevinding van sectie ' + SEC_OMSLAG + ' scherper in plaats van onwaar. '),
+      t('Het mechanisme is niet blind: het verbouwt meer wanneer het leren vastloopt, precies zoals de ' +
+        'configuratie belooft. Maar gevoeligheid voor stagnatie is niet hetzelfde als gevoeligheid voor een ' +
+        'omslag. Een omslag hoeft geen aanhoudende stagnatie te veroorzaken — de agent kan meteen op een ' +
+        'lager niveau verder leren, en dat is in de knipperfase precies wat er gebeurt — en omgekeerd treedt ' +
+        'stagnatie ook op zonder dat er iets aan de omgeving verandert. Het signaal waarop dit mechanisme ' +
+        'stuurt staat dus loodrecht op het signaal dat het zou moeten opmerken. Dat is een preciezere ' +
+        'diagnose dan "het loopt op een klok", en zij wijst een concretere reparatie aan.')
+    ]));
+    C.push(body([
+      bd('Met één voorbehoud dat hier hoort te staan. '),
+      t('Het stagnatiesignaal is afgeleid uit het gedrag van de agent zelf en niet uit de omgeving. De ' +
+        'samenhang is daarmee deels circulair te lezen: minder herstructurering omdat het netwerk al goed ' +
+        'genoeg speelt, in plaats van meer herstructurering omdat het vastzit. Die twee zijn met deze ' +
+        'gegevens niet uit elkaar te trekken, en dat is precies de reden dat de vervolgmeting in sectie ' +
+        SEC_HIERNA + ' een signaal nodig heeft dat los van het eigen gedrag van het netwerk staat.')
+    ]));
   }
   C.push(gap(60));
 }
@@ -2426,21 +2828,61 @@ if (!TAAKAS) C.push(bullet([bd('Een tweede taak. '), t('In de huidige taak is he
   'doel na verloop van tijd verdwijnt terwijl er tegelijk obstakels opduiken die binnen één tik ontweken moeten ' +
   'worden, is de eerste opzet waarin de twee soorten paden — kort en reflexmatig, lang en met geheugen — ook ' +
   'werkelijk allebei nodig zijn.')]));
-if (TAAKAS) C.push(bullet([bd('Een omslag binnen één leven. '), t('De as van sectie 10.8 traint elke agent op ' +
+if (TAAKAS && !OMSLAG) C.push(bullet([bd('Een omslag binnen één leven. '), t('De as van sectie 10.8 traint elke agent op ' +
   'één stand. Wat een vaste architectuur principieel niet kan, is haar rekenstructuur verbouwen wanneer de ' +
   'eisen halverwege veranderen — en dat is het enige verkoopargument dat na sectie 10.4 tot en met 10.8 nog ' +
   'overeind staat. Eén doorlopend leven waarin de omgeving na een derde van de pogingen omslaat en er later ' +
   'weer terugkeert, met hersteltijd, behoud van de eerste vaardigheid en interferentie als maten, is de ' +
   'meting die dat kan uitwijzen. Ook daar geldt: als de vrije graaf niet sneller herstelt dan diezelfde ' +
   'graaf bevroren, dan is dát het resultaat.')]));
-if (TAAKAS) C.push(bullet([bd('Waarom de vrije graaf onder knipperen verliest. '), t('Sectie 10.8 stelt vast ' +
+if (TAAKAS && !OMSLAG) C.push(bullet([bd('Waarom de vrije graaf onder knipperen verliest. '), t('Sectie 10.8 stelt vast ' +
   'dát het gebeurt, niet waardoor. De voor de hand liggende verdachte is de herstructurering zelf: die loopt ' +
   'door terwijl de invoerstatistiek heen en weer schakelt, en snoeit dan mogelijk juist de verbindingen weg ' +
   'die de informatie over de donkere periode heen dragen. Dat is te toetsen door de herstructurering ' +
   'gefaseerd uit te zetten en door de gesnoeide verbindingen te vergelijken met de verbindingen die de ' +
   'geheugenhorizon dragen.')]));
+if (OMSLAG) C.push(bullet([bd('Herstructurering die op de omgeving stuurt in plaats van op de klok. '),
+  t('Dit is de meting die direct uit sectie ' + SEC_OMSLAG + ' volgt, en sectie ' + SEC_SG + ' maakt haar ' +
+    'scherper. Het mechanisme blijkt gevoelig voor stagnatie maar niet voor een omslag, en die twee vallen ' +
+    'niet samen. De ingreep is klein — vervang de vaste periode door een aansturing op een signaal — maar ' +
+    'het signaal moet dan wel onafhankelijk zijn van het eigen gedrag van het netwerk, anders wordt gemeten ' +
+    'dat een net dat goed speelt minder verbouwt. Een detector op de invoerstatistiek voldoet daaraan; de ' +
+    'lopende beloningsbasislijn niet. Daarna wordt de omslagproef van sectie ' + SEC_OMSLAG + ' ' +
+    'onveranderd opnieuw gedraaid. Levert dat evenmin een herstelvoordeel op, dan is de negatieve ' +
+    'bevinding niet langer aan één ontwerpkeuze toe te schrijven.')]));
+if (SGEDRAG) C.push(bullet([bd('Structuurmaten die wél bewegen. '),
+  t('Sectie ' + SEC_SG + ' laat zien dat verscheidene maten uit sectie 6 over alle gemeten runs heen ' +
+    'constant zijn: zij variëren niet met de taak en niet met het zaad. Zulke maten kunnen per definitie ' +
+    'geen gedrag verklaren. Wat dit werk nodig heeft is een beschrijving van de gevormde structuur die ' +
+    'onder omgevingsdruk wél uiteenloopt — en het eerlijkste startpunt daarvoor is niet nog een telling, ' +
+    'maar een interventiemaat in de geest van de blinderingsproef: verstoor een deel van de graaf en meet ' +
+    'wat het gedrag verliest.')]));
 C.push(h2(SEC_VRAAG, 'De onderzoeksvraag, smaller gemaakt'));
-if (TAAKAS) C.push(body(
+if (OMSLAG) C.push(body(
+  'Dit document is begonnen met de vraag of een netwerk zonder lagen en zonder backpropagation beter kan ' +
+  'zijn dan een vast netwerk. Zes meetreeksen later is die vraag beantwoord, en het antwoord is nee. De ' +
+  'graaf voegt op deze taak niets toe aan de leerregel (10.4). Lokaal leren kost meer dan twintig ' +
+  'procentpunt en ongeveer een factor veertig aan rekenwerk (10.5). Geen enkel structureel mechanisme ' +
+  'draagt afzonderlijk aantoonbaar bij (10.7). Zodra de omgeving deels waarneembaar wordt verliest de ' +
+  'vrije graaf méér dan diezelfde graaf bevroren (10.8). En wanneer de omgeving halverwege het leven ' +
+  'omslaat — de enige opzet waarin verbouwen tijdens het leren iets kán opleveren — herstelt de vrije ' +
+  'graaf niet sneller dan de bevroren (' + SEC_OMSLAG + ').\n\n' +
+  'Wat dit werk onderscheidt van een reeks tegenvallers is dat de oorzaak aanwijsbaar is. De ' +
+  'herstructurering wordt aangestuurd door een klok, en waar zij wél op een signaal reageert, is dat de ' +
+  'stagnatie van het eigen leren en niet een verandering in de omgeving (' + SEC_SG + '). Een mechanisme ' +
+  'dat de omslag niet waarneemt kan er per constructie niet op reageren. Daarmee gaat de negatieve ' +
+  'bevinding niet over structurele plasticiteit als idee, maar over deze aansturing ervan — en dat is een ' +
+  'uitspraak die te repareren en opnieuw te toetsen valt, wat de eerste openstaande meting in sectie ' +
+  SEC_HIERNA + ' dan ook is.\n\n' +
+  'De vraag die overblijft is geen vergelijkingsvraag maar een grensvraag: onder welke omgevingsdruk, en ' +
+  'onder welke aansturing, betaalt structurele plasticiteit binnen één leven zich terug ten opzichte van ' +
+  'dezelfde graaf met bevroren structuur? Dit document levert daar vier dingen voor. Een systeem waarvan ' +
+  'elke schroef gecontroleerd is, tot en met de numerieke controle van de leerregel zelf. Twee ' +
+  'meetinstrumenten die losstaan van dit model en op elke architectuur werken: de blinderingsproef voor ' +
+  'geheugen en de omslagproef voor aanpassing. Een mechanismeresultaat dat wél staat — het typesysteem ' +
+  'draagt de geheugenhorizon (10.8). En een aanwijsbare oorzaak voor waarom de rest niet staat.'
+));
+if (TAAKAS && !OMSLAG) C.push(body(
   'Dit document is begonnen met de vraag of een netwerk zonder lagen en zonder backpropagation beter kan ' +
   'zijn dan een vast netwerk. Vier meetreeksen later is die vraag beantwoord, en het antwoord is nee: de ' +
   'graaf voegt op deze taak niets toe aan de leerregel (10.4), lokaal leren kost meer dan twintig ' +
@@ -2543,6 +2985,31 @@ if (ABLATIE && ABLATIE.tabel && ABLATIE.tabel['ang-vol']) {
       'tijdschalen werkelijk allebei nodig zijn, en dat is precies wat de tweede taak moet leveren.')
   ]));
 }
+if (OMSLAG && OMSLAG.tabel && OMSLAG.tabel['s13-ang']) {
+  const A = OMSLAG.tabel['s13-ang'], V = OMSLAG.tabel['s13-ang-vast'];
+  C.push(body([
+    bd('En de laatste aanspraak is nu ook gemeten. '),
+    t('Wat een vaste architectuur principieel niet heeft, is de mogelijkheid haar rekenstructuur te ' +
+      'verbouwen terwijl het leven doorloopt. Sectie ' + SEC_OMSLAG + ' zet daar één doorlopend leven ' +
+      'tegenover waarin de omgeving twee keer omslaat, en de vrije graaf herstelt niet sneller dan ' +
+      'dezelfde graaf bevroren (' + A.hersteltijd.m.toFixed(1).replace('.', ',') + ' tegen ' +
+      V.hersteltijd.m.toFixed(1).replace('.', ',') + ' pogingen). Daarmee is de negatieve bevinding ' +
+      'compleet: niet in eindprestatie, niet in geheugen, niet in monsterefficiëntie en niet in ' +
+      'aanpassingssnelheid levert deze vorm van structurele plasticiteit iets op.')
+  ]));
+  C.push(body([
+    bd('Maar zij is niet alleen negatief, en dat is het verschil. '),
+    t('Dezelfde sectie laat zien waaróm: de herstructurering piekt niet na een omslag, want zij loopt op ' +
+      'een vaste klok' + (SGEDRAG ? ' — en waar zij wél op een signaal reageert, is dat de stagnatie van ' +
+        'het eigen leren en niet een verandering in de omgeving (sectie ' + SEC_SG + ')' : '') + '. Een ' +
+      'mechanisme dat de omslag niet waarneemt, kan er niet op reageren. De uitspraak van dit document is ' +
+      'daarmee smaller en bruikbaarder dan "structurele plasticiteit werkt niet": zij werkt niet ' +
+      'wanneer je haar op een klok laat lopen, en dat is een ontwerpkeuze en geen eigenschap van het idee. ' +
+      'Wat overblijft als bijdrage is dan ook niet het model maar het gereedschap eromheen — de ' +
+      'blinderingsproef, de omslagproef, en een meetopzet waarin een voorspelling eerder vastligt dan de ' +
+      'data die haar moet weerleggen.')
+  ]));
+}
 
 /* ===== referenties ===== */
 /* =====================================================================
@@ -2577,9 +3044,11 @@ C.push(body(
   'Twee dingen. Ten eerste: de tabellen in de secties 3.5, 3.11 en 10 worden door de generator rechtstreeks uit ' +
   'de meetbestanden opgebouwd en niet met de hand overgetypt, juist omdat een getal dat een taalmodel uit zijn ' +
   'hoofd opschrijft geen meting is. Ontbreekt een meetbestand, dan zegt de betreffende sectie dat de meting nog ' +
-  'moet gebeuren in plaats van een getal te noemen. Ten tweede: de referenties zijn nog niet stuk voor stuk tegen ' +
-  'de originelen geverifieerd. Tot dat gebeurd is, moet de lezer de bibliografie met gepaste argwaan lezen — ' +
-  'juist bij een document dat op deze manier tot stand is gekomen.'
+  'moet gebeuren in plaats van een getal te noemen. Ten tweede: de referenties zijn inmiddels stuk voor stuk ' +
+  'tegen de vindplaats gecontroleerd — jaargang, deel, nummer en paginabereik — omdat een bibliografie precies ' +
+  'de plek is waar een taalmodel plausibele maar onjuiste details produceert. Waar een paginabereik niet tegen ' +
+  'een primaire bron te controleren was, staat er geen paginabereik maar een DOI. Dat is een bewuste keuze: ' +
+  'liever een onvolledige verwijzing die klopt dan een volledige die misschien niet klopt.'
 ));
 
 C.push(h1('', 'Belangenverklaring'));
@@ -2620,21 +3089,21 @@ C.push(body(
 
 C.push(h1('', 'Referenties'));
 const REFS = [
-  'Bogdan, P. A., Rowley, A. G. D., Rhodes, O., & Furber, S. B. (2018). Structural plasticity on the SpiNNaker many-core neuromorphic system. Frontiers in Neuroscience, 12.',
+  'Bogdan, P. A., Rowley, A. G. D., Rhodes, O., & Furber, S. B. (2018). Structural plasticity on the SpiNNaker many-core neuromorphic system. Frontiers in Neuroscience, 12, 434.',
   'Chklovskii, D. B., Mel, B. W., & Svoboda, K. (2004). Cortical rewiring and information storage. Nature, 431(7010), 782–788.',
   'Fiete, I. R., & Seung, H. S. (2006). Gradient learning in spiking neural networks by dynamic perturbation of conductances. Physical Review Letters, 97(4), 048104.',
-  'Frémaux, N., & Gerstner, W. (2016). Neuromodulated spike-timing-dependent plasticity and theory of three-factor learning rules. Frontiers in Neural Circuits, 9, 85.',
+  'Frémaux, N., & Gerstner, W. (2016). Neuromodulated spike-timing-dependent plasticity, and theory of three-factor learning rules. Frontiers in Neural Circuits, 9, 85. doi:10.3389/fncir.2015.00085',
   'Holtmaat, A., & Svoboda, K. (2009). Experience-dependent structural synaptic plasticity in the mammalian brain. Nature Reviews Neuroscience, 10(9), 647–658.',
   'Izhikevich, E. M. (2007). Solving the distal reward problem through linkage of STDP and dopamine signaling. Cerebral Cortex, 17(10), 2443–2452.',
-  'Jaeger, H. (2001). The "echo state" approach to analysing and training recurrent neural networks. GMD Report 148.',
+  'Jaeger, H. (2001). The "echo state" approach to analysing and training recurrent neural networks (GMD Report 148). Bonn: German National Research Center for Information Technology.',
   'Maass, W., Natschläger, T., & Markram, H. (2002). Real-time computing without stable states: a new framework for neural computation based on perturbations. Neural Computation, 14(11), 2531–2560.',
-  'Ng, A. Y., Harada, D., & Russell, S. (1999). Policy invariance under reward transformations: theory and application to reward shaping. Proceedings of ICML, 278–287.',
+  'Ng, A. Y., Harada, D., & Russell, S. (1999). Policy invariance under reward transformations: theory and application to reward shaping. Proceedings of the Sixteenth International Conference on Machine Learning (ICML), 278–287. Morgan Kaufmann.',
   'Seung, H. S. (2003). Learning in spiking neural networks by reinforcement of stochastic synaptic transmission. Neuron, 40(6), 1063–1073.',
   'Stanley, K. O., & Miikkulainen, R. (2002). Evolving neural networks through augmenting topologies. Evolutionary Computation, 10(2), 99–127.',
   'Sutton, R. S., & Barto, A. G. (2018). Reinforcement Learning: An Introduction (2e druk). MIT Press.',
   'Williams, R. J. (1992). Simple statistical gradient-following algorithms for connectionist reinforcement learning. Machine Learning, 8, 229–256.',
-  'Xie, S., Kirillov, A., Girshick, R., & He, K. (2019). Exploring randomly wired neural networks for image recognition. Proceedings of ICCV, 1284–1293.',
-  'You, J., Leskovec, J., He, K., & Xie, S. (2020). Graph structure of neural networks. Proceedings of ICML, 10881–10891.'
+  'Xie, S., Kirillov, A., Girshick, R., & He, K. (2019). Exploring randomly wired neural networks for image recognition. Proceedings of the IEEE/CVF International Conference on Computer Vision (ICCV). doi:10.1109/ICCV.2019.00137',
+  'You, J., Leskovec, J., He, K., & Xie, S. (2020). Graph structure of neural networks. Proceedings of the 37th International Conference on Machine Learning (ICML), PMLR 119, 10881–10891.'
 ];
 REFS.forEach((r, i) => C.push(new Paragraph({
   children: [new TextRun({ text: `[${i + 1}]  ${r}`, font: SERIF, size: 18, color: INK })],
