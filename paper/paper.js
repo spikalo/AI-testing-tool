@@ -2192,7 +2192,8 @@ if (TAAKAS && TAAKAS.tabel) {
     'ang': 'ANG, met structurele plasticiteit',
     'ang-vast': 'ANG, structuur bevroren',
     'mlp-16-bp': 'vast net zonder terugkoppeling, backprop',
-    'elman-16-bp': 'vast recurrent net, backprop door de tijd'
+    'elman-16-bp': 'vast recurrent net, backprop door de tijd',
+    'ang-typeloos': 'ANG zonder neuronsoorten'
   };
   const cel = (a, b) => T[`s12-${a}-b${b}`];
   const tt = (c, tegen, taak, maat) => TT.find(x => x.conditie === c && x.tegen === tegen &&

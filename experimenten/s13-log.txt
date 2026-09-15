@@ -1,0 +1,95 @@
+s13-ang            zaad 1001: A1 60%  B 11%  A-na-B 23%  A2 63%  herstel 46p  churn 2.12->1.98  (18s)
+s13-ang            zaad 1002: A1 49%  B 15%  A-na-B 43%  A2 61%  herstel 11p  churn 1.90->1.84  (18s)
+s13-ang            zaad 1003: A1 58%  B 16%  A-na-B 32%  A2 61%  herstel 16p  churn 2.00->1.96  (17s)
+s13-ang            zaad 1004: A1 55%  B 18%  A-na-B 56%  A2 63%  herstel 13p  churn 2.28->1.78  (17s)
+s13-ang            zaad 1005: A1 56%  B 13%  A-na-B 65%  A2 66%  herstel 11p  churn 1.86->1.86  (17s)
+s13-ang            zaad 1006: A1 56%  B 14%  A-na-B 22%  A2 60%  herstel 33p  churn 1.70->1.76  (18s)
+s13-ang            zaad 1007: A1 69%  B 18%  A-na-B 64%  A2 69%  herstel 11p  churn 1.80->1.68  (17s)
+s13-ang            zaad 1008: A1 59%  B 13%  A-na-B 38%  A2 71%  herstel 39p  churn 2.32->1.46  (17s)
+s13-ang            zaad 1009: A1 27%  B 4%  A-na-B 43%  A2 53%  herstel 43p  churn 1.94->2.10  (19s)
+s13-ang            zaad 1010: A1 65%  B 20%  A-na-B 54%  A2 68%  herstel 47p  churn 2.04->1.72  (17s)
+s13-ang            zaad 1011: A1 64%  B 20%  A-na-B 33%  A2 73%  herstel 17p  churn 1.76->1.86  (18s)
+s13-ang-vast       zaad 1000: A1 61%  B 17%  A-na-B 49%  A2 65%  herstel 43p  churn 0.00->0.00  (13s)
+s13-ang-vast       zaad 1001: A1 61%  B 8%  A-na-B 35%  A2 72%  herstel 19p  churn 0.00->0.00  (13s)
+s13-ang-vast       zaad 1002: A1 57%  B 16%  A-na-B 48%  A2 69%  herstel 45p  churn 0.00->0.00  (14s)
+s13-ang-vast       zaad 1003: A1 51%  B 16%  A-na-B 42%  A2 66%  herstel 35p  churn 0.00->0.00  (13s)
+s13-ang-vast       zaad 1004: A1 56%  B 18%  A-na-B 52%  A2 66%  herstel 45p  churn 0.00->0.00  (13s)
+s13-ang-vast       zaad 1005: A1 69%  B 19%  A-na-B 55%  A2 63%  herstel 14p  churn 0.00->0.00  (13s)
+s13-ang-vast       zaad 1006: A1 46%  B 9%  A-na-B 28%  A2 65%  herstel 34p  churn 0.00->0.00  (13s)
+s13-ang-vast       zaad 1007: A1 69%  B 16%  A-na-B 61%  A2 74%  herstel 14p  churn 0.00->0.00  (12s)
+s13-ang-vast       zaad 1008: A1 74%  B 24%  A-na-B 69%  A2 74%  herstel 50p  churn 0.00->0.00  (12s)
+s13-ang-vast       zaad 1009: A1 57%  B 11%  A-na-B 44%  A2 67%  herstel 45p  churn 0.00->0.00  (13s)
+s13-ang-vast       zaad 1010: A1 73%  B 20%  A-na-B 61%  A2 76%  herstel 13p  churn 0.00->0.00  (12s)
+s13-ang-vast       zaad 1011: A1 63%  B 23%  A-na-B 42%  A2 69%  herstel 32p  churn 0.00->0.00  (14s)
+s13-ang-geensnoei  zaad 1000: A1 65%  B 22%  A-na-B 61%  A2 68%  herstel 18p  churn 0.80->0.76  (20s)
+s13-ang-geensnoei  zaad 1001: A1 63%  B 14%  A-na-B 40%  A2 74%  herstel 14p  churn 0.80->0.72  (21s)
+s13-ang-geensnoei  zaad 1002: A1 71%  B 21%  A-na-B 54%  A2 71%  herstel 14p  churn 0.76->0.68  (21s)
+s13-ang-geensnoei  zaad 1003: A1 62%  B 20%  A-na-B 57%  A2 66%  herstel 15p  churn 0.80->0.64  (21s)
+s13-ang-geensnoei  zaad 1004: A1 57%  B 20%  A-na-B 59%  A2 68%  herstel 14p  churn 0.88->0.72  (21s)
+s13-ang-geensnoei  zaad 1005: A1 51%  B 12%  A-na-B 51%  A2 68%  herstel 13p  churn 0.72->0.76  (21s)
+s13-ang-geensnoei  zaad 1006: A1 59%  B 14%  A-na-B 30%  A2 71%  herstel 19p  churn 0.76->0.64  (21s)
+s13-ang-geensnoei  zaad 1007: A1 69%  B 13%  A-na-B 63%  A2 72%  herstel 13p  churn 0.88->0.80  (20s)
+s13-ang-geensnoei  zaad 1008: A1 63%  B 20%  A-na-B 42%  A2 71%  herstel 44p  churn 0.80->0.72  (20s)
+s13-ang-geensnoei  zaad 1009: A1 59%  B 11%  A-na-B 52%  A2 69%  herstel 15p  churn 0.80->0.68  (21s)
+s13-ang-geensnoei  zaad 1010: A1 76%  B 19%  A-na-B 67%  A2 73%  herstel 43p  churn 0.88->0.80  (20s)
+s13-ang-geensnoei  zaad 1011: A1 62%  B 23%  A-na-B 42%  A2 72%  herstel 33p  churn 0.80->0.72  (21s)
+s13-elman-16-bp    zaad 1000: A1 70%  B 66%  A-na-B 67%  A2 57%  herstel 1p  churn 0.00->0.00  (5s)
+s13-elman-16-bp    zaad 1001: A1 66%  B 66%  A-na-B 64%  A2 62%  herstel 0p  churn 0.00->0.00  (5s)
+s13-elman-16-bp    zaad 1002: A1 68%  B 74%  A-na-B 70%  A2 60%  herstel 0p  churn 0.00->0.00  (5s)
+s13-elman-16-bp    zaad 1003: A1 72%  B 79%  A-na-B 72%  A2 60%  herstel 0p  churn 0.00->0.00  (5s)
+s13-elman-16-bp    zaad 1004: A1 77%  B 71%  A-na-B 67%  A2 59%  herstel 0p  churn 0.00->0.00  (5s)
+s13-elman-16-bp    zaad 1005: A1 68%  B 53%  A-na-B 69%  A2 61%  herstel 3p  churn 0.00->0.00  (5s)
+s13-elman-16-bp    zaad 1006: A1 74%  B 60%  A-na-B 68%  A2 72%  herstel 0p  churn 0.00->0.00  (5s)
+s13-elman-16-bp    zaad 1007: A1 69%  B 62%  A-na-B 71%  A2 66%  herstel 0p  churn 0.00->0.00  (5s)
+s13-elman-16-bp    zaad 1008: A1 78%  B 65%  A-na-B 72%  A2 66%  herstel 0p  churn 0.00->0.00  (5s)
+s13-elman-16-bp    zaad 1009: A1 68%  B 79%  A-na-B 68%  A2 64%  herstel 0p  churn 0.00->0.00  (5s)
+s13-elman-16-bp    zaad 1010: A1 69%  B 38%  A-na-B 63%  A2 63%  herstel 11p  churn 0.00->0.00  (5s)
+s13-elman-16-bp    zaad 1011: A1 69%  B 58%  A-na-B 70%  A2 61%  herstel 3p  churn 0.00->0.00  (5s)
+s13-mlp-16-bp      zaad 1000: A1 74%  B 20%  A-na-B 72%  A2 65%  herstel 32p  churn 0.00->0.00  (4s)
+s13-mlp-16-bp      zaad 1001: A1 70%  B 16%  A-na-B 71%  A2 67%  herstel 3p  churn 0.00->0.00  (4s)
+s13-mlp-16-bp      zaad 1002: A1 65%  B 20%  A-na-B 69%  A2 67%  herstel 3p  churn 0.00->0.00  (4s)
+s13-mlp-16-bp      zaad 1003: A1 74%  B 16%  A-na-B 62%  A2 68%  herstel 0p  churn 0.00->0.00  (4s)
+s13-mlp-16-bp      zaad 1004: A1 72%  B 18%  A-na-B 67%  A2 66%  herstel 0p  churn 0.00->0.00  (4s)
+s13-mlp-16-bp      zaad 1005: A1 65%  B 20%  A-na-B 66%  A2 64%  herstel 1p  churn 0.00->0.00  (4s)
+s13-mlp-16-bp      zaad 1006: A1 72%  B 19%  A-na-B 74%  A2 72%  herstel 27p  churn 0.00->0.00  (4s)
+s13-mlp-16-bp      zaad 1007: A1 66%  B 21%  A-na-B 70%  A2 66%  herstel 33p  churn 0.00->0.00  (4s)
+s13-mlp-16-bp      zaad 1008: A1 71%  B 23%  A-na-B 67%  A2 72%  herstel 3p  churn 0.00->0.00  (4s)
+s13-mlp-16-bp      zaad 1009: A1 64%  B 21%  A-na-B 75%  A2 65%  herstel 2p  churn 0.00->0.00  (4s)
+s13-mlp-16-bp      zaad 1010: A1 66%  B 17%  A-na-B 71%  A2 69%  herstel 41p  churn 0.00->0.00  (4s)
+s13-mlp-16-bp      zaad 1011: A1 67%  B 21%  A-na-B 70%  A2 68%  herstel 3p  churn 0.00->0.00  (4s)
+
+--- het leven in vier meetpunten (benchmark, geloot) ---
+conditie        A1 eind           B op B            A na B            A2 eind           
+ang             56.9% ± 6.2       15.3% ± 2.9       43.1% ± 8.2       64.1% ± 3.0       
+ang-vast        61.3% ± 4.9       16.2% ± 2.9       48.6% ± 6.4       68.5% ± 2.4       
+ang-geensnoei   62.9% ± 3.8       17.4% ± 2.4       51.3% ± 6.2       70.0% ± 1.4       
+elman-16-bp     70.3% ± 2.1       64.0% ± 6.5       68.1% ± 1.6       62.4% ± 2.3       
+mlp-16-bp       68.5% ± 2.1       19.0% ± 1.3       69.2% ± 2.0       67.3% ± 1.5       
+
+--- herstel en behoud ---
+conditie        hersteltijd     niet hersteld  behoud (pp)     terugwinst (pp) 
+ang             26.8 pogingen   0/12           -13.8           7.2             
+ang-vast        32.4 pogingen   0/12           -12.7           7.3             
+ang-geensnoei   21.3 pogingen   0/12           -11.6           7.1             
+elman-16-bp     1.5 pogingen    0/12           -2.2            -7.9            
+mlp-16-bp       12.3 pogingen   0/12           0.7             -1.2            
+
+--- herstructurering per poging, rond elke omslag ---
+ang              poging 300 (naar knipperen        ) 2.25 -> 2.18   5/12 omhoog, p = 0.7744   binnen de ruis
+ang              poging 600 (terug naar zichtbaar  ) 1.96 -> 1.84   4/11 omhoog, p = 0.5488   binnen de ruis
+ang-geensnoei    poging 300 (naar knipperen        ) 0.84 -> 0.84   3/6 omhoog, p = 1.0000   binnen de ruis
+ang-geensnoei    poging 600 (terug naar zichtbaar  ) 0.81 -> 0.72   1/12 omhoog, p = 0.0063   juist minder na de omslag
+
+--- Mann-Whitney, Holm per familie ---
+herstel   hersteltijd  ang vs ang-vast              −5.7        p = 0.2987   Holm 0.5974   binnen de ruis
+herstel   hersteltijd  ang-geensnoei vs ang         −5.5        p = 0.7075   Holm 0.7075   binnen de ruis
+herstel   hersteltijd  ang vs elman-16-bp           +25.3       p = 0.0001   Holm 0.0002   sterk
+herstel   hersteltijd  ang vs mlp-16-bp             +14.4       p = 0.0111   Holm 0.0332   significant
+behoud    behoud       ang vs ang-vast              −1.1        p = 0.8399   Holm 1.0000   binnen de ruis
+behoud    behoud       ang-geensnoei vs ang         +2.2        p = 0.6236   Holm 1.0000   binnen de ruis
+behoud    behoud       ang vs elman-16-bp           −11.6       p = 0.0531   Holm 0.1593   binnen de ruis
+behoud    behoud       ang vs mlp-16-bp             −14.5       p = 0.0166   Holm 0.0663   binnen de ruis
+behoud    terugwinst   ang vs ang-vast              −0.0        p = 0.7075   Holm 1.0000   binnen de ruis
+behoud    terugwinst   ang-geensnoei vs ang         −0.1        p = 0.7508   Holm 1.0000   binnen de ruis
+behoud    terugwinst   ang vs elman-16-bp           +15.2       p = 0.0001   Holm 0.0002   sterk
+behoud    terugwinst   ang vs mlp-16-bp             +8.5        p = 0.0024   Holm 0.0073   sterk
