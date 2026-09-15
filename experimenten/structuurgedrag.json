@@ -1,0 +1,1888 @@
+{
+  "uitgevoerd": "2026-09-15T14:17:39.034Z",
+  "beschrijving": "Werkplan stap 14: structuur tegen gedrag, over alle bestaande runs van stap 8, 12, 12b en 13. Geen nieuwe metingen — vier analyses op wat er al ligt: (1) correlatie tussen structuurmaten en gedrag binnen alleen de ang-architectuur, (2) of netwerkgrootte per blok van 25 pogingen vóór of ná het gedrag stabiliseert in de levens van stap 13, (3) of de twaalf eindnetwerken van s13-ang op vergelijkbare organisaties uitkomen, en (4) of de herstructureringsactiviteit samenhangt met een stagnatiesignaal of alleen met de klok.",
+  "deel1": {
+    "vraag": "Correleert structuur met gedrag binnen de ang-architectuur zelf (taakas, 48 runs op vier standen), of alleen wanneer je architecturen samen pooit?",
+    "n": 48,
+    "gepoold": {
+      "verbindingen~benchBeleid": {
+        "n": 48,
+        "rho": 0.6840191075887526
+      },
+      "verbindingen~memHorizon": {
+        "n": 48,
+        "rho": 0.5390579421840674
+      },
+      "actieveVerbindingen~benchBeleid": {
+        "n": 48,
+        "rho": 0.23092582045799523
+      },
+      "actieveVerbindingen~memHorizon": {
+        "n": 48,
+        "rho": 0.2846079220574711
+      },
+      "neuronenEind~benchBeleid": {
+        "n": 48,
+        "rho": 0.44651126292516596
+      },
+      "neuronenEind~memHorizon": {
+        "n": 48,
+        "rho": 0.40642596000011777
+      },
+      "kortstePad~benchBeleid": {
+        "n": 48,
+        "rho": null
+      },
+      "kortstePad~memHorizon": {
+        "n": 48,
+        "rho": null
+      },
+      "lussen~benchBeleid": {
+        "n": 48,
+        "rho": null
+      },
+      "lussen~memHorizon": {
+        "n": 48,
+        "rho": null
+      },
+      "reflexbogen~benchBeleid": {
+        "n": 48,
+        "rho": 0.17716305614933742
+      },
+      "reflexbogen~memHorizon": {
+        "n": 48,
+        "rho": 0.07253952543175977
+      },
+      "mem~benchBeleid": {
+        "n": 48,
+        "rho": null
+      },
+      "mem~memHorizon": {
+        "n": 48,
+        "rho": null
+      },
+      "gesnoeid~benchBeleid": {
+        "n": 48,
+        "rho": -0.3209836333728551
+      },
+      "gesnoeid~memHorizon": {
+        "n": 48,
+        "rho": -0.24525043269263314
+      },
+      "bijgegroeid~benchBeleid": {
+        "n": 48,
+        "rho": null
+      },
+      "bijgegroeid~memHorizon": {
+        "n": 48,
+        "rho": null
+      },
+      "typeVeranderingen~benchBeleid": {
+        "n": 48,
+        "rho": 0.4144487393923411
+      },
+      "typeVeranderingen~memHorizon": {
+        "n": 48,
+        "rho": 0.39304142533139086
+      }
+    },
+    "perStand": {
+      "s12-ang-b0": {
+        "verbindingen~benchBeleid": {
+          "n": 12,
+          "rho": 0.08421052631578947
+        },
+        "verbindingen~memHorizon": {
+          "n": 12,
+          "rho": 0.2390161863479093
+        },
+        "actieveVerbindingen~benchBeleid": {
+          "n": 12,
+          "rho": 0.44483430739484986
+        },
+        "actieveVerbindingen~memHorizon": {
+          "n": 12,
+          "rho": 0.7473730217009666
+        },
+        "neuronenEind~benchBeleid": {
+          "n": 12,
+          "rho": 0.2437976054565526
+        },
+        "neuronenEind~memHorizon": {
+          "n": 12,
+          "rho": 0.1713230316834971
+        },
+        "kortstePad~benchBeleid": {
+          "n": 12,
+          "rho": null
+        },
+        "kortstePad~memHorizon": {
+          "n": 12,
+          "rho": null
+        },
+        "lussen~benchBeleid": {
+          "n": 12,
+          "rho": null
+        },
+        "lussen~memHorizon": {
+          "n": 12,
+          "rho": null
+        },
+        "reflexbogen~benchBeleid": {
+          "n": 12,
+          "rho": 0.12079086437651002
+        },
+        "reflexbogen~memHorizon": {
+          "n": 12,
+          "rho": -0.1334595633939474
+        },
+        "mem~benchBeleid": {
+          "n": 12,
+          "rho": null
+        },
+        "mem~memHorizon": {
+          "n": 12,
+          "rho": null
+        },
+        "gesnoeid~benchBeleid": {
+          "n": 12,
+          "rho": 0.1681263524012031
+        },
+        "gesnoeid~memHorizon": {
+          "n": 12,
+          "rho": -0.08421104469870047
+        },
+        "bijgegroeid~benchBeleid": {
+          "n": 12,
+          "rho": null
+        },
+        "bijgegroeid~memHorizon": {
+          "n": 12,
+          "rho": null
+        },
+        "typeVeranderingen~benchBeleid": {
+          "n": 12,
+          "rho": -0.05281722883227872
+        },
+        "typeVeranderingen~memHorizon": {
+          "n": 12,
+          "rho": -0.001763671173310043
+        }
+      },
+      "s12-ang-b10": {
+        "verbindingen~benchBeleid": {
+          "n": 12,
+          "rho": 0.6293706293706294
+        },
+        "verbindingen~memHorizon": {
+          "n": 12,
+          "rho": 0.5569185423289853
+        },
+        "actieveVerbindingen~benchBeleid": {
+          "n": 12,
+          "rho": 0.2517482517482518
+        },
+        "actieveVerbindingen~memHorizon": {
+          "n": 12,
+          "rho": 0.2381789992350377
+        },
+        "neuronenEind~benchBeleid": {
+          "n": 12,
+          "rho": 0.4654235930324664
+        },
+        "neuronenEind~memHorizon": {
+          "n": 12,
+          "rho": 0.4235304570017449
+        },
+        "kortstePad~benchBeleid": {
+          "n": 12,
+          "rho": null
+        },
+        "kortstePad~memHorizon": {
+          "n": 12,
+          "rho": null
+        },
+        "lussen~benchBeleid": {
+          "n": 12,
+          "rho": null
+        },
+        "lussen~memHorizon": {
+          "n": 12,
+          "rho": null
+        },
+        "reflexbogen~benchBeleid": {
+          "n": 12,
+          "rho": -0.2567338496354409
+        },
+        "reflexbogen~memHorizon": {
+          "n": 12,
+          "rho": -0.21789188604257337
+        },
+        "mem~benchBeleid": {
+          "n": 12,
+          "rho": null
+        },
+        "mem~memHorizon": {
+          "n": 12,
+          "rho": null
+        },
+        "gesnoeid~benchBeleid": {
+          "n": 12,
+          "rho": -0.16083916083916083
+        },
+        "gesnoeid~memHorizon": {
+          "n": 12,
+          "rho": -0.13310002898428577
+        },
+        "bijgegroeid~benchBeleid": {
+          "n": 12,
+          "rho": null
+        },
+        "bijgegroeid~memHorizon": {
+          "n": 12,
+          "rho": null
+        },
+        "typeVeranderingen~benchBeleid": {
+          "n": 12,
+          "rho": 0.4452547004263383
+        },
+        "typeVeranderingen~memHorizon": {
+          "n": 12,
+          "rho": 0.29381681504298734
+        }
+      },
+      "s12-ang-b20": {
+        "verbindingen~benchBeleid": {
+          "n": 12,
+          "rho": -0.04895104895104895
+        },
+        "verbindingen~memHorizon": {
+          "n": 12,
+          "rho": -0.1093516945300032
+        },
+        "actieveVerbindingen~benchBeleid": {
+          "n": 12,
+          "rho": 0.20279720279720279
+        },
+        "actieveVerbindingen~memHorizon": {
+          "n": 12,
+          "rho": 0.19753854495742512
+        },
+        "neuronenEind~benchBeleid": {
+          "n": 12,
+          "rho": -0.1580465479710797
+        },
+        "neuronenEind~memHorizon": {
+          "n": 12,
+          "rho": -0.24098157578351534
+        },
+        "kortstePad~benchBeleid": {
+          "n": 12,
+          "rho": null
+        },
+        "kortstePad~memHorizon": {
+          "n": 12,
+          "rho": null
+        },
+        "lussen~benchBeleid": {
+          "n": 12,
+          "rho": null
+        },
+        "lussen~memHorizon": {
+          "n": 12,
+          "rho": null
+        },
+        "reflexbogen~benchBeleid": {
+          "n": 12,
+          "rho": -0.025097506271765165
+        },
+        "reflexbogen~memHorizon": {
+          "n": 12,
+          "rho": 0.1067049100420788
+        },
+        "mem~benchBeleid": {
+          "n": 12,
+          "rho": null
+        },
+        "mem~memHorizon": {
+          "n": 12,
+          "rho": null
+        },
+        "gesnoeid~benchBeleid": {
+          "n": 12,
+          "rho": -0.23467636689334598
+        },
+        "gesnoeid~memHorizon": {
+          "n": 12,
+          "rho": -0.3498320577464046
+        },
+        "bijgegroeid~benchBeleid": {
+          "n": 12,
+          "rho": null
+        },
+        "bijgegroeid~memHorizon": {
+          "n": 12,
+          "rho": null
+        },
+        "typeVeranderingen~benchBeleid": {
+          "n": 12,
+          "rho": 0.11661432630213622
+        },
+        "typeVeranderingen~memHorizon": {
+          "n": 12,
+          "rho": 0.23885955951421933
+        }
+      },
+      "s12-ang-b40": {
+        "verbindingen~benchBeleid": {
+          "n": 12,
+          "rho": 0.4833632631534589
+        },
+        "verbindingen~memHorizon": {
+          "n": 12,
+          "rho": 0.5787043096127515
+        },
+        "actieveVerbindingen~benchBeleid": {
+          "n": 12,
+          "rho": -0.09457107322567675
+        },
+        "actieveVerbindingen~memHorizon": {
+          "n": 12,
+          "rho": 0.07144497649540142
+        },
+        "neuronenEind~benchBeleid": {
+          "n": 12,
+          "rho": 0.34283289448038873
+        },
+        "neuronenEind~memHorizon": {
+          "n": 12,
+          "rho": 0.5217528292291198
+        },
+        "kortstePad~benchBeleid": {
+          "n": 12,
+          "rho": null
+        },
+        "kortstePad~memHorizon": {
+          "n": 12,
+          "rho": null
+        },
+        "lussen~benchBeleid": {
+          "n": 12,
+          "rho": null
+        },
+        "lussen~memHorizon": {
+          "n": 12,
+          "rho": null
+        },
+        "reflexbogen~benchBeleid": {
+          "n": 12,
+          "rho": 0.5004034127367843
+        },
+        "reflexbogen~memHorizon": {
+          "n": 12,
+          "rho": 0.24586164320746984
+        },
+        "mem~benchBeleid": {
+          "n": 12,
+          "rho": null
+        },
+        "mem~memHorizon": {
+          "n": 12,
+          "rho": null
+        },
+        "gesnoeid~benchBeleid": {
+          "n": 12,
+          "rho": 0.1824561403508772
+        },
+        "gesnoeid~memHorizon": {
+          "n": 12,
+          "rho": -0.07872722968299287
+        },
+        "bijgegroeid~benchBeleid": {
+          "n": 12,
+          "rho": null
+        },
+        "bijgegroeid~memHorizon": {
+          "n": 12,
+          "rho": null
+        },
+        "typeVeranderingen~benchBeleid": {
+          "n": 12,
+          "rho": 0.422272029299953
+        },
+        "typeVeranderingen~memHorizon": {
+          "n": 12,
+          "rho": 0.49733685654607723
+        }
+      }
+    }
+  },
+  "deel2": {
+    "vraag": "Stabiliseert de netwerkgrootte per blok van 25 pogingen vóór of ná succes20, over de drie levensfasen van stap 13 heen?",
+    "blok": 25,
+    "perConditie": {
+      "ang": {
+        "n": 12,
+        "settleStruct": {
+          "n": 12,
+          "m": 30.916666666666668,
+          "sd": 1.5642792899510294,
+          "ci": 0.8850743277581639
+        },
+        "settleGedrag": {
+          "n": 12,
+          "m": 35,
+          "sd": 0,
+          "ci": 0
+        },
+        "verschil": {
+          "n": 12,
+          "m": -4.083333333333333,
+          "sd": 1.5642792899510294,
+          "ci": 0.8850743277581639
+        },
+        "tekentoets": {
+          "n": 12,
+          "positief": 0,
+          "p": 0.00048828125
+        },
+        "perZaad": [
+          {
+            "zaad": 1000,
+            "settleStruct": 31,
+            "settleGedrag": 35,
+            "verschil": -4
+          },
+          {
+            "zaad": 1001,
+            "settleStruct": 32,
+            "settleGedrag": 35,
+            "verschil": -3
+          },
+          {
+            "zaad": 1002,
+            "settleStruct": 32,
+            "settleGedrag": 35,
+            "verschil": -3
+          },
+          {
+            "zaad": 1003,
+            "settleStruct": 31,
+            "settleGedrag": 35,
+            "verschil": -4
+          },
+          {
+            "zaad": 1004,
+            "settleStruct": 31,
+            "settleGedrag": 35,
+            "verschil": -4
+          },
+          {
+            "zaad": 1005,
+            "settleStruct": 32,
+            "settleGedrag": 35,
+            "verschil": -3
+          },
+          {
+            "zaad": 1006,
+            "settleStruct": 30,
+            "settleGedrag": 35,
+            "verschil": -5
+          },
+          {
+            "zaad": 1007,
+            "settleStruct": 32,
+            "settleGedrag": 35,
+            "verschil": -3
+          },
+          {
+            "zaad": 1008,
+            "settleStruct": 32,
+            "settleGedrag": 35,
+            "verschil": -3
+          },
+          {
+            "zaad": 1009,
+            "settleStruct": 27,
+            "settleGedrag": 35,
+            "verschil": -8
+          },
+          {
+            "zaad": 1010,
+            "settleStruct": 29,
+            "settleGedrag": 35,
+            "verschil": -6
+          },
+          {
+            "zaad": 1011,
+            "settleStruct": 32,
+            "settleGedrag": 35,
+            "verschil": -3
+          }
+        ]
+      },
+      "ang-vast": {
+        "n": 12,
+        "settleStruct": {
+          "n": 12,
+          "m": 0,
+          "sd": 0,
+          "ci": 0
+        },
+        "settleGedrag": {
+          "n": 12,
+          "m": 34.916666666666664,
+          "sd": 0.2886751345948129,
+          "ci": 0.16333333333333336
+        },
+        "verschil": {
+          "n": 12,
+          "m": -34.916666666666664,
+          "sd": 0.2886751345948129,
+          "ci": 0.16333333333333336
+        },
+        "tekentoets": {
+          "n": 12,
+          "positief": 0,
+          "p": 0.00048828125
+        },
+        "perZaad": [
+          {
+            "zaad": 1000,
+            "settleStruct": 0,
+            "settleGedrag": 35,
+            "verschil": -35
+          },
+          {
+            "zaad": 1001,
+            "settleStruct": 0,
+            "settleGedrag": 35,
+            "verschil": -35
+          },
+          {
+            "zaad": 1002,
+            "settleStruct": 0,
+            "settleGedrag": 35,
+            "verschil": -35
+          },
+          {
+            "zaad": 1003,
+            "settleStruct": 0,
+            "settleGedrag": 35,
+            "verschil": -35
+          },
+          {
+            "zaad": 1004,
+            "settleStruct": 0,
+            "settleGedrag": 35,
+            "verschil": -35
+          },
+          {
+            "zaad": 1005,
+            "settleStruct": 0,
+            "settleGedrag": 35,
+            "verschil": -35
+          },
+          {
+            "zaad": 1006,
+            "settleStruct": 0,
+            "settleGedrag": 34,
+            "verschil": -34
+          },
+          {
+            "zaad": 1007,
+            "settleStruct": 0,
+            "settleGedrag": 35,
+            "verschil": -35
+          },
+          {
+            "zaad": 1008,
+            "settleStruct": 0,
+            "settleGedrag": 35,
+            "verschil": -35
+          },
+          {
+            "zaad": 1009,
+            "settleStruct": 0,
+            "settleGedrag": 35,
+            "verschil": -35
+          },
+          {
+            "zaad": 1010,
+            "settleStruct": 0,
+            "settleGedrag": 35,
+            "verschil": -35
+          },
+          {
+            "zaad": 1011,
+            "settleStruct": 0,
+            "settleGedrag": 35,
+            "verschil": -35
+          }
+        ]
+      },
+      "ang-geensnoei": {
+        "n": 12,
+        "settleStruct": {
+          "n": 12,
+          "m": 35,
+          "sd": 0,
+          "ci": 0
+        },
+        "settleGedrag": {
+          "n": 12,
+          "m": 35,
+          "sd": 0,
+          "ci": 0
+        },
+        "verschil": {
+          "n": 12,
+          "m": 0,
+          "sd": 0,
+          "ci": 0
+        },
+        "tekentoets": {
+          "n": 0,
+          "positief": 0,
+          "p": null
+        },
+        "perZaad": [
+          {
+            "zaad": 1000,
+            "settleStruct": 35,
+            "settleGedrag": 35,
+            "verschil": 0
+          },
+          {
+            "zaad": 1001,
+            "settleStruct": 35,
+            "settleGedrag": 35,
+            "verschil": 0
+          },
+          {
+            "zaad": 1002,
+            "settleStruct": 35,
+            "settleGedrag": 35,
+            "verschil": 0
+          },
+          {
+            "zaad": 1003,
+            "settleStruct": 35,
+            "settleGedrag": 35,
+            "verschil": 0
+          },
+          {
+            "zaad": 1004,
+            "settleStruct": 35,
+            "settleGedrag": 35,
+            "verschil": 0
+          },
+          {
+            "zaad": 1005,
+            "settleStruct": 35,
+            "settleGedrag": 35,
+            "verschil": 0
+          },
+          {
+            "zaad": 1006,
+            "settleStruct": 35,
+            "settleGedrag": 35,
+            "verschil": 0
+          },
+          {
+            "zaad": 1007,
+            "settleStruct": 35,
+            "settleGedrag": 35,
+            "verschil": 0
+          },
+          {
+            "zaad": 1008,
+            "settleStruct": 35,
+            "settleGedrag": 35,
+            "verschil": 0
+          },
+          {
+            "zaad": 1009,
+            "settleStruct": 35,
+            "settleGedrag": 35,
+            "verschil": 0
+          },
+          {
+            "zaad": 1010,
+            "settleStruct": 35,
+            "settleGedrag": 35,
+            "verschil": 0
+          },
+          {
+            "zaad": 1011,
+            "settleStruct": 35,
+            "settleGedrag": 35,
+            "verschil": 0
+          }
+        ]
+      }
+    }
+  },
+  "deel3": {
+    "vraag": "Eindigen de twaalf s13-ang levens op vergelijkbare functionele organisaties, of op verschillende oplossingen met dezelfde score?",
+    "n": 12,
+    "paren": 66,
+    "compositiePerType": {
+      "sens": {
+        "n": 12,
+        "m": 0.06845238095238096,
+        "sd": 0.01864081277872104,
+        "ci": 0.010547032710193848
+      },
+      "work": {
+        "n": 12,
+        "m": 0.8202380952380951,
+        "sd": 0.028381402710044717,
+        "ci": 0.016058290284731023
+      },
+      "refl": {
+        "n": 12,
+        "m": 0.03988095238095237,
+        "sd": 0.023485347212770576,
+        "ci": 0.013288086104598822
+      },
+      "mem": {
+        "n": 12,
+        "m": 0.07142857142857141,
+        "sd": 1.4494876628609418e-17,
+        "ci": 8.201248504930103e-18
+      },
+      "neut": {
+        "n": 12,
+        "m": 0,
+        "sd": 0,
+        "ci": 0
+      }
+    },
+    "gemiddeldeOrganisatieAfstand": {
+      "n": 66,
+      "m": 0.10261338748959968,
+      "sd": 0.04348114657647236,
+      "ci": 0.010490231956714226
+    },
+    "gemiddeldScoreverschil": {
+      "n": 66,
+      "m": 0.0553030303030303,
+      "sd": 0.041529959416516764,
+      "ci": 0.010019489864784846
+    },
+    "correlatieAfstandTegenScoreverschil": {
+      "n": 66,
+      "rho": 0.1450733973252098
+    },
+    "eindNetwerken": [
+      {
+        "zaad": 1000,
+        "score": 0.674,
+        "compositie": {
+          "sens": 0.08571428571428572,
+          "work": 0.8214285714285714,
+          "refl": 0.02142857142857143,
+          "mem": 0.07142857142857142,
+          "neut": 0
+        }
+      },
+      {
+        "zaad": 1001,
+        "score": 0.632,
+        "compositie": {
+          "sens": 0.07142857142857142,
+          "work": 0.8285714285714286,
+          "refl": 0.02857142857142857,
+          "mem": 0.07142857142857142,
+          "neut": 0
+        }
+      },
+      {
+        "zaad": 1002,
+        "score": 0.638,
+        "compositie": {
+          "sens": 0.05714285714285714,
+          "work": 0.8357142857142857,
+          "refl": 0.03571428571428571,
+          "mem": 0.07142857142857142,
+          "neut": 0
+        }
+      },
+      {
+        "zaad": 1003,
+        "score": 0.61,
+        "compositie": {
+          "sens": 0.03571428571428571,
+          "work": 0.8214285714285714,
+          "refl": 0.07142857142857142,
+          "mem": 0.07142857142857142,
+          "neut": 0
+        }
+      },
+      {
+        "zaad": 1004,
+        "score": 0.658,
+        "compositie": {
+          "sens": 0.06428571428571428,
+          "work": 0.85,
+          "refl": 0.014285714285714285,
+          "mem": 0.07142857142857142,
+          "neut": 0
+        }
+      },
+      {
+        "zaad": 1005,
+        "score": 0.684,
+        "compositie": {
+          "sens": 0.08571428571428572,
+          "work": 0.7714285714285715,
+          "refl": 0.07142857142857142,
+          "mem": 0.07142857142857142,
+          "neut": 0
+        }
+      },
+      {
+        "zaad": 1006,
+        "score": 0.584,
+        "compositie": {
+          "sens": 0.04285714285714286,
+          "work": 0.8714285714285714,
+          "refl": 0.014285714285714285,
+          "mem": 0.07142857142857142,
+          "neut": 0
+        }
+      },
+      {
+        "zaad": 1007,
+        "score": 0.69,
+        "compositie": {
+          "sens": 0.07857142857142857,
+          "work": 0.8285714285714286,
+          "refl": 0.02142857142857143,
+          "mem": 0.07142857142857142,
+          "neut": 0
+        }
+      },
+      {
+        "zaad": 1008,
+        "score": 0.706,
+        "compositie": {
+          "sens": 0.09285714285714286,
+          "work": 0.7714285714285715,
+          "refl": 0.06428571428571428,
+          "mem": 0.07142857142857142,
+          "neut": 0
+        }
+      },
+      {
+        "zaad": 1009,
+        "score": 0.542,
+        "compositie": {
+          "sens": 0.07142857142857142,
+          "work": 0.8142857142857143,
+          "refl": 0.04285714285714286,
+          "mem": 0.07142857142857142,
+          "neut": 0
+        }
+      },
+      {
+        "zaad": 1010,
+        "score": 0.674,
+        "compositie": {
+          "sens": 0.05,
+          "work": 0.8071428571428572,
+          "refl": 0.07142857142857142,
+          "mem": 0.07142857142857142,
+          "neut": 0
+        }
+      },
+      {
+        "zaad": 1011,
+        "score": 0.682,
+        "compositie": {
+          "sens": 0.08571428571428572,
+          "work": 0.8214285714285714,
+          "refl": 0.02142857142857143,
+          "mem": 0.07142857142857142,
+          "neut": 0
+        }
+      }
+    ]
+  },
+  "deel4": {
+    "vraag": "Correleert de herstructureringsactiviteit met íéts in de omgeving (hier: de trend van succes20, als stagnatiesignaal — structOn vereist alleenBijStagnatie), of alleen met de pogingsteller?",
+    "perLeven": [
+      {
+        "conditie": "ang",
+        "zaad": 1000,
+        "ticks": 89,
+        "fractieActief": 1,
+        "churnDalend": {
+          "n": 49,
+          "m": 25.836734693877553,
+          "sd": 44.56659199948972,
+          "ci": 12.47864575985712
+        },
+        "churnStijgend": {
+          "n": 40,
+          "m": 18.9,
+          "sd": 5.84325164130296,
+          "ci": 1.8108424445473874
+        },
+        "verschilDalendMinStijgend": 6.936734693877554,
+        "rhoChurnTrend": -0.05710045626189465,
+        "rhoChurnEp": -0.5649384923569774,
+        "rhoPerFase": [
+          {
+            "fase": "1-300",
+            "n": 29,
+            "rho": -0.0012390039265033832
+          },
+          {
+            "fase": "301-600",
+            "n": 30,
+            "rho": -0.09725601310303639
+          },
+          {
+            "fase": "601-900",
+            "n": 30,
+            "rho": -0.08223796376696897
+          }
+        ]
+      },
+      {
+        "conditie": "ang",
+        "zaad": 1001,
+        "ticks": 89,
+        "fractieActief": 1,
+        "churnDalend": {
+          "n": 43,
+          "m": 26.46511627906977,
+          "sd": 41.08142254063688,
+          "ci": 12.279122081166458
+        },
+        "churnStijgend": {
+          "n": 46,
+          "m": 19.804347826086957,
+          "sd": 6.177448467224749,
+          "ci": 1.7851975686652284
+        },
+        "verschilDalendMinStijgend": 6.660768452982811,
+        "rhoChurnTrend": -0.1926784311681991,
+        "rhoChurnEp": -0.5136746975618981,
+        "rhoPerFase": [
+          {
+            "fase": "1-300",
+            "n": 29,
+            "rho": -0.11273388418096217
+          },
+          {
+            "fase": "301-600",
+            "n": 30,
+            "rho": -0.2863384444193586
+          },
+          {
+            "fase": "601-900",
+            "n": 30,
+            "rho": -0.21580726168123432
+          }
+        ]
+      },
+      {
+        "conditie": "ang",
+        "zaad": 1002,
+        "ticks": 89,
+        "fractieActief": 1,
+        "churnDalend": {
+          "n": 49,
+          "m": 25.653061224489797,
+          "sd": 38.88956105671125,
+          "ci": 10.88907709587915
+        },
+        "churnStijgend": {
+          "n": 40,
+          "m": 19.05,
+          "sd": 5.620247279896098,
+          "ci": 1.7417326769480779
+        },
+        "verschilDalendMinStijgend": 6.603061224489796,
+        "rhoChurnTrend": -0.05605714236116967,
+        "rhoChurnEp": -0.5264084081443315,
+        "rhoPerFase": [
+          {
+            "fase": "1-300",
+            "n": 29,
+            "rho": 0.22275044550133652
+          },
+          {
+            "fase": "301-600",
+            "n": 30,
+            "rho": 0.01715438961337333
+          },
+          {
+            "fase": "601-900",
+            "n": 30,
+            "rho": -0.27033990954591686
+          }
+        ]
+      },
+      {
+        "conditie": "ang",
+        "zaad": 1003,
+        "ticks": 89,
+        "fractieActief": 1,
+        "churnDalend": {
+          "n": 43,
+          "m": 27.13953488372093,
+          "sd": 50.68463719311369,
+          "ci": 15.149496031162133
+        },
+        "churnStijgend": {
+          "n": 46,
+          "m": 19.956521739130434,
+          "sd": 5.553603521795076,
+          "ci": 1.6049149672458962
+        },
+        "verschilDalendMinStijgend": 7.183013144590497,
+        "rhoChurnTrend": -0.0617969767090376,
+        "rhoChurnEp": -0.5385238089936774,
+        "rhoPerFase": [
+          {
+            "fase": "1-300",
+            "n": 29,
+            "rho": -0.09227153402321892
+          },
+          {
+            "fase": "301-600",
+            "n": 30,
+            "rho": 0.06182916539617294
+          },
+          {
+            "fase": "601-900",
+            "n": 30,
+            "rho": 0.0863577023942687
+          }
+        ]
+      },
+      {
+        "conditie": "ang",
+        "zaad": 1004,
+        "ticks": 89,
+        "fractieActief": 1,
+        "churnDalend": {
+          "n": 53,
+          "m": 24.79245283018868,
+          "sd": 39.20378636078116,
+          "ci": 10.554706238744014
+        },
+        "churnStijgend": {
+          "n": 36,
+          "m": 19.916666666666668,
+          "sd": 6.600324667339154,
+          "ci": 2.156106057997457
+        },
+        "verschilDalendMinStijgend": 4.875786163522012,
+        "rhoChurnTrend": -0.1774103598912015,
+        "rhoChurnEp": -0.532246177244488,
+        "rhoPerFase": [
+          {
+            "fase": "1-300",
+            "n": 29,
+            "rho": -0.1424864454955049
+          },
+          {
+            "fase": "301-600",
+            "n": 30,
+            "rho": -0.2900661659652232
+          },
+          {
+            "fase": "601-900",
+            "n": 30,
+            "rho": -0.18400412479870257
+          }
+        ]
+      },
+      {
+        "conditie": "ang",
+        "zaad": 1005,
+        "ticks": 89,
+        "fractieActief": 1,
+        "churnDalend": {
+          "n": 52,
+          "m": 26.076923076923077,
+          "sd": 38.028289858506575,
+          "ci": 10.33620692484551
+        },
+        "churnStijgend": {
+          "n": 37,
+          "m": 19.45945945945946,
+          "sd": 6.80112161744335,
+          "ci": 2.1914711126385904
+        },
+        "verschilDalendMinStijgend": 6.617463617463617,
+        "rhoChurnTrend": -0.1519617434183248,
+        "rhoChurnEp": -0.5756705179113764,
+        "rhoPerFase": [
+          {
+            "fase": "1-300",
+            "n": 29,
+            "rho": 0.030830493608918434
+          },
+          {
+            "fase": "301-600",
+            "n": 30,
+            "rho": -0.33827337268107044
+          },
+          {
+            "fase": "601-900",
+            "n": 30,
+            "rho": -0.11653243191490359
+          }
+        ]
+      },
+      {
+        "conditie": "ang",
+        "zaad": 1006,
+        "ticks": 89,
+        "fractieActief": 1,
+        "churnDalend": {
+          "n": 49,
+          "m": 26.877551020408163,
+          "sd": 41.157539129676884,
+          "ci": 11.524110956309528
+        },
+        "churnStijgend": {
+          "n": 40,
+          "m": 19.275,
+          "sd": 5.3731884245905475,
+          "ci": 1.6651683444578855
+        },
+        "verschilDalendMinStijgend": 7.602551020408164,
+        "rhoChurnTrend": -0.2082238475366625,
+        "rhoChurnEp": -0.5809116407716504,
+        "rhoPerFase": [
+          {
+            "fase": "1-300",
+            "n": 29,
+            "rho": -0.14000994206246622
+          },
+          {
+            "fase": "301-600",
+            "n": 30,
+            "rho": -0.272771806636348
+          },
+          {
+            "fase": "601-900",
+            "n": 30,
+            "rho": -0.0857686843627271
+          }
+        ]
+      },
+      {
+        "conditie": "ang",
+        "zaad": 1007,
+        "ticks": 89,
+        "fractieActief": 1,
+        "churnDalend": {
+          "n": 52,
+          "m": 24.673076923076923,
+          "sd": 35.85029939648337,
+          "ci": 9.744222373881644
+        },
+        "churnStijgend": {
+          "n": 37,
+          "m": 17.486486486486488,
+          "sd": 4.555958379611995,
+          "ci": 1.4680300898745944
+        },
+        "verschilDalendMinStijgend": 7.186590436590436,
+        "rhoChurnTrend": -0.2938604931281665,
+        "rhoChurnEp": -0.4139191984823902,
+        "rhoPerFase": [
+          {
+            "fase": "1-300",
+            "n": 29,
+            "rho": -0.13634240375978524
+          },
+          {
+            "fase": "301-600",
+            "n": 30,
+            "rho": -0.44104215551891357
+          },
+          {
+            "fase": "601-900",
+            "n": 30,
+            "rho": -0.22894735475238426
+          }
+        ]
+      },
+      {
+        "conditie": "ang",
+        "zaad": 1008,
+        "ticks": 89,
+        "fractieActief": 1,
+        "churnDalend": {
+          "n": 44,
+          "m": 27.704545454545453,
+          "sd": 46.35483946309218,
+          "ci": 13.696979774719235
+        },
+        "churnStijgend": {
+          "n": 45,
+          "m": 19.755555555555556,
+          "sd": 6.554511130634852,
+          "ci": 1.9150941064574614
+        },
+        "verschilDalendMinStijgend": 7.948989898989897,
+        "rhoChurnTrend": -0.19504532011490439,
+        "rhoChurnEp": -0.5796032887871282,
+        "rhoPerFase": [
+          {
+            "fase": "1-300",
+            "n": 29,
+            "rho": -0.116227263861684
+          },
+          {
+            "fase": "301-600",
+            "n": 30,
+            "rho": -0.10839406210362959
+          },
+          {
+            "fase": "601-900",
+            "n": 30,
+            "rho": -0.3239044229507105
+          }
+        ]
+      },
+      {
+        "conditie": "ang",
+        "zaad": 1009,
+        "ticks": 89,
+        "fractieActief": 1,
+        "churnDalend": {
+          "n": 52,
+          "m": 25.865384615384617,
+          "sd": 39.95930716692838,
+          "ci": 10.861063407994497
+        },
+        "churnStijgend": {
+          "n": 37,
+          "m": 19.45945945945946,
+          "sd": 5.49036830678454,
+          "ci": 1.769117539554863
+        },
+        "verschilDalendMinStijgend": 6.405925155925157,
+        "rhoChurnTrend": -0.11191846516492532,
+        "rhoChurnEp": -0.6512002333310948,
+        "rhoPerFase": [
+          {
+            "fase": "1-300",
+            "n": 29,
+            "rho": -0.20658910831871793
+          },
+          {
+            "fase": "301-600",
+            "n": 30,
+            "rho": -0.18399746689902008
+          },
+          {
+            "fase": "601-900",
+            "n": 30,
+            "rho": 0.08922188045402431
+          }
+        ]
+      },
+      {
+        "conditie": "ang",
+        "zaad": 1010,
+        "ticks": 89,
+        "fractieActief": 1,
+        "churnDalend": {
+          "n": 50,
+          "m": 25.88,
+          "sd": 43.77569915757708,
+          "ci": 12.134004740397955
+        },
+        "churnStijgend": {
+          "n": 39,
+          "m": 19.974358974358974,
+          "sd": 6.401016282333116,
+          "ci": 2.0089665227419564
+        },
+        "verschilDalendMinStijgend": 5.9056410256410246,
+        "rhoChurnTrend": -0.014520335607396856,
+        "rhoChurnEp": -0.5474144840894436,
+        "rhoPerFase": [
+          {
+            "fase": "1-300",
+            "n": 29,
+            "rho": 0.026136520639131612
+          },
+          {
+            "fase": "301-600",
+            "n": 30,
+            "rho": -0.06973362992763794
+          },
+          {
+            "fase": "601-900",
+            "n": 30,
+            "rho": 0.05504486518726548
+          }
+        ]
+      },
+      {
+        "conditie": "ang",
+        "zaad": 1011,
+        "ticks": 89,
+        "fractieActief": 1,
+        "churnDalend": {
+          "n": 50,
+          "m": 26.26,
+          "sd": 48.87961471507196,
+          "ci": 13.548737954510749
+        },
+        "churnStijgend": {
+          "n": 39,
+          "m": 19.384615384615383,
+          "sd": 5.44162990586356,
+          "ci": 1.7078619750123047
+        },
+        "verschilDalendMinStijgend": 6.875384615384618,
+        "rhoChurnTrend": -0.11104893086858368,
+        "rhoChurnEp": -0.4148116434934581,
+        "rhoPerFase": [
+          {
+            "fase": "1-300",
+            "n": 29,
+            "rho": -0.2571110640111464
+          },
+          {
+            "fase": "301-600",
+            "n": 30,
+            "rho": 0.035217629777251125
+          },
+          {
+            "fase": "601-900",
+            "n": 30,
+            "rho": -0.11683726770921822
+          }
+        ]
+      },
+      {
+        "conditie": "ang-geensnoei",
+        "zaad": 1000,
+        "ticks": 89,
+        "fractieActief": 1,
+        "churnDalend": {
+          "n": 48,
+          "m": 8.291666666666666,
+          "sd": 1.0907411755575824,
+          "ci": 0.3085724585489457
+        },
+        "churnStijgend": {
+          "n": 41,
+          "m": 7.2682926829268295,
+          "sd": 0.9753048303966931,
+          "ci": 0.29854136772831374
+        },
+        "verschilDalendMinStijgend": 1.0233739837398366,
+        "rhoChurnTrend": -0.4670063201874131,
+        "rhoChurnEp": -0.25817155171169476,
+        "rhoPerFase": [
+          {
+            "fase": "1-300",
+            "n": 29,
+            "rho": -0.7215987557193674
+          },
+          {
+            "fase": "301-600",
+            "n": 30,
+            "rho": -0.39585671875463596
+          },
+          {
+            "fase": "601-900",
+            "n": 30,
+            "rho": -0.14801950656715673
+          }
+        ]
+      },
+      {
+        "conditie": "ang-geensnoei",
+        "zaad": 1001,
+        "ticks": 89,
+        "fractieActief": 1,
+        "churnDalend": {
+          "n": 47,
+          "m": 8.27659574468085,
+          "sd": 1.1171027678304901,
+          "ci": 0.3193745240344631
+        },
+        "churnStijgend": {
+          "n": 42,
+          "m": 7.333333333333333,
+          "sd": 1.0515184529577069,
+          "ci": 0.3180155268831278
+        },
+        "verschilDalendMinStijgend": 0.9432624113475176,
+        "rhoChurnTrend": -0.49358788074922644,
+        "rhoChurnEp": -0.24603877120181414,
+        "rhoPerFase": [
+          {
+            "fase": "1-300",
+            "n": 29,
+            "rho": -0.6142243611440837
+          },
+          {
+            "fase": "301-600",
+            "n": 30,
+            "rho": -0.5592200540480624
+          },
+          {
+            "fase": "601-900",
+            "n": 30,
+            "rho": -0.3314195777645305
+          }
+        ]
+      },
+      {
+        "conditie": "ang-geensnoei",
+        "zaad": 1002,
+        "ticks": 89,
+        "fractieActief": 1,
+        "churnDalend": {
+          "n": 47,
+          "m": 8.27659574468085,
+          "sd": 1.2971897326876263,
+          "ci": 0.37086055588608796
+        },
+        "churnStijgend": {
+          "n": 42,
+          "m": 7.285714285714286,
+          "sd": 0.9699312091703455,
+          "ci": 0.2933407242232229
+        },
+        "verschilDalendMinStijgend": 0.9908814589665651,
+        "rhoChurnTrend": -0.4710198038646899,
+        "rhoChurnEp": -0.30454361401561053,
+        "rhoPerFase": [
+          {
+            "fase": "1-300",
+            "n": 29,
+            "rho": -0.6381476220127121
+          },
+          {
+            "fase": "301-600",
+            "n": 30,
+            "rho": -0.46941526259073113
+          },
+          {
+            "fase": "601-900",
+            "n": 30,
+            "rho": -0.40091189377622655
+          }
+        ]
+      },
+      {
+        "conditie": "ang-geensnoei",
+        "zaad": 1003,
+        "ticks": 89,
+        "fractieActief": 1,
+        "churnDalend": {
+          "n": 48,
+          "m": 8.270833333333334,
+          "sd": 1.1058756679246549,
+          "ci": 0.31285403113761273
+        },
+        "churnStijgend": {
+          "n": 41,
+          "m": 7.317073170731708,
+          "sd": 0.9601829094043461,
+          "ci": 0.2939125390431338
+        },
+        "verschilDalendMinStijgend": 0.9537601626016263,
+        "rhoChurnTrend": -0.6020855213007064,
+        "rhoChurnEp": -0.19832298554546482,
+        "rhoPerFase": [
+          {
+            "fase": "1-300",
+            "n": 29,
+            "rho": -0.7206988661328786
+          },
+          {
+            "fase": "301-600",
+            "n": 30,
+            "rho": -0.4709780458796556
+          },
+          {
+            "fase": "601-900",
+            "n": 30,
+            "rho": -0.5965631205537121
+          }
+        ]
+      },
+      {
+        "conditie": "ang-geensnoei",
+        "zaad": 1004,
+        "ticks": 89,
+        "fractieActief": 1,
+        "churnDalend": {
+          "n": 51,
+          "m": 8.196078431372548,
+          "sd": 1.4002800840280099,
+          "ci": 0.38431372549019605
+        },
+        "churnStijgend": {
+          "n": 38,
+          "m": 7.2631578947368425,
+          "sd": 1.1782765821848356,
+          "ci": 0.37463773522835864
+        },
+        "verschilDalendMinStijgend": 0.9329205366357058,
+        "rhoChurnTrend": -0.4232681780624811,
+        "rhoChurnEp": -0.42974483782965267,
+        "rhoPerFase": [
+          {
+            "fase": "1-300",
+            "n": 29,
+            "rho": -0.6356005051467601
+          },
+          {
+            "fase": "301-600",
+            "n": 30,
+            "rho": -0.49002951530252353
+          },
+          {
+            "fase": "601-900",
+            "n": 30,
+            "rho": -0.23995641480809837
+          }
+        ]
+      },
+      {
+        "conditie": "ang-geensnoei",
+        "zaad": 1005,
+        "ticks": 89,
+        "fractieActief": 1,
+        "churnDalend": {
+          "n": 46,
+          "m": 8.26086956521739,
+          "sd": 1.08391845959608,
+          "ci": 0.3132375136706878
+        },
+        "churnStijgend": {
+          "n": 43,
+          "m": 7.3023255813953485,
+          "sd": 0.9644856443408244,
+          "ci": 0.2882820564618616
+        },
+        "verschilDalendMinStijgend": 0.9585439838220422,
+        "rhoChurnTrend": -0.5805552173455673,
+        "rhoChurnEp": -0.11530293441051237,
+        "rhoPerFase": [
+          {
+            "fase": "1-300",
+            "n": 29,
+            "rho": -0.6648741718007094
+          },
+          {
+            "fase": "301-600",
+            "n": 30,
+            "rho": -0.47335666428234435
+          },
+          {
+            "fase": "601-900",
+            "n": 30,
+            "rho": -0.5931723240119426
+          }
+        ]
+      },
+      {
+        "conditie": "ang-geensnoei",
+        "zaad": 1006,
+        "ticks": 89,
+        "fractieActief": 1,
+        "churnDalend": {
+          "n": 49,
+          "m": 8.204081632653061,
+          "sd": 1.368995858234767,
+          "ci": 0.38331884030573476
+        },
+        "churnStijgend": {
+          "n": 40,
+          "m": 7.3,
+          "sd": 1.066987131347674,
+          "ci": 0.3306627377764936
+        },
+        "verschilDalendMinStijgend": 0.9040816326530612,
+        "rhoChurnTrend": -0.5253727451565382,
+        "rhoChurnEp": -0.3070735351478409,
+        "rhoPerFase": [
+          {
+            "fase": "1-300",
+            "n": 29,
+            "rho": -0.8195836727778251
+          },
+          {
+            "fase": "301-600",
+            "n": 30,
+            "rho": -0.4829643769872493
+          },
+          {
+            "fase": "601-900",
+            "n": 30,
+            "rho": -0.28041249463175183
+          }
+        ]
+      },
+      {
+        "conditie": "ang-geensnoei",
+        "zaad": 1007,
+        "ticks": 89,
+        "fractieActief": 1,
+        "churnDalend": {
+          "n": 53,
+          "m": 8.150943396226415,
+          "sd": 1.0988845115895123,
+          "ci": 0.2958490566037736
+        },
+        "churnStijgend": {
+          "n": 36,
+          "m": 7.333333333333333,
+          "sd": 1.0690449676496978,
+          "ci": 0.34922135609890126
+        },
+        "verschilDalendMinStijgend": 0.817610062893082,
+        "rhoChurnTrend": -0.4092325143249198,
+        "rhoChurnEp": -0.27872414404508505,
+        "rhoPerFase": [
+          {
+            "fase": "1-300",
+            "n": 29,
+            "rho": -0.5529840079337325
+          },
+          {
+            "fase": "301-600",
+            "n": 30,
+            "rho": -0.36191670442405227
+          },
+          {
+            "fase": "601-900",
+            "n": 30,
+            "rho": -0.2765418251675279
+          }
+        ]
+      },
+      {
+        "conditie": "ang-geensnoei",
+        "zaad": 1008,
+        "ticks": 89,
+        "fractieActief": 1,
+        "churnDalend": {
+          "n": 50,
+          "m": 8.4,
+          "sd": 0.9897433186107875,
+          "ci": 0.2743428511917161
+        },
+        "churnStijgend": {
+          "n": 39,
+          "m": 7.0256410256410255,
+          "sd": 1.0127393670836669,
+          "ci": 0.3178494468682064
+        },
+        "verschilDalendMinStijgend": 1.3743589743589748,
+        "rhoChurnTrend": -0.624023340633875,
+        "rhoChurnEp": -0.21247691940526353,
+        "rhoPerFase": [
+          {
+            "fase": "1-300",
+            "n": 29,
+            "rho": -0.7236559983667618
+          },
+          {
+            "fase": "301-600",
+            "n": 30,
+            "rho": -0.6255908155278828
+          },
+          {
+            "fase": "601-900",
+            "n": 30,
+            "rho": -0.5690102292221232
+          }
+        ]
+      },
+      {
+        "conditie": "ang-geensnoei",
+        "zaad": 1009,
+        "ticks": 89,
+        "fractieActief": 1,
+        "churnDalend": {
+          "n": 52,
+          "m": 8.307692307692308,
+          "sd": 1.3363465198503481,
+          "ci": 0.3632231216250862
+        },
+        "churnStijgend": {
+          "n": 37,
+          "m": 7.135135135135135,
+          "sd": 1.1096085937082643,
+          "ci": 0.3575403170574822
+        },
+        "verschilDalendMinStijgend": 1.1725571725571733,
+        "rhoChurnTrend": -0.5202852993442432,
+        "rhoChurnEp": -0.3533221186271035,
+        "rhoPerFase": [
+          {
+            "fase": "1-300",
+            "n": 29,
+            "rho": -0.7329197807582915
+          },
+          {
+            "fase": "301-600",
+            "n": 30,
+            "rho": -0.603581421579834
+          },
+          {
+            "fase": "601-900",
+            "n": 30,
+            "rho": -0.1782025426447529
+          }
+        ]
+      },
+      {
+        "conditie": "ang-geensnoei",
+        "zaad": 1010,
+        "ticks": 89,
+        "fractieActief": 1,
+        "churnDalend": {
+          "n": 51,
+          "m": 8.27450980392157,
+          "sd": 1.3278317871258996,
+          "ci": 0.3644299356645365
+        },
+        "churnStijgend": {
+          "n": 38,
+          "m": 7.157894736842105,
+          "sd": 1.0007109848036473,
+          "ci": 0.31818004586818466
+        },
+        "verschilDalendMinStijgend": 1.1166150670794641,
+        "rhoChurnTrend": -0.4531540260070684,
+        "rhoChurnEp": -0.23814060407103452,
+        "rhoPerFase": [
+          {
+            "fase": "1-300",
+            "n": 29,
+            "rho": -0.7221873626685699
+          },
+          {
+            "fase": "301-600",
+            "n": 30,
+            "rho": -0.5835530143879901
+          },
+          {
+            "fase": "601-900",
+            "n": 30,
+            "rho": -0.07404736946948257
+          }
+        ]
+      },
+      {
+        "conditie": "ang-geensnoei",
+        "zaad": 1011,
+        "ticks": 89,
+        "fractieActief": 1,
+        "churnDalend": {
+          "n": 46,
+          "m": 8.369565217391305,
+          "sd": 1.2885598447219875,
+          "ci": 0.3723760568917822
+        },
+        "churnStijgend": {
+          "n": 43,
+          "m": 7.209302325581396,
+          "sd": 0.9894235824310302,
+          "ci": 0.29573593627722844
+        },
+        "verschilDalendMinStijgend": 1.160262891809909,
+        "rhoChurnTrend": -0.5590554064313152,
+        "rhoChurnEp": -0.326906818070813,
+        "rhoPerFase": [
+          {
+            "fase": "1-300",
+            "n": 29,
+            "rho": -0.7185971927080548
+          },
+          {
+            "fase": "301-600",
+            "n": 30,
+            "rho": -0.635802563316685
+          },
+          {
+            "fase": "601-900",
+            "n": 30,
+            "rho": -0.4173379215761242
+          }
+        ]
+      }
+    ],
+    "fractieActief": {
+      "n": 24,
+      "m": 1,
+      "sd": 0,
+      "ci": 0
+    },
+    "verschilDalendMinStijgend": {
+      "n": 24,
+      "m": 3.881255741180439,
+      "sd": 2.967071836497656,
+      "ci": 1.1870759648349698
+    },
+    "tekentoetsDalendBovenStijgend": {
+      "n": 24,
+      "positief": 24,
+      "p": 1.1920928955078125e-7
+    },
+    "rhoChurnTrendGemiddeld": {
+      "n": 24,
+      "m": -0.3233445314849379,
+      "sd": 0.205285314782413,
+      "ci": 0.08213123124091097
+    },
+    "rhoChurnEpGemiddeld": {
+      "n": 24,
+      "m": -0.40450380938540853,
+      "sd": 0.15339053094805294,
+      "ci": 0.06136899359222916
+    },
+    "rhoPerFaseGemiddeld": [
+      {
+        "fase": "1-300",
+        "rho": {
+          "n": 24,
+          "m": -0.3829318952941812,
+          "sd": 0.32843079158441096,
+          "ci": 0.1313996830160285
+        }
+      },
+      {
+        "fase": "301-600",
+        "rho": {
+          "n": 24,
+          "m": -0.3385807120645454,
+          "sd": 0.2190855575901359,
+          "ci": 0.08765247826446529
+        }
+      },
+      {
+        "fase": "601-900",
+        "rho": {
+          "n": 24,
+          "m": -0.22913959140169324,
+          "sd": 0.19321228445157926,
+          "ci": 0.07730101312749536
+        }
+      }
+    ]
+  }
+}
