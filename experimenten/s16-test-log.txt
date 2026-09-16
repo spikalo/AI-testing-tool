@@ -1,0 +1,26 @@
+OK    de maatfunctie reproduceert de tabel van stap 13   25/25 waarden gelijk
+OK    de klokconditie geeft exact het leven van stap 13 terug   2/2 levens identiek
+OK    een andere detectorinstelling verandert het leven niet zolang de poort uit staat
+OK    maar de d-reeks verandert wél mee (anders meet de detector niets)
+OK    elke poging heeft een regel in de poortlog   900 van 900
+OK    elke d is eindig
+OK    geen enkele d is negatief
+OK    er zijn rijpe pogingen   750 rijp
+OK    elke drempel is eindig zodra de detector rijp is
+OK    de d-reeks staat niet stil
+OK    elke poging heeft zestien kanaalgemiddelden
+OK    de signaalconditie herstructureert werkelijk   24 ronden
+OK    en doet dat op signaalmomenten
+OK    elke ronde valt op een poging waarop de poort vuurde
+OK    de poort volgt niet stiekem de klok   minstens één ronde valt buiten het klokrooster
+OK    de vaste conditie herstructureert niet
+OK    en de detector loopt daar nog steeds mee
+OK    de budgetconditie loopt op de opgegeven klokperiode   28 ronden, elke 32 pogingen
+OK    en dat is een ander aantal dan de gewone klok
+OK    de signaalconditie verbouwt echt op andere momenten dan de klok
+OK    het stagnatievenster staat los van structEvery   venster 10, klok 32
+OK    de aansturing staat in de opgeslagen configuratie   klok
+OK    en bij de signaalconditie staat daar "omgevingssignaal"
+
+alle controles groen
+KLAAR exitcode=0 

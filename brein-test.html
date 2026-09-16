@@ -1843,6 +1843,15 @@ function readCfg(){
     perturbFrac: $("pfrac")? +$("pfrac").value/100 : 1,
     catPolicy: $("catbeleid")? $("catbeleid").checked : false,
     structOn:$("structplast").checked, structEvery:+$("structevery").value,
+    /* stap 16 — de aansturing van de herstructureringspoort. `structSignal:false` is
+       de oude regel en wel exact: de poort valt dan terug op S.ep % structEvery, en
+       de detector trekt niets uit de toevalsgenerator (vaste regel uit stap 7). De
+       waarden komen uit cfg en niet uit een globale (fout 12), zodat een conditie die
+       ze zet de experimentloper ook werkelijk bereikt. `stagVenster` maakt het venster
+       van isStagnating() los van structEvery: zonder die knop verandert een conditie
+       die de klokperiode verzet stilzwijgend ook de stagnatiemeting mee. */
+    structSignal:false, sigFast:5, sigSlow:60, sigK:3, sigWarmup:60, sigBuffer:200,
+    stagVenster:null,
     pruneT:+$("prune").value/1000, sprout:+$("sprout").value,
     growOn:$("grow").checked, growStagnant:$("growstag").checked,
     growMax:+$("growmax").value, growN:+$("grown").value, newLinks:+$("newlinks").value,
@@ -1882,6 +1891,11 @@ const S={
   rnd:Math.random, evalRnd:null, evalSample:false, evalTemp:undefined,
   phase:0, selected:-1, hover:-1,
   lastRestructure:{pruned:0,sprouted:0,retyped:0,grown:0}, structLog:[],
+  /* stap 16: de detector op de invoerstatistiek. epInSom/epInN tellen de invoer van
+     de lopende poging op; drift houdt de twee exponentiële gemiddelden en de ring
+     voor de meelopende drempel bij; driftLog bewaart de hele reeks — de kromme, niet
+     alleen het afgeleide getal (vaste regel). */
+  drift:null, driftLog:[], epInSom:null, epInN:0,
   resultsDirHandle:null, lastResult:null, dirty:false,
   gradAccum:null, gradAccumBias:null,
   expDirHandle:null, expCsvLines:null, expCsvName:"runs.csv", expAbort:false, expRunning:false,
@@ -1901,6 +1915,7 @@ function startEpisode(){
   S.step=0; S.epReward=0; S.epCollisions=0; S.epIdle=0; S.reached=false;
   S.prevDist=Math.hypot(S.world.goal.x-S.ag.x,S.world.goal.y-S.ag.y);
   resetBrainState(S.B);
+  invoerReset();          /* stap 16: de invoerteller hoort bij één poging */
 }
 /* Ruis loopt terug, maar nooit tot nul: zonder exploratie komt er geen spoor meer
    binnen, terwijl de vervaging en het snoeien wél doorgaan — en dan valt een goed
@@ -1937,6 +1952,10 @@ function gameTick(learn,noise){
   if(learn) S.stapLeer++; else S.stapInf++;
   S.lrScale=c.lrAnneal? (c.noise0>0? noise/c.noise0 : 1) : 1;
   sense(S.ag,w,S.inp);
+  /* stap 16: alleen de lerende stappen tellen mee voor de detector. De benchmark en
+     de geheugenproef leggen hun eigen zichtbaarheidsregime op; zouden die meetellen,
+     dan zag de detector op elke fasegrens een omslag die het leven niet gehad heeft. */
+  if(learn) invoerTel(S.inp);
   /* De criticus wordt gelezen op de toestand vóór de actie — dat is de s in
      r + γV(s′) − V(s). Hij kost ook rekenwerk, en dat hoort net zo goed geteld te
      worden als het rekenwerk in de graaf: drie keer zestien kanten-bezoeken per
@@ -1999,18 +2018,148 @@ function finishEpisode(){
     maxW:mx, conns:S.B.nc,meanW:meanAbsW(S.B),neuronen:S.B.n-HID0,succ20});
   fadeWeights(S.B,c);
   S.ep++;
-  if(c.structOn && S.ep%c.structEvery===0){
+  /* De poort. De detector wordt altijd bijgewerkt, ook als hij niet stuurt — zie de
+     blokcommentaar bij driftStap(): dat maakt de klokconditie een controle op zichzelf.
+     Welke tak er stuurt hangt af van cfg.structSignal en van niets anders. */
+  const poort=driftStap(c);
+  const klokslag = S.ep%c.structEvery===0;
+  const vuur = c.structSignal ? poort.vuur : klokslag;
+  S.driftLog.push({poging:S.ep, d:poort.d, drempel:poort.drempel,
+    rijp:poort.rijp, signaalVuur:poort.vuur, klokslag, vuur, m:poort.m||null});
+  if(c.structOn && vuur){
     S.lastRestructure=restructure(S.B,c,S.rnd,isStagnating(c));
-    S.structLog.push({ep:S.ep,...S.lastRestructure,neuronen:S.B.n-HID0});
+    S.structLog.push({ep:S.ep,...S.lastRestructure,neuronen:S.B.n-HID0,
+      bron:c.structSignal?"signaal":"klok"});
   }
   if(c.evalOn && S.ep%20===0) runEval();
   if(S.ep%c.worldEvery===0) newWorld(S.ep);
   startEpisode();
 }
+/* ============== stap 16: de poort die de herstructurering aanstuurt ==============
+   Stap 13 vond dat de herstructurering op een klok loopt en aantoonbaar niet op een
+   omslag in de omgeving reageert; stap 14 liet zien dat zij wél meebeweegt met een
+   stagnatiesignaal, maar dat stagnatie niet dezelfde as is als een omslag — een
+   omslag hoeft geen aanhoudende stilstand in de beloning te veroorzaken. Hier komt
+   er een tweede aansturing bij, en die kijkt naar de omgeving zelf.
+
+   WAAROM DE INVOER EN NIET DE BELONING. Een poort op de lopende beloningsbasislijn
+   is circulair te lezen — minder verbouwen omdat het net al goed speelt is niet te
+   onderscheiden van meer verbouwen omdat het vastzit — en is bovendien precies de
+   samenhang die stap 14 al gemeten heeft. De invoerstatistiek verschuift bij een
+   omslag ongeacht hoe goed de agent speelt, en is dus de enige kandidaat die de
+   vraag niet bij voorbaat beantwoordt.
+
+   HOE. Per poging wordt van elk van de zestien invoerkanalen het gemiddelde over de
+   stappen van die poging genomen. Daar lopen twee exponentiële gemiddelden overheen,
+   een snel (sigFast pogingen) en een traag (sigSlow). Hun afstand d is groot zolang de
+   invoerverdeling verschuift en klein zodra zij weer stilstaat.
+
+   ELK KANAAL WORDT GESCHAALD OP ZIJN EIGEN SPREIDING: d = gemiddelde over de kanalen
+   van |snel − traag| / (sd + ε), met sd een meelopende standaardafwijking per kanaal.
+   De eerste kalibratie deed dat niet en dat werkte niet: de acht afstandsstralen
+   fluctueren van poging tot poging veel sterker dan de doelkanalen, dus mat een
+   ongeschaalde L1-afstand vooral hoe grillig de agent die ronde gelopen had. De omslag
+   kwam er nauwelijks bovenuit (1,4 × zo vaak vuren na een omslag als ernaast, zie
+   experimenten/s16-kalibratie.json). Geschaald is de ruis per kanaal van dezelfde orde
+   en telt alleen een systematische verschuiving nog mee.
+
+   De drempel is niet met de hand gekozen maar loopt mee: mediaan + sigK × MAD over de
+   laatste sigBuffer waarden van d. Die ring wordt pas ná het vergelijken bijgewerkt,
+   zodat de huidige waarde haar eigen drempel niet omhoog duwt, en hij wordt NIET
+   bijgewerkt in een poging waarin de poort vuurt — anders tilt een omslag zijn eigen
+   drempel op en dooft de detector zichzelf. Dat mag omdat d een verschúíving meet en
+   geen niveau: zodra de nieuwe omgeving stilstaat, zakt d vanzelf terug en vuurt de
+   poort weer niet, ook zonder dat de drempel is meegegroeid.
+
+   DE DETECTOR TREKT NIETS UIT DE TOEVALSGENERATOR, en zijn boekhouding draait ook
+   wanneer hij niet stuurt. Dat is met opzet: in de klokconditie levert hij dezelfde
+   d-reeks zonder ook maar iets aan het leven te veranderen, zodat de klokconditie van
+   stap 16 bit voor bit gelijk moet zijn aan die van stap 13. Dat is meteen de controle
+   dat de nieuwe knop in haar uitstand werkelijk niets doet.                         */
+function invoerReset(){ S.epInSom=new Float64Array(N_IN); S.epInN=0; }
+function invoerTel(inp){
+  if(!S.epInSom) invoerReset();
+  for(let i=0;i<N_IN;i++) S.epInSom[i]+=inp[i];
+  S.epInN++;
+}
+/* mediaan en MAD over de ring — verdelingsvrij, en ongevoelig voor de uitschieters
+   die we juist willen detecteren. O(n log n) op tweehonderd waarden, één keer per
+   poging; dat valt weg tegen de driehonderd spelstappen van die poging. */
+function medMad(ring){
+  const v=ring.filter(x=>x!==null&&isFinite(x)).sort((a,b)=>a-b);
+  if(v.length<8) return null;
+  const med=v[v.length>>1];
+  const afw=v.map(x=>Math.abs(x-med)).sort((a,b)=>a-b);
+  return {med, mad:afw[afw.length>>1]};
+}
+function driftStap(c){
+  if(!S.drift) S.drift={snel:null, traag:null, var:null, ring:[], gezien:0};
+  const D=S.drift;
+  if(!S.epInN) return {d:null, drempel:null, vuur:false, rijp:false};
+  const m=new Float64Array(N_IN);
+  for(let i=0;i<N_IN;i++) m[i]=S.epInSom[i]/S.epInN;
+  const af=2/(Math.max(1,c.sigFast)+1), at=2/(Math.max(1,c.sigSlow)+1);
+  if(!D.snel){
+    D.snel=Float64Array.from(m); D.traag=Float64Array.from(m);
+    D.var=new Float64Array(N_IN);
+  } else {
+    for(let i=0;i<N_IN;i++){
+      /* De spreiding wordt gemeten rond het SNELLE gemiddelde, niet rond het trage.
+         Dat is geen detail maar het verschil tussen een werkende en een dode detector:
+         meet je haar rond het trage gemiddelde, dan blaast een omslag de teller én de
+         noemer even hard op en blijft de verhouding vlak — de tweede kalibratieronde
+         gaf letterlijk dezelfde d in een stilstaande fase als na een omslag (0,479
+         tegen 0,479). Rond het snelle gemiddelde meet sd alleen de schommeling van
+         poging tot poging: het snelle gemiddelde heeft een verschuiving binnen een
+         handvol pogingen ingehaald, terwijl het gat met het trage gemiddelde er
+         tientallen pogingen over doet. */
+      const afwSnel=m[i]-D.snel[i];
+      D.var[i]+=at*(afwSnel*afwSnel-D.var[i]);
+      D.snel[i]+=af*afwSnel;
+      D.traag[i]+=at*(m[i]-D.traag[i]);
+    }
+  }
+  /* d is een z-maat, geen ruwe afstand, en dat is de derde en laatste correctie van de
+     kalibratie. Twee dingen gingen er mis zolang hij dat niet was.
+
+     Ten eerste de noemer. De ruwe spreiding van één poging is niet de spreiding van
+     het verschil tussen twee exponentiële gemiddelden: die is een factor kleiner,
+     namelijk sqrt(a/(2−a)) per gemiddelde. Door door de ruwe sd te delen was elke
+     verschuiving structureel te klein.
+
+     Ten tweede het samennemen over de kanalen. Een gemiddelde van |z| over zestien
+     kanalen verdunt een verschuiving die in acht kanalen zit met de acht kanalen die
+     niets doen. De diagnose (experimenten/s16-diagnose.json) liet precies dat zien: de
+     doelkanalen schuiven 1,3 tot 2,5 spreiding op, de stralen nauwelijks, en het
+     gemiddelde kwam daardoor niet verder dan 0,35 naar 0,6. Kwadratisch samennemen
+     (RMS) weegt een echte uitschieter zwaarder dan ruis en houdt de verdunning binnen
+     de perken. Onder stilstand ligt d dan rond 1 met een spreiding van ongeveer
+     1/sqrt(2N); dat is meteen de schaal waarop de meelopende drempel werkt. */
+  const va=af/(2-af)+at/(2-at);
+  let s=0;
+  for(let i=0;i<N_IN;i++){
+    const z=(D.snel[i]-D.traag[i])/(Math.sqrt(D.var[i]*va)+1e-6);
+    s+=z*z;
+  }
+  const d=Math.sqrt(s/N_IN);
+  D.gezien++;
+  const basis=medMad(D.ring);
+  const drempel = basis ? basis.med + c.sigK*(basis.mad+1e-9) : null;
+  /* Opwarmen: zolang het trage gemiddelde zijn eigen venster nog niet gezien heeft,
+     is d groot om een reden die niets met de omgeving te maken heeft. */
+  const rijp = D.gezien > Math.max(c.sigWarmup|0, c.sigSlow|0);
+  const vuur = !!(rijp && drempel!==null && isFinite(d) && d>drempel);
+  /* de ring bevriest tijdens het vuren — zie de blokcommentaar hierboven */
+  if(!vuur && isFinite(d)){ D.ring.push(d); if(D.ring.length>(c.sigBuffer|0)) D.ring.shift(); }
+  /* De zestien kanaalgemiddelden van deze poging gaan mee de log in. Dat is de ruwe
+     invoer waar d uit komt; zonder die kolommen is achteraf niet na te gaan wélk
+     kanaal een omslag droeg, en is elke herberekening een nieuwe meetreeks. */
+  return {d, drempel, vuur, rijp, m:Array.from(m, x=>+x.toFixed(5))};
+}
 /* Gaat het brein nog vooruit? Vergelijk de gemiddelde beloning van het laatste
    blok pogingen met dat ervoor. Zo niet, dan mag er materiaal bijgroeien. */
 function isStagnating(c){
-  const k=Math.max(6,c.structEvery);
+  const k=Math.max(6, (c.stagVenster||c.structEvery));
   if(S.rewards.length<2*k) return false;
   const a=S.rewards.slice(-2*k,-k), b=S.rewards.slice(-k);
   const m=x=>x.reduce((p,q)=>p+q,0)/x.length;
@@ -2806,6 +2955,11 @@ function buildResult(naamOverride){
         perturbatieFractie:(S.cfg.perturbFrac===undefined?1:S.cfg.perturbFrac),
         beleidsvorm:S.cfg.catPolicy?"categorisch":"bernoulli"},
       structureel:{aan:S.cfg.structOn, herstructureerElke:S.cfg.structEvery,
+        /* stap 16 */
+        aansturing:S.cfg.structSignal?"omgevingssignaal":"klok",
+        signaalSnelVenster:S.cfg.sigFast, signaalTraagVenster:S.cfg.sigSlow,
+        signaalK:S.cfg.sigK, signaalOpwarmen:S.cfg.sigWarmup, signaalRing:S.cfg.sigBuffer,
+        stagnatieVenster:(S.cfg.stagVenster||S.cfg.structEvery),
         snoeidrempel:S.cfg.pruneT, nieuweVerbindingenPerRonde:S.cfg.sprout,
         groeiAan:S.cfg.growOn, alleenBijStagnatie:S.cfg.growStagnant, maxNeuronen:S.cfg.growMax,
         nieuweNeuronenPerRonde:S.cfg.growN, startverbindingenNieuwNeuron:S.cfg.newLinks,
@@ -2858,6 +3012,10 @@ function buildResult(naamOverride){
       verbindingen:d.conns,neuronen:d.neuronen,gemW:d.meanW,succes20:d.succ20})),
     toetsen:S.evalHist.map(e=>({poging:e.ep,pct:e.pct})),
     herstructureringen:S.structLog,
+    /* stap 16: de hele d-reeks, niet alleen het afgeleide getal. Drie keer eerder heeft
+       dat het verschil gemaakt tussen een migratie van dertig seconden en een dag
+       opnieuw meten (vaste regel). */
+    poort:S.driftLog,
     netwerk:{
       nextId:S.B.nextId||0,
       neuronen:Array.from({length:S.B.n},(_,i)=>({i,type:KIND_KEY[S.B.kinds[i]],label:S.B.labels[i],
@@ -3141,6 +3299,7 @@ function rekenkosten(){
 function clearRunState(){
   S.hist=[]; S.evalHist=[]; S.rewards=[]; S.stepsSucc=[]; S.succTotal=0; S.collisions=0;
   S.structLog=[]; S.ep=0; S.elapsed=0; S.selected=-1; S.lastBench=null; S.evalStreng=null;
+  S.drift=null; S.driftLog=[]; S.epInSom=null; S.epInN=0;   /* stap 16 */
   S.lastMem=null;
   S.kbLeer=0; S.kbInf=0; S.stapLeer=0; S.stapInf=0;
 }

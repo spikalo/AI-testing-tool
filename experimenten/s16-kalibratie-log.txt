@@ -1,0 +1,10 @@
+kalibratie op de klokconditie (de detector loopt mee maar stuurt niet),
+3 zaden, 900 pogingen, omslag op 300 en 600, venster 50
+
+variant                   d stil    d na omslag   vuur/leven  % stil   % na     verhouding  eerste vuur na omslag
+fast 5 slow 60 k 3        1.373     1.443         57.7        5.9      13.7     2.3×        47.3 / 3.0 pogingen
+fast 10 slow 100 k 3      1.408     1.685         48.7        4.3      18.3     4.2×        49.0 / 3.0 pogingen
+fast 20 slow 150 k 3      1.469     1.851         28.0        1.0      21.7     22.2×       – / 4.0 pogingen
+fast 20 slow 150 k 5      1.469     1.851         3.0         0.0      3.0      –           – / 6.0 pogingen
+fast 30 slow 200 k 3      1.607     1.866         2.3         0.1      2.0      36.0×       – / 7.0 pogingen
+KLAAR exitcode=0 

@@ -1,0 +1,280 @@
+{
+  "uitgevoerd": "2026-09-16T16:44:35.477Z",
+  "beschrijving": "Kalibratie van de detector uit stap 16 op de klokconditie, waarin hij meeloopt maar niets stuurt. Gemeten is hoe vaak de poort zou vuren in een stilstaande fase en of de omslag daar bovenuit komt; er is geen uitkomstmaat bij betrokken. De eerste ronde hiervan (ongeschaalde L1-afstand, drempelring die tijdens het vuren doorliep) haalde een verhouding van 1,4 x en is de reden dat elk kanaal nu op zijn eigen spreiding geschaald wordt en dat de ring tijdens het vuren bevriest.",
+  "zaden": 3,
+  "fasen": [
+    {
+      "naam": "A1",
+      "pogingen": 300,
+      "ov": {
+        "goalBlink": 0
+      }
+    },
+    {
+      "naam": "B",
+      "pogingen": 300,
+      "ov": {
+        "goalBlink": 20
+      }
+    },
+    {
+      "naam": "A2",
+      "pogingen": 300,
+      "ov": {
+        "goalBlink": 0
+      }
+    }
+  ],
+  "omslagpogingen": [
+    300,
+    600
+  ],
+  "venster": 50,
+  "varianten": [
+    {
+      "variant": {
+        "sigFast": 5,
+        "sigSlow": 60,
+        "sigK": 3,
+        "sigWarmup": 60,
+        "sigBuffer": 200
+      },
+      "perZaad": [
+        {
+          "zaad": 1000,
+          "nVuur": 39,
+          "dStil": 1.377396352597866,
+          "dNa": 1.4759208613281911,
+          "vuurStil": 0.03918918918918919,
+          "vuurNa": 0.1,
+          "eersteNaOmslag1": 48,
+          "eersteNaOmslag2": 3
+        },
+        {
+          "zaad": 1001,
+          "nVuur": 70,
+          "dStil": 1.3749580143582631,
+          "dNa": 1.4235442615215284,
+          "vuurStil": 0.07432432432432433,
+          "vuurNa": 0.15,
+          "eersteNaOmslag1": 47,
+          "eersteNaOmslag2": 3
+        },
+        {
+          "zaad": 1002,
+          "nVuur": 64,
+          "dStil": 1.3667890923337735,
+          "dNa": 1.428955034282518,
+          "vuurStil": 0.06486486486486487,
+          "vuurNa": 0.16,
+          "eersteNaOmslag1": 47,
+          "eersteNaOmslag2": 3
+        }
+      ],
+      "dStil": 1.3730478197633007,
+      "dNa": 1.4428067190440792,
+      "vuurPerLeven": 57.666666666666664,
+      "vuurStil": 0.05945945945945946,
+      "vuurNa": 0.1366666666666667,
+      "verhouding": 2.298484848484849,
+      "eersteNaOmslag1": 47.333333333333336,
+      "eersteNaOmslag2": 3
+    },
+    {
+      "variant": {
+        "sigFast": 10,
+        "sigSlow": 100,
+        "sigK": 3,
+        "sigWarmup": 100,
+        "sigBuffer": 200
+      },
+      "perZaad": [
+        {
+          "zaad": 1000,
+          "nVuur": 49,
+          "dStil": 1.4100839632142665,
+          "dNa": 1.7233536969986758,
+          "vuurStil": 0.04285714285714286,
+          "vuurNa": 0.19,
+          "eersteNaOmslag1": null,
+          "eersteNaOmslag2": 3
+        },
+        {
+          "zaad": 1001,
+          "nVuur": 47,
+          "dStil": 1.4118295954288957,
+          "dNa": 1.6576255445535932,
+          "vuurStil": 0.04285714285714286,
+          "vuurNa": 0.17,
+          "eersteNaOmslag1": 49,
+          "eersteNaOmslag2": 3
+        },
+        {
+          "zaad": 1002,
+          "nVuur": 50,
+          "dStil": 1.4031936442782762,
+          "dNa": 1.6729577292547766,
+          "vuurStil": 0.04428571428571428,
+          "vuurNa": 0.19,
+          "eersteNaOmslag1": 49,
+          "eersteNaOmslag2": 3
+        }
+      ],
+      "dStil": 1.4083690676404794,
+      "dNa": 1.6846456569356818,
+      "vuurPerLeven": 48.666666666666664,
+      "vuurStil": 0.043333333333333335,
+      "vuurNa": 0.18333333333333335,
+      "verhouding": 4.230769230769231,
+      "eersteNaOmslag1": 49,
+      "eersteNaOmslag2": 3
+    },
+    {
+      "variant": {
+        "sigFast": 20,
+        "sigSlow": 150,
+        "sigK": 3,
+        "sigWarmup": 150,
+        "sigBuffer": 200
+      },
+      "perZaad": [
+        {
+          "zaad": 1000,
+          "nVuur": 36,
+          "dStil": 1.4770713693604747,
+          "dNa": 1.8977080351425415,
+          "vuurStil": 0.012307692307692308,
+          "vuurNa": 0.28,
+          "eersteNaOmslag1": null,
+          "eersteNaOmslag2": 4
+        },
+        {
+          "zaad": 1001,
+          "nVuur": 24,
+          "dStil": 1.4655398042182577,
+          "dNa": 1.8181345147712333,
+          "vuurStil": 0.007692307692307693,
+          "vuurNa": 0.19,
+          "eersteNaOmslag1": null,
+          "eersteNaOmslag2": 4
+        },
+        {
+          "zaad": 1002,
+          "nVuur": 24,
+          "dStil": 1.4652366208192125,
+          "dNa": 1.837551564742171,
+          "vuurStil": 0.009230769230769232,
+          "vuurNa": 0.18,
+          "eersteNaOmslag1": null,
+          "eersteNaOmslag2": 4
+        }
+      ],
+      "dStil": 1.4692825981326483,
+      "dNa": 1.851131371551982,
+      "vuurPerLeven": 28,
+      "vuurStil": 0.009743589743589744,
+      "vuurNa": 0.21666666666666667,
+      "verhouding": 22.236842105263158,
+      "eersteNaOmslag1": null,
+      "eersteNaOmslag2": 4
+    },
+    {
+      "variant": {
+        "sigFast": 20,
+        "sigSlow": 150,
+        "sigK": 5,
+        "sigWarmup": 150,
+        "sigBuffer": 200
+      },
+      "perZaad": [
+        {
+          "zaad": 1000,
+          "nVuur": 3,
+          "dStil": 1.4770713693604747,
+          "dNa": 1.8977080351425415,
+          "vuurStil": 0,
+          "vuurNa": 0.03,
+          "eersteNaOmslag1": null,
+          "eersteNaOmslag2": 6
+        },
+        {
+          "zaad": 1001,
+          "nVuur": 3,
+          "dStil": 1.4655398042182577,
+          "dNa": 1.8181345147712333,
+          "vuurStil": 0,
+          "vuurNa": 0.03,
+          "eersteNaOmslag1": null,
+          "eersteNaOmslag2": 6
+        },
+        {
+          "zaad": 1002,
+          "nVuur": 3,
+          "dStil": 1.4652366208192125,
+          "dNa": 1.837551564742171,
+          "vuurStil": 0,
+          "vuurNa": 0.03,
+          "eersteNaOmslag1": null,
+          "eersteNaOmslag2": 6
+        }
+      ],
+      "dStil": 1.4692825981326483,
+      "dNa": 1.851131371551982,
+      "vuurPerLeven": 3,
+      "vuurStil": 0,
+      "vuurNa": 0.03,
+      "verhouding": null,
+      "eersteNaOmslag1": null,
+      "eersteNaOmslag2": 6
+    },
+    {
+      "variant": {
+        "sigFast": 30,
+        "sigSlow": 200,
+        "sigK": 3,
+        "sigWarmup": 200,
+        "sigBuffer": 200
+      },
+      "perZaad": [
+        {
+          "zaad": 1000,
+          "nVuur": 0,
+          "dStil": 1.61930613212671,
+          "dNa": 1.9158364990561685,
+          "vuurStil": 0,
+          "vuurNa": 0,
+          "eersteNaOmslag1": null,
+          "eersteNaOmslag2": null
+        },
+        {
+          "zaad": 1001,
+          "nVuur": 3,
+          "dStil": 1.5920166672780924,
+          "dNa": 1.8448670155730296,
+          "vuurStil": 0,
+          "vuurNa": 0.03,
+          "eersteNaOmslag1": null,
+          "eersteNaOmslag2": 7
+        },
+        {
+          "zaad": 1002,
+          "nVuur": 4,
+          "dStil": 1.6088451812946063,
+          "dNa": 1.8385962402433542,
+          "vuurStil": 0.0016666666666666668,
+          "vuurNa": 0.03,
+          "eersteNaOmslag1": null,
+          "eersteNaOmslag2": 7
+        }
+      ],
+      "dStil": 1.6067226602331361,
+      "dNa": 1.8664332516241842,
+      "vuurPerLeven": 2.3333333333333335,
+      "vuurStil": 0.0005555555555555556,
+      "vuurNa": 0.02,
+      "verhouding": 36,
+      "eersteNaOmslag1": null,
+      "eersteNaOmslag2": 7
+    }
+  ]
+}
