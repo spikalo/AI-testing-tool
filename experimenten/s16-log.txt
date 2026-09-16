@@ -1,0 +1,87 @@
+ang-klok       zaad 1000: A1 67%  B 25%  A-na-B 48%  A2 65%  herstel 34p  ronden 90 (na de tweede omslag 5)  (17s)
+ang-klok       zaad 1001: A1 60%  B 11%  A-na-B 23%  A2 63%  herstel 46p  ronden 90 (na de tweede omslag 5)  (18s)
+ang-klok       zaad 1002: A1 49%  B 15%  A-na-B 43%  A2 61%  herstel 11p  ronden 90 (na de tweede omslag 5)  (18s)
+ang-klok       zaad 1003: A1 58%  B 16%  A-na-B 32%  A2 61%  herstel 16p  ronden 90 (na de tweede omslag 5)  (19s)
+ang-klok       zaad 1004: A1 55%  B 18%  A-na-B 56%  A2 63%  herstel 13p  ronden 90 (na de tweede omslag 5)  (18s)
+ang-klok       zaad 1005: A1 56%  B 13%  A-na-B 65%  A2 66%  herstel 11p  ronden 90 (na de tweede omslag 5)  (17s)
+ang-klok       zaad 1006: A1 56%  B 14%  A-na-B 22%  A2 60%  herstel 33p  ronden 90 (na de tweede omslag 5)  (20s)
+ang-klok       zaad 1007: A1 69%  B 18%  A-na-B 64%  A2 69%  herstel 11p  ronden 90 (na de tweede omslag 5)  (17s)
+ang-klok       zaad 1008: A1 59%  B 13%  A-na-B 38%  A2 71%  herstel 39p  ronden 90 (na de tweede omslag 5)  (17s)
+ang-klok       zaad 1009: A1 27%  B 4%  A-na-B 43%  A2 53%  herstel 43p  ronden 90 (na de tweede omslag 5)  (19s)
+ang-klok       zaad 1010: A1 65%  B 20%  A-na-B 54%  A2 68%  herstel 47p  ronden 90 (na de tweede omslag 5)  (18s)
+ang-klok       zaad 1011: A1 64%  B 20%  A-na-B 33%  A2 73%  herstel 17p  ronden 90 (na de tweede omslag 5)  (18s)
+ang-signaal    zaad 1000: A1 61%  B 25%  A-na-B 50%  A2 66%  herstel 34p  ronden 24 (na de tweede omslag 20)  (13s)
+ang-signaal    zaad 1001: A1 62%  B 8%  A-na-B 40%  A2 73%  herstel 15p  ronden 56 (na de tweede omslag 30)  (15s)
+ang-signaal    zaad 1002: A1 57%  B 18%  A-na-B 45%  A2 65%  herstel 51p  ronden 27 (na de tweede omslag 22)  (14s)
+ang-signaal    zaad 1003: A1 51%  B 15%  A-na-B 39%  A2 65%  herstel 42p  ronden 127 (na de tweede omslag 45)  (17s)
+ang-signaal    zaad 1004: A1 56%  B 18%  A-na-B 55%  A2 67%  herstel 48p  ronden 49 (na de tweede omslag 23)  (15s)
+ang-signaal    zaad 1005: A1 69%  B 12%  A-na-B 57%  A2 67%  herstel 13p  ronden 57 (na de tweede omslag 25)  (14s)
+ang-signaal    zaad 1006: A1 46%  B 7%  A-na-B 32%  A2 62%  herstel 39p  ronden 70 (na de tweede omslag 37)  (16s)
+ang-signaal    zaad 1007: A1 69%  B 21%  A-na-B 66%  A2 72%  herstel 14p  ronden 45 (na de tweede omslag 30)  (13s)
+ang-signaal    zaad 1008: A1 74%  B 23%  A-na-B 67%  A2 72%  herstel 15p  ronden 52 (na de tweede omslag 35)  (14s)
+ang-signaal    zaad 1009: A1 57%  B 8%  A-na-B 52%  A2 67%  herstel 42p  ronden 29 (na de tweede omslag 13)  (13s)
+ang-signaal    zaad 1010: A1 68%  B 16%  A-na-B 47%  A2 68%  herstel 15p  ronden 61 (na de tweede omslag 26)  (14s)
+ang-signaal    zaad 1011: A1 63%  B 22%  A-na-B 42%  A2 70%  herstel 36p  ronden 68 (na de tweede omslag 30)  (14s)
+ang-vast       zaad 1000: A1 61%  B 17%  A-na-B 49%  A2 65%  herstel 43p  ronden 0 (na de tweede omslag 0)  (13s)
+ang-vast       zaad 1001: A1 61%  B 8%  A-na-B 35%  A2 72%  herstel 19p  ronden 0 (na de tweede omslag 0)  (14s)
+ang-vast       zaad 1002: A1 57%  B 16%  A-na-B 48%  A2 69%  herstel 45p  ronden 0 (na de tweede omslag 0)  (14s)
+ang-vast       zaad 1003: A1 51%  B 16%  A-na-B 42%  A2 66%  herstel 35p  ronden 0 (na de tweede omslag 0)  (14s)
+ang-vast       zaad 1004: A1 56%  B 18%  A-na-B 52%  A2 66%  herstel 45p  ronden 0 (na de tweede omslag 0)  (14s)
+ang-vast       zaad 1005: A1 69%  B 19%  A-na-B 55%  A2 63%  herstel 14p  ronden 0 (na de tweede omslag 0)  (13s)
+ang-vast       zaad 1006: A1 46%  B 9%  A-na-B 28%  A2 65%  herstel 34p  ronden 0 (na de tweede omslag 0)  (14s)
+ang-vast       zaad 1007: A1 69%  B 16%  A-na-B 61%  A2 74%  herstel 14p  ronden 0 (na de tweede omslag 0)  (13s)
+ang-vast       zaad 1008: A1 74%  B 24%  A-na-B 69%  A2 74%  herstel 50p  ronden 0 (na de tweede omslag 0)  (13s)
+ang-vast       zaad 1009: A1 57%  B 11%  A-na-B 44%  A2 67%  herstel 45p  ronden 0 (na de tweede omslag 0)  (14s)
+ang-vast       zaad 1010: A1 73%  B 20%  A-na-B 61%  A2 76%  herstel 13p  ronden 0 (na de tweede omslag 0)  (13s)
+ang-vast       zaad 1011: A1 63%  B 23%  A-na-B 42%  A2 69%  herstel 32p  ronden 0 (na de tweede omslag 0)  (14s)
+ang-budget     zaad 1000: A1 65%  B 16%  A-na-B 56%  A2 69%  herstel 15p  ronden 23 (na de tweede omslag 2)  [klok elke 38, signaal had er 24]  (13s)
+ang-budget     zaad 1001: A1 64%  B 14%  A-na-B 44%  A2 73%  herstel 14p  ronden 56 (na de tweede omslag 3)  [klok elke 16, signaal had er 56]  (15s)
+ang-budget     zaad 1002: A1 63%  B 16%  A-na-B 43%  A2 65%  herstel 44p  ronden 27 (na de tweede omslag 1)  [klok elke 33, signaal had er 27]  (14s)
+ang-budget     zaad 1003: A1 27%  B 11%  A-na-B 17%  A2 46%  herstel 35p  ronden 128 (na de tweede omslag 7)  [klok elke 7, signaal had er 127]  (20s)
+ang-budget     zaad 1004: A1 55%  B 15%  A-na-B 51%  A2 67%  herstel 19p  ronden 50 (na de tweede omslag 3)  [klok elke 18, signaal had er 49]  (15s)
+ang-budget     zaad 1005: A1 64%  B 14%  A-na-B 52%  A2 66%  herstel 16p  ronden 56 (na de tweede omslag 3)  [klok elke 16, signaal had er 57]  (15s)
+ang-budget     zaad 1006: A1 63%  B 17%  A-na-B 22%  A2 57%  herstel 41p  ronden 69 (na de tweede omslag 4)  [klok elke 13, signaal had er 70]  (17s)
+ang-budget     zaad 1007: A1 71%  B 14%  A-na-B 61%  A2 74%  herstel 19p  ronden 45 (na de tweede omslag 2)  [klok elke 20, signaal had er 45]  (15s)
+ang-budget     zaad 1008: A1 73%  B 25%  A-na-B 63%  A2 70%  herstel 18p  ronden 52 (na de tweede omslag 3)  [klok elke 17, signaal had er 52]  (14s)
+ang-budget     zaad 1009: A1 62%  B 9%  A-na-B 49%  A2 63%  herstel 46p  ronden 29 (na de tweede omslag 1)  [klok elke 31, signaal had er 29]  (13s)
+ang-budget     zaad 1010: A1 64%  B 16%  A-na-B 51%  A2 76%  herstel 43p  ronden 60 (na de tweede omslag 3)  [klok elke 15, signaal had er 61]  (15s)
+ang-budget     zaad 1011: A1 50%  B 10%  A-na-B 26%  A2 64%  herstel 43p  ronden 69 (na de tweede omslag 4)  [klok elke 13, signaal had er 68]  (17s)
+
+--- het leven in vier meetpunten (benchmark, geloot) ---
+conditie      A1 eind           B op B            A na B            A2 eind           
+ang-klok      56.9% ± 6.2       15.3% ± 2.9       43.1% ± 8.2       64.1% ± 3.0       
+ang-signaal   61.0% ± 4.6       15.9% ± 3.5       49.1% ± 6.0       67.6% ± 1.9       
+ang-budget    59.8% ± 6.8       14.6% ± 2.3       44.4% ± 8.6       65.6% ± 4.5       
+ang-vast      61.3% ± 4.9       16.2% ± 2.9       48.6% ± 6.4       68.5% ± 2.4       
+
+--- herstel, behoud en hoeveel er verbouwd is ---
+conditie      hersteltijd     niet hersteld  behoud (pp)   ronden    ronden na omslag 2
+ang-klok      26.8 pogingen   0/12           -13.8         90.0      5.0
+ang-signaal   30.3 pogingen   0/12           -11.9         55.4      28.0
+ang-budget    29.4 pogingen   0/12           -15.4         55.3      3.0
+ang-vast      32.4 pogingen   0/12           -12.7         0.0       0.0
+
+--- V1, de controle op de ingreep: vuurt de poort bij een omslag? ---
+gezondheid van de meting: in orde  {"allePogingenEenD":true,"alleDEindig":true,"alleDNietNegatief":true,"alleDrempelEindig":true,"minstensEenVuur":true}
+poging 300 (naar knipperen        ) vuurkans 4.2% -> 0.2%   d 1.44 -> 1.70   0/12 omhoog, p = 0.0005   eerste vuur na 50.0 pogingen (11 levens niet)   vuurt juist minder na de omslag
+poging 600 (terug naar zichtbaar  ) vuurkans 4.2% -> 56.0%   d 1.44 -> 1.94   12/12 omhoog, p = 0.0005   eerste vuur na 3.2 pogingen (0 levens niet)   vuurt vaker na de omslag
+
+--- Mann-Whitney, Holm per familie (nieuwe families, los van stap 13) ---
+herstel   hersteltijd  ang-signaal vs ang-klok        +3.6        p = 0.4529   Holm 1.0000   binnen de ruis
+herstel   hersteltijd  ang-signaal vs ang-vast        −2.1        p = 0.8399   Holm 1.0000   binnen de ruis
+herstel   hersteltijd  ang-signaal vs ang-budget      +0.9        p = 0.7075   Holm 1.0000   binnen de ruis
+herstel   hersteltijd  ang-budget vs ang-klok         +2.7        p = 0.4025   Holm 1.0000   binnen de ruis
+herstel   hersteltijd  ang-klok vs ang-vast           −5.7        p = 0.2987   Holm 1.0000   binnen de ruis
+behoud    behoud       ang-signaal vs ang-klok        +1.9        p = 0.7950   Holm 1.0000   binnen de ruis
+behoud    behoud       ang-signaal vs ang-vast        +0.8        p = 0.7075   Holm 1.0000   binnen de ruis
+behoud    behoud       ang-signaal vs ang-budget      +3.5        p = 0.5444   Holm 1.0000   binnen de ruis
+behoud    behoud       ang-budget vs ang-klok         −1.6        p = 0.9310   Holm 1.0000   binnen de ruis
+behoud    behoud       ang-klok vs ang-vast           −1.1        p = 0.8399   Holm 1.0000   binnen de ruis
+behoud    terugwinst   ang-signaal vs ang-klok        −0.6        p = 0.8625   Holm 1.0000   binnen de ruis
+behoud    terugwinst   ang-signaal vs ang-vast        −0.6        p = 0.8399   Holm 1.0000   binnen de ruis
+behoud    terugwinst   ang-signaal vs ang-budget      +0.8        p = 0.7290   Holm 1.0000   binnen de ruis
+behoud    terugwinst   ang-budget vs ang-klok         −1.4        p = 0.6650   Holm 1.0000   binnen de ruis
+behoud    terugwinst   ang-klok vs ang-vast           −0.0        p = 0.7075   Holm 1.0000   binnen de ruis
+
+--- V4 beschrijvend --- signaal 30.3, budget 29.4, klok 26.8 pogingen; moment -0.9 tegen hoeveelheid -2.7 — de hoeveelheid weegt minstens zo zwaar als het moment
+KLAAR exitcode=0 

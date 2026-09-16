@@ -50,6 +50,7 @@ const ABLATIE = lees(path.join(EXPDIR, 'ablatie.json'));
 const TAAKAS = lees(path.join(EXPDIR, 'taakas.json'));
 const OMSLAG = lees(path.join(EXPDIR, 'omslag.json'));
 const SGEDRAG = lees(path.join(EXPDIR, 'structuurgedrag.json'));
+const SIGNAAL = lees(path.join(EXPDIR, 'signaalsturing.json'));
 function stat(xs) {
   const v = xs.filter(x => typeof x === 'number' && isFinite(x));
   const n = v.length; if (!n) return null;
@@ -64,13 +65,16 @@ const num = (x, d = 0) => x === null ? '–' : x.m.toFixed(d) + ' ± ' + x.ci.to
 const kol = k => RUNS ? RUNS.map(r => r[k]) : [];
 /* een gemiddelde-met-interval uit benchmark.json in dezelfde vorm als stat() */
 const bm = o => o ? { n: o.n, m: o.m, sd: o.sd, ci: o.ci, min: o.m, max: o.m } : null;
-const VERSIE = SGEDRAG ? '2.0' : OMSLAG ? '1.9' : TAAKAS ? '1.8' : ABLATIE ? '1.7' : LEERREGEL ? '1.6' : '1.5';
-/* De twee laatste secties schuiven mee met wat er gemeten is, zodat een verwijzing in
-   de tekst nooit naar een verkeerd nummer wijst. */
+const VERSIE = SIGNAAL ? '2.1' : SGEDRAG ? '2.0' : OMSLAG ? '1.9' : TAAKAS ? '1.8' : ABLATIE ? '1.7' : LEERREGEL ? '1.6' : '1.5';
+/* De laatste secties schuiven mee met wat er gemeten is, zodat een verwijzing in de
+   tekst nooit naar een verkeerd nummer wijst. */
 const SEC_OMSLAG = '10.9', SEC_SG = OMSLAG ? '10.10' : '10.9';
-const SEC_HIERNA = SGEDRAG ? (OMSLAG ? '10.11' : '10.10') : OMSLAG ? '10.10' : TAAKAS ? '10.9' : ABLATIE ? '10.8' : '10.7';
-const SEC_VRAAG = SGEDRAG ? (OMSLAG ? '10.12' : '10.11') : OMSLAG ? '10.11' : TAAKAS ? '10.10' : ABLATIE ? '10.9' : '10.8';
-const DATUM = '15 september 2026';
+/* nummer van de basissectie waar de rest achteraan schuift */
+const NA_SG = SGEDRAG ? (OMSLAG ? 11 : 10) : OMSLAG ? 10 : TAAKAS ? 9 : ABLATIE ? 8 : 7;
+const SEC_SIG = SIGNAAL ? '10.' + NA_SG : null;
+const SEC_HIERNA = '10.' + (NA_SG + (SIGNAAL ? 1 : 0));
+const SEC_VRAAG = '10.' + (NA_SG + 1 + (SIGNAAL ? 1 : 0));
+const DATUM = '16 september 2026';
 const SERIF = 'Cambria';
 const TEXTW_PT = 448;              // bruikbare tekstbreedte in punten
 const INK = '1A1D21', DIM = '55606B', ACC = '1F5C73';
@@ -235,7 +239,10 @@ C.push(new Paragraph({
        vergelijking die het niet wint — sectie 10.5 laat zien wat lokaal leren kost.
        Wat dit document werkelijk levert is een grens: tot waar is structurele
        plasticiteit opgerekt, en waar houdt het op. */
-    text: OMSLAG
+    text: SIGNAAL
+      ? 'Wanneer betaalt structurele plasticiteit zich terug? Een gecontroleerde grens, '
+        + 'een functionele geheugenmaat en een oorzaak die is getoetst'
+      : OMSLAG
       ? 'Wanneer betaalt structurele plasticiteit zich terug? Een gecontroleerde grens, '
         + 'een functionele geheugenmaat en een aanwijsbare oorzaak'
       : TAAKAS
@@ -326,9 +333,18 @@ C.push(new Paragraph({
         'dan dat negatieve resultaat is de oorzaak, want die is aanwijsbaar: de herstructurering piekt niet ' +
         'na een omslag maar loopt op een vaste klok' +
         (SGEDRAG ? ', en waar zij wél op een signaal reageert is dat de stagnatie van het eigen leren en ' +
-          'niet een verandering in de omgeving' : '') + '. Een mechanisme dat de omslag niet waarneemt kan ' +
-        'er niet op reageren, en daarmee gaat de negatieve bevinding niet over structurele plasticiteit als ' +
-        'idee maar over deze aansturing ervan — een uitspraak die te repareren en opnieuw te toetsen valt.' : '')
+          'niet een verandering in de omgeving' : '') + '. ' +
+        (SIGNAAL
+          ? 'Die oorzaak wordt vervolgens niet alleen aangewezen maar ook weggenomen: de vaste periode ' +
+            'maakt plaats voor een detector op de invoerstatistiek, die de terugslag binnen een handvol ' +
+            'pogingen ziet en daar vele malen intensiever verbouwt dan elders, en de proef wordt ' +
+            'onveranderd opnieuw gedraaid. Het herstel verandert er niet van, ook niet tegen een klok met ' +
+            'precies dezelfde hoeveelheid herstructurering. De negatieve bevinding is daarmee niet aan die ' +
+            'ene ontwerpkeuze toe te schrijven, en de conclusie rust op een getoetste oorzaak in plaats ' +
+            'van op een aangewezen correlatie.'
+          : 'Een mechanisme dat de omslag niet waarneemt kan er niet op reageren, en daarmee gaat de ' +
+            'negatieve bevinding niet over structurele plasticiteit als idee maar over deze aansturing ' +
+            'ervan — een uitspraak die te repareren en opnieuw te toetsen valt.') : '')
   })]
 }));
 C.push(new Paragraph({
@@ -2788,9 +2804,249 @@ if (SGEDRAG) {
         'samenhang is daarmee deels circulair te lezen: minder herstructurering omdat het netwerk al goed ' +
         'genoeg speelt, in plaats van meer herstructurering omdat het vastzit. Die twee zijn met deze ' +
         'gegevens niet uit elkaar te trekken, en dat is precies de reden dat de vervolgmeting in sectie ' +
-        SEC_HIERNA + ' een signaal nodig heeft dat los van het eigen gedrag van het netwerk staat.')
+        (SEC_SIG || SEC_HIERNA) + ' een signaal nodig heeft dat los van het eigen gedrag van het netwerk ' +
+        'staat' + (SEC_SIG ? ' — en dat daar dan ook op de invoerstatistiek gebouwd is' : '') + '.')
     ]));
   }
+  C.push(gap(60));
+}
+
+/* --- 10.11: herstructurering op een omgevingssignaal -----------------------------
+   Volledig uit experimenten/signaalsturing.json. Dit is de enige sectie in het
+   document waarin een eerder aangewezen oorzaak ook werkelijk getoetst wordt: sectie
+   10.9 stelde vast dat de herstructurering op een klok loopt, sectie 10.10 dat zij op
+   stagnatie reageert en niet op een omslag, en beide lieten open of dát de reden is
+   dat plasticiteit niets oplevert. Hier wordt de klok vervangen en de proef opnieuw
+   gedraaid. Elke datagestuurde zin hieronder moet ook kloppen als het teken omslaat;
+   tests/lees-sectie.js leest de sectie na het genereren terug. */
+if (SIGNAAL) {
+  const S16 = n => SIGNAAL.tabel['s16-' + n];
+  const g1s = (o, d = 1) => (o === null || o === undefined) ? '–' : o.m.toFixed(d) + ' ± ' + o.ci.toFixed(d);
+  const p1 = (o, d = 1) => (o === null || o === undefined) ? '–' : (100 * o.m).toFixed(d) + '% ± ' + (100 * o.ci).toFixed(d);
+  const pp = (o, d = 1) => (o === null || o === undefined) ? '–' : (100 * o.m).toFixed(d) + ' ± ' + (100 * o.ci).toFixed(d);
+  const pK = p => (p === null || p === undefined) ? '–' : (p < 0.001 ? 'p < 0.001' : 'p = ' + p.toFixed(3));
+  const toets = (c, tg, maat) => SIGNAAL.toetsen.find(x => x.conditie === c && x.tegen === tg && x.maat === maat);
+  const V1 = SIGNAAL.poortToetsen.filter(x => x.soort === 'V1');
+  const gezond = SIGNAAL.poortToetsen.find(x => x.soort === 'gezondheid');
+  const NAAM16 = { 'ang-klok': 'klok (als sectie ' + SEC_OMSLAG + ')', 'ang-signaal': 'omgevingssignaal',
+    'ang-budget': 'klok, zelfde hoeveelheid als het signaal', 'ang-vast': 'structuur bevroren' };
+  const CN16 = ['ang-klok', 'ang-signaal', 'ang-budget', 'ang-vast'].filter(n => S16(n));
+  const D16 = SIGNAAL.detector;
+
+  C.push(h2(SEC_SIG, 'Herstructurering op een omgevingssignaal'));
+  C.push(body(
+    'Secties ' + SEC_OMSLAG + ' en ' + SEC_SG + ' wijzen samen een oorzaak aan: de herstructurering wordt ' +
+    'aangestuurd door een vaste klok, en waar zij op een signaal reageert is dat de stagnatie van het eigen ' +
+    'leren en niet een verandering in de omgeving. Een aangewezen oorzaak is geen getoetste oorzaak. Deze ' +
+    'sectie vervangt de klok door een detector op de omgeving en draait de omslagproef van sectie ' +
+    SEC_OMSLAG + ' verder onveranderd opnieuw: dezelfde fasen, dezelfde ' + SIGNAAL.zaden + ' breinzaden, ' +
+    'dezelfde herstelregel, dezelfde meetpunten. Alleen de aansturing van de poort verschilt, want dat is ' +
+    'de vraag.'
+  ));
+  C.push(h3('Wat de detector meet, en waarom niet de beloning'));
+  C.push(body([
+    t('De detector kijkt uitsluitend naar de invoer. Per poging wordt van elk van de zestien ' +
+      'invoerkanalen het gemiddelde over de spelstappen genomen; daar lopen een snel en een traag ' +
+      'exponentieel gemiddelde overheen (' + D16.sigFast + ' en ' + D16.sigSlow + ' pogingen). Het verschil ' +
+      'daartussen wordt per kanaal gedeeld door zijn eigen standaardfout en kwadratisch samengenomen, zodat ' +
+      'het resultaat een z-maat is die onder een stilstaande omgeving rond één ligt. De poort vuurt wanneer ' +
+      'die maat boven mediaan plus ' + D16.sigK + ' × MAD van haar eigen recente verloop uitkomt — een ' +
+      'meelopende drempel, zodat er geen getal met de hand gekozen hoeft te worden.'),
+  ]));
+  C.push(body([
+    bd('Het signaal mag niet uit het gedrag van het netwerk komen. '),
+    t('Sectie ' + SEC_SG + ' eindigt met dat voorbehoud en het is hier bindend. Een poort die op de lopende ' +
+      'beloningsbasislijn stuurt, meet precies de samenhang die daar al gerapporteerd is, en die is ' +
+      'circulair te lezen: minder verbouwen omdat het netwerk al goed speelt is dan niet te onderscheiden ' +
+      'van meer verbouwen omdat het vastzit. De invoerstatistiek heeft dat bezwaar niet — zij verschuift ' +
+      'bij een omslag ongeacht hoe goed de agent speelt.')
+  ]));
+  C.push(body([
+    bd('De instellingen van de detector zijn gekalibreerd op de klokconditie. '),
+    t('Daar loopt de detector mee zonder iets te sturen, dus er was geen uitkomstmaat om op te kiezen; ' +
+      'gemeten is alleen of de poort in een stilstaande fase stil blijft en bij een omslag aanslaat. Dat de ' +
+      'nieuwe knop in haar uitstand werkelijk niets doet, is niet aangenomen maar nagerekend: de ' +
+      'klokconditie levert met hetzelfde zaad bit voor bit hetzelfde leven op als de ang-conditie van ' +
+      'sectie ' + SEC_OMSLAG + ' — historie, netwerk en herstructureringen identiek.')
+  ]));
+
+  C.push(h3('Vuurt de poort waar zij zou moeten vuren?'));
+  C.push(body(
+    'Dit is een controle op de ingreep en geen uitkomstmaat: voordat er iets over herstel gezegd mag ' +
+    'worden, moet vaststaan dat de poort werkelijk op de omgeving reageert. De vuurkans binnen vijftig ' +
+    'pogingen na een omslag staat daarom naast die in de rest van het leven, per omslag afzonderlijk en ' +
+    'per zaad gepaard.' + (gezond && gezond.alles
+      ? ' Elke poging heeft een eindige, niet-negatieve waarde en elke drempel is eindig zodra de detector ' +
+        'rijp is; die controle gaat vooraf aan elke vergelijking, omdat een meting eerst moet bewijzen dát ' +
+        'er gemeten is.' : '')
+  ));
+  C.push(tbl(
+    ['omslag', 'vuurkans elders', 'vuurkans binnen 50 pogingen', 'zaden omhoog', 'eerste keer vuren'],
+    V1.map(x => [String(x.omslag) + ' (' + x.naarWat + ')', p1(x.vuurBuiten), p1(x.vuurNa),
+      (x.tekentoets ? x.tekentoets.positief + ' van ' + x.tekentoets.n + ', ' + pK(x.tekentoets.p) : '–'),
+      /* Deze cel moet ook kloppen als er niemand vuurt en als iedereen vuurt; het
+         aantal levens dat wél vuurde gaat daarom voorop en niet het gemiddelde. */
+      (() => {
+        const n = x.tekentoets.n, wel = n - x.nietGevuurd;
+        if (!wel) return 'geen enkel leven';
+        if (!x.nietGevuurd) return 'alle ' + n + ' levens, na ' + g1s(x.eersteVuur) + ' pogingen';
+        return wel + ' van de ' + n + ' levens, na ' + g1s(x.eersteVuur) + ' pogingen';
+      })()]),
+    [2900, 1700, 2200, 1900, 1972]));
+  {
+    const terug = V1.find(x => x.omslag === SIGNAAL.omslagpogingen[1]);
+    const donker = V1.find(x => x.omslag === SIGNAAL.omslagpogingen[0]);
+    if (terug) C.push(body([
+      bd(terug.verschil.m > 0
+        ? 'Bij de terugslag naar de oorspronkelijke taak doet de poort precies wat zij moet doen. '
+        : 'Bij de terugslag naar de oorspronkelijke taak doet de poort het tegenovergestelde van wat zij moet doen. '),
+      t('De vuurkans gaat van ' + p1(terug.vuurBuiten) + ' naar ' + p1(terug.vuurNa) + ', in ' +
+        terug.tekentoets.positief + ' van de ' + terug.tekentoets.n + ' levens dezelfde kant op (' +
+        pK(terug.tekentoets.p) + '), en zij slaat gemiddeld ' + g1s(terug.eersteVuur) + ' pogingen na de ' +
+        'omslag voor het eerst aan. De onderliggende maat gaat daarbij van ' + terug.dBuiten.m.toFixed(2) +
+        ' naar ' + terug.dNa.m.toFixed(2) + '.')
+    ]));
+    if (donker) C.push(body([
+      bd(donker.nietGevuurd >= donker.tekentoets.n - 1
+        ? 'Bij de omslag naar het knipperende doel mist de detector hem, en dat hoort er onverkort bij te staan. '
+        : 'Bij de omslag naar het knipperende doel slaat de detector eveneens aan. '),
+      t('Daar gaat de vuurkans van ' + p1(donker.vuurBuiten) + ' naar ' + p1(donker.vuurNa) + ', en in ' +
+        donker.nietGevuurd + ' van de ' + donker.tekentoets.n + ' levens vuurt de poort binnen het venster ' +
+        'in het geheel niet. De maat zelf beweegt wel de goede kant op — van ' + donker.dBuiten.m.toFixed(2) +
+        ' naar ' + donker.dNa.m.toFixed(2) + ' — maar niet ver genoeg boven de meelopende drempel. De reden ' +
+        'is te zien in de ruwe kanaalgemiddelden: wanneer het doel verdwijnt zakken de doelkanalen naar nul, ' +
+        'en nul is een waarde die zij in de zichtbare fase ook geregeld aannemen, zodat de verschuiving ' +
+        'klein is ten opzichte van de spreiding die er toch al was. Komt het doel terug, dan springen ' +
+        'diezelfde kanalen omhoog uit een fase waarin zij nauwelijks varieerden, en dat is een veel ' +
+        'grotere verschuiving in spreidingseenheden. Voor de vraag van deze sectie is dat draaglijk: het ' +
+        'herstel wordt gemeten ná de terugslag, en dáár vuurt de poort. Maar de detector is daarmee geen ' +
+        'algemene omslagdetector, en zo wordt hij hier ook niet gepresenteerd.')
+    ]));
+  }
+
+  C.push(h3('Levert verbouwen op het juiste moment herstel op?'));
+  C.push(body(
+    'De vier condities verschillen alleen in de aansturing van de poort. De budgetconditie is er omdat een ' +
+    'signaalgestuurde poort niet alleen op andere momenten verbouwt maar ook een ander aantal keren: haar ' +
+    'klokperiode is per zaad zó gezet dat zij evenveel herstructureringsronden haalt als het signaalleven ' +
+    'van datzelfde zaad. Zonder die controle zou een verschil in herstel even goed aan de hoeveelheid als ' +
+    'aan het moment kunnen liggen.'
+  ));
+  C.push(tbl(
+    ['aansturing', 'ronden per leven', 'ronden binnen 50 pogingen na de terugslag', 'hersteltijd (pogingen)', 'behoud (pp)'],
+    CN16.map(n => [NAAM16[n] || n, g1s(S16(n).ronden), g1s(S16(n).rondenNa2),
+      g1s(S16(n).hersteltijd), pp(S16(n).behoud)]),
+    [2900, 1700, 2600, 1900, 1572]));
+  {
+    const sig = S16('ang-signaal'), klok = S16('ang-klok'), bud = S16('ang-budget'), vast = S16('ang-vast');
+    const tSK = toets('ang-signaal', 'ang-klok', 'hersteltijd');
+    const tSV = toets('ang-signaal', 'ang-vast', 'hersteltijd');
+    const tSB = toets('ang-signaal', 'ang-budget', 'hersteltijd');
+    if (sig && klok && bud) C.push(body([
+      bd('De ingreep doet wat zij moet doen aan de verdeling van het verbouwen. '),
+      t('Het signaalleven legt ' + g1s(sig.rondenNa2) + ' van zijn ' + g1s(sig.ronden) + ' ronden in de ' +
+        'vijftig pogingen na de terugslag; de budgetconditie, met hetzelfde aantal ronden over het hele ' +
+        'leven, komt daar op ' + g1s(bud.rondenNa2) + ' en de gewone klok op ' + g1s(klok.rondenNa2) + '. ' +
+        'Het verschil tussen de condities zit dus werkelijk in het moment en niet in de hoeveelheid, en de ' +
+        'koppeling per zaad wijkt nergens meer dan één ronde af.')
+    ]));
+    if (tSK) C.push(body([
+      bd(tSK.pHolm < 0.05
+        ? (tSK.verschil < 0 ? 'En het levert herstel op. ' : 'En het maakt het herstel aantoonbaar trager. ')
+        : 'En het levert geen herstelvoordeel op. '),
+      t('De hersteltijd is ' + g1s(sig.hersteltijd) + ' pogingen tegen ' + g1s(klok.hersteltijd) +
+        ' voor de klok' + (tSK.pHolm < 0.05 ? '' : ', en dat verschil blijft binnen de meetruis') +
+        ' (' + pK(tSK.p) + ', Holm ' + tSK.pHolm.toFixed(3) + '). ' +
+        (tSV ? 'Tegen de bevroren structuur, die ' + g1s(vast.hersteltijd) + ' pogingen nodig heeft, is het ' +
+          'beeld hetzelfde (' + pK(tSV.p) + ', Holm ' + tSV.pHolm.toFixed(3) + '). ' : '') +
+        (tSB ? 'Ook tegen de budgetconditie verschuift er niets (' + pK(tSB.p) + ', Holm ' +
+          tSB.pHolm.toFixed(3) + '). ' : '') +
+        (() => {
+          /* Deze zin moet ook kloppen als er wél gecensureerd is: dan mag er niet staan
+             dat iedereen zijn plateau terughaalt. */
+          const levens = CN16.reduce((a, n) => a + S16(n).runs, 0);
+          const cens = CN16.reduce((a, n) => a + S16(n).gecensureerd, 0);
+          return cens === 0
+            ? 'Geen van de ' + levens + ' levens is gecensureerd: elke conditie haalt haar oude plateau ' +
+              'binnen de derde fase terug.'
+            : cens + ' van de ' + levens + ' levens halen hun oude plateau binnen de derde fase niet terug ' +
+              'en zijn gecensureerd; in de rangtoets krijgen zij een waarde boven alles wat wél herstelde.';
+        })())
+    ]));
+    if (SIGNAAL.V4) C.push(body([
+      bd('Het moment weegt niet zwaarder dan de hoeveelheid. '),
+      t('Beschrijvend, met alle drie de gemiddelden naast elkaar: het verschil tussen signaal en budget — ' +
+        'gelijke hoeveelheid, ander moment — is ' + Math.abs(SIGNAAL.V4.signaalTegenBudget).toFixed(1) +
+        ' pogingen, en dat tussen budget en de gewone klok — zelfde soort aansturing, andere hoeveelheid — ' +
+        Math.abs(SIGNAAL.V4.budgetTegenKlok).toFixed(1) + ' pogingen. Beide liggen ruim binnen de ' +
+        'intervallen van de afzonderlijke gemiddelden, die alle drie ongeveer acht pogingen breed zijn. ' +
+        'Uit deze meting valt dus niet af te leiden dat het moment van verbouwen ertoe doet, en evenmin ' +
+        'dat de hoeveelheid ertoe doet.')
+    ]));
+    const tBeh = toets('ang-signaal', 'ang-klok', 'behoud');
+    if (tBeh && sig && klok) C.push(body([
+      bd(tBeh.pHolm < 0.05
+        ? (tBeh.verschil > 0 ? 'Gericht verbouwen kost geen extra behoud — het levert het zelfs op. '
+          : 'Gericht verbouwen kost wél extra behoud. ')
+        : 'Gericht verbouwen kost ook geen extra behoud. '),
+      t('De score op taak A verandert over de knipperfase met ' + pp(sig.behoud) + ' procentpunt tegen ' +
+        pp(klok.behoud) + ' voor de klok (' + pK(tBeh.p) + ', Holm ' + tBeh.pHolm.toFixed(3) + '). Het ' +
+        'stabiliteit-plasticiteitsruilpunt dat sectie ' + SEC_OMSLAG + ' niet kon aantonen, wordt hier ' +
+        'dus ook niet zichtbaar wanneer de plasticiteit gericht wordt.')
+    ]));
+    if (sig && vast && klok) C.push(body([
+      bd('Wat wél opvalt, staat in de eindstanden en niet in de hersteltijd. '),
+      t('Op de benchmark aan het eind van het leven staat de signaalconditie op ' + p1(sig.aEind3) +
+        ', de budgetconditie op ' + p1(bud.aEind3) + ', de gewone klok op ' + p1(klok.aEind3) +
+        ' en de bevroren structuur op ' + p1(vast.aEind3) + '. De twee condities die minder verbouwen — ' +
+        'ongeveer ' + g1s(sig.ronden, 0) + ' ronden tegen ' + g1s(klok.ronden, 0) + ' — liggen daarmee ' +
+        'dichter bij de bevroren variant dan de gewone klok, en de bevroren variant staat bovenaan. Die ' +
+        'intervallen overlappen en dit is geen voorgeregistreerde vergelijking, dus er hangt geen conclusie ' +
+        'aan; het past wel bij wat sectie 10.8 al vond, namelijk dat herstructureren op deze taakfamilie ' +
+        'eerder een kostenpost dan een opbrengst is.')
+    ]));
+  }
+  C.push(body([
+    bd('Wat deze sectie aan het betoog verandert. '),
+    t('Sectie ' + SEC_OMSLAG + ' vond geen herstelvoordeel en wees een oorzaak aan; sectie ' + SEC_SG +
+      ' maakte die aanwijzing preciezer maar bleef een correlatie. Hier is de aangewezen oorzaak weggenomen ' +
+      '— ' + (() => {
+        /* Geen getal met de hand: de verhouding komt uit de tabel, en de zin moet ook
+           kloppen als de dichtheid ná de omslag lager uitvalt dan daarbuiten. */
+        const s = S16('ang-signaal'), V = SIGNAAL.herstelregel.omslagVenster;
+        const tot = SIGNAAL.grenzen[SIGNAAL.grenzen.length - 1];
+        const binnen = s.rondenNa2.m / V;
+        const buiten = (s.ronden.m - s.rondenNa2.m) / (tot - V);
+        const f = buiten > 0 ? binnen / buiten : null;
+        if (f === null) return 'de herstructurering ziet de terugslag nu binnen een handvol pogingen';
+        return f >= 1
+          ? 'de herstructurering ziet de terugslag nu binnen een handvol pogingen en verbouwt daar ' +
+            f.toFixed(0) + ' keer zo dicht als in de rest van het leven'
+          : 'de herstructurering ziet de terugslag nu binnen een handvol pogingen, al verbouwt zij daar ' +
+            'niet dichter dan elders';
+      })() + ' — en het herstel verandert er niet van. Daarmee is de negatieve ' +
+      'bevinding van sectie ' + SEC_OMSLAG + ' niet langer aan die ene ontwerpkeuze toe te schrijven. Dat ' +
+      'is een ongemakkelijker uitkomst dan de omgekeerde zou zijn geweest, en een sterkere: de conclusie ' +
+      'van dit werk rust vanaf hier op een getoetste oorzaak in plaats van op een aangewezen correlatie.')
+  ]));
+  C.push(body([
+    bd('Met twee voorbehouden. '),
+    t('Het eerste is de detector: hij ziet de terugslag naar de zichtbare taak wel en de overgang naar het ' +
+      'knipperende doel niet, dus deze meting toetst de aansturing bij één van de twee omslagen en niet ' +
+      'bij beide. Het tweede is de maat. ' + (() => {
+        const H = CN16.map(n => S16(n).hersteltijd.m);
+        const cens = CN16.reduce((a, n) => a + S16(n).gecensureerd, 0);
+        const levens = CN16.reduce((a, n) => a + S16(n).runs, 0);
+        const TW16 = ['nul', 'één', 'twee', 'drie', 'vier', 'vijf', 'zes', 'zeven', 'acht'];
+        return 'De hersteltijden van de ' + (TW16[CN16.length] || CN16.length) + ' aansturingen liggen alle tussen ' +
+          Math.min(...H).toFixed(0) + ' en ' + Math.max(...H).toFixed(0) + ' pogingen, en ' +
+          (cens === 0
+            ? 'geen enkel leven is gecensureerd'
+            : cens + ' van de ' + levens + ' levens zijn gecensureerd') +
+          ', zodat er weinig ruimte is waarin een voordeel zichtbaar zou kunnen worden.';
+      })() + ' Een omslag die dieper snijdt of een plateau dat hoger ligt zou die ruimte vergroten; ' +
+      'beide zouden een nieuwe meetreeks vergen en geen van beide is hier gedaan.')
+  ]));
   C.push(gap(60));
 }
 
@@ -2841,7 +3097,15 @@ if (TAAKAS && !OMSLAG) C.push(bullet([bd('Waarom de vrije graaf onder knipperen 
   'die de informatie over de donkere periode heen dragen. Dat is te toetsen door de herstructurering ' +
   'gefaseerd uit te zetten en door de gesnoeide verbindingen te vergelijken met de verbindingen die de ' +
   'geheugenhorizon dragen.')]));
-if (OMSLAG) C.push(bullet([bd('Herstructurering die op de omgeving stuurt in plaats van op de klok. '),
+if (SIGNAAL) C.push(bullet([bd('Een omslag die dieper snijdt, of een uitgeleerd plateau. '),
+  t('Sectie ' + SEC_SIG + ' laat twee openingen. De hersteltijd van alle vier de aansturingen ligt rond ' +
+    'de dertig pogingen en geen enkel leven is gecensureerd, dus er is weinig ruimte waarin een ' +
+    'herstelvoordeel zichtbaar zou kunnen worden; een zwaardere omslag of een fase die lang genoeg duurt ' +
+    'om uit te leren vergroot die ruimte. En de detector ziet de terugslag naar de zichtbare taak wel maar ' +
+    'de overgang naar het knipperende doel niet, omdat een kanaal dat naar nul zakt minder opvalt dan een ' +
+    'kanaal dat uit stilstand omhoogspringt. Een detector die ook een afname in spreiding meeweegt zou ' +
+    'beide omslagen zien, en pas dan is de aansturing bij allebei getoetst.')]));
+if (OMSLAG && !SIGNAAL) C.push(bullet([bd('Herstructurering die op de omgeving stuurt in plaats van op de klok. '),
   t('Dit is de meting die direct uit sectie ' + SEC_OMSLAG + ' volgt, en sectie ' + SEC_SG + ' maakt haar ' +
     'scherper. Het mechanisme blijkt gevoelig voor stagnatie maar niet voor een omslag, en die twee vallen ' +
     'niet samen. De ingreep is klein — vervang de vaste periode door een aansturing op een signaal — maar ' +
@@ -2867,20 +3131,35 @@ if (OMSLAG) C.push(body(
   'vrije graaf méér dan diezelfde graaf bevroren (10.8). En wanneer de omgeving halverwege het leven ' +
   'omslaat — de enige opzet waarin verbouwen tijdens het leren iets kán opleveren — herstelt de vrije ' +
   'graaf niet sneller dan de bevroren (' + SEC_OMSLAG + ').\n\n' +
-  'Wat dit werk onderscheidt van een reeks tegenvallers is dat de oorzaak aanwijsbaar is. De ' +
-  'herstructurering wordt aangestuurd door een klok, en waar zij wél op een signaal reageert, is dat de ' +
-  'stagnatie van het eigen leren en niet een verandering in de omgeving (' + SEC_SG + '). Een mechanisme ' +
-  'dat de omslag niet waarneemt kan er per constructie niet op reageren. Daarmee gaat de negatieve ' +
-  'bevinding niet over structurele plasticiteit als idee, maar over deze aansturing ervan — en dat is een ' +
-  'uitspraak die te repareren en opnieuw te toetsen valt, wat de eerste openstaande meting in sectie ' +
-  SEC_HIERNA + ' dan ook is.\n\n' +
+  (SIGNAAL
+    ? 'Wat dit werk onderscheidt van een reeks tegenvallers is dat de voor de hand liggende oorzaak niet ' +
+      'alleen is aangewezen maar ook is weggenomen. De herstructurering wordt aangestuurd door een klok, ' +
+      'en waar zij wél op een signaal reageert is dat de stagnatie van het eigen leren en niet een ' +
+      'verandering in de omgeving (' + SEC_SG + '). Sectie ' + SEC_SIG + ' vervangt die klok door een ' +
+      'detector op de invoerstatistiek en draait de omslagproef onveranderd opnieuw. De poort ziet de ' +
+      'terugslag dan binnen een handvol pogingen en verbouwt daar vele malen intensiever dan elders — en ' +
+      'het herstel verandert er niet van, ook niet tegen een klok met precies dezelfde hoeveelheid ' +
+      'herstructurering. De negatieve bevinding is daarmee niet aan die ene ontwerpkeuze toe te schrijven. ' +
+      'Dat is een ongemakkelijker uitkomst dan de omgekeerde zou zijn geweest, en een sterkere: de ' +
+      'conclusie rust op een getoetste oorzaak in plaats van op een aangewezen correlatie.\n\n'
+    : 'Wat dit werk onderscheidt van een reeks tegenvallers is dat de oorzaak aanwijsbaar is. De ' +
+      'herstructurering wordt aangestuurd door een klok, en waar zij wél op een signaal reageert, is dat de ' +
+      'stagnatie van het eigen leren en niet een verandering in de omgeving (' + SEC_SG + '). Een mechanisme ' +
+      'dat de omslag niet waarneemt kan er per constructie niet op reageren. Daarmee gaat de negatieve ' +
+      'bevinding niet over structurele plasticiteit als idee, maar over deze aansturing ervan — en dat is een ' +
+      'uitspraak die te repareren en opnieuw te toetsen valt, wat de eerste openstaande meting in sectie ' +
+      SEC_HIERNA + ' dan ook is.\n\n') +
   'De vraag die overblijft is geen vergelijkingsvraag maar een grensvraag: onder welke omgevingsdruk, en ' +
   'onder welke aansturing, betaalt structurele plasticiteit binnen één leven zich terug ten opzichte van ' +
   'dezelfde graaf met bevroren structuur? Dit document levert daar vier dingen voor. Een systeem waarvan ' +
   'elke schroef gecontroleerd is, tot en met de numerieke controle van de leerregel zelf. Twee ' +
   'meetinstrumenten die losstaan van dit model en op elke architectuur werken: de blinderingsproef voor ' +
   'geheugen en de omslagproef voor aanpassing. Een mechanismeresultaat dat wél staat — het typesysteem ' +
-  'draagt de geheugenhorizon (10.8). En een aanwijsbare oorzaak voor waarom de rest niet staat.'
+  'draagt de geheugenhorizon (10.8). En ' +
+  (SIGNAAL
+    ? 'een oorzaak die is getoetst en daarbij is uitgesloten, wat de grens waar dit document over gaat ' +
+      'een stuk scherper trekt dan een vermoeden dat zou doen.'
+    : 'een aanwijsbare oorzaak voor waarom de rest niet staat.')
 ));
 if (TAAKAS && !OMSLAG) C.push(body(
   'Dit document is begonnen met de vraag of een netwerk zonder lagen en zonder backpropagation beter kan ' +
@@ -2974,11 +3253,16 @@ if (ABLATIE && ABLATIE.tabel && ABLATIE.tabel['ang-vol']) {
     bd('En per onderdeel is de rekening opgemaakt. '),
     t('De ablatiereeks in sectie 10.7 haalt er één onderdeel tegelijk uit — de drie gespecialiseerde soorten ' +
       'neuronen, de vier vormen van structurele plasticiteit, de bedradingsgrammatica — en meet wat dat kost. ' +
-      (raak.length
-        ? 'Na correctie voor negen vergelijkingen blijven er ' + raak.length + ' over die aantoonbaar iets ' +
-          'uitmaken; de rest valt binnen de ruis. '
-        : 'Na correctie voor negen vergelijkingen blijft er geen enkel onderdeel over dat op deze taak ' +
-          'aantoonbaar iets uitmaakt. ') +
+      /* Deze zin moet ook lopen bij precies één overgebleven onderdeel; tot versie 2.0
+         stond er "blijven er 1 over die", en dat is geen Nederlands. */
+      (raak.length === 0
+        ? 'Na correctie voor negen vergelijkingen blijft er geen enkel onderdeel over dat op deze taak ' +
+          'aantoonbaar iets uitmaakt. '
+        : raak.length === 1
+          ? 'Na correctie voor negen vergelijkingen blijft er precies één onderdeel over dat aantoonbaar ' +
+            'iets uitmaakt; de rest valt binnen de ruis. '
+          : 'Na correctie voor negen vergelijkingen blijven er ' + raak.length + ' onderdelen over die ' +
+            'aantoonbaar iets uitmaken; de rest valt binnen de ruis. ') +
       'Dat is een hard resultaat over dit spel en een zacht resultaat over het model: in een omgeving waarin ' +
       'het doel altijd zichtbaar is en niets binnen één tik beantwoord hoeft te worden, hebben geheugen en ' +
       'reflex per constructie niets te doen. De ablaties krijgen pas betekenis op een taak waarin de twee ' +
@@ -3002,12 +3286,25 @@ if (OMSLAG && OMSLAG.tabel && OMSLAG.tabel['s13-ang']) {
     t('Dezelfde sectie laat zien waaróm: de herstructurering piekt niet na een omslag, want zij loopt op ' +
       'een vaste klok' + (SGEDRAG ? ' — en waar zij wél op een signaal reageert, is dat de stagnatie van ' +
         'het eigen leren en niet een verandering in de omgeving (sectie ' + SEC_SG + ')' : '') + '. Een ' +
-      'mechanisme dat de omslag niet waarneemt, kan er niet op reageren. De uitspraak van dit document is ' +
-      'daarmee smaller en bruikbaarder dan "structurele plasticiteit werkt niet": zij werkt niet ' +
-      'wanneer je haar op een klok laat lopen, en dat is een ontwerpkeuze en geen eigenschap van het idee. ' +
-      'Wat overblijft als bijdrage is dan ook niet het model maar het gereedschap eromheen — de ' +
-      'blinderingsproef, de omslagproef, en een meetopzet waarin een voorspelling eerder vastligt dan de ' +
-      'data die haar moet weerleggen.')
+      'mechanisme dat de omslag niet waarneemt, kan er niet op reageren. ' +
+      (SIGNAAL
+        /* Deze alinea beweerde tot versie 2.0 dat de aansturing de verklaring wás.
+           Sectie 10.11 heeft dat getoetst en het is niet zo; de alinea moet dat
+           zeggen en niet de oude, prettiger lezende versie. */
+        ? 'Die diagnose lag daarmee voor de hand, en sectie ' + SEC_SIG + ' heeft haar getoetst door de ' +
+          'klok te vervangen door een detector op de omgeving. De poort vuurt daarna bij de terugslag in ' +
+          'alle levens en binnen een handvol pogingen, en het herstel verandert er niet van — ook niet ' +
+          'tegen een klok met precies dezelfde hoeveelheid herstructurering. De aansturing was dus niet de ' +
+          'verklaring. Wat dit document daarmee zegt is smaller en harder tegelijk: op deze taakfamilie ' +
+          'betaalt structurele plasticiteit zich niet terug, en dat ligt niet aan het moment waarop er ' +
+          'verbouwd wordt. Wat overblijft als bijdrage is dan ook niet het model maar het gereedschap ' +
+          'eromheen — de blinderingsproef, de omslagproef, de signaalproef, en een meetopzet waarin een ' +
+          'voorspelling eerder vastligt dan de data die haar moet weerleggen.'
+        : 'De uitspraak van dit document is daarmee smaller en bruikbaarder dan "structurele plasticiteit ' +
+          'werkt niet": zij werkt niet wanneer je haar op een klok laat lopen, en dat is een ontwerpkeuze ' +
+          'en geen eigenschap van het idee. Wat overblijft als bijdrage is dan ook niet het model maar het ' +
+          'gereedschap eromheen — de blinderingsproef, de omslagproef, en een meetopzet waarin een ' +
+          'voorspelling eerder vastligt dan de data die haar moet weerleggen.'))
   ]));
 }
 

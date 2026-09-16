@@ -1,0 +1,76 @@
+--- kerntabel (12 zaden per conditie) ---
+conditie      A1 eind         A2 eind         hersteltijd     behoud pp       ronden          ronden na omslag 2
+ang-klok      56.9 ± 6.2      64.1 ± 3.0      26.8 ± 8.4      -13.8 ± 9.5     90.0 ± 0.0      5.0 ± 0.0
+ang-signaal   61.0 ± 4.6      67.6 ± 1.9      30.3 ± 8.4      -11.9 ± 3.8     55.4 ± 15.4     28.0 ± 4.8
+ang-budget    59.8 ± 6.8      65.6 ± 4.5      29.4 ± 7.6      -15.4 ± 5.5     55.3 ± 15.6     3.0 ± 0.9
+ang-vast      61.3 ± 4.9      68.5 ± 2.4      32.4 ± 7.9      -12.7 ± 3.5     0.0 ± 0.0       0.0 ± 0.0
+
+--- de budgetkoppeling per zaad ---
+zaad  signaal  klokperiode  gehaald
+1000       24           38       23
+1001       56           16       56
+1002       27           33       27
+1003      127            7      128
+1004       49           18       50
+1005       57           16       56
+1006       70           13       69
+1007       45           20       45
+1008       52           17       52
+1009       29           31       29
+1010       61           15       60
+1011       68           13       69
+grootste afwijking: 1 ronden
+
+--- V1, per omslag ---
+gezondheid: in orde
+poging 300 (naar knipperen): vuurkans 4.2% -> 0.2% (± 0.3), d 1.44 -> 1.70, 0/12 omhoog, p = 0.0005, 11 van de 12 levens vuurden binnen het venster niet — vuurt juist minder na de omslag
+poging 600 (terug naar zichtbaar): vuurkans 4.2% -> 56.0% (± 9.6), d 1.44 -> 1.94, 12/12 omhoog, p = 0.0005, 0 van de 12 levens vuurden binnen het venster niet — vuurt vaker na de omslag
+
+--- alle toetsen met ruwe p en Holm ---
+herstel   hersteltijd  ang-signaal vs ang-klok        verschil 3.6 pogingen   p = 0.4529  Holm 1.0000  binnen de ruis
+herstel   hersteltijd  ang-signaal vs ang-vast        verschil -2.1 pogingen  p = 0.8399  Holm 1.0000  binnen de ruis
+herstel   hersteltijd  ang-signaal vs ang-budget      verschil 0.9 pogingen   p = 0.7075  Holm 1.0000  binnen de ruis
+herstel   hersteltijd  ang-budget vs ang-klok         verschil 2.7 pogingen   p = 0.4025  Holm 1.0000  binnen de ruis
+herstel   hersteltijd  ang-klok vs ang-vast           verschil -5.7 pogingen  p = 0.2987  Holm 1.0000  binnen de ruis
+behoud    behoud       ang-signaal vs ang-klok        verschil 1.9 pp         p = 0.7950  Holm 1.0000  binnen de ruis
+behoud    behoud       ang-signaal vs ang-vast        verschil 0.8 pp         p = 0.7075  Holm 1.0000  binnen de ruis
+behoud    behoud       ang-signaal vs ang-budget      verschil 3.5 pp         p = 0.5444  Holm 1.0000  binnen de ruis
+behoud    behoud       ang-budget vs ang-klok         verschil -1.6 pp        p = 0.9310  Holm 1.0000  binnen de ruis
+behoud    behoud       ang-klok vs ang-vast           verschil -1.1 pp        p = 0.8399  Holm 1.0000  binnen de ruis
+behoud    terugwinst   ang-signaal vs ang-klok        verschil -0.6 pp        p = 0.8625  Holm 1.0000  binnen de ruis
+behoud    terugwinst   ang-signaal vs ang-vast        verschil -0.6 pp        p = 0.8399  Holm 1.0000  binnen de ruis
+behoud    terugwinst   ang-signaal vs ang-budget      verschil 0.8 pp         p = 0.7290  Holm 1.0000  binnen de ruis
+behoud    terugwinst   ang-budget vs ang-klok         verschil -1.4 pp        p = 0.6650  Holm 1.0000  binnen de ruis
+behoud    terugwinst   ang-klok vs ang-vast           verschil -0.0 pp        p = 0.7075  Holm 1.0000  binnen de ruis
+
+--- V4 ---
+{
+ "signaalTegenBudget": -0.9166666666666643,
+ "budgetTegenKlok": -2.666666666666668,
+ "signaal": {
+  "n": 12,
+  "m": 30.333333333333332,
+  "sd": 14.785332617363082,
+  "ci": 8.365589451358876
+ },
+ "budget": {
+  "n": 12,
+  "m": 29.416666666666668,
+  "sd": 13.466850433789654,
+  "ci": 7.619587928623188
+ },
+ "klok": {
+  "n": 12,
+  "m": 26.75,
+  "sd": 14.863775367712545,
+  "ci": 8.409972615528508
+ },
+ "oordeel": "de hoeveelheid weegt minstens zo zwaar als het moment"
+}
+
+--- hersteltijd per zaad, voor het geval het interval iets verbergt ---
+ang-klok      34 46 11 16 13 11 33 11 39 43 47 17
+ang-signaal   34 15 51 42 48 13 39 14 15 42 15 36
+ang-budget    15 14 44 35 19 16 41 19 18 46 43 43
+ang-vast      43 19 45 35 45 14 34 14 50 45 13 32
+KLAAR exitcode=0 

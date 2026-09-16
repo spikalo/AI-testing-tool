@@ -1,0 +1,60 @@
+10.11  Herstructurering op een omgevingssignaal
+Secties 10.9 en 10.10 wijzen samen een oorzaak aan: de herstructurering wordt aangestuurd door een vaste klok, en waar zij op een signaal reageert is dat de stagnatie van het eigen leren en niet een verandering in de omgeving. Een aangewezen oorzaak is geen getoetste oorzaak. Deze sectie vervangt de klok door een detector op de omgeving en draait de omslagproef van sectie 10.9 verder onveranderd opnieuw: dezelfde fasen, dezelfde 12 breinzaden, dezelfde herstelregel, dezelfde meetpunten. Alleen de aansturing van de poort verschilt, want dat is de vraag.
+Wat de detector meet, en waarom niet de beloning
+De detector kijkt uitsluitend naar de invoer. Per poging wordt van elk van de zestien invoerkanalen het gemiddelde over de spelstappen genomen; daar lopen een snel en een traag exponentieel gemiddelde overheen (20 en 150 pogingen). Het verschil daartussen wordt per kanaal gedeeld door zijn eigen standaardfout en kwadratisch samengenomen, zodat het resultaat een z-maat is die onder een stilstaande omgeving rond één ligt. De poort vuurt wanneer die maat boven mediaan plus 3 × MAD van haar eigen recente verloop uitkomt — een meelopende drempel, zodat er geen getal met de hand gekozen hoeft te worden.
+Het signaal mag niet uit het gedrag van het netwerk komen. Sectie 10.10 eindigt met dat voorbehoud en het is hier bindend. Een poort die op de lopende beloningsbasislijn stuurt, meet precies de samenhang die daar al gerapporteerd is, en die is circulair te lezen: minder verbouwen omdat het netwerk al goed speelt is dan niet te onderscheiden van meer verbouwen omdat het vastzit. De invoerstatistiek heeft dat bezwaar niet — zij verschuift bij een omslag ongeacht hoe goed de agent speelt.
+De instellingen van de detector zijn gekalibreerd op de klokconditie. Daar loopt de detector mee zonder iets te sturen, dus er was geen uitkomstmaat om op te kiezen; gemeten is alleen of de poort in een stilstaande fase stil blijft en bij een omslag aanslaat. Dat de nieuwe knop in haar uitstand werkelijk niets doet, is niet aangenomen maar nagerekend: de klokconditie levert met hetzelfde zaad bit voor bit hetzelfde leven op als de ang-conditie van sectie 10.9 — historie, netwerk en herstructureringen identiek.
+Vuurt de poort waar zij zou moeten vuren?
+Dit is een controle op de ingreep en geen uitkomstmaat: voordat er iets over herstel gezegd mag worden, moet vaststaan dat de poort werkelijk op de omgeving reageert. De vuurkans binnen vijftig pogingen na een omslag staat daarom naast die in de rest van het leven, per omslag afzonderlijk en per zaad gepaard. Elke poging heeft een eindige, niet-negatieve waarde en elke drempel is eindig zodra de detector rijp is; die controle gaat vooraf aan elke vergelijking, omdat een meting eerst moet bewijzen dát er gemeten is.
+omslag
+vuurkans elders
+vuurkans binnen 50 pogingen
+zaden omhoog
+eerste keer vuren
+300 (naar knipperen)
+4.2% ± 1.8
+0.2% ± 0.3
+0 van 12, p < 0.001
+1 van de 12 levens, na 50.0 ± 0.0 pogingen
+600 (terug naar zichtbaar)
+4.2% ± 1.8
+56.0% ± 9.6
+12 van 12, p < 0.001
+alle 12 levens, na 3.2 ± 0.4 pogingen
+Bij de terugslag naar de oorspronkelijke taak doet de poort precies wat zij moet doen. De vuurkans gaat van 4.2% ± 1.8 naar 56.0% ± 9.6, in 12 van de 12 levens dezelfde kant op (p < 0.001), en zij slaat gemiddeld 3.2 ± 0.4 pogingen na de omslag voor het eerst aan. De onderliggende maat gaat daarbij van 1.44 naar 1.94.
+Bij de omslag naar het knipperende doel mist de detector hem, en dat hoort er onverkort bij te staan. Daar gaat de vuurkans van 4.2% ± 1.8 naar 0.2% ± 0.3, en in 11 van de 12 levens vuurt de poort binnen het venster in het geheel niet. De maat zelf beweegt wel de goede kant op — van 1.44 naar 1.70 — maar niet ver genoeg boven de meelopende drempel. De reden is te zien in de ruwe kanaalgemiddelden: wanneer het doel verdwijnt zakken de doelkanalen naar nul, en nul is een waarde die zij in de zichtbare fase ook geregeld aannemen, zodat de verschuiving klein is ten opzichte van de spreiding die er toch al was. Komt het doel terug, dan springen diezelfde kanalen omhoog uit een fase waarin zij nauwelijks varieerden, en dat is een veel grotere verschuiving in spreidingseenheden. Voor de vraag van deze sectie is dat draaglijk: het herstel wordt gemeten ná de terugslag, en dáár vuurt de poort. Maar de detector is daarmee geen algemene omslagdetector, en zo wordt hij hier ook niet gepresenteerd.
+Levert verbouwen op het juiste moment herstel op?
+De vier condities verschillen alleen in de aansturing van de poort. De budgetconditie is er omdat een signaalgestuurde poort niet alleen op andere momenten verbouwt maar ook een ander aantal keren: haar klokperiode is per zaad zó gezet dat zij evenveel herstructureringsronden haalt als het signaalleven van datzelfde zaad. Zonder die controle zou een verschil in herstel even goed aan de hoeveelheid als aan het moment kunnen liggen.
+aansturing
+ronden per leven
+ronden binnen 50 pogingen na de terugslag
+hersteltijd (pogingen)
+behoud (pp)
+klok (als sectie 10.9)
+90.0 ± 0.0
+5.0 ± 0.0
+26.8 ± 8.4
+-13.8 ± 9.5
+omgevingssignaal
+55.4 ± 15.4
+28.0 ± 4.8
+30.3 ± 8.4
+-11.9 ± 3.8
+klok, zelfde hoeveelheid als het signaal
+55.3 ± 15.6
+3.0 ± 0.9
+29.4 ± 7.6
+-15.4 ± 5.5
+structuur bevroren
+0.0 ± 0.0
+0.0 ± 0.0
+32.4 ± 7.9
+-12.7 ± 3.5
+De ingreep doet wat zij moet doen aan de verdeling van het verbouwen. Het signaalleven legt 28.0 ± 4.8 van zijn 55.4 ± 15.4 ronden in de vijftig pogingen na de terugslag; de budgetconditie, met hetzelfde aantal ronden over het hele leven, komt daar op 3.0 ± 0.9 en de gewone klok op 5.0 ± 0.0. Het verschil tussen de condities zit dus werkelijk in het moment en niet in de hoeveelheid, en de koppeling per zaad wijkt nergens meer dan één ronde af.
+En het levert geen herstelvoordeel op. De hersteltijd is 30.3 ± 8.4 pogingen tegen 26.8 ± 8.4 voor de klok, en dat verschil blijft binnen de meetruis (p = 0.453, Holm 1.000). Tegen de bevroren structuur, die 32.4 ± 7.9 pogingen nodig heeft, is het beeld hetzelfde (p = 0.840, Holm 1.000). Ook tegen de budgetconditie verschuift er niets (p = 0.707, Holm 1.000). Geen van de 48 levens is gecensureerd: elke conditie haalt haar oude plateau binnen de derde fase terug.
+Het moment weegt niet zwaarder dan de hoeveelheid. Beschrijvend, met alle drie de gemiddelden naast elkaar: het verschil tussen signaal en budget — gelijke hoeveelheid, ander moment — is 0.9 pogingen, en dat tussen budget en de gewone klok — zelfde soort aansturing, andere hoeveelheid — 2.7 pogingen. Beide liggen ruim binnen de intervallen van de afzonderlijke gemiddelden, die alle drie ongeveer acht pogingen breed zijn. Uit deze meting valt dus niet af te leiden dat het moment van verbouwen ertoe doet, en evenmin dat de hoeveelheid ertoe doet.
+Gericht verbouwen kost ook geen extra behoud. De score op taak A verandert over de knipperfase met -11.9 ± 3.8 procentpunt tegen -13.8 ± 9.5 voor de klok (p = 0.795, Holm 1.000). Het stabiliteit-plasticiteitsruilpunt dat sectie 10.9 niet kon aantonen, wordt hier dus ook niet zichtbaar wanneer de plasticiteit gericht wordt.
+Wat wél opvalt, staat in de eindstanden en niet in de hersteltijd. Op de benchmark aan het eind van het leven staat de signaalconditie op 67.6% ± 1.9, de budgetconditie op 65.6% ± 4.5, de gewone klok op 64.1% ± 3.0 en de bevroren structuur op 68.5% ± 2.4. De twee condities die minder verbouwen — ongeveer 55 ± 15 ronden tegen 90 ± 0 — liggen daarmee dichter bij de bevroren variant dan de gewone klok, en de bevroren variant staat bovenaan. Die intervallen overlappen en dit is geen voorgeregistreerde vergelijking, dus er hangt geen conclusie aan; het past wel bij wat sectie 10.8 al vond, namelijk dat herstructureren op deze taakfamilie eerder een kostenpost dan een opbrengst is.
+Wat deze sectie aan het betoog verandert. Sectie 10.9 vond geen herstelvoordeel en wees een oorzaak aan; sectie 10.10 maakte die aanwijzing preciezer maar bleef een correlatie. Hier is de aangewezen oorzaak weggenomen — de herstructurering ziet de terugslag nu binnen een handvol pogingen en verbouwt daar 17 keer zo dicht als in de rest van het leven — en het herstel verandert er niet van. Daarmee is de negatieve bevinding van sectie 10.9 niet langer aan die ene ontwerpkeuze toe te schrijven. Dat is een ongemakkelijker uitkomst dan de omgekeerde zou zijn geweest, en een sterkere: de conclusie van dit werk rust vanaf hier op een getoetste oorzaak in plaats van op een aangewezen correlatie.
+Met twee voorbehouden. Het eerste is de detector: hij ziet de terugslag naar de zichtbare taak wel en de overgang naar het knipperende doel niet, dus deze meting toetst de aansturing bij één van de twee omslagen en niet bij beide. Het tweede is de maat. De hersteltijden van de 4 aansturingen liggen alle tussen 27 en 32 pogingen, en geen enkel leven is gecensureerd, zodat er weinig ruimte is waarin een voordeel zichtbaar zou kunnen worden. Een omslag die dieper snijdt of een plateau dat hoger ligt zou die ruimte vergroten; beide zouden een nieuwe meetreeks vergen en geen van beide is hier gedaan.
+KLAAR exitcode=0 
