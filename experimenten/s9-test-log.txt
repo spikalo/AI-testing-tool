@@ -1,0 +1,19 @@
+OK    elke cel levert het gevraagde aantal neuronen   8→8 16→16 30→30 60→60 120→120
+OK    en de vijf maten zijn werkelijk verschillend
+OK    meer neuronen levert ook meer verbindingen op   203 → 477 → 1177 → 2639 → 4745
+OK    het aandeel sens-neuronen blijft over de maten heen ongeveer gelijk   0.19 0.14 0.14 0.15 0.14  (spreiding 0.05)
+OK    het aandeel work-neuronen blijft over de maten heen ongeveer gelijk   0.63 0.66 0.69 0.70 0.69  (spreiding 0.07)
+OK    het aandeel refl-neuronen blijft over de maten heen ongeveer gelijk   0.06 0.11 0.10 0.09 0.09  (spreiding 0.05)
+OK    het aandeel mem-neuronen blijft over de maten heen ongeveer gelijk   0.13 0.09 0.07 0.07 0.07  (spreiding 0.06)
+OK    workers vormen overal de meerderheid   0.63 0.66 0.69 0.70 0.69
+OK    een hogere startdichtheid levert meer verbindingen op   d=15:1130  d=35:2639  d=70:3713
+OK    en het aantal neuronen verandert er niet van
+OK    op taak A zijn de twee metingen gelijk (zelfde stand, zelfde meting)   0.65 tegen 0.65
+OK    op B-20 zijn zij niet gelijk — anders leest de loper het verkeerde veld   0.167 tegen 0.342
+OK    en op B-20 ligt de eigen stand lager dan taak A   knipperen hoort moeilijker te zijn dan niet knipperen
+OK    elke meting is eindig en in bereik
+OK    de geheugenhorizon is eindig en niet negatief   A 30, B-20 13
+OK    veegzaden en meetzaden overlappen niet   veeg 2000,2001,2002 · meet 1000..1007
+
+alle controles groen
+KLAAR exitcode=0 
