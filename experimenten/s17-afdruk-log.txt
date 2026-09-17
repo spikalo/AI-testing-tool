@@ -1,0 +1,3 @@
+tik 340/240, 3 van 25 eisen goed, strook 30 tikken
+geschreven: docs/seinhuis.png
+KLAAR exitcode=0 

@@ -504,6 +504,30 @@
           <label>Aantal obstakels <span class="val" id="nobsval">7</span></label>
           <input type="range" id="nobs" min="0" max="26" step="1" value="7">
         </div>
+        <!-- stap 17: welk spel er gespeeld wordt. Staat boven de wereldinstellingen omdat
+             hij bepaalt welke daarvan nog iets doen. -->
+        <div class="field">
+          <label>Spel</label>
+          <select id="taak" style="width:100%;padding:6px;background:#181c22;color:#e6e9ee;border:1px solid #39414c;border-radius:6px;">
+            <option value="doel" selected>1 — doel bereiken (2D-wereld)</option>
+            <option value="seinhuis">2 — seinhuis (seinen en handels)</option>
+          </select>
+          <div class="hint">Spel 2 is een heel andere taak: geen ruimte en geen navigatie, maar acht
+            seinlampen, een wissel en vier handels, met zes regels die door elkaar heen lopen — van
+            "reageer deze tik" tot "onthoud dit tachtig tikken". Elke regel wordt apart gescoord.
+            De instellingen hieronder over obstakels, stappen en het knipperende doel doen in spel 2
+            niets; die over het brein, de leerregel en de structurele plasticiteit wél.</div>
+        </div>
+        <div class="field">
+          <label>Seinhuis: tikken per dienst <span class="val" id="seintikkenval">240</span></label>
+          <input type="range" id="seintikken" min="80" max="480" step="10" value="240">
+        </div>
+        <div class="field">
+          <label>Seinhuis: actieve regels <span class="val" id="seinregelsval">6</span></label>
+          <input type="range" id="seinregels" min="1" max="6" step="1" value="6">
+          <div class="hint">Op <b>1</b> geldt alleen de eerste regel, op <b>6</b> alle zes. De
+            groeiende dienstregeling van stap 19 zet deze knop tijdens één leven omhoog.</div>
+        </div>
         <div class="field">
           <label>Stappen per poging <span class="val" id="maxstepsval">320</span></label>
           <input type="range" id="maxsteps" min="80" max="2000" step="20" value="320">
@@ -1858,6 +1882,13 @@ function readCfg(){
     retypeOn:$("retype").checked, retypeN:+$("retypen").value, retypeCost:+$("retypecost").value/100,
     rGoal:+$("rgoal").value/10, rProg:+$("rprog").value/100, rCol:+$("rcol").value/100,
     rStep:+$("rstep").value/1000, rIdle:+$("ridle").value/1000,
+    /* stap 17 — welk spel er gespeeld wordt. "doel" is spel 1 en moet bit voor bit
+       blijven wat het was; "seinhuis" is spel 2. De waarde komt uit cfg en niet uit een
+       globale (fout 12), en staat standaard op spel 1 zodat elke bestaande conditie,
+       elk opgeslagen brein en elke eerdere meetreeks onveranderd doorloopt. */
+    taak: $("taak") ? $("taak").value : "doel",
+    seinTikken: $("seintikken") ? +$("seintikken").value : SEIN_TIKKEN,
+    seinRegels: $("seinregels") ? +$("seinregels").value : SEIN_REGELS,
     nEpisodes:+$("nep").value, evalOn:$("evalon").checked,
     evalMode: ($("evalstrict")&&$("evalstrict").checked) ? "streng" : "beleid",
     /* de vaste benchmarkset aan het eind van een run; alleen de experimentloper
@@ -1896,6 +1927,9 @@ const S={
      voor de meelopende drempel bij; driftLog bewaart de hele reeks — de kromme, niet
      alleen het afgeleide getal (vaste regel). */
   drift:null, driftLog:[], epInSom:null, epInN:0,
+  /* stap 17: het seinhuis. seinTel telt de lopende dienst, seinStrook is alleen voor het
+     tekenen, seinBench houdt de vaste dienstenset vast. */
+  seinTel:null, seinStrook:null, seinBench:null, seinFractie:null,
   resultsDirHandle:null, lastResult:null, dirty:false,
   gradAccum:null, gradAccumBias:null,
   expDirHandle:null, expCsvLines:null, expCsvName:"runs.csv", expAbort:false, expRunning:false,
@@ -1907,9 +1941,13 @@ const S={
 
 /* ======================= spel ======================= */
 function newWorld(seedOffset){
+  /* stap 17: welk spel er gespeeld wordt, bepaalt wat een "wereld" is. Bij spel 1 een
+     doolhof, bij spel 2 een dienst. De rest van de lus merkt het verschil niet. */
+  if(S.cfg && S.cfg.taak==="seinhuis"){ S.world=seinDienst(S.cfg.seed*1000+seedOffset, S.cfg); return; }
   S.world=makeWorld(S.cfg.seed*1000+seedOffset, S.cfg.nObs);
 }
 function startEpisode(){
+  if(S.cfg && S.cfg.taak==="seinhuis"){ seinStart(); return; }
   S.ag.x=S.world.start.x; S.ag.y=S.world.start.y;
   S.trail=[[S.ag.x,S.ag.y]];
   S.step=0; S.epReward=0; S.epCollisions=0; S.epIdle=0; S.reached=false;
@@ -1945,6 +1983,9 @@ function moveAgent(dx,dy,mag,w){
 }
 /* één spelstap. learn=false → geen ruis, geen plasticiteit (toetsen/kijken) */
 function gameTick(learn,noise){
+  /* stap 17: de enige plek waar de twee spellen uit elkaar gaan. Alles vóór deze regel —
+     het brein, de leerregel, de herstructurering, de poort uit stap 16 — is gedeeld. */
+  if(S.cfg.taak==="seinhuis") return seinTick(learn,noise);
   const c=S.cfg, B=S.B, w=S.world;
   /* Rekenkosten worden apart geteld voor leren en voor inferentie: dat zijn twee
      verschillende getallen die allebei "efficiëntie" heten. */
@@ -2167,6 +2208,373 @@ function isStagnating(c){
 }
 function meanAbsW(B){ let s=0; for(let c=0;c<B.nc;c++) s+=Math.abs(B.cW[c]); return B.nc? s/B.nc:0; }
 
+/* ======================= spel 2: het seinhuis =======================
+   WAAROM ER EEN TWEEDE SPEL IS. Zestien meetstappen lang is alles gemeten op één taak:
+   doel bereiken in een 2D-wereld. Die taak heeft één tijdschaal, één soort antwoord en
+   een vaste hoeveelheid werk, en een netwerk dat zijn structuur kan verbouwen heeft er
+   per constructie niets te verbouwen. De paper schrijft dat zelf al op drie plaatsen op
+   als open vraag. Dit is die vraag, uitgevoerd.
+
+   HET SPEL. Geen ruimte, geen navigatie. De agent is een seinhuiswachter: er komt een
+   stroom lampjes binnen en hij bedient vier handels. De zestien invoerkanalen zijn acht
+   seinlampen, de wisselstand, en zeven afleiders die nergens over gaan. Die zeven staan
+   er met opzet: `sensorGebruik` bestaat al sinds sectie 6 en heeft nooit een taak gehad
+   waarop hij iets kon betekenen. Hier hoort een goed netwerk negen kanalen te bedraden
+   en zeven te negeren, en dat is te meten.
+
+   ZES REGELS, ELK ÉÉN ZIN — makkelijk op te schrijven, moeilijk om te spelen:
+
+     R1  lamp 0 én wissel open           -> handel 0, DEZE tik
+     R2  lamp 1 én wissel dicht          -> handel 1, DEZE tik
+     R3  lamp 2 zet een vlag; bij lamp 3 -> handel 0 als de vlag aanstond, anders 1
+     R4  lamp 4 zet een vlag; bij lamp 5 -> handel 2 als de vlag aanstond, anders 3
+     R5  elke derde keer dat lamp 6 aangaat -> handel 2
+     R6  lamp 7 twee keer binnen drie tikken -> handel 3, op de tweede keer
+
+   DRIE DINGEN DIE DIT SPEL KAN EN SPEL 1 NIET.
+
+   Ten eerste: vier tijdschalen tegelijk in één lichaam. Eén tik voor R1 en R2, een tot
+   drie voor R6, vijf tot vijftien voor R3, dertig tot tachtig voor R4. Dat is letterlijk
+   de aanspraak uit de conclusie van de paper — "verschillende informatielatenties" — en
+   zij is nooit gemeten omdat spel 1 er maar één heeft.
+
+   Ten tweede: elke regel wordt APART gescoord. Daardoor zie je niet alleen dát een
+   netwerk tekortschiet maar wélke regel als eerste valt, en dat is het antwoord op de
+   vraag waar dit project uit voortkomt in een vorm die je kunt laten zien.
+
+   Ten derde: een dubbele dissociatie is toetsbaar. Reflex-neuronen uitzetten hoort R1 en
+   R2 te slopen en R3 en R4 met rust te laten; geheugen-neuronen uitzetten precies
+   andersom. Staat dat patroon er, dan is het typesysteem voor het eerst functioneel
+   aangetoond op meer dan één as. Staat het er niet, dan is het weerlegd.
+
+   ELKE HANDEL WORDT DOOR TWEE REGELS GEBRUIKT (0 door R1 en R3, 1 door R2 en R3, 2 door
+   R4 en R5, 3 door R4 en R6). Dat is geen sierlijkheid: zou elke regel zijn eigen handel
+   hebben, dan is de handel een verklikker voor de regel en hoeft het netwerk de regel
+   niet te herkennen maar alleen de lamp.
+
+   GOED IS: de gevraagde handel ingedrukt EN de andere drie niet. Zonder die uitsluiting
+   scoort een netwerk dat alle vier de handels vasthoudt honderd procent, en dat is geen
+   wachter maar een baksteen. Met uitsluiting ligt de toevalsbodem bij een geloot beleid
+   met p = 0,5 op 0,5 x 0,5^3 = 6,25 % en de bovengrens op 100 %. Beide worden in
+   tests/test-stap17.js nagemeten, want een score op een nieuw spel is een getal zonder
+   schaal zolang bodem en plafond niet gemeten zijn.                                  */
+const SEIN_LAMPEN=8, SEIN_RUIS=7, SEIN_REGELS=6;
+const SEIN_REGELNAAM=[
+  "lamp 0 + wissel open -> handel 0, deze tik",
+  "lamp 1 + wissel dicht -> handel 1, deze tik",
+  "lamp 3 -> handel 0 als er sinds de vorige lamp 3 een lamp 2 was, anders handel 1",
+  "lamp 5 -> handel 2 als er sinds de vorige lamp 5 een lamp 4 was, anders handel 3",
+  "elke derde lamp 6 -> handel 2",
+  "lamp 7 twee keer binnen 3 tikken -> handel 3"
+];
+const SEIN_KORT=["R1","R2","R3","R4","R5","R6"];
+/* Korte namen voor de tekening. De volledige regel staat in SEIN_REGELNAAM en gaat mee
+   de meetbestanden in; op een scorebalk past hij niet, en half afgekapt is hij erger dan
+   kort. */
+const SEIN_TEKENNAAM=[
+  "lamp 0 + wissel open",
+  "lamp 1 + wissel dicht",
+  "lamp 3, vlag van lamp 2",
+  "lamp 5, vlag van lamp 4",
+  "elke derde lamp 6",
+  "lamp 7 twee keer snel"
+];
+/* Tweehonderdveertig tikken per dienst, en dat getal volgt uit R4 en niet uit smaak: een
+   vertraging van dertig tot zeventig tikken past alleen tussen twee vragen van diezelfde
+   regel als die vragen ver genoeg uit elkaar liggen. De dienstlengte is dus de prijs van
+   de langste tijdschaal die het spel vraagt. */
+const SEIN_TIKKEN=240, SEIN_PER_REGEL=3;
+
+/* Eén dienst: de hele stroom wordt vooraf uitgerekend en ligt daarmee vast bij het zaad.
+   Dat is met opzet — een stroom die tijdens het spelen geloot wordt, verschuift zodra er
+   ergens anders een trekking bij komt, en dan is geen enkele run meer reproduceerbaar.
+   Zelfde reden als de vaste benchmarkset van spel 1. */
+function seinDienst(seed,cfg){
+  const rnd=mulberry32((seed|0)*7919+13);
+  const T=Math.max(60,(cfg.seinTikken|0)||SEIN_TIKKEN);
+  const nR=Math.min(SEIN_REGELS,Math.max(1,(cfg.seinRegels|0)||SEIN_REGELS));
+  const lamp=new Int8Array(T).fill(-1);
+  const wissel=new Uint8Array(T);
+  const eisRegel=new Int8Array(T);            /* 0 = geen eis, anders 1..6 */
+  const eisHandel=new Int8Array(T).fill(-1);
+  const bezet=new Uint8Array(T);
+  /* De wissel staat los van de lampen en wisselt langzaam, zodat hij een toestand is en
+     geen tweede lampje; de planner overschrijft hem alleen waar een regel dat eist. */
+  let w=rnd()<0.5?1:0;
+  for(let t=0;t<T;t++){ if(rnd()<0.08) w=1-w; wissel[t]=w; }
+  const ruis=new Float32Array(T*SEIN_RUIS);
+  for(let i=0;i<ruis.length;i++) ruis[i]=rnd();
+
+  const vrijTik=t=> t>=2 && t<T-2 && !bezet[t];
+  const vrijSpan=(t,len)=>{ if(t<2||t+len>T-2) return false;
+    for(let i=0;i<len;i++) if(bezet[t+i]) return false; return true; };
+  const kiesTik=()=>{ for(let p=0;p<80;p++){ const t=2+Math.floor(rnd()*(T-6));
+    if(vrijTik(t)) return t; } return -1; };
+  const kiesSpan=len=>{ for(let p=0;p<80;p++){ const t=2+Math.floor(rnd()*Math.max(1,T-len-4));
+    if(vrijSpan(t,len)) return t; } return -1; };
+  /* Bij een vraag met vertraging worden alleen de twee uiteinden gereserveerd en niet de
+     hele tussenliggende ruimte. Dat is het verschil tussen een taak waarin de regels door
+     elkaar heen lopen en een taak waarin zij netjes op hun beurt wachten — en door elkaar
+     heen lopen is precies wat er gemeten moet worden. */
+  const kiesPaar=g=>{ for(let p=0;p<80;p++){ const t=2+Math.floor(rnd()*Math.max(1,T-g-6));
+    if(vrijTik(t)&&vrijTik(t+g)) return t; } return -1; };
+  const zet=(t,l)=>{ lamp[t]=l; bezet[t]=1; };
+  const eis=(t,regel,handel)=>{ eisRegel[t]=regel; eisHandel[t]=handel; };
+
+  const actief=[];
+  for(let r=1;r<=nR;r++) actief.push(r);
+  /* De volgorde waarin de regels hun plekken claimen wordt geloot, anders krijgt regel 1
+     altijd de rustigste plekken en regel 6 de restjes. */
+  for(let i=actief.length-1;i>0;i--){ const j=Math.floor(rnd()*(i+1));
+    const h=actief[i]; actief[i]=actief[j]; actief[j]=h; }
+
+  /* EERST DE LAMPEN, DAARNA PAS DE EISEN. Dat is geen stijlkeuze maar een correctie op
+     de eerste versie, en zij is het vermelden waard omdat de fout er een was die zich
+     als een werkende taak voordeed.
+
+     In die versie legde de planner per proef een vlaglamp en een vraaglamp neer en
+     schreef hij meteen op welke handel daarbij hoorde. Zodra twee proeven van dezelfde
+     regel elkaar overlappen — en bij een vertraging tot tachtig tikken doen zij dat
+     voortdurend — klopte dat niet meer: de vraag van proef A kreeg de vlag van proef B
+     voorgeschoteld. De taak vroeg dan iets wat uit de waarneming niet af te leiden was.
+     Een netwerk dat dat "fout" doet, doet het juist goed.
+
+     Daarom worden de eisen hier in één keer uit de WERKELIJK GEVALLEN lampenreeks
+     afgeleid. De regel is daarmee ook scherper te formuleren: een vlag geldt tot de
+     eerstvolgende vraag, en dat is de enige lezing die eenduidig is. Omdat elke regel
+     op een eigen lamp aanslaat en er hoogstens één lamp per tik brandt, kan er per tik
+     ook nooit meer dan één regel iets eisen. */
+  /* De twee vraagregels worden chronologisch gepland en niet proef voor proef. Anders
+     loopt de verhouding tussen de twee antwoorden scheef: een vlag is een bit, dus twee
+     vlaglampen vóór dezelfde vraag vallen samen, en bij een vertraging tot tachtig tikken
+     gebeurde dat zo vaak dat R4 in bijna driekwart van de gevallen hetzelfde antwoord
+     kreeg. Een regel waarvan één antwoord overheerst, is voor een deel op te lossen door
+     te gokken, en dan meet hij niet meer wat hij belooft.
+
+     Door eerst alle vraagtikken te leggen, ze op volgorde te zetten en daarna om en om
+     wél of géén vlag in het gat vóór die vraag te plaatsen, ligt de verhouding op vijftig
+     om vijftig vast — en blijft de vertraging binnen het bedoelde bereik. */
+  /* De vraagtikken worden over even grote blokken verdeeld en niet vrij geloot. Anders
+     staan twee vragen soms vlak achter elkaar, past de vlag er niet meer tussen, en valt
+     die proef terug op "geen vlag" — bij R4 liep de verhouding daardoor naar 12 om 88.
+     Met blokken ligt de onderlinge afstand vast op ongeveer T / aantal vragen, en dat is
+     meteen de bovengrens voor de vertraging die een regel kan vragen. */
+  const kiesInBlok=(i,n)=>{
+    const van=2+Math.floor(i*(T-6)/n), tot=2+Math.floor((i+1)*(T-6)/n)-1;
+    for(let p=0;p<60;p++){ const t=van+Math.floor(rnd()*Math.max(1,tot-van+1));
+      if(vrijTik(t)) return t; }
+    return -1;
+  };
+  const plaatsVraagregel=(vraagLamp,vlagLamp,gMin,gMax,nVragen)=>{
+    const vragen=[];
+    for(let k=0;k<nVragen;k++){ const t=kiesInBlok(k,nVragen); if(t>=0){ zet(t,vraagLamp); vragen.push(t); } }
+    vragen.sort((a,b)=>a-b);
+    for(let i=0;i<vragen.length;i+=2){
+      const t=vragen[i], vorige=i>0?vragen[i-1]:1;
+      const van=Math.max(vorige+1,t-gMax), tot=Math.min(t-gMin,t-1);
+      for(let p=0;p<40 && tot>=van;p++){
+        const c=van+Math.floor(rnd()*(tot-van+1));
+        if(vrijTik(c)){ zet(c,vlagLamp); break; }
+      }
+    }
+  };
+  for(const r of actief){
+    /* R4 krijgt minder vragen dan de andere regels, en dat is geen slordigheid: zijn
+       vertraging is de langste van het spel, en die past alleen tussen twee vragen als
+       die vragen ver genoeg uit elkaar liggen. Minder vragen is hier de prijs van een
+       langer geheugen. */
+    if(r===3){ plaatsVraagregel(3,2,5,15,SEIN_PER_REGEL*2); continue; }
+    if(r===4){ plaatsVraagregel(5,4,30,70,SEIN_PER_REGEL+1); continue; }
+    for(let k=0;k<SEIN_PER_REGEL*2;k++){
+      const eist=(k%2===0);
+      if(r===1){ const t=kiesTik(); if(t<0) continue; zet(t,0); wissel[t]=eist?1:0; }
+      else if(r===2){ const t=kiesTik(); if(t<0) continue; zet(t,1); wissel[t]=eist?0:1; }
+      else if(r===5){ const t=kiesTik(); if(t<0) continue; zet(t,6); }
+      else if(r===6){
+        if(eist){ const d=1+Math.floor(rnd()*3); const t=kiesSpan(d+3); if(t<0) continue;
+          zet(t,7); zet(t+d,7); for(let i=1;i<d+3&&t+i<T;i++) bezet[t+i]=1; }
+        else { const t=kiesSpan(4); if(t<0) continue;
+          zet(t,7); for(let i=1;i<4;i++) bezet[t+i]=1; }
+      }
+    }
+  }
+  /* R5 heeft drie keer zoveel lampen nodig als eisen, want elke derde telt. */
+  if(nR>=5) for(let k=0;k<SEIN_PER_REGEL*3;k++){ const t=kiesTik(); if(t<0) break; zet(t,6); }
+
+  /* ---- de eisen, afgeleid uit de gevallen lampen ---- */
+  let vlag3=false, vlag4=false, tel6=0;
+  for(let t=0;t<T;t++){
+    const l=lamp[t];
+    if(l===2) vlag3=true;
+    if(l===4) vlag4=true;
+    if(nR>=1 && l===0 && wissel[t]===1) eis(t,1,0);
+    if(nR>=2 && l===1 && wissel[t]===0) eis(t,2,1);
+    /* De vlag geldt tot de eerstvolgende vraag en wordt daar opgebruikt. */
+    if(nR>=3 && l===3){ eis(t,3,vlag3?0:1); vlag3=false; }
+    if(nR>=4 && l===5){ eis(t,4,vlag4?2:3); vlag4=false; }
+    if(nR>=5 && l===6){ tel6++; if(tel6%3===0) eis(t,5,2); }
+    if(nR>=6 && l===7){
+      let paar=false;
+      for(let k=1;k<=3 && t-k>=0;k++) if(lamp[t-k]===7) paar=true;
+      if(paar) eis(t,6,3);
+    }
+  }
+
+  return {T, nR, lamp, wissel, eisRegel, eisHandel, ruis, zaad:seed};
+}
+
+/* De zestien invoerkanalen op tik t. */
+function seinWaarnemen(d,t,out){
+  for(let i=0;i<N_IN;i++) out[i]=0;
+  const l=d.lamp[t]; if(l>=0) out[l]=1;
+  out[SEIN_LAMPEN]=d.wissel[t];
+  for(let i=0;i<SEIN_RUIS;i++) out[SEIN_LAMPEN+1+i]=d.ruis[t*SEIN_RUIS+i];
+  return out;
+}
+
+/* De score van één tik, en de ENIGE plaats waar "goed" gedefinieerd wordt. De benchmark,
+   de trainingslus en de controletest gebruiken alle drie deze functie; zou elk van hen
+   het zelf uitrekenen, dan is de bovengrens die de test meet niet de bovengrens die de
+   benchmark rapporteert. */
+function seinScoreTik(d,t,P){
+  const regel=d.eisRegel[t], handel=d.eisHandel[t];
+  let ingedrukt=0; for(let i=0;i<N_OUT;i++) if(P[i]) ingedrukt++;
+  if(regel>0){
+    const juist=P[handel]?1:0;
+    /* Vloeiend genoeg om een gradiënt te geven: de juiste handel telt, elke extra handel
+       kost. Zonder die tweede term is alles vasthouden de beste zet. */
+    return {regel, handel, goed:(juist===1 && ingedrukt===1), ingedrukt,
+      r:(juist?1.5:-1.5)-0.5*(ingedrukt-juist)};
+  }
+  return {regel:0, handel:-1, goed:null, ingedrukt, r:-0.5*ingedrukt};
+}
+
+function seinLeegTelling(){
+  return {eis:new Int32Array(SEIN_REGELS), goed:new Int32Array(SEIN_REGELS),
+    stil:0, loos:0, eisTot:0, goedTot:0};
+}
+function seinStart(){
+  S.step=0; S.epReward=0; S.epCollisions=0; S.epIdle=0; S.reached=false;
+  S.seinTel=seinLeegTelling();
+  if(S.B) resetBrainState(S.B);
+  invoerReset();
+}
+/* Eén spelstap in het seinhuis. Zelfde volgorde als gameTick van spel 1 — waarnemen,
+   criticus lezen, stap door het brein, sporen bijwerken, belonen — zodat de leerregel op
+   beide spellen aantoonbaar hetzelfde doet. */
+function seinTick(learn,noise){
+  const c=S.cfg, B=S.B, d=S.world;
+  MEET = learn ? "leer" : "inf";
+  if(learn) S.stapLeer++; else S.stapInf++;
+  S.lrScale=c.lrAnneal? (c.noise0>0? noise/c.noise0 : 1) : 1;
+  const t=S.step;
+  seinWaarnemen(d,t,S.inp);
+  if(learn) invoerTel(S.inp);
+  const criticOn=learn && !!c.criticOn;
+  let v0=0;
+  if(criticOn){ if(!S.inpNext) S.inpNext=new Float32Array(N_IN); v0=criticValue(B,S.inp); kb(3*N_IN); }
+  brainStep(B,S.inp,c,noise,S.rnd);
+  const P=B.press;
+  S.outPressed=[!!P[0],!!P[1],!!P[2],!!P[3]];
+  if(learn){
+    if(c.gradExact) updateTracesExact(B,c.lam);
+    else updateTraces(B,c.lam,c.traceOud,c.perturbGain);
+  }
+  const s=seinScoreTik(d,t,P);
+  const tel=S.seinTel;
+  if(s.regel>0){ tel.eis[s.regel-1]++; tel.eisTot++;
+    if(s.goed){ tel.goed[s.regel-1]++; tel.goedTot++; } }
+  else { tel.stil++; if(s.ingedrukt>0) tel.loos++; }
+  S.epReward+=s.r;
+  seinStrook(d,t,P,s);
+  let adv=null;
+  if(criticOn){
+    const terminaal=(t+1>=d.T);
+    seinWaarnemen(d,Math.min(t+1,d.T-1),S.inpNext);
+    const v1=terminaal?0:criticValue(B,S.inpNext);
+    adv=s.r+c.criticGamma*v1-v0;
+    criticUpdate(B,S.inp,adv,c.criticLr);
+  }
+  if(learn) applyReward(B,s.r,c,S.lrScale,adv);
+  S.step++;
+  if(S.step>=d.T){
+    /* "Geslaagd" is een foutloze dienst: elke eis goed en geen enkel loos alarm. Dat is
+       streng, en het is de enige drempelvrije definitie die er is — elke andere vraagt
+       een grens die niemand kan verdedigen. De vloeiende maat staat ernaast in de
+       historie en is wat de benchmark rapporteert. */
+    S.reached=(tel.eisTot>0 && tel.goedTot===tel.eisTot && tel.loos===0);
+    S.seinFractie=tel.eisTot? tel.goedTot/tel.eisTot : null;
+    return true;
+  }
+  return false;
+}
+/* De laatste dertig tikken, voor het tekenen. Alleen bijhouden als er iemand kijkt: in de
+   experimentloper kost dit anders geheugen zonder dat het iets oplevert. */
+function seinStrook(d,t,P,s){
+  if(!S.watching && !S.running) return;
+  if(!S.seinStrook) S.seinStrook=[];
+  S.seinStrook.push({t, lamp:d.lamp[t], wissel:d.wissel[t], regel:s.regel,
+    handel:s.handel, gedrukt:[!!P[0],!!P[1],!!P[2],!!P[3]], goed:s.goed});
+  if(S.seinStrook.length>30) S.seinStrook.shift();
+}
+
+/* De vaste dienstenset: het ijkpunt van spel 2. Eigen zaadreeks, nooit gebruikt om
+   instellingen te kiezen, precies zoals de vijfhonderd werelden van spel 1. */
+const SEIN_BENCH_N=200, SEIN_BENCH_SEED0=7000000, SEIN_BENCH_STRIDE=97, SEIN_BENCH_RNG=20260917;
+function seinBenchDiensten(n,cfg){
+  const N=n||SEIN_BENCH_N;
+  const sleutel=((cfg.seinRegels|0)||SEIN_REGELS)+"x"+((cfg.seinTikken|0)||SEIN_TIKKEN);
+  if(!S.seinBench || S.seinBench.sleutel!==sleutel || S.seinBench.lijst.length<N){
+    const lijst=[];
+    for(let k=0;k<Math.max(N,SEIN_BENCH_N);k++)
+      lijst.push(seinDienst(SEIN_BENCH_SEED0+k*SEIN_BENCH_STRIDE,cfg));
+    S.seinBench={sleutel,lijst};
+  }
+  return S.seinBench.lijst.slice(0,N);
+}
+/* Speel de vaste dienstenset zonder leren. Per regel apart gescoord, want dat is het hele
+   punt van dit spel; het interval gaat over de diensten. Alles wat de lopende run aangaat
+   wordt bewaard en teruggezet: dit is een meting, geen voortzetting van het spel. */
+function seinBench(mode,n){
+  const c=S.cfg, B=S.B;
+  const saveW=Float32Array.from(B.cW), saveE=Float32Array.from(B.cE), saveB=Float32Array.from(B.bias);
+  const saveWorld=S.world, saveStep=S.step, saveR=S.epReward, saveReach=S.reached, saveTel=S.seinTel;
+  const wasSample=S.evalSample, wasTemp=S.evalTemp, wasRnd=S.evalRnd;
+  S.evalSample=(mode!=="streng");
+  S.evalTemp=tempOf(noiseEnd(c.noise0));
+  const diensten=seinBenchDiensten(n,c);
+  const eis=new Int32Array(SEIN_REGELS), goed=new Int32Array(SEIN_REGELS);
+  let stil=0, loos=0, eisTot=0, goedTot=0, foutloos=0;
+  const perDienst=[];
+  for(let k=0;k<diensten.length;k++){
+    S.evalRnd=mulberry32(SEIN_BENCH_RNG+k*131);
+    S.world=diensten[k];
+    seinStart();
+    let done=false;
+    while(!done) done=seinTick(false,0);
+    const tel=S.seinTel;
+    for(let r=0;r<SEIN_REGELS;r++){ eis[r]+=tel.eis[r]; goed[r]+=tel.goed[r]; }
+    stil+=tel.stil; loos+=tel.loos; eisTot+=tel.eisTot; goedTot+=tel.goedTot;
+    if(S.reached) foutloos++;
+    perDienst.push(tel.eisTot? tel.goedTot/tel.eisTot : null);
+  }
+  B.cW.set(saveW); B.cE.set(saveE); B.bias.set(saveB);
+  S.world=saveWorld; S.step=saveStep; S.epReward=saveR; S.reached=saveReach; S.seinTel=saveTel;
+  S.evalSample=wasSample; S.evalTemp=wasTemp; S.evalRnd=wasRnd;
+  resetBrainState(S.B);
+  const v=perDienst.filter(x=>x!==null);
+  const m=v.length? v.reduce((a,b)=>a+b,0)/v.length : 0;
+  const sd=v.length>1? Math.sqrt(v.reduce((a,b)=>a+(b-m)*(b-m),0)/(v.length-1)) : 0;
+  const perRegel={};
+  for(let r=0;r<SEIN_REGELS;r++) perRegel[SEIN_KORT[r]]=
+    {naam:SEIN_REGELNAAM[r], eisen:eis[r], goed:goed[r], pct: eis[r]? goed[r]/eis[r] : null};
+  return {pct:m, ci:v.length?1.96*sd/Math.sqrt(v.length):0, sd,
+    werelden:v.length, herhalingen:1, pogingen:v.length, diensten:v.length,
+    eisen:eisTot, goed:goedTot, stilleTikken:stil, loosAlarm: stil? loos/stil : null,
+    foutlozeDiensten: v.length? foutloos/v.length : null,
+    perRegel, perWereld:perDienst, modus:mode, gemStappen:null};
+}
+
 /* toets op onbekende werelden — zonder leren, zonder ruis */
 /* Toets op werelden die het brein nooit gezien heeft. Zonder leren, zonder ruis in
    de wolk, en met een eigen toevalsgenerator zodat de toets de training niet
@@ -2251,6 +2659,10 @@ function playWorlds(worlds,reps,tik,rngBase){
 /* De benchmark met het brein, in één beleidsvorm. Alles wat de lopende run aangaat
    wordt bewaard en teruggezet: dit is een meting, geen voortzetting van het spel. */
 function benchBrain(mode,n,reps){
+  /* stap 17: spel 2 heeft een eigen ijkpunt met een eigen vaste set. De aanroepers —
+     runLeven, runBenchmark, de experimentloper — merken daar niets van en krijgen een
+     object met dezelfde velden terug. */
+  if(S.cfg.taak==="seinhuis") return seinBench(mode,n);
   const c=S.cfg, B=S.B;
   const saveW=Float32Array.from(B.cW), saveE=Float32Array.from(B.cE), saveB=Float32Array.from(B.bias);
   const saveWorld=S.world, saveAg={x:S.ag.x,y:S.ag.y}, saveTrail=S.trail, saveStep=S.step,
@@ -2340,6 +2752,11 @@ function memLoop(worlds,verberg,blindAt,H){
   return uit;
 }
 function geheugenProef(n,blindAt,H){
+  /* stap 17: de blinderingsproef meet of de agent zijn koers naar een doel vasthoudt, en
+     in het seinhuis is er geen koers en geen doel. Null teruggeven is hier eerlijker dan
+     een getal: de proef hoort bij spel 1. Spel 2 meet geheugen op zijn eigen manier,
+     namelijk aan de score op R3 en R4 afzonderlijk. */
+  if(S.cfg.taak==="seinhuis") return null;
   const N=n||MEM_N, BA=blindAt||MEM_BLIND, HH=H||MEM_H, B=S.B;
   const saveW=Float32Array.from(B.cW), saveE=Float32Array.from(B.cE), saveB=Float32Array.from(B.bias);
   const saveWorld=S.world, saveAg={x:S.ag.x,y:S.ag.y}, saveTrail=S.trail, saveStep=S.step,
@@ -2451,8 +2868,114 @@ function runBenchmark(n,reps){
   return S.lastBench;
 }
 
+/* ======================= tekenen: het seinhuis =======================
+   Op hetzelfde canvas als spel 1, want het is hetzelfde venster en hetzelfde brein — er
+   is geen reden om er een tweede pagina naast te zetten. Wat je ziet: de acht seinlampen
+   met de lamp van dit moment op, de wisselstand, de vier handels, een meelopende strook
+   van de laatste dertig tikken met per tik of er een eis stond en of hij goed ging, en
+   per regel een scorebalk over de lopende dienst. */
+function drawSeinhuis(){
+  const cvs=$("worldcvs"), ctx=cvs.getContext("2d");
+  const W=cvs.width, H=cvs.height;
+  ctx.clearRect(0,0,W,H);
+  ctx.fillStyle="#0f1114"; ctx.fillRect(0,0,W,H);
+  const d=S.world, tel=S.seinTel;
+  if(!d || !d.lamp){ return; }
+  const t=Math.min(S.step,d.T-1);
+  const pad=Math.round(W*0.035);
+  /* ---- seinlampen ---- */
+  ctx.font="600 "+Math.round(H*0.028)+"px system-ui,sans-serif";
+  ctx.fillStyle="#7c8794"; ctx.textAlign="left";
+  ctx.fillText("seinlampen", pad, pad+H*0.03);
+  const lr=Math.min(W*0.028, H*0.045);
+  for(let i=0;i<SEIN_LAMPEN;i++){
+    const cx=pad+lr+i*(lr*2.6), cy=pad+H*0.10;
+    const aan=(d.lamp[t]===i);
+    ctx.beginPath(); ctx.arc(cx,cy,lr,0,Math.PI*2);
+    ctx.fillStyle=aan?"#ffb454":"#20252c"; ctx.fill();
+    ctx.strokeStyle=aan?"#ffd08a":"#39414c"; ctx.lineWidth=2; ctx.stroke();
+    ctx.fillStyle=aan?"#0f1114":"#55606b"; ctx.textAlign="center";
+    ctx.fillText(String(i),cx,cy+lr*0.35);
+  }
+  /* ---- wissel ---- */
+  const wx=pad, wy=pad+H*0.18;
+  ctx.textAlign="left"; ctx.fillStyle="#7c8794";
+  ctx.fillText("wissel", wx, wy+H*0.03);
+  ctx.fillStyle=d.wissel[t]?"#4fd1c5":"#39414c";
+  ctx.fillRect(wx+W*0.13, wy+H*0.008, W*0.09, H*0.032);
+  ctx.fillStyle=d.wissel[t]?"#0f1114":"#9aa4b0"; ctx.textAlign="center";
+  ctx.fillText(d.wissel[t]?"open":"dicht", wx+W*0.175, wy+H*0.032);
+  /* ---- handels ---- */
+  ctx.textAlign="left"; ctx.fillStyle="#7c8794";
+  ctx.fillText("handels", wx, wy+H*0.09);
+  const eisNu=d.eisRegel[t], handelNu=d.eisHandel[t];
+  for(let i=0;i<N_OUT;i++){
+    const hx=wx+W*0.13+i*(W*0.085), hy=wy+H*0.065;
+    const ge=S.outPressed&&S.outPressed[i];
+    const moet=(eisNu>0 && handelNu===i);
+    ctx.fillStyle=ge?"#59c2ff":"#20252c";
+    ctx.fillRect(hx,hy,W*0.065,H*0.038);
+    ctx.strokeStyle=moet?"#ff6b57":"#39414c"; ctx.lineWidth=moet?3:1;
+    ctx.strokeRect(hx,hy,W*0.065,H*0.038);
+    ctx.fillStyle=ge?"#0f1114":"#55606b"; ctx.textAlign="center";
+    ctx.fillText(String(i),hx+W*0.0325,hy+H*0.027);
+  }
+  /* ---- de strook van de laatste dertig tikken ---- */
+  const st=S.seinStrook||[];
+  const sy=wy+H*0.15, sh=H*0.10, sw=(W-2*pad)/30;
+  ctx.textAlign="left"; ctx.fillStyle="#7c8794";
+  ctx.fillText("laatste 30 tikken", pad, sy-H*0.012);
+  for(let i=0;i<st.length;i++){
+    const r=st[i], x=pad+i*sw;
+    ctx.fillStyle="#181c22"; ctx.fillRect(x,sy,sw-1,sh);
+    if(r.lamp>=0){ ctx.fillStyle="#ffb454"; ctx.fillRect(x,sy,sw-1,sh*0.22); }
+    if(r.wissel){ ctx.fillStyle="#2a6b66"; ctx.fillRect(x,sy+sh*0.24,sw-1,sh*0.10); }
+    if(r.regel>0){
+      ctx.fillStyle=r.goed?"#3fa66b":"#c0392b";
+      ctx.fillRect(x,sy+sh*0.38,sw-1,sh*0.62);
+      ctx.fillStyle="#0f1114"; ctx.textAlign="center";
+      ctx.font=Math.round(sh*0.34)+"px system-ui,sans-serif";
+      ctx.fillText(SEIN_KORT[r.regel-1].slice(1), x+sw/2, sy+sh*0.85);
+      ctx.font="600 "+Math.round(H*0.028)+"px system-ui,sans-serif";
+    }
+  }
+  /* ---- scorebalken per regel, over de lopende dienst ---- */
+  const by=sy+sh+H*0.055;
+  ctx.textAlign="left"; ctx.fillStyle="#7c8794";
+  ctx.fillText("score per regel, deze dienst", pad, by-H*0.012);
+  /* Drie kolommen die samen precies het canvas vullen: naam, balk, getal. De eerste
+     versie rekende de balk tot aan de rechterrand en zette het getal dáár nog achter,
+     zodat het buiten beeld viel. */
+  const bh=H*0.030, bx=pad+W*0.30, bw=W*0.42;
+  for(let r=0;r<SEIN_REGELS;r++){
+    const y=by+r*(bh+H*0.012);
+    const actief=(r<(d.nR||SEIN_REGELS));
+    const e=tel?tel.eis[r]:0, g=tel?tel.goed[r]:0;
+    const f=e? g/e : 0;
+    ctx.fillStyle=actief?"#9aa4b0":"#39414c"; ctx.textAlign="left";
+    ctx.font=Math.round(H*0.024)+"px system-ui,sans-serif";
+    ctx.fillText(SEIN_KORT[r]+"  "+SEIN_TEKENNAAM[r], pad, y+bh*0.75);
+    ctx.fillStyle="#181c22"; ctx.fillRect(bx,y,bw,bh);
+    if(actief && e){
+      ctx.fillStyle = f>0.75?"#3fa66b" : f>0.4?"#ffb454" : "#c0392b";
+      ctx.fillRect(bx,y,bw*f,bh);
+    }
+    /* de toevalsbodem als streepje, zodat een balk nooit gelezen wordt als "het doet iets" */
+    ctx.strokeStyle="#55606b"; ctx.lineWidth=1;
+    ctx.beginPath(); ctx.moveTo(bx+bw*0.0625,y); ctx.lineTo(bx+bw*0.0625,y+bh); ctx.stroke();
+    ctx.fillStyle=actief?"#9aa4b0":"#39414c"; ctx.textAlign="right";
+    ctx.fillText(actief ? (e? (100*f).toFixed(0)+"%   "+g+"/"+e : "nog geen eis") : "uit",
+      W-pad, y+bh*0.78);
+  }
+  ctx.textAlign="left"; ctx.fillStyle="#55606b";
+  ctx.font=Math.round(H*0.022)+"px system-ui,sans-serif";
+  ctx.fillText("streepje = toevalsbodem 6,25 %   ·   tik "+t+" / "+d.T+
+    (tel?("   ·   loos alarm "+tel.loos+" van "+tel.stil+" stille tikken"):""), pad, H-pad*0.4);
+}
+
 /* ======================= tekenen: wereld ======================= */
 function drawWorld(){
+  if(S.cfg && S.cfg.taak==="seinhuis") return drawSeinhuis();
   const cvs=$("worldcvs"), ctx=cvs.getContext("2d");
   const W=cvs.width, H=cvs.height, sx=W/WW, sy=H/WH;
   ctx.clearRect(0,0,W,H);
@@ -2716,8 +3239,19 @@ function updateSensorUI(){
 function updateStatus(){
   $("s-ep").textContent=S.ep; $("s-eptot").textContent=S.cfg?S.cfg.nEpisodes:0;
   $("s-step").textContent=S.step; $("s-rew").textContent=fmt(S.epReward,2);
-  $("s-dist").textContent=S.world?fmt(Math.hypot(S.world.goal.x-S.ag.x,S.world.goal.y-S.ag.y),1):"–";
-  $("s-col").textContent=S.epCollisions;
+  /* stap 17: in het seinhuis is er geen doel en dus geen afstand ertoe. In plaats
+     daarvan staat er hoeveel eisen van deze dienst goed gingen — dezelfde plek in de
+     balk, een ander getal. Zonder deze tak leest de statusbalk S.world.goal.x en gaat de
+     hele pagina onderuit zodra je spel 2 kiest; de experimentloper merkte dat niet, want
+     die tekent nooit. */
+  if(S.cfg && S.cfg.taak==="seinhuis"){
+    const tel=S.seinTel;
+    $("s-dist").textContent = tel ? (tel.goedTot+"/"+tel.eisTot) : "–";
+    $("s-col").textContent = tel ? tel.loos : 0;
+  } else {
+    $("s-dist").textContent=S.world?fmt(Math.hypot(S.world.goal.x-S.ag.x,S.world.goal.y-S.ag.y),1):"–";
+    $("s-col").textContent=S.epCollisions;
+  }
   $("s-noise").textContent=S.running?fmt(noiseNow(),2):"–";
   const pct=S.cfg&&S.cfg.nEpisodes?clamp(S.ep/S.cfg.nEpisodes,0,1)*100:0;
   $("progbar").style.width=pct.toFixed(1)+"%";
@@ -2992,7 +3526,15 @@ function buildResult(naamOverride){
       werelden:S.lastBench.werelden, herhalingen:S.lastBench.herhalingen,
       obstakels:S.lastBench.obstakels, stappenPerPoging:S.lastBench.stappenPerPoging,
       zaadreeks:S.lastBench.zaadreeks,
+      /* stap 17: de seinhuisvelden gaan mee wanneer zij er zijn en blijven weg wanneer
+         niet. Zij hier vergeten is precies wat er de eerste keer gebeurde: de benchmark
+         rekende de score per regel netjes uit en buildResult kopieerde alleen de velden
+         die spel 1 kent, zodat het hele punt van spel 2 onderweg verdween. */
       beleid:{pct:S.lastBench.beleid.pct, ci:S.lastBench.beleid.ci, sd:S.lastBench.beleid.sd,
+        perRegel:S.lastBench.beleid.perRegel||null,
+        eisen:S.lastBench.beleid.eisen, goed:S.lastBench.beleid.goed,
+        loosAlarm:(S.lastBench.beleid.loosAlarm===undefined?null:S.lastBench.beleid.loosAlarm),
+        foutlozeDiensten:(S.lastBench.beleid.foutlozeDiensten===undefined?null:S.lastBench.beleid.foutlozeDiensten),
         gemStappen:S.lastBench.beleid.gemStappen, pogingen:S.lastBench.beleid.pogingen,
         perWereld:S.lastBench.beleid.perWereld},
       streng:{pct:S.lastBench.streng.pct, ci:S.lastBench.streng.ci, sd:S.lastBench.streng.sd,
@@ -3012,6 +3554,19 @@ function buildResult(naamOverride){
       verbindingen:d.conns,neuronen:d.neuronen,gemW:d.meanW,succes20:d.succ20})),
     toetsen:S.evalHist.map(e=>({poging:e.ep,pct:e.pct})),
     herstructureringen:S.structLog,
+    /* stap 17: alles wat spel 2 aangaat staat in één blok, zodat een run van spel 1 er
+       geen veld bij krijgt en elke oudere run leesbaar blijft. */
+    seinhuis: (S.cfg.taak==="seinhuis") ? {
+      tikkenPerDienst:S.cfg.seinTikken, actieveRegels:S.cfg.seinRegels,
+      regels:SEIN_REGELNAAM.map((n,i)=>({id:SEIN_KORT[i], regel:n})),
+      dienstenset:{aantal:SEIN_BENCH_N, eersteZaad:SEIN_BENCH_SEED0, stap:SEIN_BENCH_STRIDE},
+      toevalsbodem:0.0625, bovengrens:1,
+      laatsteDienst: S.seinTel ? {
+        eisen:S.seinTel.eisTot, goed:S.seinTel.goedTot,
+        stilleTikken:S.seinTel.stil, loosAlarm:S.seinTel.loos,
+        perRegel:Array.from(S.seinTel.eis).map((e,i)=>({id:SEIN_KORT[i], eisen:e, goed:S.seinTel.goed[i]}))
+      } : null
+    } : null,
     /* stap 16: de hele d-reeks, niet alleen het afgeleide getal. Drie keer eerder heeft
        dat het verschil gemaakt tussen een migratie van dertig seconden en een dag
        opnieuw meten (vaste regel). */
@@ -3732,6 +4287,10 @@ function initUI(){
   bindSlider("density","densval",v=>fmt(v/10,1));
   bindSlider("nobs","nobsval",v=>v);
   bindSlider("maxsteps","maxstepsval",v=>v);
+  /* stap 17 */
+  bindSlider("seintikken","seintikkenval",v=>v);
+  bindSlider("seinregels","seinregelsval",v=>v);
+  if($("taak")) $("taak").addEventListener("change",()=>{ genBrain(); drawWorld(); });
   bindSlider("goalhide","goalhideval",v=>+v===0?"nooit":v+" stappen");
   bindSlider("goalblink","goalblinkval",v=>v);
   bindSlider("worldevery","worldeveryval",v=>v);
@@ -3929,6 +4488,10 @@ function runHeadless(nEp,brainSeed,evalOn){
 }
 window.__brain={S,createBrain,analyze,makeWorld,readCfg,startTraining,stopTraining,runHeadless,genBrain,evalWorlds,
   canConnect,countKinds,restructure,buildResult,brainFromResult,applyCfgToUI,applyResult,repeatRun,
+  /* stap 17: het seinhuis, zodat tests/test-stap17.js de bovengrens en de toevalsbodem
+     met dezelfde scorefunctie kan nameten die de benchmark gebruikt. */
+  seinDienst,seinWaarnemen,seinScoreTik,seinBench,seinBenchDiensten,
+  SEIN_REGELS,SEIN_KORT,SEIN_REGELNAAM,SEIN_LAMPEN,SEIN_RUIS,SEIN_TIKKEN,
   runOne,runLeven,cfgOverride,runExperiments,csvRow,CSV_COLS,meanCI,mannWhitney,
   benchmarkWorlds,benchWorldSeed,playWorlds,benchBrain,benchReactief,runBenchmark,createLayered,
   reactiefDir,reactiefTick,moveAgent,rayDist,blocked,DIRV,
