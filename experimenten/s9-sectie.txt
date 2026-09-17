@@ -1,0 +1,61 @@
+Waaraan je het ziet, en waaraan niet
+Een score zegt dát het misgaat en niet waaraan je het had kunnen zien. De praktische vraag is of er aan één getraind netwerk af te lezen valt dat het verkeerd gedimensioneerd is, zonder een tweede netwerk te trainen om mee te vergelijken. Daarvoor staan hieronder zes maten die alle al sinds sectie 6 bestaan en nog nooit een taak hadden waarop zij iets konden betekenen, elk tegen de benchmarkscore van hun cel.
+maat
+rho met de score, A
+rho met de score, B20
+geheugenhorizon (functioneel)
+0.78
+0.70
+actieve verbindingen
+0.61
+0.75
+verbindingen totaal
+0.60
+0.65
+meedoende neuronen
+0.44
+0.62
+gemiddeld gewicht t.o.v. het plafond
+0.53
+0.48
+losgeraakte neuronen
+-0.62
+0.21
+De maat die het op beide standen volhoudt, is de enige functionele van het stel. Beoordeeld op het zwakste van de twee getallen — want een diagnose die maar op één taak werkt is er geen — komt de geheugenhorizon uit de blinderingsproef bovenaan met 0.78 en 0.70, gevolgd door het aantal actieve verbindingen met 0.61 en 0.75. Het is de enige maat in het rijtje die niet telt wat er gebouwd is maar meet wat het netwerk kán, en dat maakt de uitkomst meer dan een rangorde: het is dezelfde boodschap als sectie 10.8, nu niet als methodologisch standpunt maar als meetresultaat. Op de stand met geheugendruk wordt hij op de kop af geëvenaard door een structurele telling, dus het verschil is geen afstand maar een consistentievoordeel. Onderaan staat het aantal losgeraakte neuronen, en niet omdat het laag scoort maar omdat het van teken wisselt tussen de twee standen (-0.62 tegen 0.21). Een maat die van richting verandert zodra de taak verandert, is als losse diagnose onbruikbaar — hij zou een te groot netwerk op de ene taak gezond noemen en op de andere ziek.
+Eén voorgeregistreerde verwachting is onderuitgegaan, en het is de moeite waard te zeggen waarom. Vooraf stond opgeschreven dat een te klein netwerk zijn gewichten tegen het plafond zou duwen. Dat gebeurt niet: het gemiddelde gewicht komt in geen enkele cel boven een twintigste van het plafond uit, en de samenhang met de grootte is positief in plaats van negatief — grotere netwerken hebben gemiddeld zwaardere gewichten, geen kleinere. De maat heet in de meetbestanden nog &quot;randdruk&quot;, en die naam belooft meer dan hij waarmaakt; wat hij meet is gemiddelde gewichtsgrootte, en verzadiging tegen het plafond komt in dit model bij geen enkele grootte voor.
+De dichtheidsknop heeft een plafond dat met de grootte meeschuift
+Tijdens het draaien bleek iets wat niet was voorzien en wat op zichzelf een antwoord is. Bij kleine netwerken leveren twee verschillende startdichtheden exact hetzelfde netwerk op. De reden staat in de constructie: het aantal verbindingen is het minimum van het aantal legale paren en dichtheid maal netwerkgrootte, en bij weinig neuronen loopt die eerste term het eerst vol. Boven dat plafond doet de knop niets meer.
+neuronen
+dichtheid 15
+dichtheid 35
+dichtheid 70
+plafond bereikt vanaf
+8
+902
+902
+902
+dichtheid 35
+16
+1172
+1157
+1157
+dichtheid 70
+30
+1303
+1757
+1757
+dichtheid 70
+60
+1795
+3075
+3926
+niet binnen dit raster
+120
+2083
+4331
+8114
+niet binnen dit raster
+Wat dat praktisch betekent. Onder ongeveer dertig neuronen is de bedradingsdichtheid geen instelbare knop meer maar een gevolg van de grootte: er zijn simpelweg niet genoeg toegestane verbindingen om er meer te maken. Wie een klein netwerk dichter wil bedraden, moet het groter maken of de bedradingsgrammatica verruimen — de schuif verzetten doet niets. Dat is geen meetfout maar een eigenschap van het model, en het verklaart waarom de dichtheid in de eerdere secties zo weinig varieerde: die draaiden alle op zestig neuronen, net boven de plek waar de knop weer begint te werken.
+Van de twee knoppen is de grootte de sterkste, maar niet met grote voorsprong. Binnen een grootte spant de dichtheid 23.5 en 5.2 procentpunt; binnen een dichtheid spant de grootte 37.9 en 7.2 procentpunt. De hint in de testpagina die de startdichtheid &quot;veruit de belangrijkste knop&quot; noemt, stamt van vóór de structurele plasticiteit en is daarmee achterhaald — maar alleen in de rangorde. Een knop die tientallen procentpunten waard is, blijft een knop die je goed moet zetten, en op de grote netwerken is te dun bedraden nog steeds de duurste fout die er in dit raster te maken valt.
+Het antwoord op de vraag waar dit werk uit voortkomt, zo scherp als deze meting hem toelaat. Te klein is veel duurder dan te groot. Op beide standen kost terugschalen naar de kleinste maat tientallen procentpunten en kost doorschalen naar de grootste vrijwel niets. De gangbare vuistregel — neem hem ruim — is op deze taakfamilie dus gewoon juist, en de tegengestelde verwachting die vooraf was opgeschreven is onderuitgegaan. Hoevéél ruim hangt van de taak af: zonder geheugendruk ligt het optimum bij 60 neuronen, met geheugendruk is er binnen dit raster geen optimum gevonden. En herkennen doe je een verkeerd gedimensioneerd netwerk aan de maat die hierboven als enige op beide standen overeind bleef; welke dat is, staat daar en wordt hier niet nog een keer met de hand opgeschreven.
+KLAAR exitcode=0 

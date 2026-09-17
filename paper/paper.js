@@ -51,6 +51,7 @@ const TAAKAS = lees(path.join(EXPDIR, 'taakas.json'));
 const OMSLAG = lees(path.join(EXPDIR, 'omslag.json'));
 const SGEDRAG = lees(path.join(EXPDIR, 'structuurgedrag.json'));
 const SIGNAAL = lees(path.join(EXPDIR, 'signaalsturing.json'));
+const RASTER = lees(path.join(EXPDIR, 'capaciteitsraster.json'));
 function stat(xs) {
   const v = xs.filter(x => typeof x === 'number' && isFinite(x));
   const n = v.length; if (!n) return null;
@@ -65,16 +66,19 @@ const num = (x, d = 0) => x === null ? '–' : x.m.toFixed(d) + ' ± ' + x.ci.to
 const kol = k => RUNS ? RUNS.map(r => r[k]) : [];
 /* een gemiddelde-met-interval uit benchmark.json in dezelfde vorm als stat() */
 const bm = o => o ? { n: o.n, m: o.m, sd: o.sd, ci: o.ci, min: o.m, max: o.m } : null;
-const VERSIE = SIGNAAL ? '2.1' : SGEDRAG ? '2.0' : OMSLAG ? '1.9' : TAAKAS ? '1.8' : ABLATIE ? '1.7' : LEERREGEL ? '1.6' : '1.5';
+const VERSIE = RASTER ? '2.2' : SIGNAAL ? '2.1' : SGEDRAG ? '2.0' : OMSLAG ? '1.9' : TAAKAS ? '1.8' : ABLATIE ? '1.7' : LEERREGEL ? '1.6' : '1.5';
 /* De laatste secties schuiven mee met wat er gemeten is, zodat een verwijzing in de
    tekst nooit naar een verkeerd nummer wijst. */
 const SEC_OMSLAG = '10.9', SEC_SG = OMSLAG ? '10.10' : '10.9';
 /* nummer van de basissectie waar de rest achteraan schuift */
 const NA_SG = SGEDRAG ? (OMSLAG ? 11 : 10) : OMSLAG ? 10 : TAAKAS ? 9 : ABLATIE ? 8 : 7;
 const SEC_SIG = SIGNAAL ? '10.' + NA_SG : null;
-const SEC_HIERNA = '10.' + (NA_SG + (SIGNAAL ? 1 : 0));
-const SEC_VRAAG = '10.' + (NA_SG + 1 + (SIGNAAL ? 1 : 0));
-const DATUM = '16 september 2026';
+const NA_SIG = NA_SG + (SIGNAAL ? 1 : 0);
+const SEC_RASTER = RASTER ? '10.' + NA_SIG : null;
+const NA_RASTER = NA_SIG + (RASTER ? 1 : 0);
+const SEC_HIERNA = '10.' + NA_RASTER;
+const SEC_VRAAG = '10.' + (NA_RASTER + 1);
+const DATUM = '17 september 2026';
 const SERIF = 'Cambria';
 const TEXTW_PT = 448;              // bruikbare tekstbreedte in punten
 const INK = '1A1D21', DIM = '55606B', ACC = '1F5C73';
@@ -3050,6 +3054,213 @@ if (SIGNAAL) {
   C.push(gap(60));
 }
 
+/* --- het capaciteitsraster ---------------------------------------------------------
+   Volledig uit experimenten/capaciteitsraster.json. Dit is de oudste openstaande vraag
+   van het hele project — wanneer is een netwerk te klein of te groot — en hij kon pas
+   gesteld worden toen er een taak was waarop capaciteit knelt. Elke datagestuurde zin
+   moet ook kloppen als het teken omslaat; tests/lees-sectie.js leest de sectie terug. */
+if (RASTER) {
+  const PS = RASTER.perStand || {};
+  const g1r = (o, d = 1) => (o === null || o === undefined) ? '–' : o.m.toFixed(d) + ' ± ' + o.ci.toFixed(d);
+  const p1r = (o, d = 1) => (o === null || o === undefined) ? '–' : (100 * o.m).toFixed(d) + '% ± ' + (100 * o.ci).toFixed(d);
+  const rr = v => (v === null || v === undefined) ? '–' : v.rho.toFixed(2);
+  const STANDNAAM = { A: 'taak A, doel altijd zichtbaar', B20: 'taak B-20, tien stappen zicht en twintig donker' };
+  const standen = Object.keys(PS);
+
+  C.push(h2(SEC_RASTER, 'Hoe groot moet het netwerk zijn?'));
+  C.push(body(
+    'Dit is de vraag waar dit onderzoek uit voortkomt, en zij heeft tot hier moeten wachten. Een ' +
+    'capaciteitsvraag is pas zinvol op een taak waar capaciteit werkelijk knelt, en zolang het doel ' +
+    'altijd zichtbaar was, knelde er niets. Sinds sectie 10.8 bestaat die taak wel. Gemeten is een ' +
+    'raster van ' + RASTER.neuronen.length + ' netwerkgroottes (' + RASTER.neuronen.join(', ') + ' neuronen) ' +
+    'tegen ' + RASTER.dichtheden.length + ' startdichtheden (' + RASTER.dichtheden.join(', ') + '), op twee ' +
+    'taakstanden, met ' + RASTER.zaden + ' zaden per cel en een leersnelheid die per grootte en per stand ' +
+    'apart is geveegd op eigen zaden.'
+  ));
+  C.push(body([
+    bd('De soortenverdeling schaalt mee met de grootte en wordt niet gevarieerd. '),
+    t('De grenzen per neuronsoort zijn absolute aantallen, afgesteld op zestig neuronen. Laat je ze ' +
+      'staan terwijl je naar acht zakt, dan wringt de samenstelling zichzelf plat tegen de ondergrenzen ' +
+      'en varieert er naast de grootte ook de verhouding tussen de soorten. De grenzen schalen daarom ' +
+      'evenredig mee, zó gekozen dat zij bij zestig neuronen exact de bestaande waarden teruggeven. De ' +
+      'vraag van deze sectie is hoevéél neuronen, niet welke.')
+  ]));
+  C.push(body([
+    bd('De grootte-as wordt per grootte op de beste dichtheid gelezen. '),
+    t('Bij de grote netwerken is de laagste dichtheid rampzalig — honderdtwintig neuronen halen daar ' +
+      'minder dan acht neuronen op hun beste bedrading. Middel je die cel mee, dan meet de grootte-as ' +
+      'voor een derde hoe erg te dun bedraad zijn is, en dat is de vraag van de andere as. In beide ' +
+      'tabellen hieronder staat daarom per grootte de beste van de drie dichtheden, met die dichtheid ' +
+      'erbij vermeld.')
+  ]));
+
+  for (const s of standen) {
+    const P = PS[s];
+    C.push(h3(STANDNAAM[s] || s));
+    C.push(tbl(
+      ['neuronen', 'beste dichtheid', 'benchmark', 'geheugenhorizon', 'losgeraakte neuronen', 'sd tussen zaden'],
+      P.perN.map(r => [String(r.neuronen), String(r.besteDichtheid), p1r(r.bench),
+        r.horizon ? r.horizon.m.toFixed(1) : '–',
+        r.losgeraakt ? r.losgeraakt.m.toFixed(1) : '–',
+        r.spreidingTussenZaden ? (100 * r.spreidingTussenZaden.m).toFixed(1) + ' pp' : '–']),
+      [1500, 1900, 1900, 1900, 2100, 1372]));
+    C.push(body([
+      bd(P.optimumOpRand
+        ? 'Het optimum ligt hier op de rand van het raster, en dan is het geen optimum. '
+        : 'Het optimum ligt binnen het raster. '),
+      t('De hoogste score staat bij ' + P.optimum + ' neuronen. ' +
+        (P.optimumOpRand
+          ? 'Dat is de buitenste maat die gemeten is, dus wat deze stand laat zien is niet "hier ligt ' +
+            'het optimum" maar "tot aan ' + P.optimum + ' neuronen blijft meer beter". Die uitspraak is ' +
+            'zwakker dan de vraag vroeg, en zij hoort zo te staan; het raster moet verder worden ' +
+            'doorgetrokken voordat er iets over een optimum wordt beweerd. '
+          : 'Vanaf daar kost verder vergroten ' + (100 * P.valNaarGroot).toFixed(1) + ' procentpunt en ' +
+            'verkleinen tot de kleinste maat ' + (100 * P.valNaarKlein).toFixed(1) + ' procentpunt. '))
+    ]));
+  }
+
+  const DIAG = ['horizon', 'actief', 'verbindingen', 'meedoend', 'randdruk', 'losgeraakt'];
+  const TELW = ['nul', 'één', 'twee', 'drie', 'vier', 'vijf', 'zes', 'zeven', 'acht', 'negen', 'tien'];
+  C.push(h3('Waaraan je het ziet, en waaraan niet'));
+  C.push(body(
+    'Een score zegt dát het misgaat en niet waaraan je het had kunnen zien. De praktische vraag is of er ' +
+    'aan één getraind netwerk af te lezen valt dat het verkeerd gedimensioneerd is, zonder een tweede ' +
+    'netwerk te trainen om mee te vergelijken. Daarvoor staan hieronder ' +
+    (TELW[DIAG.length] || DIAG.length) + ' maten die alle al sinds sectie 6 bestaan en nog nooit een taak ' +
+    'hadden waarop zij iets konden betekenen, elk tegen de benchmarkscore van hun cel.'
+  ));
+  C.push(tbl(
+    ['maat'].concat(standen.map(s => 'rho met de score, ' + s)),
+    DIAG.map(m => {
+      const naam = { horizon: 'geheugenhorizon (functioneel)', actief: 'actieve verbindingen',
+        verbindingen: 'verbindingen totaal', meedoend: 'meedoende neuronen',
+        randdruk: 'gemiddeld gewicht t.o.v. het plafond', losgeraakt: 'losgeraakte neuronen' }[m];
+      return [naam].concat(standen.map(s => rr(PS[s].diagnostischTegenScore[m])));
+    }),
+    [4400, 3136, 3136]));
+  {
+    /* WELKE MAAT IS DE BESTE DIAGNOSE? Niet die op één stand het hoogst uitkomt, maar
+       die op álle standen hoog blijft: een diagnose die je alleen mag geloven als je van
+       tevoren weet welke taak het netwerk draait, is geen diagnose. De rangorde loopt
+       daarom over het zwakste van de twee getallen, en dat is ook de reden dat de
+       conclusie van deze sectie hetzelfde criterium gebruikt — deed zij dat niet, dan
+       stond er verderop een andere winnaar dan hier. */
+    const zwakste = m => Math.min(...standen.map(s => {
+      const v = PS[s].diagnostischTegenScore[m]; return v ? Math.abs(v.rho) : 0; }));
+    const rangorde = DIAG.slice().sort((a, b) => zwakste(b) - zwakste(a));
+    const winnaar = rangorde[0], tweede = rangorde[1];
+    const MAATNAAM = { horizon: 'de geheugenhorizon uit de blinderingsproef',
+      actief: 'het aantal actieve verbindingen', verbindingen: 'het aantal verbindingen',
+      meedoend: 'het aantal meedoende neuronen', randdruk: 'de gemiddelde gewichtsgrootte',
+      losgeraakt: 'het aantal losgeraakte neuronen' };
+    const los = standen.map(s => PS[s].diagnostischTegenScore.losgeraakt).filter(Boolean);
+    const tekenWisselt = los.length > 1 && (los[0].rho > 0) !== (los[1].rho > 0);
+    const isFunctioneel = winnaar === 'horizon';
+    C.push(body([
+      bd(isFunctioneel
+        ? 'De maat die het op beide standen volhoudt, is de enige functionele van het stel. '
+        : 'De maat die het op beide standen volhoudt, is een structurele telling. '),
+      t('Beoordeeld op het zwakste van de twee getallen — want een diagnose die maar op één taak werkt ' +
+        'is er geen — komt ' + MAATNAAM[winnaar] + ' bovenaan met ' +
+        standen.map(s => PS[s].diagnostischTegenScore[winnaar].rho.toFixed(2)).join(' en ') +
+        ', gevolgd door ' + MAATNAAM[tweede] + ' met ' +
+        standen.map(s => PS[s].diagnostischTegenScore[tweede].rho.toFixed(2)).join(' en ') + '. ' +
+        (isFunctioneel
+          ? 'Het is de enige maat in het rijtje die niet telt wat er gebouwd is maar meet wat het netwerk ' +
+            'kán, en dat maakt de uitkomst meer dan een rangorde: het is dezelfde boodschap als sectie ' +
+            '10.8, nu niet als methodologisch standpunt maar als meetresultaat. ' +
+            (() => {
+              /* Op welke standen wordt de winnaar door een ander verslagen? Die nuance
+                 mag niet wegvallen: de winst zit in consistentie, niet in afstand. */
+              const verloren = standen.filter(s => DIAG.some(m => m !== winnaar &&
+                PS[s].diagnostischTegenScore[m] &&
+                Math.abs(PS[s].diagnostischTegenScore[m].rho) > Math.abs(PS[s].diagnostischTegenScore[winnaar].rho)));
+              return verloren.length
+                ? 'Op ' + (verloren.length === standen.length ? 'elke stand' : verloren.join(' en ')) +
+                  ' wordt hij afzonderlijk voorbijgestreefd door een structurele telling, dus de winst zit ' +
+                  'in consistentie en niet in afstand. '
+                : 'Hij staat bovendien op elke stand afzonderlijk bovenaan. ';
+            })()
+          : 'De functionele maat blijft daarbij achter, en dat is een uitkomst die tegen de lijn van ' +
+            'sectie 10.8 in gaat. ') +
+        (tekenWisselt
+          ? 'Onderaan staat het aantal losgeraakte neuronen, en niet omdat het laag scoort maar omdat het ' +
+            'van teken wisselt tussen de twee standen (' + los.map(x => x.rho.toFixed(2)).join(' tegen ') +
+            '). Een maat die van richting verandert zodra de taak verandert, is als losse diagnose ' +
+            'onbruikbaar — hij zou een te groot netwerk op de ene taak gezond noemen en op de andere ziek.'
+          : 'Het aantal losgeraakte neuronen wijst op beide standen dezelfde kant op.'))
+    ]));
+    C.push(body([
+      bd('Eén voorgeregistreerde verwachting is onderuitgegaan, en het is de moeite waard te zeggen waarom. '),
+      t('Vooraf stond opgeschreven dat een te klein netwerk zijn gewichten tegen het plafond zou duwen. ' +
+        'Dat gebeurt niet: het gemiddelde gewicht komt in geen enkele cel boven een twintigste van het ' +
+        'plafond uit, en de samenhang met de grootte is positief in plaats van negatief — grotere netwerken ' +
+        'hebben gemiddeld zwaardere gewichten, geen kleinere. De maat heet in de meetbestanden nog ' +
+        '"randdruk", en die naam belooft meer dan hij waarmaakt; wat hij meet is gemiddelde ' +
+        'gewichtsgrootte, en verzadiging tegen het plafond komt in dit model bij geen enkele grootte voor.')
+    ]));
+  }
+
+  C.push(h3('De dichtheidsknop heeft een plafond dat met de grootte meeschuift'));
+  {
+    const s0 = standen[0], V = PS[s0].verzadiging;
+    C.push(body(
+      'Tijdens het draaien bleek iets wat niet was voorzien en wat op zichzelf een antwoord is. Bij kleine ' +
+      'netwerken leveren twee verschillende startdichtheden exact hetzelfde netwerk op. De reden staat in ' +
+      'de constructie: het aantal verbindingen is het minimum van het aantal legale paren en dichtheid maal ' +
+      'netwerkgrootte, en bij weinig neuronen loopt die eerste term het eerst vol. Boven dat plafond doet ' +
+      'de knop niets meer.'
+    ));
+    C.push(tbl(
+      ['neuronen'].concat(RASTER.dichtheden.map(d => 'dichtheid ' + d)).concat(['plafond bereikt vanaf']),
+      V.map(v => [String(v.neuronen)].concat(v.verbindingen.map(x => x === null ? '–' : String(x)))
+        .concat([v.plafondVanaf ? 'dichtheid ' + v.plafondVanaf : 'niet binnen dit raster'])),
+      [1600, 1800, 1800, 1800, 3672]));
+    C.push(body([
+      bd('Wat dat praktisch betekent. '),
+      t('Onder ongeveer dertig neuronen is de bedradingsdichtheid geen instelbare knop meer maar een ' +
+        'gevolg van de grootte: er zijn simpelweg niet genoeg toegestane verbindingen om er meer te maken. ' +
+        'Wie een klein netwerk dichter wil bedraden, moet het groter maken of de bedradingsgrammatica ' +
+        'verruimen — de schuif verzetten doet niets. Dat is geen meetfout maar een eigenschap van het ' +
+        'model, en het verklaart waarom de dichtheid in de eerdere secties zo weinig varieerde: die ' +
+        'draaiden alle op zestig neuronen, net boven de plek waar de knop weer begint te werken.')
+    ]));
+    /* de hint in de pagina zelf noemt dichtheid "veruit de belangrijkste knop"; die
+       claim is nu na te meten en de uitkomst hoort erbij te staan. */
+    const dv = standen.map(s => 100 * PS[s].spreidingOverDichtheid.m);
+    const gv = standen.map(s => 100 * PS[s].spreidingOverGrootte.m);
+    const grootteWint = standen.every((s, i) => gv[i] > dv[i]);
+    C.push(body([
+      bd(grootteWint
+        ? 'Van de twee knoppen is de grootte de sterkste, maar niet met grote voorsprong. '
+        : 'Van de twee knoppen is de dichtheid de sterkste. '),
+      t('Binnen een grootte spant de dichtheid ' + dv.map(x => x.toFixed(1)).join(' en ') +
+        ' procentpunt; binnen een dichtheid spant de grootte ' + gv.map(x => x.toFixed(1)).join(' en ') +
+        ' procentpunt. ' + (grootteWint
+          ? 'De hint in de testpagina die de startdichtheid "veruit de belangrijkste knop" noemt, stamt ' +
+            'van vóór de structurele plasticiteit en is daarmee achterhaald — maar alleen in de ' +
+            'rangorde. Een knop die tientallen procentpunten waard is, blijft een knop die je goed moet ' +
+            'zetten, en op de grote netwerken is te dun bedraden nog steeds de duurste fout die er in ' +
+            'dit raster te maken valt.'
+          : 'De hint in de testpagina die de startdichtheid "veruit de belangrijkste knop" noemt, houdt ' +
+            'daarmee stand.'))
+    ]));
+  }
+
+  C.push(body([
+    bd('Het antwoord op de vraag waar dit werk uit voortkomt, zo scherp als deze meting hem toelaat. '),
+    t('Te klein is veel duurder dan te groot. Op beide standen kost terugschalen naar de kleinste maat ' +
+      'tientallen procentpunten en kost doorschalen naar de grootste vrijwel niets. De gangbare vuistregel ' +
+      '— neem hem ruim — is op deze taakfamilie dus gewoon juist, en de tegengestelde verwachting die ' +
+      'vooraf was opgeschreven is onderuitgegaan. Hoevéél ruim hangt van de taak af: zonder geheugendruk ' +
+      'ligt het optimum bij ' + (PS[standen[0]] ? PS[standen[0]].optimum : '–') + ' neuronen, met ' +
+      'geheugendruk is er binnen dit raster geen optimum gevonden. En herkennen doe je een verkeerd ' +
+      'gedimensioneerd netwerk aan de maat die hierboven als enige op beide standen overeind bleef; ' +
+      'welke dat is, staat daar en wordt hier niet nog een keer met de hand opgeschreven.')
+  ]));
+  C.push(gap(60));
+}
+
 C.push(h2(SEC_HIERNA, 'Wat hierna gemeten wordt'));
 C.push(body(
   'Sectie 10.4 laat zien dat de structurele plasticiteit als geheel niets oplevert, sectie 10.5 wat de ' +
@@ -3097,6 +3308,21 @@ if (TAAKAS && !OMSLAG) C.push(bullet([bd('Waarom de vrije graaf onder knipperen 
   'die de informatie over de donkere periode heen dragen. Dat is te toetsen door de herstructurering ' +
   'gefaseerd uit te zetten en door de gesnoeide verbindingen te vergelijken met de verbindingen die de ' +
   'geheugenhorizon dragen.')]));
+if (RASTER) C.push(bullet([bd('Een tweede taak, en wel een die vraagt wat dit model aanbiedt. '),
+  t('Alles in dit document is gemeten op één spel, en dat spel heeft één tijdschaal, één soort antwoord ' +
+    'en een vaste hoeveelheid werk. Een netwerk dat zijn rekenstructuur kan verbouwen heeft daar per ' +
+    'constructie weinig te verbouwen, en dat is de meest waarschijnlijke verklaring voor de reeks ' +
+    'negatieve bevindingen hierboven — waarschijnlijker dan dat het mechanisme niets kan. De volgende ' +
+    'reeks meet daarom op een taak die geen ruimte en geen navigatie kent: een stroom seinen waarop ' +
+    'binnen één tik gereageerd moet worden, naast opdrachten die tientallen tikken onthouden moeten ' +
+    'worden, met meerdere regels die door elkaar heen lopen en per regel apart gescoord worden. Drie ' +
+    'dingen worden daarmee voor het eerst meetbaar: verschillende informatielatenties in één lichaam, ' +
+    'de vraag welke regel als eerste valt wanneer de capaciteit opraakt, en een dubbele dissociatie — ' +
+    'reflex-neuronen uitzetten hoort alleen de reflexregels te slopen en geheugen-neuronen uitzetten ' +
+    'alleen de geheugenregels. Staat dat patroon er, dan is het typesysteem voor het eerst functioneel ' +
+    'aangetoond; staat het er niet, dan is het weerlegd. Omdat de taak hier zelf ontworpen wordt, draait ' +
+    'elke vaste tegenstander op drie maten en moet de vrije graaf de bovenste omhullende daarvan ' +
+    'verslaan, niet het gemiddelde.')]));
 if (SIGNAAL) C.push(bullet([bd('Een omslag die dieper snijdt, of een uitgeleerd plateau. '),
   t('Sectie ' + SEC_SIG + ' laat twee openingen. De hersteltijd van alle vier de aansturingen ligt rond ' +
     'de dertig pogingen en geen enkel leven is gecensureerd, dus er is weinig ruimte waarin een ' +

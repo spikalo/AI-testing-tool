@@ -1,0 +1,69 @@
+
+--- het raster ---
+A     n=  8 d=15   lr=0.016  bench 26.5±11.5  horizon   7.8  randdruk 0.047  los  30.5
+A     n=  8 d=35   lr=0.016  bench 26.5±11.5  horizon   7.8  randdruk 0.047  los  30.5
+A     n=  8 d=70   lr=0.016  bench 26.5±11.5  horizon   7.8  randdruk 0.047  los  30.5
+A     n= 16 d=15   lr=0.016  bench 51.6±5.8  horizon   6.6  randdruk 0.049  los  49.4
+A     n= 16 d=35   lr=0.016  bench 54.1±4.0  horizon   7.3  randdruk 0.049  los  41.0
+A     n= 16 d=70   lr=0.016  bench 54.1±4.0  horizon   7.3  randdruk 0.049  los  41.0
+A     n= 30 d=15   lr=0.016  bench 34.1±8.6  horizon   5.5  randdruk 0.049  los  46.3
+A     n= 30 d=35   lr=0.016  bench 58.3±6.0  horizon  13.1  randdruk 0.050  los  10.0
+A     n= 30 d=70   lr=0.016  bench 58.3±6.0  horizon  13.1  randdruk 0.050  los  10.0
+A     n= 60 d=15   lr=0.004  bench 26.0±9.1  horizon   6.3  randdruk 0.054  los  17.6
+A     n= 60 d=35   lr=0.004  bench 64.5±3.5  horizon  22.4  randdruk 0.057  los   5.3
+A     n= 60 d=70   lr=0.004  bench 68.5±4.4  horizon  18.1  randdruk 0.058  los   2.6
+A     n=120 d=15   lr=0.008  bench 19.5±3.7  horizon   5.6  randdruk 0.057  los  32.0
+A     n=120 d=35   lr=0.008  bench 65.9±2.7  horizon  27.1  randdruk 0.057  los  14.6
+A     n=120 d=70   lr=0.008  bench 67.8±1.3  horizon  18.9  randdruk 0.056  los   6.6
+B20   n=  8 d=15   lr=0.016  bench 5.4±2.5  horizon   2.8  randdruk 0.044  los   0.8
+B20   n=  8 d=35   lr=0.016  bench 5.4±2.5  horizon   2.8  randdruk 0.044  los   0.8
+B20   n=  8 d=70   lr=0.016  bench 5.4±2.5  horizon   2.8  randdruk 0.044  los   0.8
+B20   n= 16 d=15   lr=0.008  bench 8.8±1.9  horizon   2.0  randdruk 0.047  los   1.8
+B20   n= 16 d=35   lr=0.008  bench 8.3±2.0  horizon   2.4  randdruk 0.047  los   2.4
+B20   n= 16 d=70   lr=0.008  bench 8.3±2.0  horizon   2.4  randdruk 0.047  los   2.4
+B20   n= 30 d=15   lr=0.008  bench 5.8±1.6  horizon   3.3  randdruk 0.048  los   5.4
+B20   n= 30 d=35   lr=0.008  bench 10.4±2.3  horizon   6.3  randdruk 0.050  los   1.5
+B20   n= 30 d=70   lr=0.008  bench 10.4±2.3  horizon   6.3  randdruk 0.050  los   1.5
+B20   n= 60 d=15   lr=0.004  bench 5.3±1.1  horizon   1.1  randdruk 0.054  los   7.1
+B20   n= 60 d=35   lr=0.004  bench 9.5±2.1  horizon  10.5  randdruk 0.056  los   2.9
+B20   n= 60 d=70   lr=0.004  bench 14.0±2.9  horizon  11.6  randdruk 0.056  los   3.4
+B20   n=120 d=15   lr=0.008  bench 6.2±1.2  horizon   0.4  randdruk 0.056  los  21.9
+B20   n=120 d=35   lr=0.008  bench 9.6±2.7  horizon  12.8  randdruk 0.055  los  12.1
+B20   n=120 d=70   lr=0.008  bench 18.5±7.3  horizon  14.9  randdruk 0.054  los   6.8
+
+=== A (doel altijd zichtbaar — geen geheugendruk) ===
+neuronen  beste d  benchmark     bij d=35    horizon     randdruk    losgeraakt  sd tussen zaden
+8         15       26.5±11.5     26.5±11.5   7.8         0.047       30.5        16.7 pp
+16        35       54.1±4.0      54.1±4.0    7.3         0.049       41.0        5.8 pp
+30        35       58.3±6.0      58.3±6.0    13.1        0.050       10.0        8.6 pp
+60        70       68.5±4.4      64.5±3.5    18.1        0.058       2.6         6.3 pp
+120       70       67.8±1.3      65.9±2.7    18.9        0.056       6.6         1.9 pp
+optimum bij 60 neuronen; val naar de grootste maat 0.7 pp, naar de kleinste 42.0 pp
+spreiding over de dichtheden 23.5 pp, over de maten 37.9 pp
+verbindingen per grootte over de drie dichtheden (plafond waar de knop ophoudt):
+  n=  8    902   902   902   plafond bereikt vanaf dichtheid 35
+  n= 16   1172  1157  1157   plafond bereikt vanaf dichtheid 70
+  n= 30   1303  1757  1757   plafond bereikt vanaf dichtheid 70
+  n= 60   1795  3075  3926   geen plafond binnen dit raster
+  n=120   2083  4331  8114   geen plafond binnen dit raster
+rangcorrelatie met het aantal neuronen: randdruk 0.87, horizon 0.39, losgeraakt -0.35, meedoend 0.87
+rangcorrelatie met de SCORE (per cel) — dit is wat een diagnose waard maakt: randdruk 0.53, horizon 0.78, losgeraakt -0.62, meedoend 0.44, verbindingen 0.60, actief 0.61
+
+=== B20 (10 stappen zichtbaar, 20 donker — wel geheugendruk) ===
+neuronen  beste d  benchmark     bij d=35    horizon     randdruk    losgeraakt  sd tussen zaden
+8         15       5.4±2.5       5.4±2.5     2.8         0.044       0.8         3.6 pp
+16        15       8.8±1.9       8.3±2.0     2.0         0.047       1.8         2.7 pp
+30        35       10.4±2.3      10.4±2.3    6.3         0.050       1.5         3.3 pp
+60        70       14.0±2.9      9.5±2.1     11.6        0.056       3.4         4.2 pp
+120       70       18.5±7.3      9.6±2.7     14.9        0.054       6.8         10.5 pp
+optimum bij 120 neuronen  — LET OP: op de rand van het raster; val naar de grootste maat 0.0 pp, naar de kleinste 13.1 pp
+spreiding over de dichtheden 5.2 pp, over de maten 7.2 pp
+verbindingen per grootte over de drie dichtheden (plafond waar de knop ophoudt):
+  n=  8    871   871   871   plafond bereikt vanaf dichtheid 35
+  n= 16   1123  1130  1130   plafond bereikt vanaf dichtheid 70
+  n= 30   1351  1756  1756   plafond bereikt vanaf dichtheid 70
+  n= 60   1761  2973  3812   geen plafond binnen dit raster
+  n=120   2077  4284  8017   geen plafond binnen dit raster
+rangcorrelatie met het aantal neuronen: randdruk 0.91, horizon 0.32, losgeraakt 0.74, meedoend 0.95
+rangcorrelatie met de SCORE (per cel) — dit is wat een diagnose waard maakt: randdruk 0.48, horizon 0.70, losgeraakt 0.21, meedoend 0.62, verbindingen 0.65, actief 0.75
+KLAAR exitcode=0 

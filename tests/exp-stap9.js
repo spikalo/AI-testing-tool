@@ -200,19 +200,52 @@ function maten(row) {
   }
 
   /* ---------- analyse ---------- */
+  /* VERZADIGING VAN DE DICHTHEIDSAS. Tijdens het draaien bleek iets wat vooraf niet
+     was voorzien: bij kleine netwerken leveren twee verschillende dichtheden exact
+     hetzelfde netwerk op. De reden staat in createBrain — het aantal verbindingen is
+     `min(aantal legale paren, dichtheid x (neuronen + invoer))`, en bij weinig neuronen
+     loopt die eerste term als eerste vol. Boven het plafond doet de knop niets meer.
+     Dat is geen meetfout maar een eigenschap van het model, en het is zelf een antwoord
+     op de vraag van deze stap. Het wordt hier gedetecteerd in plaats van weggepoetst, en
+     V5 wordt daarna alleen op de cellen beoordeeld waar de as werkelijk beweegt. */
+  for (const naam in cel) {
+    const c = cel[naam];
+    const lager = Object.values(cel).filter(x => x.stand === c.stand && x.neuronen === c.neuronen
+      && x.dichtheid < c.dichtheid && x.verbindingen && c.verbindingen);
+    c.verzadigd = lager.some(x => Math.abs(x.verbindingen.m - c.verbindingen.m) < 1e-9);
+  }
+
   const perStand = {};
   for (const stand of STANDEN) {
     const cellen = Object.values(cel).filter(c => c.stand === stand.naam);
     if (!cellen.length) continue;
-    /* over de dichtheden heen gemiddeld, want V1 t/m V3 gaan over de grootte */
+    /* DE GROOTTE-AS WORDT OP DE BESTE DICHTHEID GELEZEN, niet op het gemiddelde over de
+       drie. Twee redenen, en ze wijzen dezelfde kant op.
+
+       De eerste is dat middelen hier ongelijke dingen optelt: bij acht neuronen zijn twee
+       van de drie dichtheden verzadigd en dus dezelfde cel, bij zestig geen enkele. Een
+       gemiddelde weegt de maten dan ongelijk zonder dat iemand daarom gevraagd heeft.
+
+       De tweede weegt zwaarder. De laagste dichtheid blijkt bij de grote netwerken
+       rampzalig — honderdtwintig neuronen halen op dichtheid 15 minder dan acht neuronen
+       op hun beste dichtheid. Middel je die cel mee, dan meet de grootte-as voor een derde
+       "hoe erg is te dun bedraad zijn", en dat is de vraag van de ándere as. De vraag
+       "hoe groot moet mijn netwerk zijn" veronderstelt dat je het daarna fatsoenlijk
+       bedraadt, en zo wordt hij hier ook beantwoord: per grootte de beste van de drie
+       dichtheden, met de cel op de standaarddichtheid ernaast zodat beide zichtbaar zijn. */
     const perN = NEURONEN.map(N => {
-      const c = cellen.filter(x => x.neuronen === N);
-      const alle = [].concat(...c.map(x => x.perZaad));
-      return { neuronen: N, cellen: c.length,
-        bench: mci(alle.map(r => r.bench)), horizon: mci(alle.map(r => r.horizon)),
-        randdruk: mci(alle.map(r => r.randdruk)), losgeraakt: mci(alle.map(r => r.losgeraakt)),
-        spreidingTussenZaden: mci(c.map(x => x.bench ? x.bench.sd : null)) };
-    }).filter(x => x.bench);
+      const c = cellen.filter(x => x.neuronen === N && x.bench);
+      if (!c.length) return null;
+      const beste = c.reduce((a, x) => x.bench.m > a.bench.m ? x : a, c[0]);
+      const standaard = c.find(x => x.dichtheid === STANDAARD_D) || beste;
+      return { neuronen: N,
+        besteDichtheid: beste.dichtheid, bench: beste.bench,
+        horizon: beste.horizon, randdruk: beste.randdruk, losgeraakt: beste.losgeraakt,
+        meedoend: beste.meedoend, neuronenEind: beste.neuronenEind,
+        spreidingTussenZaden: { n: beste.runs, m: beste.bench.sd, sd: 0, ci: 0 },
+        bijStandaardDichtheid: standaard.bench,
+        verzadigdeCellen: c.filter(x => x.verzadigd).length };
+    }).filter(Boolean);
     const top = perN.reduce((a, c) => c.bench.m > a.bench.m ? c : a, perN[0]);
     const kleinste = perN[0], grootste = perN[perN.length - 1];
     /* V5: spreiding over dichtheden binnen een maat tegen die over maten binnen een dichtheid */
@@ -227,6 +260,14 @@ function maten(row) {
     /* V4: loopt elke diagnostische maat mee met de grootte? Over alle losse runs. */
     const alleRuns = [].concat(...cellen.map(c => c.perZaad.map(r => Object.assign({ neuronen: c.neuronen }, r))));
     const rho = m => spearman(alleRuns.map(r => r.neuronen), alleRuns.map(r => r[m]));
+    /* En de vraag die er praktisch toe doet, en die V4 eigenlijk stelt: voorspelt de maat
+       de SCORE? Meelopen met de grootte is niet genoeg — het aantal neuronen kun je zelf
+       aflezen, daar heb je geen maat voor nodig. Een diagnostische maat is pas iets waard
+       als hij zegt hoe goed het netwerk het doet zonder dat je een tweede netwerk hoeft te
+       trainen om mee te vergelijken. Op celniveau, want de ruis per run is groot. */
+    const cellenMetScore = cellen.filter(c => c.bench);
+    const rhoScore = m => spearman(cellenMetScore.map(c => c[m] ? c[m].m : null),
+      cellenMetScore.map(c => c.bench.m));
     perStand[stand.naam] = {
       perN,
       optimum: top.neuronen,
@@ -235,7 +276,17 @@ function maten(row) {
       valNaarKlein: top.bench.m - kleinste.bench.m,
       spreidingOverDichtheid: overDichtheid, spreidingOverGrootte: overGrootte,
       diagnostisch: { randdruk: rho('randdruk'), horizon: rho('horizon'),
-        losgeraakt: rho('losgeraakt'), meedoend: rho('meedoend') }
+        losgeraakt: rho('losgeraakt'), meedoend: rho('meedoend') },
+      diagnostischTegenScore: { randdruk: rhoScore('randdruk'), horizon: rhoScore('horizon'),
+        losgeraakt: rhoScore('losgeraakt'), meedoend: rhoScore('meedoend'),
+        verbindingen: rhoScore('verbindingen'), actief: rhoScore('actief') },
+      /* waar de dichtheidsknop ophoudt iets te doen, per grootte */
+      verzadiging: NEURONEN.map(N => {
+        const rij = DICHTHEDEN.map(D => cellen.find(x => x.neuronen === N && x.dichtheid === D)).filter(Boolean);
+        const eerste = rij.find(x => x.verzadigd);
+        return { neuronen: N, verbindingen: rij.map(x => x.verbindingen ? Math.round(x.verbindingen.m) : null),
+          plafondVanaf: eerste ? eerste.dichtheid : null };
+      })
     };
   }
 
@@ -260,9 +311,12 @@ function maten(row) {
   for (const stand of STANDEN) {
     const P = perStand[stand.naam]; if (!P) continue;
     console.log(`\n=== ${stand.naam} (${stand.omschrijving}) ===`);
-    console.log('neuronen'.padEnd(10) + 'benchmark'.padEnd(14) + 'horizon'.padEnd(12) +
+    console.log('neuronen'.padEnd(10) + 'beste d'.padEnd(9) + 'benchmark'.padEnd(14) +
+      'bij d=' + STANDAARD_D + '    ' + 'horizon'.padEnd(12) +
       'randdruk'.padEnd(12) + 'losgeraakt'.padEnd(12) + 'sd tussen zaden');
-    for (const r of P.perN) console.log(String(r.neuronen).padEnd(10) + pct(r.bench).padEnd(14) +
+    for (const r of P.perN) console.log(String(r.neuronen).padEnd(10) +
+      String(r.besteDichtheid).padEnd(9) + pct(r.bench).padEnd(14) +
+      pct(r.bijStandaardDichtheid).padEnd(12) +
       (r.horizon ? r.horizon.m.toFixed(1) : '–').padEnd(12) +
       (r.randdruk ? r.randdruk.m.toFixed(3) : '–').padEnd(12) +
       (r.losgeraakt ? r.losgeraakt.m.toFixed(1) : '–').padEnd(12) +
@@ -271,8 +325,14 @@ function maten(row) {
       `val naar de grootste maat ${(100 * P.valNaarGroot).toFixed(1)} pp, naar de kleinste ${(100 * P.valNaarKlein).toFixed(1)} pp`);
     console.log(`spreiding over de dichtheden ${(100 * P.spreidingOverDichtheid.m).toFixed(1)} pp, ` +
       `over de maten ${(100 * P.spreidingOverGrootte.m).toFixed(1)} pp`);
+    console.log('verbindingen per grootte over de drie dichtheden (plafond waar de knop ophoudt):');
+    for (const v of P.verzadiging) console.log(`  n=${String(v.neuronen).padStart(3)}  ` +
+      v.verbindingen.map(x => String(x).padStart(5)).join(' ') +
+      (v.plafondVanaf ? `   plafond bereikt vanaf dichtheid ${v.plafondVanaf}` : '   geen plafond binnen dit raster'));
     console.log('rangcorrelatie met het aantal neuronen: ' +
       Object.entries(P.diagnostisch).map(([k, v]) => `${k} ${v ? v.rho.toFixed(2) : '–'}`).join(', '));
+    console.log('rangcorrelatie met de SCORE (per cel) — dit is wat een diagnose waard maakt: ' +
+      Object.entries(P.diagnostischTegenScore).map(([k, v]) => `${k} ${v ? v.rho.toFixed(2) : '–'}`).join(', '));
   }
 
   if (fouten.length) { console.error(fouten.join('\n')); process.exitCode = 1; }

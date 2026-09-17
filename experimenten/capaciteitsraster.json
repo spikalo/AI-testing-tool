@@ -1,0 +1,6653 @@
+{
+  "uitgevoerd": "2026-09-17T18:13:15.128Z",
+  "beschrijving": "Werkplan stap 9: een raster van netwerkgrootte x startdichtheid op twee taakstanden. De vraag is niet alleen welke grootte het beste scoort, maar waaraan je aan een getraind netwerk kunt zien dat het te klein of te groot is — daarom staan naast de benchmarkscore vier structurele maten die tot nu toe geen taak hadden waarop zij iets konden betekenen. De soortenverdeling schaalt mee met de grootte, zodat er niet twee dingen tegelijk variëren.",
+  "neuronen": [
+    8,
+    16,
+    30,
+    60,
+    120
+  ],
+  "dichtheden": [
+    15,
+    35,
+    70
+  ],
+  "standen": [
+    {
+      "naam": "A",
+      "blink": 0,
+      "omschrijving": "doel altijd zichtbaar — geen geheugendruk"
+    },
+    {
+      "naam": "B20",
+      "blink": 20,
+      "omschrijving": "10 stappen zichtbaar, 20 donker — wel geheugendruk"
+    }
+  ],
+  "pogingen": 500,
+  "zaden": 8,
+  "eersteZaad": 1000,
+  "benchmark": {
+    "werelden": 500,
+    "herhalingen": 1
+  },
+  "geheugenproef": {
+    "werelden": 100
+  },
+  "leersnelheidsveeg": {
+    "kandidaten": [
+      0.004,
+      0.008,
+      0.016
+    ],
+    "zaden": 3,
+    "eersteZaad": 2000,
+    "perCel": {
+      "n8-A": {
+        "neuronen": 8,
+        "stand": "A",
+        "kandidaten": [
+          {
+            "lr": 0.004,
+            "score": {
+              "n": 3,
+              "m": 0.1486666666666667,
+              "sd": 0.02318045153428495,
+              "ci": 0.02623115026918272
+            }
+          },
+          {
+            "lr": 0.008,
+            "score": {
+              "n": 3,
+              "m": 0.19999999999999998,
+              "sd": 0.05411099703387474,
+              "ci": 0.061232357459108176
+            }
+          },
+          {
+            "lr": 0.016,
+            "score": {
+              "n": 3,
+              "m": 0.212,
+              "sd": 0.07717512552629893,
+              "ci": 0.08733187581480961
+            }
+          }
+        ],
+        "gekozen": 0.016,
+        "marge": 0.01200000000000001
+      },
+      "n8-B20": {
+        "neuronen": 8,
+        "stand": "B20",
+        "kandidaten": [
+          {
+            "lr": 0.004,
+            "score": {
+              "n": 3,
+              "m": 0.024000000000000004,
+              "sd": 0.010583005244258363,
+              "ci": 0.011975797816151263
+            }
+          },
+          {
+            "lr": 0.008,
+            "score": {
+              "n": 3,
+              "m": 0.05266666666666667,
+              "sd": 0.005033222956847168,
+              "ci": 0.005695627952893149
+            }
+          },
+          {
+            "lr": 0.016,
+            "score": {
+              "n": 3,
+              "m": 0.056,
+              "sd": 0.037469987990390384,
+              "ci": 0.04240128299945651
+            }
+          }
+        ],
+        "gekozen": 0.016,
+        "marge": 0.003333333333333334
+      },
+      "n16-A": {
+        "neuronen": 16,
+        "stand": "A",
+        "kandidaten": [
+          {
+            "lr": 0.004,
+            "score": {
+              "n": 3,
+              "m": 0.318,
+              "sd": 0.06063002556489646,
+              "ci": 0.06860933269849906
+            }
+          },
+          {
+            "lr": 0.008,
+            "score": {
+              "n": 3,
+              "m": 0.39399999999999996,
+              "sd": 0.07725283166331187,
+              "ci": 0.08741980858668896
+            }
+          },
+          {
+            "lr": 0.016,
+            "score": {
+              "n": 3,
+              "m": 0.4366666666666667,
+              "sd": 0.11400584780323042,
+              "ci": 0.1290097615600377
+            }
+          }
+        ],
+        "gekozen": 0.016,
+        "marge": 0.04266666666666674
+      },
+      "n16-B20": {
+        "neuronen": 16,
+        "stand": "B20",
+        "kandidaten": [
+          {
+            "lr": 0.004,
+            "score": {
+              "n": 3,
+              "m": 0.04866666666666667,
+              "sd": 0.015143755588800732,
+              "ci": 0.017136772676842566
+            }
+          },
+          {
+            "lr": 0.008,
+            "score": {
+              "n": 3,
+              "m": 0.07733333333333332,
+              "sd": 0.0023094010767585054,
+              "ci": 0.002613333333333336
+            }
+          },
+          {
+            "lr": 0.016,
+            "score": {
+              "n": 3,
+              "m": 0.042666666666666665,
+              "sd": 0.00808290376865476,
+              "ci": 0.009146666666666668
+            }
+          }
+        ],
+        "gekozen": 0.008,
+        "marge": 0.028666666666666653
+      },
+      "n30-A": {
+        "neuronen": 30,
+        "stand": "A",
+        "kandidaten": [
+          {
+            "lr": 0.004,
+            "score": {
+              "n": 3,
+              "m": 0.6146666666666666,
+              "sd": 0.08821186617078978,
+              "ci": 0.09982112357167247
+            }
+          },
+          {
+            "lr": 0.008,
+            "score": {
+              "n": 3,
+              "m": 0.626,
+              "sd": 0.052115256883181575,
+              "ci": 0.05897396487716711
+            }
+          },
+          {
+            "lr": 0.016,
+            "score": {
+              "n": 3,
+              "m": 0.6606666666666666,
+              "sd": 0.05131601439446884,
+              "ci": 0.058069536859795184
+            }
+          }
+        ],
+        "gekozen": 0.016,
+        "marge": 0.03466666666666662
+      },
+      "n30-B20": {
+        "neuronen": 30,
+        "stand": "B20",
+        "kandidaten": [
+          {
+            "lr": 0.004,
+            "score": {
+              "n": 3,
+              "m": 0.06866666666666667,
+              "sd": 0.022030282189144407,
+              "ci": 0.024929611130362846
+            }
+          },
+          {
+            "lr": 0.008,
+            "score": {
+              "n": 3,
+              "m": 0.08266666666666667,
+              "sd": 0.022120880030716075,
+              "ci": 0.02503213223927287
+            }
+          },
+          {
+            "lr": 0.016,
+            "score": {
+              "n": 3,
+              "m": 0.07866666666666666,
+              "sd": 0.03312602199681292,
+              "ci": 0.03748562272540115
+            }
+          }
+        ],
+        "gekozen": 0.008,
+        "marge": 0.0040000000000000036
+      },
+      "n60-A": {
+        "neuronen": 60,
+        "stand": "A",
+        "kandidaten": [
+          {
+            "lr": 0.004,
+            "score": {
+              "n": 3,
+              "m": 0.6646666666666667,
+              "sd": 0.06306610288683878,
+              "ci": 0.07136601369777573
+            }
+          },
+          {
+            "lr": 0.008,
+            "score": {
+              "n": 3,
+              "m": 0.6426666666666666,
+              "sd": 0.052624455658309074,
+              "ci": 0.05955017753495325
+            }
+          },
+          {
+            "lr": 0.016,
+            "score": {
+              "n": 3,
+              "m": 0.5473333333333333,
+              "sd": 0.18903262505010432,
+              "ci": 0.21391055243826668
+            }
+          }
+        ],
+        "gekozen": 0.004,
+        "marge": 0.02200000000000013
+      },
+      "n60-B20": {
+        "neuronen": 60,
+        "stand": "B20",
+        "kandidaten": [
+          {
+            "lr": 0.004,
+            "score": {
+              "n": 3,
+              "m": 0.08133333333333333,
+              "sd": 0.029955522584881294,
+              "ci": 0.03389786489507037
+            }
+          },
+          {
+            "lr": 0.008,
+            "score": {
+              "n": 3,
+              "m": 0.076,
+              "sd": 0.02116601048851673,
+              "ci": 0.023951595632302532
+            }
+          },
+          {
+            "lr": 0.016,
+            "score": {
+              "n": 3,
+              "m": 0.05866666666666667,
+              "sd": 0.020033305601755626,
+              "ci": 0.022669819388586032
+            }
+          }
+        ],
+        "gekozen": 0.004,
+        "marge": 0.005333333333333329
+      },
+      "n120-A": {
+        "neuronen": 120,
+        "stand": "A",
+        "kandidaten": [
+          {
+            "lr": 0.004,
+            "score": {
+              "n": 3,
+              "m": 0.5193333333333333,
+              "sd": 0.20923989422032627,
+              "ci": 0.23677723013649582
+            }
+          },
+          {
+            "lr": 0.008,
+            "score": {
+              "n": 3,
+              "m": 0.5533333333333333,
+              "sd": 0.210231618300705,
+              "ci": 0.23789947157944208
+            }
+          },
+          {
+            "lr": 0.016,
+            "score": {
+              "n": 3,
+              "m": 0.548,
+              "sd": 0.1811408291909916,
+              "ci": 0.204980144729516
+            }
+          }
+        ],
+        "gekozen": 0.008,
+        "marge": 0.005333333333333301
+      },
+      "n120-B20": {
+        "neuronen": 120,
+        "stand": "B20",
+        "kandidaten": [
+          {
+            "lr": 0.004,
+            "score": {
+              "n": 3,
+              "m": 0.09533333333333334,
+              "sd": 0.03035347316755256,
+              "ci": 0.03434818837208805
+            }
+          },
+          {
+            "lr": 0.008,
+            "score": {
+              "n": 3,
+              "m": 0.12066666666666666,
+              "sd": 0.0774682730757136,
+              "ci": 0.08766360349528064
+            }
+          },
+          {
+            "lr": 0.016,
+            "score": {
+              "n": 3,
+              "m": 0.052,
+              "sd": 0.03538361202590826,
+              "ci": 0.04004032633899646
+            }
+          }
+        ],
+        "gekozen": 0.008,
+        "marge": 0.02533333333333332
+      }
+    }
+  },
+  "voorspellingen": [
+    {
+      "id": "V1",
+      "wat": "er is een optimum in netwerkgrootte, en het ligt niet op de rand van het raster",
+      "toets": "benchmarkscore tegen aantal neuronen, per stand, met interval per cel",
+      "waar": "Dan zijn \"te klein\" en \"te groot\" allebei op deze as meetbaar en heeft de vraag waar dit project uit voortkomt een antwoord in de vorm van een curve in plaats van een vuistregel.",
+      "onwaar": "Het optimum ligt bij 8 of bij 120 neuronen. Dan meet dit raster alleen \"meer is beter\" of \"minder is beter\" tot buiten wat er gemeten is, en wordt het raster uitgebreid vóór er ook maar iets over een optimum wordt opgeschreven. Een optimum op de rand is geen optimum."
+    },
+    {
+      "id": "V2",
+      "wat": "het optimum schuift met de taakstand mee: op B-20 ligt het bij meer neuronen dan op A",
+      "toets": "het argmaximum van de benchmarkscore over de vijf maten, per stand",
+      "waar": "Hoeveel netwerk je nodig hebt is een eigenschap van de opgave en niet van de architectuur. Voor iemand die een model lokaal draait is dat de bruikbaarste uitkomst van deze stap: de vraag \"hoe groot moet het\" heeft geen taakonafhankelijk antwoord.",
+      "onwaar": "Het optimum ligt op beide standen bij dezelfde maat. Dan is netwerkgrootte hier wél een eigenschap van de architectuur, en is één keer uitmeten genoeg — een prettiger boodschap, en dan moet die er staan."
+    },
+    {
+      "id": "V3",
+      "wat": "te groot kost meer dan te klein",
+      "toets": "de daling vanaf het optimum naar de grootste maat tegen die naar de kleinste maat, per stand, met interval",
+      "waar": "Overcapaciteit interfereert, zoals stap 12 al liet vermoeden toen een ruimer net onder geheugendruk slechter presteerde. Het praktische advies wordt dan \"liever iets te klein dan iets te groot\", en dat is het tegenovergestelde van de gangbare vuistregel.",
+      "onwaar": "De daling is symmetrisch, of te klein kost juist méér. Dan is \"neem hem ruim\" hier gewoon het juiste advies en is de gangbare vuistregel op deze taak niet te verbeteren."
+    },
+    {
+      "id": "V4",
+      "wat": "te klein en te groot zijn aan andere maten te herkennen dan aan de score alleen",
+      "preciezer": "een te klein netwerk laat een hogere gemiddelde gewichtsgrootte ten opzichte van het gewichtsplafond zien (het duwt zijn parameters tegen de rand) en een lagere geheugenhorizon; een te groot netwerk laat meer losgeraakte neuronen zien en een grotere spreiding tussen zaden",
+      "toets": "rangcorrelatie van elke maat met het aantal neuronen, per stand, beschrijvend gerapporteerd",
+      "waar": "Dan is er een diagnose te stellen aan één getraind netwerk, zonder een tweede ter vergelijking. Dat is precies wat de vraag achter dit project wil weten en het is het enige onderdeel van deze stap dat buiten dit model bruikbaar is.",
+      "onwaar": "Geen van de vier maten loopt mee met de grootte, of zij lopen alle vier dezelfde kant op zodat te klein en te groot er hetzelfde uitzien. Dan is de eerlijke boodschap dat je een verkeerd gedimensioneerd netwerk alleen aan zijn prestatie herkent en dus altijd moet vergelijken — een negatief antwoord op een praktijkvraag, en nog steeds een antwoord."
+    },
+    {
+      "id": "V5",
+      "wat": "de startdichtheid doet er minder toe dan het aantal neuronen",
+      "toets": "de spreiding van de benchmarkscore over de drie dichtheden binnen een maat, tegen die over de vijf maten binnen een dichtheid",
+      "waar": "Het snoeien en aangroeien wissen de startdichtheid binnen een leven uit. Dan is dichtheid een knop die je niet nauwkeurig hoeft te zetten, en — belangrijker — is de paginahint die haar \"veruit de belangrijkste knop\" noemt achterhaald door de structurele plasticiteit die er later bij gekomen is. Die hint wordt dan aangepast.",
+      "onwaar": "Dichtheid doet er wel degelijk toe. Dan is er een tweede as waarop een netwerk verkeerd gedimensioneerd kan zijn, en moet elk advies over grootte de dichtheid erbij noemen."
+    }
+  ],
+  "cellen": {
+    "s9-n8-d15-A": {
+      "neuronen": 8,
+      "dichtheid": 15,
+      "stand": "A",
+      "lr": 0.016,
+      "runs": 8,
+      "perZaad": [
+        {
+          "zaad": 1000,
+          "bench": 0.338,
+          "benchOpA": 0.338,
+          "horizon": 4,
+          "succes20": 0.55,
+          "verbindingen": 929,
+          "actief": 197,
+          "randdruk": 0.04785901045260562,
+          "losgeraakt": 8,
+          "meedoend": 48,
+          "neuronenEind": 56,
+          "tijdMs": 3009
+        },
+        {
+          "zaad": 1001,
+          "bench": 0.532,
+          "benchOpA": 0.532,
+          "horizon": 11,
+          "succes20": 0.7,
+          "verbindingen": 912,
+          "actief": 160,
+          "randdruk": 0.049010146743241195,
+          "losgeraakt": 27,
+          "meedoend": 29,
+          "neuronenEind": 56,
+          "tijdMs": 2791
+        },
+        {
+          "zaad": 1002,
+          "bench": 0.068,
+          "benchOpA": 0.068,
+          "horizon": 1,
+          "succes20": 0.5,
+          "verbindingen": 867,
+          "actief": 83,
+          "randdruk": 0.046604340935956834,
+          "losgeraakt": 47,
+          "meedoend": 9,
+          "neuronenEind": 56,
+          "tijdMs": 3110
+        },
+        {
+          "zaad": 1003,
+          "bench": 0.398,
+          "benchOpA": 0.398,
+          "horizon": 7,
+          "succes20": 0.7,
+          "verbindingen": 949,
+          "actief": 135,
+          "randdruk": 0.047992714620990244,
+          "losgeraakt": 29,
+          "meedoend": 29,
+          "neuronenEind": 58,
+          "tijdMs": 2919
+        },
+        {
+          "zaad": 1004,
+          "bench": 0.032,
+          "benchOpA": 0.032,
+          "horizon": 0,
+          "succes20": 0.4,
+          "verbindingen": 847,
+          "actief": 441,
+          "randdruk": 0.04194622875247349,
+          "losgeraakt": 1,
+          "meedoend": 55,
+          "neuronenEind": 56,
+          "tijdMs": 3018
+        },
+        {
+          "zaad": 1005,
+          "bench": 0.186,
+          "benchOpA": 0.186,
+          "horizon": 1,
+          "succes20": 0.45,
+          "verbindingen": 913,
+          "actief": 106,
+          "randdruk": 0.04487183469749053,
+          "losgeraakt": 49,
+          "meedoend": 7,
+          "neuronenEind": 56,
+          "tijdMs": 3056
+        },
+        {
+          "zaad": 1006,
+          "bench": 0.274,
+          "benchOpA": 0.274,
+          "horizon": 3,
+          "succes20": 0.45,
+          "verbindingen": 837,
+          "actief": 85,
+          "randdruk": 0.04797408726696969,
+          "losgeraakt": 44,
+          "meedoend": 10,
+          "neuronenEind": 54,
+          "tijdMs": 2870
+        },
+        {
+          "zaad": 1007,
+          "bench": 0.292,
+          "benchOpA": 0.292,
+          "horizon": 35,
+          "succes20": 0.55,
+          "verbindingen": 964,
+          "actief": 131,
+          "randdruk": 0.04647169911744738,
+          "losgeraakt": 39,
+          "meedoend": 23,
+          "neuronenEind": 62,
+          "tijdMs": 3132
+        }
+      ],
+      "bench": {
+        "n": 8,
+        "m": 0.265,
+        "sd": 0.166671618974043,
+        "ci": 0.11549753936772851
+      },
+      "horizon": {
+        "n": 8,
+        "m": 7.75,
+        "sd": 11.597413504743201,
+        "ci": 8.036597538759795
+      },
+      "succes20": {
+        "n": 8,
+        "m": 0.5375000000000001,
+        "sd": 0.11259916264596032,
+        "ci": 0.07802723883362782
+      },
+      "verbindingen": {
+        "n": 8,
+        "m": 902.25,
+        "sd": 47.02203131056152,
+        "ci": 32.58460526076692
+      },
+      "actief": {
+        "n": 8,
+        "m": 167.25,
+        "sd": 117.01373545748501,
+        "ci": 81.08638171727728
+      },
+      "randdruk": {
+        "n": 8,
+        "m": 0.04659125782339687,
+        "sd": 0.0022640575197315663,
+        "ci": 0.0015689118166946142
+      },
+      "losgeraakt": {
+        "n": 8,
+        "m": 30.5,
+        "sd": 17.968225924034428,
+        "ci": 12.451345308841129
+      },
+      "meedoend": {
+        "n": 8,
+        "m": 26.25,
+        "sd": 17.95828499606797,
+        "ci": 12.444456597216288
+      },
+      "neuronenEind": {
+        "n": 8,
+        "m": 56.75,
+        "sd": 2.3754698783308417,
+        "ci": 1.6461166422826787
+      },
+      "tijdMs": {
+        "n": 8,
+        "m": 2988.125,
+        "sd": 118.97110993850566,
+        "ci": 82.44277303075145
+      },
+      "verzadigd": false
+    },
+    "s9-n8-d35-A": {
+      "neuronen": 8,
+      "dichtheid": 35,
+      "stand": "A",
+      "lr": 0.016,
+      "runs": 8,
+      "perZaad": [
+        {
+          "zaad": 1000,
+          "bench": 0.338,
+          "benchOpA": 0.338,
+          "horizon": 4,
+          "succes20": 0.55,
+          "verbindingen": 929,
+          "actief": 197,
+          "randdruk": 0.04785901045260562,
+          "losgeraakt": 8,
+          "meedoend": 48,
+          "neuronenEind": 56,
+          "tijdMs": 3003
+        },
+        {
+          "zaad": 1001,
+          "bench": 0.532,
+          "benchOpA": 0.532,
+          "horizon": 11,
+          "succes20": 0.7,
+          "verbindingen": 912,
+          "actief": 160,
+          "randdruk": 0.049010146743241195,
+          "losgeraakt": 27,
+          "meedoend": 29,
+          "neuronenEind": 56,
+          "tijdMs": 2912
+        },
+        {
+          "zaad": 1002,
+          "bench": 0.068,
+          "benchOpA": 0.068,
+          "horizon": 1,
+          "succes20": 0.5,
+          "verbindingen": 867,
+          "actief": 83,
+          "randdruk": 0.046604340935956834,
+          "losgeraakt": 47,
+          "meedoend": 9,
+          "neuronenEind": 56,
+          "tijdMs": 3133
+        },
+        {
+          "zaad": 1003,
+          "bench": 0.398,
+          "benchOpA": 0.398,
+          "horizon": 7,
+          "succes20": 0.7,
+          "verbindingen": 949,
+          "actief": 135,
+          "randdruk": 0.047992714620990244,
+          "losgeraakt": 29,
+          "meedoend": 29,
+          "neuronenEind": 58,
+          "tijdMs": 2961
+        },
+        {
+          "zaad": 1004,
+          "bench": 0.032,
+          "benchOpA": 0.032,
+          "horizon": 0,
+          "succes20": 0.4,
+          "verbindingen": 847,
+          "actief": 441,
+          "randdruk": 0.04194622875247349,
+          "losgeraakt": 1,
+          "meedoend": 55,
+          "neuronenEind": 56,
+          "tijdMs": 3151
+        },
+        {
+          "zaad": 1005,
+          "bench": 0.186,
+          "benchOpA": 0.186,
+          "horizon": 1,
+          "succes20": 0.45,
+          "verbindingen": 913,
+          "actief": 106,
+          "randdruk": 0.04487183469749053,
+          "losgeraakt": 49,
+          "meedoend": 7,
+          "neuronenEind": 56,
+          "tijdMs": 3167
+        },
+        {
+          "zaad": 1006,
+          "bench": 0.274,
+          "benchOpA": 0.274,
+          "horizon": 3,
+          "succes20": 0.45,
+          "verbindingen": 837,
+          "actief": 85,
+          "randdruk": 0.04797408726696969,
+          "losgeraakt": 44,
+          "meedoend": 10,
+          "neuronenEind": 54,
+          "tijdMs": 2873
+        },
+        {
+          "zaad": 1007,
+          "bench": 0.292,
+          "benchOpA": 0.292,
+          "horizon": 35,
+          "succes20": 0.55,
+          "verbindingen": 964,
+          "actief": 131,
+          "randdruk": 0.04647169911744738,
+          "losgeraakt": 39,
+          "meedoend": 23,
+          "neuronenEind": 62,
+          "tijdMs": 3186
+        }
+      ],
+      "bench": {
+        "n": 8,
+        "m": 0.265,
+        "sd": 0.166671618974043,
+        "ci": 0.11549753936772851
+      },
+      "horizon": {
+        "n": 8,
+        "m": 7.75,
+        "sd": 11.597413504743201,
+        "ci": 8.036597538759795
+      },
+      "succes20": {
+        "n": 8,
+        "m": 0.5375000000000001,
+        "sd": 0.11259916264596032,
+        "ci": 0.07802723883362782
+      },
+      "verbindingen": {
+        "n": 8,
+        "m": 902.25,
+        "sd": 47.02203131056152,
+        "ci": 32.58460526076692
+      },
+      "actief": {
+        "n": 8,
+        "m": 167.25,
+        "sd": 117.01373545748501,
+        "ci": 81.08638171727728
+      },
+      "randdruk": {
+        "n": 8,
+        "m": 0.04659125782339687,
+        "sd": 0.0022640575197315663,
+        "ci": 0.0015689118166946142
+      },
+      "losgeraakt": {
+        "n": 8,
+        "m": 30.5,
+        "sd": 17.968225924034428,
+        "ci": 12.451345308841129
+      },
+      "meedoend": {
+        "n": 8,
+        "m": 26.25,
+        "sd": 17.95828499606797,
+        "ci": 12.444456597216288
+      },
+      "neuronenEind": {
+        "n": 8,
+        "m": 56.75,
+        "sd": 2.3754698783308417,
+        "ci": 1.6461166422826787
+      },
+      "tijdMs": {
+        "n": 8,
+        "m": 3048.25,
+        "sd": 125.216098919314,
+        "ci": 86.770329606381
+      },
+      "verzadigd": true
+    },
+    "s9-n8-d70-A": {
+      "neuronen": 8,
+      "dichtheid": 70,
+      "stand": "A",
+      "lr": 0.016,
+      "runs": 8,
+      "perZaad": [
+        {
+          "zaad": 1000,
+          "bench": 0.338,
+          "benchOpA": 0.338,
+          "horizon": 4,
+          "succes20": 0.55,
+          "verbindingen": 929,
+          "actief": 197,
+          "randdruk": 0.04785901045260562,
+          "losgeraakt": 8,
+          "meedoend": 48,
+          "neuronenEind": 56,
+          "tijdMs": 2990
+        },
+        {
+          "zaad": 1001,
+          "bench": 0.532,
+          "benchOpA": 0.532,
+          "horizon": 11,
+          "succes20": 0.7,
+          "verbindingen": 912,
+          "actief": 160,
+          "randdruk": 0.049010146743241195,
+          "losgeraakt": 27,
+          "meedoend": 29,
+          "neuronenEind": 56,
+          "tijdMs": 2768
+        },
+        {
+          "zaad": 1002,
+          "bench": 0.068,
+          "benchOpA": 0.068,
+          "horizon": 1,
+          "succes20": 0.5,
+          "verbindingen": 867,
+          "actief": 83,
+          "randdruk": 0.046604340935956834,
+          "losgeraakt": 47,
+          "meedoend": 9,
+          "neuronenEind": 56,
+          "tijdMs": 3112
+        },
+        {
+          "zaad": 1003,
+          "bench": 0.398,
+          "benchOpA": 0.398,
+          "horizon": 7,
+          "succes20": 0.7,
+          "verbindingen": 949,
+          "actief": 135,
+          "randdruk": 0.047992714620990244,
+          "losgeraakt": 29,
+          "meedoend": 29,
+          "neuronenEind": 58,
+          "tijdMs": 2923
+        },
+        {
+          "zaad": 1004,
+          "bench": 0.032,
+          "benchOpA": 0.032,
+          "horizon": 0,
+          "succes20": 0.4,
+          "verbindingen": 847,
+          "actief": 441,
+          "randdruk": 0.04194622875247349,
+          "losgeraakt": 1,
+          "meedoend": 55,
+          "neuronenEind": 56,
+          "tijdMs": 3029
+        },
+        {
+          "zaad": 1005,
+          "bench": 0.186,
+          "benchOpA": 0.186,
+          "horizon": 1,
+          "succes20": 0.45,
+          "verbindingen": 913,
+          "actief": 106,
+          "randdruk": 0.04487183469749053,
+          "losgeraakt": 49,
+          "meedoend": 7,
+          "neuronenEind": 56,
+          "tijdMs": 3056
+        },
+        {
+          "zaad": 1006,
+          "bench": 0.274,
+          "benchOpA": 0.274,
+          "horizon": 3,
+          "succes20": 0.45,
+          "verbindingen": 837,
+          "actief": 85,
+          "randdruk": 0.04797408726696969,
+          "losgeraakt": 44,
+          "meedoend": 10,
+          "neuronenEind": 54,
+          "tijdMs": 2868
+        },
+        {
+          "zaad": 1007,
+          "bench": 0.292,
+          "benchOpA": 0.292,
+          "horizon": 35,
+          "succes20": 0.55,
+          "verbindingen": 964,
+          "actief": 131,
+          "randdruk": 0.04647169911744738,
+          "losgeraakt": 39,
+          "meedoend": 23,
+          "neuronenEind": 62,
+          "tijdMs": 3153
+        }
+      ],
+      "bench": {
+        "n": 8,
+        "m": 0.265,
+        "sd": 0.166671618974043,
+        "ci": 0.11549753936772851
+      },
+      "horizon": {
+        "n": 8,
+        "m": 7.75,
+        "sd": 11.597413504743201,
+        "ci": 8.036597538759795
+      },
+      "succes20": {
+        "n": 8,
+        "m": 0.5375000000000001,
+        "sd": 0.11259916264596032,
+        "ci": 0.07802723883362782
+      },
+      "verbindingen": {
+        "n": 8,
+        "m": 902.25,
+        "sd": 47.02203131056152,
+        "ci": 32.58460526076692
+      },
+      "actief": {
+        "n": 8,
+        "m": 167.25,
+        "sd": 117.01373545748501,
+        "ci": 81.08638171727728
+      },
+      "randdruk": {
+        "n": 8,
+        "m": 0.04659125782339687,
+        "sd": 0.0022640575197315663,
+        "ci": 0.0015689118166946142
+      },
+      "losgeraakt": {
+        "n": 8,
+        "m": 30.5,
+        "sd": 17.968225924034428,
+        "ci": 12.451345308841129
+      },
+      "meedoend": {
+        "n": 8,
+        "m": 26.25,
+        "sd": 17.95828499606797,
+        "ci": 12.444456597216288
+      },
+      "neuronenEind": {
+        "n": 8,
+        "m": 56.75,
+        "sd": 2.3754698783308417,
+        "ci": 1.6461166422826787
+      },
+      "tijdMs": {
+        "n": 8,
+        "m": 2987.375,
+        "sd": 128.69225473419692,
+        "ci": 89.17918268856246
+      },
+      "verzadigd": true
+    },
+    "s9-n16-d15-A": {
+      "neuronen": 16,
+      "dichtheid": 15,
+      "stand": "A",
+      "lr": 0.016,
+      "runs": 8,
+      "perZaad": [
+        {
+          "zaad": 1000,
+          "bench": 0.59,
+          "benchOpA": 0.59,
+          "horizon": 5,
+          "succes20": 0.6,
+          "verbindingen": 1226,
+          "actief": 106,
+          "randdruk": 0.04959761055899767,
+          "losgeraakt": 62,
+          "meedoend": 10,
+          "neuronenEind": 72,
+          "tijdMs": 3478
+        },
+        {
+          "zaad": 1001,
+          "bench": 0.544,
+          "benchOpA": 0.544,
+          "horizon": 6,
+          "succes20": 0.55,
+          "verbindingen": 1148,
+          "actief": 311,
+          "randdruk": 0.0495781045963807,
+          "losgeraakt": 7,
+          "meedoend": 59,
+          "neuronenEind": 66,
+          "tijdMs": 3276
+        },
+        {
+          "zaad": 1002,
+          "bench": 0.576,
+          "benchOpA": 0.576,
+          "horizon": 4,
+          "succes20": 0.8,
+          "verbindingen": 1157,
+          "actief": 119,
+          "randdruk": 0.05143078870152895,
+          "losgeraakt": 58,
+          "meedoend": 8,
+          "neuronenEind": 66,
+          "tijdMs": 3271
+        },
+        {
+          "zaad": 1003,
+          "bench": 0.468,
+          "benchOpA": 0.468,
+          "horizon": 5,
+          "succes20": 0.6,
+          "verbindingen": 1194,
+          "actief": 153,
+          "randdruk": 0.04750592052474451,
+          "losgeraakt": 60,
+          "meedoend": 10,
+          "neuronenEind": 70,
+          "tijdMs": 3604
+        },
+        {
+          "zaad": 1004,
+          "bench": 0.368,
+          "benchOpA": 0.368,
+          "horizon": 4,
+          "succes20": 0.65,
+          "verbindingen": 1162,
+          "actief": 189,
+          "randdruk": 0.04815462342067489,
+          "losgeraakt": 41,
+          "meedoend": 27,
+          "neuronenEind": 68,
+          "tijdMs": 3572
+        },
+        {
+          "zaad": 1005,
+          "bench": 0.486,
+          "benchOpA": 0.486,
+          "horizon": 2,
+          "succes20": 0.7,
+          "verbindingen": 1065,
+          "actief": 118,
+          "randdruk": 0.049757170910193334,
+          "losgeraakt": 55,
+          "meedoend": 7,
+          "neuronenEind": 62,
+          "tijdMs": 3259
+        },
+        {
+          "zaad": 1006,
+          "bench": 0.624,
+          "benchOpA": 0.624,
+          "horizon": 9,
+          "succes20": 0.8,
+          "verbindingen": 1259,
+          "actief": 176,
+          "randdruk": 0.05000352888917165,
+          "losgeraakt": 60,
+          "meedoend": 10,
+          "neuronenEind": 70,
+          "tijdMs": 3149
+        },
+        {
+          "zaad": 1007,
+          "bench": 0.474,
+          "benchOpA": 0.474,
+          "horizon": 18,
+          "succes20": 0.65,
+          "verbindingen": 1166,
+          "actief": 188,
+          "randdruk": 0.04938732076340034,
+          "losgeraakt": 52,
+          "meedoend": 14,
+          "neuronenEind": 66,
+          "tijdMs": 3514
+        }
+      ],
+      "bench": {
+        "n": 8,
+        "m": 0.51625,
+        "sd": 0.08314831842642914,
+        "ci": 0.05761884500751468
+      },
+      "horizon": {
+        "n": 8,
+        "m": 6.625,
+        "sd": 5.0124844139408555,
+        "ci": 3.473474485295667
+      },
+      "succes20": {
+        "n": 8,
+        "m": 0.66875,
+        "sd": 0.0923405962417707,
+        "ci": 0.06398876854573778
+      },
+      "verbindingen": {
+        "n": 8,
+        "m": 1172.125,
+        "sd": 57.761671671496096,
+        "ci": 40.02679633695407
+      },
+      "actief": {
+        "n": 8,
+        "m": 170,
+        "sd": 65.78319368523067,
+        "ci": 45.58542749607599
+      },
+      "randdruk": {
+        "n": 8,
+        "m": 0.049426883545636506,
+        "sd": 0.0011843968299421132,
+        "ci": 0.00082074512946656
+      },
+      "losgeraakt": {
+        "n": 8,
+        "m": 49.375,
+        "sd": 18.376518401792776,
+        "ci": 12.734277560976906
+      },
+      "meedoend": {
+        "n": 8,
+        "m": 18.125,
+        "sd": 17.69130133306035,
+        "ci": 12.259446357809148
+      },
+      "neuronenEind": {
+        "n": 8,
+        "m": 67.5,
+        "sd": 3.1622776601683795,
+        "ci": 2.191346617949794
+      },
+      "tijdMs": {
+        "n": 8,
+        "m": 3390.375,
+        "sd": 170.8959060781905,
+        "ci": 118.42482098360966
+      },
+      "verzadigd": false
+    },
+    "s9-n16-d35-A": {
+      "neuronen": 16,
+      "dichtheid": 35,
+      "stand": "A",
+      "lr": 0.016,
+      "runs": 8,
+      "perZaad": [
+        {
+          "zaad": 1000,
+          "bench": 0.59,
+          "benchOpA": 0.59,
+          "horizon": 5,
+          "succes20": 0.6,
+          "verbindingen": 1226,
+          "actief": 106,
+          "randdruk": 0.04959761055899767,
+          "losgeraakt": 62,
+          "meedoend": 10,
+          "neuronenEind": 72,
+          "tijdMs": 3481
+        },
+        {
+          "zaad": 1001,
+          "bench": 0.544,
+          "benchOpA": 0.544,
+          "horizon": 6,
+          "succes20": 0.55,
+          "verbindingen": 1148,
+          "actief": 311,
+          "randdruk": 0.0495781045963807,
+          "losgeraakt": 7,
+          "meedoend": 59,
+          "neuronenEind": 66,
+          "tijdMs": 3275
+        },
+        {
+          "zaad": 1002,
+          "bench": 0.576,
+          "benchOpA": 0.576,
+          "horizon": 4,
+          "succes20": 0.8,
+          "verbindingen": 1157,
+          "actief": 119,
+          "randdruk": 0.05143078870152895,
+          "losgeraakt": 58,
+          "meedoend": 8,
+          "neuronenEind": 66,
+          "tijdMs": 3264
+        },
+        {
+          "zaad": 1003,
+          "bench": 0.468,
+          "benchOpA": 0.468,
+          "horizon": 5,
+          "succes20": 0.6,
+          "verbindingen": 1194,
+          "actief": 153,
+          "randdruk": 0.04750592052474451,
+          "losgeraakt": 60,
+          "meedoend": 10,
+          "neuronenEind": 70,
+          "tijdMs": 3558
+        },
+        {
+          "zaad": 1004,
+          "bench": 0.576,
+          "benchOpA": 0.576,
+          "horizon": 10,
+          "succes20": 0.7,
+          "verbindingen": 1227,
+          "actief": 397,
+          "randdruk": 0.04929392214503197,
+          "losgeraakt": 6,
+          "meedoend": 64,
+          "neuronenEind": 70,
+          "tijdMs": 3434
+        },
+        {
+          "zaad": 1005,
+          "bench": 0.486,
+          "benchOpA": 0.486,
+          "horizon": 2,
+          "succes20": 0.7,
+          "verbindingen": 1065,
+          "actief": 118,
+          "randdruk": 0.049757170910193334,
+          "losgeraakt": 55,
+          "meedoend": 7,
+          "neuronenEind": 62,
+          "tijdMs": 3255
+        },
+        {
+          "zaad": 1006,
+          "bench": 0.618,
+          "benchOpA": 0.618,
+          "horizon": 8,
+          "succes20": 0.85,
+          "verbindingen": 1071,
+          "actief": 180,
+          "randdruk": 0.04881232506349895,
+          "losgeraakt": 28,
+          "meedoend": 30,
+          "neuronenEind": 58,
+          "tijdMs": 2904
+        },
+        {
+          "zaad": 1007,
+          "bench": 0.474,
+          "benchOpA": 0.474,
+          "horizon": 18,
+          "succes20": 0.65,
+          "verbindingen": 1166,
+          "actief": 188,
+          "randdruk": 0.04938732076340034,
+          "losgeraakt": 52,
+          "meedoend": 14,
+          "neuronenEind": 66,
+          "tijdMs": 3521
+        }
+      ],
+      "bench": {
+        "n": 8,
+        "m": 0.5415,
+        "sd": 0.058100897460489236,
+        "ci": 0.04026186781558947
+      },
+      "horizon": {
+        "n": 8,
+        "m": 7.25,
+        "sd": 4.978525312350464,
+        "ci": 3.4499420284984494
+      },
+      "succes20": {
+        "n": 8,
+        "m": 0.68125,
+        "sd": 0.10329396331413979,
+        "ci": 0.07157906467676145
+      },
+      "verbindingen": {
+        "n": 8,
+        "m": 1156.75,
+        "sd": 62.165102750659074,
+        "ci": 43.07821839398654
+      },
+      "actief": {
+        "n": 8,
+        "m": 196.5,
+        "sd": 104.13315651469654,
+        "ci": 72.16059589554398
+      },
+      "randdruk": {
+        "n": 8,
+        "m": 0.04942039540797206,
+        "sd": 0.001086503525221123,
+        "ci": 0.0007529085302576061
+      },
+      "losgeraakt": {
+        "n": 8,
+        "m": 41,
+        "sd": 23.77874200685502,
+        "ci": 16.477827526709945
+      },
+      "meedoend": {
+        "n": 8,
+        "m": 25.25,
+        "sd": 23.559953917005622,
+        "ci": 16.32621511557409
+      },
+      "neuronenEind": {
+        "n": 8,
+        "m": 66.25,
+        "sd": 4.590362575159894,
+        "ci": 3.1809589749004936
+      },
+      "tijdMs": {
+        "n": 8,
+        "m": 3336.5,
+        "sd": 212.54444913274696,
+        "ci": 147.2857888596181
+      },
+      "verzadigd": false
+    },
+    "s9-n16-d70-A": {
+      "neuronen": 16,
+      "dichtheid": 70,
+      "stand": "A",
+      "lr": 0.016,
+      "runs": 8,
+      "perZaad": [
+        {
+          "zaad": 1000,
+          "bench": 0.59,
+          "benchOpA": 0.59,
+          "horizon": 5,
+          "succes20": 0.6,
+          "verbindingen": 1226,
+          "actief": 106,
+          "randdruk": 0.04959761055899767,
+          "losgeraakt": 62,
+          "meedoend": 10,
+          "neuronenEind": 72,
+          "tijdMs": 3480
+        },
+        {
+          "zaad": 1001,
+          "bench": 0.544,
+          "benchOpA": 0.544,
+          "horizon": 6,
+          "succes20": 0.55,
+          "verbindingen": 1148,
+          "actief": 311,
+          "randdruk": 0.0495781045963807,
+          "losgeraakt": 7,
+          "meedoend": 59,
+          "neuronenEind": 66,
+          "tijdMs": 3311
+        },
+        {
+          "zaad": 1002,
+          "bench": 0.576,
+          "benchOpA": 0.576,
+          "horizon": 4,
+          "succes20": 0.8,
+          "verbindingen": 1157,
+          "actief": 119,
+          "randdruk": 0.05143078870152895,
+          "losgeraakt": 58,
+          "meedoend": 8,
+          "neuronenEind": 66,
+          "tijdMs": 3284
+        },
+        {
+          "zaad": 1003,
+          "bench": 0.468,
+          "benchOpA": 0.468,
+          "horizon": 5,
+          "succes20": 0.6,
+          "verbindingen": 1194,
+          "actief": 153,
+          "randdruk": 0.04750592052474451,
+          "losgeraakt": 60,
+          "meedoend": 10,
+          "neuronenEind": 70,
+          "tijdMs": 3558
+        },
+        {
+          "zaad": 1004,
+          "bench": 0.576,
+          "benchOpA": 0.576,
+          "horizon": 10,
+          "succes20": 0.7,
+          "verbindingen": 1227,
+          "actief": 397,
+          "randdruk": 0.04929392214503197,
+          "losgeraakt": 6,
+          "meedoend": 64,
+          "neuronenEind": 70,
+          "tijdMs": 3443
+        },
+        {
+          "zaad": 1005,
+          "bench": 0.486,
+          "benchOpA": 0.486,
+          "horizon": 2,
+          "succes20": 0.7,
+          "verbindingen": 1065,
+          "actief": 118,
+          "randdruk": 0.049757170910193334,
+          "losgeraakt": 55,
+          "meedoend": 7,
+          "neuronenEind": 62,
+          "tijdMs": 3274
+        },
+        {
+          "zaad": 1006,
+          "bench": 0.618,
+          "benchOpA": 0.618,
+          "horizon": 8,
+          "succes20": 0.85,
+          "verbindingen": 1071,
+          "actief": 180,
+          "randdruk": 0.04881232506349895,
+          "losgeraakt": 28,
+          "meedoend": 30,
+          "neuronenEind": 58,
+          "tijdMs": 2914
+        },
+        {
+          "zaad": 1007,
+          "bench": 0.474,
+          "benchOpA": 0.474,
+          "horizon": 18,
+          "succes20": 0.65,
+          "verbindingen": 1166,
+          "actief": 188,
+          "randdruk": 0.04938732076340034,
+          "losgeraakt": 52,
+          "meedoend": 14,
+          "neuronenEind": 66,
+          "tijdMs": 3556
+        }
+      ],
+      "bench": {
+        "n": 8,
+        "m": 0.5415,
+        "sd": 0.058100897460489236,
+        "ci": 0.04026186781558947
+      },
+      "horizon": {
+        "n": 8,
+        "m": 7.25,
+        "sd": 4.978525312350464,
+        "ci": 3.4499420284984494
+      },
+      "succes20": {
+        "n": 8,
+        "m": 0.68125,
+        "sd": 0.10329396331413979,
+        "ci": 0.07157906467676145
+      },
+      "verbindingen": {
+        "n": 8,
+        "m": 1156.75,
+        "sd": 62.165102750659074,
+        "ci": 43.07821839398654
+      },
+      "actief": {
+        "n": 8,
+        "m": 196.5,
+        "sd": 104.13315651469654,
+        "ci": 72.16059589554398
+      },
+      "randdruk": {
+        "n": 8,
+        "m": 0.04942039540797206,
+        "sd": 0.001086503525221123,
+        "ci": 0.0007529085302576061
+      },
+      "losgeraakt": {
+        "n": 8,
+        "m": 41,
+        "sd": 23.77874200685502,
+        "ci": 16.477827526709945
+      },
+      "meedoend": {
+        "n": 8,
+        "m": 25.25,
+        "sd": 23.559953917005622,
+        "ci": 16.32621511557409
+      },
+      "neuronenEind": {
+        "n": 8,
+        "m": 66.25,
+        "sd": 4.590362575159894,
+        "ci": 3.1809589749004936
+      },
+      "tijdMs": {
+        "n": 8,
+        "m": 3352.5,
+        "sd": 211.43996108318112,
+        "ci": 146.52041768982232
+      },
+      "verzadigd": true
+    },
+    "s9-n30-d15-A": {
+      "neuronen": 30,
+      "dichtheid": 15,
+      "stand": "A",
+      "lr": 0.016,
+      "runs": 8,
+      "perZaad": [
+        {
+          "zaad": 1000,
+          "bench": 0.41,
+          "benchOpA": 0.41,
+          "horizon": 3,
+          "succes20": 0.6,
+          "verbindingen": 1238,
+          "actief": 230,
+          "randdruk": 0.05027885838633295,
+          "losgeraakt": 38,
+          "meedoend": 36,
+          "neuronenEind": 74,
+          "tijdMs": 4189
+        },
+        {
+          "zaad": 1001,
+          "bench": 0.456,
+          "benchOpA": 0.456,
+          "horizon": 2,
+          "succes20": 0.75,
+          "verbindingen": 1211,
+          "actief": 194,
+          "randdruk": 0.051167140430370905,
+          "losgeraakt": 45,
+          "meedoend": 27,
+          "neuronenEind": 72,
+          "tijdMs": 3931
+        },
+        {
+          "zaad": 1002,
+          "bench": 0.182,
+          "benchOpA": 0.182,
+          "horizon": 2,
+          "succes20": 0.45,
+          "verbindingen": 1269,
+          "actief": 183,
+          "randdruk": 0.047891145514397604,
+          "losgeraakt": 51,
+          "meedoend": 25,
+          "neuronenEind": 76,
+          "tijdMs": 4446
+        },
+        {
+          "zaad": 1003,
+          "bench": 0.548,
+          "benchOpA": 0.548,
+          "horizon": 22,
+          "succes20": 0.8,
+          "verbindingen": 1299,
+          "actief": 361,
+          "randdruk": 0.050272714430239555,
+          "losgeraakt": 8,
+          "meedoend": 72,
+          "neuronenEind": 80,
+          "tijdMs": 3859
+        },
+        {
+          "zaad": 1004,
+          "bench": 0.232,
+          "benchOpA": 0.232,
+          "horizon": 3,
+          "succes20": 0.6,
+          "verbindingen": 1307,
+          "actief": 138,
+          "randdruk": 0.04916017161232085,
+          "losgeraakt": 67,
+          "meedoend": 11,
+          "neuronenEind": 78,
+          "tijdMs": 4330
+        },
+        {
+          "zaad": 1005,
+          "bench": 0.36,
+          "benchOpA": 0.36,
+          "horizon": 3,
+          "succes20": 0.7,
+          "verbindingen": 1392,
+          "actief": 327,
+          "randdruk": 0.049375490496249876,
+          "losgeraakt": 24,
+          "meedoend": 62,
+          "neuronenEind": 86,
+          "tijdMs": 4435
+        },
+        {
+          "zaad": 1006,
+          "bench": 0.264,
+          "benchOpA": 0.264,
+          "horizon": 3,
+          "succes20": 0.5,
+          "verbindingen": 1318,
+          "actief": 96,
+          "randdruk": 0.04750081006319535,
+          "losgeraakt": 72,
+          "meedoend": 10,
+          "neuronenEind": 82,
+          "tijdMs": 4636
+        },
+        {
+          "zaad": 1007,
+          "bench": 0.276,
+          "benchOpA": 0.276,
+          "horizon": 6,
+          "succes20": 0.7,
+          "verbindingen": 1390,
+          "actief": 143,
+          "randdruk": 0.04786129883580955,
+          "losgeraakt": 65,
+          "meedoend": 19,
+          "neuronenEind": 84,
+          "tijdMs": 4454
+        }
+      ],
+      "bench": {
+        "n": 8,
+        "m": 0.34099999999999997,
+        "sd": 0.12450588052664133,
+        "ci": 0.08627817336963038
+      },
+      "horizon": {
+        "n": 8,
+        "m": 5.5,
+        "sd": 6.782329983125268,
+        "ci": 4.699914892846465
+      },
+      "succes20": {
+        "n": 8,
+        "m": 0.6375000000000001,
+        "sd": 0.12174328963613794,
+        "ci": 0.08436379555235764
+      },
+      "verbindingen": {
+        "n": 8,
+        "m": 1303,
+        "sd": 65.0186786349013,
+        "ci": 45.055645595197056
+      },
+      "actief": {
+        "n": 8,
+        "m": 209,
+        "sd": 92.99462350050136,
+        "ci": 64.4419863132725
+      },
+      "randdruk": {
+        "n": 8,
+        "m": 0.04918845372111458,
+        "sd": 0.001342070741935752,
+        "ci": 0.0009300075760057346
+      },
+      "losgeraakt": {
+        "n": 8,
+        "m": 46.25,
+        "sd": 22.346300428866137,
+        "ci": 15.485196156329438
+      },
+      "meedoend": {
+        "n": 8,
+        "m": 32.75,
+        "sd": 22.92690247597475,
+        "ci": 15.887532848117102
+      },
+      "neuronenEind": {
+        "n": 8,
+        "m": 79,
+        "sd": 4.898979485566356,
+        "ci": 3.394819582834999
+      },
+      "tijdMs": {
+        "n": 8,
+        "m": 4285,
+        "sd": 272.086120819966,
+        "ci": 188.54606227656942
+      },
+      "verzadigd": false
+    },
+    "s9-n30-d35-A": {
+      "neuronen": 30,
+      "dichtheid": 35,
+      "stand": "A",
+      "lr": 0.016,
+      "runs": 8,
+      "perZaad": [
+        {
+          "zaad": 1000,
+          "bench": 0.566,
+          "benchOpA": 0.566,
+          "horizon": 20,
+          "succes20": 0.85,
+          "verbindingen": 1778,
+          "actief": 606,
+          "randdruk": 0.048812059361631806,
+          "losgeraakt": 9,
+          "meedoend": 75,
+          "neuronenEind": 84,
+          "tijdMs": 4545
+        },
+        {
+          "zaad": 1001,
+          "bench": 0.536,
+          "benchOpA": 0.536,
+          "horizon": 3,
+          "succes20": 0.6,
+          "verbindingen": 1712,
+          "actief": 490,
+          "randdruk": 0.0490243409190423,
+          "losgeraakt": 15,
+          "meedoend": 67,
+          "neuronenEind": 82,
+          "tijdMs": 4822
+        },
+        {
+          "zaad": 1002,
+          "bench": 0.608,
+          "benchOpA": 0.608,
+          "horizon": 13,
+          "succes20": 0.6,
+          "verbindingen": 1693,
+          "actief": 761,
+          "randdruk": 0.05106209714559902,
+          "losgeraakt": 1,
+          "meedoend": 79,
+          "neuronenEind": 80,
+          "tijdMs": 4435
+        },
+        {
+          "zaad": 1003,
+          "bench": 0.66,
+          "benchOpA": 0.66,
+          "horizon": 13,
+          "succes20": 0.65,
+          "verbindingen": 1815,
+          "actief": 665,
+          "randdruk": 0.0499445622503498,
+          "losgeraakt": 5,
+          "meedoend": 87,
+          "neuronenEind": 92,
+          "tijdMs": 4584
+        },
+        {
+          "zaad": 1004,
+          "bench": 0.398,
+          "benchOpA": 0.398,
+          "horizon": 6,
+          "succes20": 0.75,
+          "verbindingen": 1895,
+          "actief": 736,
+          "randdruk": 0.04907725406810641,
+          "losgeraakt": 2,
+          "meedoend": 86,
+          "neuronenEind": 88,
+          "tijdMs": 5091
+        },
+        {
+          "zaad": 1005,
+          "bench": 0.646,
+          "benchOpA": 0.646,
+          "horizon": 28,
+          "succes20": 0.8,
+          "verbindingen": 1640,
+          "actief": 446,
+          "randdruk": 0.049858215017735436,
+          "losgeraakt": 14,
+          "meedoend": 68,
+          "neuronenEind": 82,
+          "tijdMs": 4229
+        },
+        {
+          "zaad": 1006,
+          "bench": 0.6,
+          "benchOpA": 0.6,
+          "horizon": 7,
+          "succes20": 0.75,
+          "verbindingen": 1736,
+          "actief": 480,
+          "randdruk": 0.04865311590592808,
+          "losgeraakt": 10,
+          "meedoend": 66,
+          "neuronenEind": 76,
+          "tijdMs": 4863
+        },
+        {
+          "zaad": 1007,
+          "bench": 0.652,
+          "benchOpA": 0.652,
+          "horizon": 15,
+          "succes20": 0.7,
+          "verbindingen": 1784,
+          "actief": 439,
+          "randdruk": 0.051089984818722955,
+          "losgeraakt": 24,
+          "meedoend": 58,
+          "neuronenEind": 82,
+          "tijdMs": 4539
+        }
+      ],
+      "bench": {
+        "n": 8,
+        "m": 0.58325,
+        "sd": 0.0864337070493087,
+        "ci": 0.05989550317010451
+      },
+      "horizon": {
+        "n": 8,
+        "m": 13.125,
+        "sd": 8.131727983645296,
+        "ci": 5.635
+      },
+      "succes20": {
+        "n": 8,
+        "m": 0.7125,
+        "sd": 0.09161253813129044,
+        "ci": 0.06348425001525969
+      },
+      "verbindingen": {
+        "n": 8,
+        "m": 1756.625,
+        "sd": 79.12727089948193,
+        "ci": 54.832401233212465
+      },
+      "actief": {
+        "n": 8,
+        "m": 577.875,
+        "sd": 131.4201957734916,
+        "ci": 91.06954938397355
+      },
+      "randdruk": {
+        "n": 8,
+        "m": 0.04969020368588948,
+        "sd": 0.00097102110815356,
+        "ci": 0.000672883298045645
+      },
+      "losgeraakt": {
+        "n": 8,
+        "m": 10,
+        "sd": 7.634508123364221,
+        "ci": 5.290444215753531
+      },
+      "meedoend": {
+        "n": 8,
+        "m": 73.25,
+        "sd": 10.278271116430872,
+        "ci": 7.122478501196054
+      },
+      "neuronenEind": {
+        "n": 8,
+        "m": 83.25,
+        "sd": 4.891683905218266,
+        "ci": 3.38976400358491
+      },
+      "tijdMs": {
+        "n": 8,
+        "m": 4638.5,
+        "sd": 272.4345268657617,
+        "ci": 188.78749534860617
+      },
+      "verzadigd": false
+    },
+    "s9-n30-d70-A": {
+      "neuronen": 30,
+      "dichtheid": 70,
+      "stand": "A",
+      "lr": 0.016,
+      "runs": 8,
+      "perZaad": [
+        {
+          "zaad": 1000,
+          "bench": 0.566,
+          "benchOpA": 0.566,
+          "horizon": 20,
+          "succes20": 0.85,
+          "verbindingen": 1778,
+          "actief": 606,
+          "randdruk": 0.048812059361631806,
+          "losgeraakt": 9,
+          "meedoend": 75,
+          "neuronenEind": 84,
+          "tijdMs": 4586
+        },
+        {
+          "zaad": 1001,
+          "bench": 0.536,
+          "benchOpA": 0.536,
+          "horizon": 3,
+          "succes20": 0.6,
+          "verbindingen": 1712,
+          "actief": 490,
+          "randdruk": 0.0490243409190423,
+          "losgeraakt": 15,
+          "meedoend": 67,
+          "neuronenEind": 82,
+          "tijdMs": 4814
+        },
+        {
+          "zaad": 1002,
+          "bench": 0.608,
+          "benchOpA": 0.608,
+          "horizon": 13,
+          "succes20": 0.6,
+          "verbindingen": 1693,
+          "actief": 761,
+          "randdruk": 0.05106209714559902,
+          "losgeraakt": 1,
+          "meedoend": 79,
+          "neuronenEind": 80,
+          "tijdMs": 4434
+        },
+        {
+          "zaad": 1003,
+          "bench": 0.66,
+          "benchOpA": 0.66,
+          "horizon": 13,
+          "succes20": 0.65,
+          "verbindingen": 1815,
+          "actief": 665,
+          "randdruk": 0.0499445622503498,
+          "losgeraakt": 5,
+          "meedoend": 87,
+          "neuronenEind": 92,
+          "tijdMs": 4576
+        },
+        {
+          "zaad": 1004,
+          "bench": 0.398,
+          "benchOpA": 0.398,
+          "horizon": 6,
+          "succes20": 0.75,
+          "verbindingen": 1895,
+          "actief": 736,
+          "randdruk": 0.04907725406810641,
+          "losgeraakt": 2,
+          "meedoend": 86,
+          "neuronenEind": 88,
+          "tijdMs": 5078
+        },
+        {
+          "zaad": 1005,
+          "bench": 0.646,
+          "benchOpA": 0.646,
+          "horizon": 28,
+          "succes20": 0.8,
+          "verbindingen": 1640,
+          "actief": 446,
+          "randdruk": 0.049858215017735436,
+          "losgeraakt": 14,
+          "meedoend": 68,
+          "neuronenEind": 82,
+          "tijdMs": 4207
+        },
+        {
+          "zaad": 1006,
+          "bench": 0.6,
+          "benchOpA": 0.6,
+          "horizon": 7,
+          "succes20": 0.75,
+          "verbindingen": 1736,
+          "actief": 480,
+          "randdruk": 0.04865311590592808,
+          "losgeraakt": 10,
+          "meedoend": 66,
+          "neuronenEind": 76,
+          "tijdMs": 4804
+        },
+        {
+          "zaad": 1007,
+          "bench": 0.652,
+          "benchOpA": 0.652,
+          "horizon": 15,
+          "succes20": 0.7,
+          "verbindingen": 1784,
+          "actief": 439,
+          "randdruk": 0.051089984818722955,
+          "losgeraakt": 24,
+          "meedoend": 58,
+          "neuronenEind": 82,
+          "tijdMs": 4516
+        }
+      ],
+      "bench": {
+        "n": 8,
+        "m": 0.58325,
+        "sd": 0.0864337070493087,
+        "ci": 0.05989550317010451
+      },
+      "horizon": {
+        "n": 8,
+        "m": 13.125,
+        "sd": 8.131727983645296,
+        "ci": 5.635
+      },
+      "succes20": {
+        "n": 8,
+        "m": 0.7125,
+        "sd": 0.09161253813129044,
+        "ci": 0.06348425001525969
+      },
+      "verbindingen": {
+        "n": 8,
+        "m": 1756.625,
+        "sd": 79.12727089948193,
+        "ci": 54.832401233212465
+      },
+      "actief": {
+        "n": 8,
+        "m": 577.875,
+        "sd": 131.4201957734916,
+        "ci": 91.06954938397355
+      },
+      "randdruk": {
+        "n": 8,
+        "m": 0.04969020368588948,
+        "sd": 0.00097102110815356,
+        "ci": 0.000672883298045645
+      },
+      "losgeraakt": {
+        "n": 8,
+        "m": 10,
+        "sd": 7.634508123364221,
+        "ci": 5.290444215753531
+      },
+      "meedoend": {
+        "n": 8,
+        "m": 73.25,
+        "sd": 10.278271116430872,
+        "ci": 7.122478501196054
+      },
+      "neuronenEind": {
+        "n": 8,
+        "m": 83.25,
+        "sd": 4.891683905218266,
+        "ci": 3.38976400358491
+      },
+      "tijdMs": {
+        "n": 8,
+        "m": 4626.875,
+        "sd": 267.2481123814134,
+        "ci": 185.19349347371792
+      },
+      "verzadigd": true
+    },
+    "s9-n60-d15-A": {
+      "neuronen": 60,
+      "dichtheid": 15,
+      "stand": "A",
+      "lr": 0.004,
+      "runs": 8,
+      "perZaad": [
+        {
+          "zaad": 1000,
+          "bench": 0.346,
+          "benchOpA": 0.346,
+          "horizon": 16,
+          "succes20": 0.55,
+          "verbindingen": 1766,
+          "actief": 517,
+          "randdruk": 0.05527105025818813,
+          "losgeraakt": 32,
+          "meedoend": 72,
+          "neuronenEind": 104,
+          "tijdMs": 6169
+        },
+        {
+          "zaad": 1001,
+          "bench": 0.52,
+          "benchOpA": 0.52,
+          "horizon": 14,
+          "succes20": 0.7,
+          "verbindingen": 1947,
+          "actief": 454,
+          "randdruk": 0.0545518302749907,
+          "losgeraakt": 61,
+          "meedoend": 55,
+          "neuronenEind": 116,
+          "tijdMs": 6286
+        },
+        {
+          "zaad": 1002,
+          "bench": 0.236,
+          "benchOpA": 0.236,
+          "horizon": 7,
+          "succes20": 0.55,
+          "verbindingen": 1720,
+          "actief": 827,
+          "randdruk": 0.05437687319049579,
+          "losgeraakt": 9,
+          "meedoend": 95,
+          "neuronenEind": 104,
+          "tijdMs": 6273
+        },
+        {
+          "zaad": 1003,
+          "bench": 0.3,
+          "benchOpA": 0.3,
+          "horizon": 4,
+          "succes20": 0.55,
+          "verbindingen": 1685,
+          "actief": 800,
+          "randdruk": 0.05397877621178402,
+          "losgeraakt": 6,
+          "meedoend": 98,
+          "neuronenEind": 104,
+          "tijdMs": 6279
+        },
+        {
+          "zaad": 1004,
+          "bench": 0.144,
+          "benchOpA": 0.144,
+          "horizon": 2,
+          "succes20": 0.4,
+          "verbindingen": 1775,
+          "actief": 916,
+          "randdruk": 0.05472043357579641,
+          "losgeraakt": 3,
+          "meedoend": 103,
+          "neuronenEind": 106,
+          "tijdMs": 6721
+        },
+        {
+          "zaad": 1005,
+          "bench": 0.172,
+          "benchOpA": 0.172,
+          "horizon": 2,
+          "succes20": 0.5,
+          "verbindingen": 1877,
+          "actief": 920,
+          "randdruk": 0.05311288117182644,
+          "losgeraakt": 10,
+          "meedoend": 104,
+          "neuronenEind": 114,
+          "tijdMs": 6937
+        },
+        {
+          "zaad": 1006,
+          "bench": 0.112,
+          "benchOpA": 0.112,
+          "horizon": 0,
+          "succes20": 0.3,
+          "verbindingen": 1717,
+          "actief": 678,
+          "randdruk": 0.05406330802984408,
+          "losgeraakt": 15,
+          "meedoend": 87,
+          "neuronenEind": 102,
+          "tijdMs": 6459
+        },
+        {
+          "zaad": 1007,
+          "bench": 0.254,
+          "benchOpA": 0.254,
+          "horizon": 5,
+          "succes20": 0.55,
+          "verbindingen": 1869,
+          "actief": 955,
+          "randdruk": 0.054446841923500286,
+          "losgeraakt": 5,
+          "meedoend": 103,
+          "neuronenEind": 108,
+          "tijdMs": 6690
+        }
+      ],
+      "bench": {
+        "n": 8,
+        "m": 0.26049999999999995,
+        "sd": 0.13109974392477985,
+        "ci": 0.09084748758221108
+      },
+      "horizon": {
+        "n": 8,
+        "m": 6.25,
+        "sd": 5.8248237251071755,
+        "ci": 4.036396908134778
+      },
+      "succes20": {
+        "n": 8,
+        "m": 0.5125,
+        "sd": 0.11877349391654207,
+        "ci": 0.08230583211413392
+      },
+      "verbindingen": {
+        "n": 8,
+        "m": 1794.5,
+        "sd": 92.85318672891246,
+        "ci": 64.34397563097885
+      },
+      "actief": {
+        "n": 8,
+        "m": 758.375,
+        "sd": 190.27719441458484,
+        "ci": 131.8553685861899
+      },
+      "randdruk": {
+        "n": 8,
+        "m": 0.054315249329553235,
+        "sd": 0.0006298743760853135,
+        "ci": 0.0004364806737730594
+      },
+      "losgeraakt": {
+        "n": 8,
+        "m": 17.625,
+        "sd": 19.76965568021572,
+        "ci": 13.69967244133961
+      },
+      "meedoend": {
+        "n": 8,
+        "m": 89.625,
+        "sd": 17.646832981748148,
+        "ci": 12.228631362503325
+      },
+      "neuronenEind": {
+        "n": 8,
+        "m": 107.25,
+        "sd": 5.11998883927355,
+        "ci": 3.5479712512927724
+      },
+      "tijdMs": {
+        "n": 8,
+        "m": 6476.75,
+        "sd": 274.900891231731,
+        "ci": 190.49659865729885
+      },
+      "verzadigd": false
+    },
+    "s9-n60-d35-A": {
+      "neuronen": 60,
+      "dichtheid": 35,
+      "stand": "A",
+      "lr": 0.004,
+      "runs": 8,
+      "perZaad": [
+        {
+          "zaad": 1000,
+          "bench": 0.664,
+          "benchOpA": 0.664,
+          "horizon": 23,
+          "succes20": 0.85,
+          "verbindingen": 3125,
+          "actief": 1801,
+          "randdruk": 0.05722581522721797,
+          "losgeraakt": 3,
+          "meedoend": 109,
+          "neuronenEind": 112,
+          "tijdMs": 7936
+        },
+        {
+          "zaad": 1001,
+          "bench": 0.636,
+          "benchOpA": 0.636,
+          "horizon": 14,
+          "succes20": 0.85,
+          "verbindingen": 3011,
+          "actief": 1788,
+          "randdruk": 0.05726882014362907,
+          "losgeraakt": 0,
+          "meedoend": 104,
+          "neuronenEind": 104,
+          "tijdMs": 7905
+        },
+        {
+          "zaad": 1002,
+          "bench": 0.668,
+          "benchOpA": 0.668,
+          "horizon": 27,
+          "succes20": 0.8,
+          "verbindingen": 3060,
+          "actief": 1588,
+          "randdruk": 0.05715200617735189,
+          "losgeraakt": 11,
+          "meedoend": 97,
+          "neuronenEind": 108,
+          "tijdMs": 8032
+        },
+        {
+          "zaad": 1003,
+          "bench": 0.64,
+          "benchOpA": 0.64,
+          "horizon": 17,
+          "succes20": 1,
+          "verbindingen": 2989,
+          "actief": 1622,
+          "randdruk": 0.05700892903237755,
+          "losgeraakt": 1,
+          "meedoend": 107,
+          "neuronenEind": 108,
+          "tijdMs": 8243
+        },
+        {
+          "zaad": 1004,
+          "bench": 0.672,
+          "benchOpA": 0.672,
+          "horizon": 14,
+          "succes20": 0.95,
+          "verbindingen": 3036,
+          "actief": 1306,
+          "randdruk": 0.05734232635881779,
+          "losgeraakt": 11,
+          "meedoend": 97,
+          "neuronenEind": 108,
+          "tijdMs": 8427
+        },
+        {
+          "zaad": 1005,
+          "bench": 0.536,
+          "benchOpA": 0.536,
+          "horizon": 15,
+          "succes20": 0.8,
+          "verbindingen": 3068,
+          "actief": 1708,
+          "randdruk": 0.05604952729813757,
+          "losgeraakt": 7,
+          "meedoend": 105,
+          "neuronenEind": 112,
+          "tijdMs": 9208
+        },
+        {
+          "zaad": 1006,
+          "bench": 0.636,
+          "benchOpA": 0.636,
+          "horizon": 35,
+          "succes20": 0.8,
+          "verbindingen": 3095,
+          "actief": 1635,
+          "randdruk": 0.05609764038283838,
+          "losgeraakt": 5,
+          "meedoend": 109,
+          "neuronenEind": 114,
+          "tijdMs": 9318
+        },
+        {
+          "zaad": 1007,
+          "bench": 0.706,
+          "benchOpA": 0.706,
+          "horizon": 34,
+          "succes20": 0.75,
+          "verbindingen": 3215,
+          "actief": 1778,
+          "randdruk": 0.057981185372047994,
+          "losgeraakt": 4,
+          "meedoend": 114,
+          "neuronenEind": 118,
+          "tijdMs": 8182
+        }
+      ],
+      "bench": {
+        "n": 8,
+        "m": 0.6447499999999999,
+        "sd": 0.049867682062491266,
+        "ci": 0.03455654062547348
+      },
+      "horizon": {
+        "n": 8,
+        "m": 22.375,
+        "sd": 8.782084035125148,
+        "ci": 6.085673750703368
+      },
+      "succes20": {
+        "n": 8,
+        "m": 0.85,
+        "sd": 0.08451542547285164,
+        "ci": 0.05856620185738527
+      },
+      "verbindingen": {
+        "n": 8,
+        "m": 3074.875,
+        "sd": 71.50112386729117,
+        "ci": 49.54775095804046
+      },
+      "actief": {
+        "n": 8,
+        "m": 1653.25,
+        "sd": 162.43570156482576,
+        "ci": 112.56219836161692
+      },
+      "randdruk": {
+        "n": 8,
+        "m": 0.05701578124905227,
+        "sd": 0.0006482959328000403,
+        "ci": 0.0004492461612925954
+      },
+      "losgeraakt": {
+        "n": 8,
+        "m": 5.25,
+        "sd": 4.166190448976482,
+        "ci": 2.887022687822179
+      },
+      "meedoend": {
+        "n": 8,
+        "m": 105.25,
+        "sd": 5.922113522335465,
+        "ci": 4.103815297987959
+      },
+      "neuronenEind": {
+        "n": 8,
+        "m": 110.5,
+        "sd": 4.375255094603872,
+        "ci": 3.03189709587908
+      },
+      "tijdMs": {
+        "n": 8,
+        "m": 8406.375,
+        "sd": 555.9945882316276,
+        "ci": 385.2845927687739
+      },
+      "verzadigd": false
+    },
+    "s9-n60-d70-A": {
+      "neuronen": 60,
+      "dichtheid": 70,
+      "stand": "A",
+      "lr": 0.004,
+      "runs": 8,
+      "perZaad": [
+        {
+          "zaad": 1000,
+          "bench": 0.726,
+          "benchOpA": 0.726,
+          "horizon": 18,
+          "succes20": 0.9,
+          "verbindingen": 4048,
+          "actief": 2201,
+          "randdruk": 0.05712221292638219,
+          "losgeraakt": 1,
+          "meedoend": 115,
+          "neuronenEind": 116,
+          "tijdMs": 9553
+        },
+        {
+          "zaad": 1001,
+          "bench": 0.692,
+          "benchOpA": 0.692,
+          "horizon": 14,
+          "succes20": 0.9,
+          "verbindingen": 3920,
+          "actief": 2134,
+          "randdruk": 0.05733212595455092,
+          "losgeraakt": 3,
+          "meedoend": 105,
+          "neuronenEind": 108,
+          "tijdMs": 9338
+        },
+        {
+          "zaad": 1002,
+          "bench": 0.666,
+          "benchOpA": 0.666,
+          "horizon": 30,
+          "succes20": 1,
+          "verbindingen": 3894,
+          "actief": 2421,
+          "randdruk": 0.05847473691661289,
+          "losgeraakt": 1,
+          "meedoend": 109,
+          "neuronenEind": 110,
+          "tijdMs": 9403
+        },
+        {
+          "zaad": 1003,
+          "bench": 0.688,
+          "benchOpA": 0.688,
+          "horizon": 27,
+          "succes20": 0.9,
+          "verbindingen": 3569,
+          "actief": 2125,
+          "randdruk": 0.05785113023773994,
+          "losgeraakt": 0,
+          "meedoend": 108,
+          "neuronenEind": 108,
+          "tijdMs": 8017
+        },
+        {
+          "zaad": 1004,
+          "bench": 0.712,
+          "benchOpA": 0.712,
+          "horizon": 11,
+          "succes20": 0.9,
+          "verbindingen": 4220,
+          "actief": 2248,
+          "randdruk": 0.05738286221197418,
+          "losgeraakt": 6,
+          "meedoend": 112,
+          "neuronenEind": 118,
+          "tijdMs": 10156
+        },
+        {
+          "zaad": 1005,
+          "bench": 0.698,
+          "benchOpA": 0.698,
+          "horizon": 8,
+          "succes20": 1,
+          "verbindingen": 3368,
+          "actief": 1983,
+          "randdruk": 0.058178331414346154,
+          "losgeraakt": 1,
+          "meedoend": 109,
+          "neuronenEind": 110,
+          "tijdMs": 8305
+        },
+        {
+          "zaad": 1006,
+          "bench": 0.758,
+          "benchOpA": 0.758,
+          "horizon": 25,
+          "succes20": 0.95,
+          "verbindingen": 4360,
+          "actief": 2414,
+          "randdruk": 0.05760306000650525,
+          "losgeraakt": 1,
+          "meedoend": 111,
+          "neuronenEind": 112,
+          "tijdMs": 9930
+        },
+        {
+          "zaad": 1007,
+          "bench": 0.544,
+          "benchOpA": 0.544,
+          "horizon": 12,
+          "succes20": 0.65,
+          "verbindingen": 4028,
+          "actief": 2240,
+          "randdruk": 0.05706751580517578,
+          "losgeraakt": 8,
+          "meedoend": 106,
+          "neuronenEind": 114,
+          "tijdMs": 11285
+        }
+      ],
+      "bench": {
+        "n": 8,
+        "m": 0.6855,
+        "sd": 0.0634777801394202,
+        "ci": 0.043987857415427704
+      },
+      "horizon": {
+        "n": 8,
+        "m": 18.125,
+        "sd": 8.236460751699465,
+        "ci": 5.707576105493469
+      },
+      "succes20": {
+        "n": 8,
+        "m": 0.9,
+        "sd": 0.11019463300386793,
+        "ci": 0.07636098480244999
+      },
+      "verbindingen": {
+        "n": 8,
+        "m": 3925.875,
+        "sd": 325.1269806882052,
+        "ci": 225.30150293551083
+      },
+      "actief": {
+        "n": 8,
+        "m": 2220.75,
+        "sd": 147.4388493095164,
+        "ci": 102.16990995395855
+      },
+      "randdruk": {
+        "n": 8,
+        "m": 0.057626496934160915,
+        "sd": 0.0005053734385242298,
+        "ci": 0.0003502059257038047
+      },
+      "losgeraakt": {
+        "n": 8,
+        "m": 2.625,
+        "sd": 2.8753881725529062,
+        "ci": 1.9925423458486393
+      },
+      "meedoend": {
+        "n": 8,
+        "m": 109.375,
+        "sd": 3.2486260832190936,
+        "ci": 2.25118302232404
+      },
+      "neuronenEind": {
+        "n": 8,
+        "m": 112,
+        "sd": 3.7032803990902057,
+        "ci": 2.56624238917527
+      },
+      "tijdMs": {
+        "n": 8,
+        "m": 9498.375,
+        "sd": 1032.833541767501,
+        "ci": 715.7171291963048
+      },
+      "verzadigd": false
+    },
+    "s9-n120-d15-A": {
+      "neuronen": 120,
+      "dichtheid": 15,
+      "stand": "A",
+      "lr": 0.008,
+      "runs": 8,
+      "perZaad": [
+        {
+          "zaad": 1000,
+          "bench": 0.194,
+          "benchOpA": 0.194,
+          "horizon": 2,
+          "succes20": 0.55,
+          "verbindingen": 2086,
+          "actief": 810,
+          "randdruk": 0.057658900297179905,
+          "losgeraakt": 31,
+          "meedoend": 109,
+          "neuronenEind": 140,
+          "tijdMs": 8442
+        },
+        {
+          "zaad": 1001,
+          "bench": 0.194,
+          "benchOpA": 0.194,
+          "horizon": 3,
+          "succes20": 0.5,
+          "verbindingen": 2101,
+          "actief": 673,
+          "randdruk": 0.05655446632617623,
+          "losgeraakt": 40,
+          "meedoend": 100,
+          "neuronenEind": 140,
+          "tijdMs": 8646
+        },
+        {
+          "zaad": 1002,
+          "bench": 0.28,
+          "benchOpA": 0.28,
+          "horizon": 14,
+          "succes20": 0.65,
+          "verbindingen": 2155,
+          "actief": 632,
+          "randdruk": 0.05670961203364755,
+          "losgeraakt": 46,
+          "meedoend": 94,
+          "neuronenEind": 140,
+          "tijdMs": 8468
+        },
+        {
+          "zaad": 1003,
+          "bench": 0.13,
+          "benchOpA": 0.13,
+          "horizon": 1,
+          "succes20": 0.55,
+          "verbindingen": 2064,
+          "actief": 1140,
+          "randdruk": 0.05634651608156568,
+          "losgeraakt": 21,
+          "meedoend": 119,
+          "neuronenEind": 140,
+          "tijdMs": 8654
+        },
+        {
+          "zaad": 1004,
+          "bench": 0.236,
+          "benchOpA": 0.236,
+          "horizon": 2,
+          "succes20": 0.5,
+          "verbindingen": 1992,
+          "actief": 1020,
+          "randdruk": 0.058315777238540506,
+          "losgeraakt": 16,
+          "meedoend": 124,
+          "neuronenEind": 140,
+          "tijdMs": 8178
+        },
+        {
+          "zaad": 1005,
+          "bench": 0.222,
+          "benchOpA": 0.222,
+          "horizon": 4,
+          "succes20": 0.6,
+          "verbindingen": 2090,
+          "actief": 704,
+          "randdruk": 0.057276614116723135,
+          "losgeraakt": 48,
+          "meedoend": 92,
+          "neuronenEind": 140,
+          "tijdMs": 8445
+        },
+        {
+          "zaad": 1006,
+          "bench": 0.12,
+          "benchOpA": 0.12,
+          "horizon": 1,
+          "succes20": 0.3,
+          "verbindingen": 2081,
+          "actief": 1097,
+          "randdruk": 0.05677550415440088,
+          "losgeraakt": 9,
+          "meedoend": 131,
+          "neuronenEind": 140,
+          "tijdMs": 8590
+        },
+        {
+          "zaad": 1007,
+          "bench": 0.182,
+          "benchOpA": 0.182,
+          "horizon": 18,
+          "succes20": 0.6,
+          "verbindingen": 2092,
+          "actief": 630,
+          "randdruk": 0.05760609500453942,
+          "losgeraakt": 45,
+          "meedoend": 95,
+          "neuronenEind": 140,
+          "tijdMs": 8587
+        }
+      ],
+      "bench": {
+        "n": 8,
+        "m": 0.19474999999999998,
+        "sd": 0.05298989121925589,
+        "ci": 0.03672012118716386
+      },
+      "horizon": {
+        "n": 8,
+        "m": 5.625,
+        "sd": 6.566962768281849,
+        "ci": 4.550673027146644
+      },
+      "succes20": {
+        "n": 8,
+        "m": 0.53125,
+        "sd": 0.10669549461635469,
+        "ci": 0.07393620560997163
+      },
+      "verbindingen": {
+        "n": 8,
+        "m": 2082.625,
+        "sd": 45.18513503987156,
+        "ci": 31.311701087612597
+      },
+      "actief": {
+        "n": 8,
+        "m": 838.25,
+        "sd": 214.83332409767613,
+        "ci": 148.87189828842781
+      },
+      "randdruk": {
+        "n": 8,
+        "m": 0.057155435656596656,
+        "sd": 0.0006736116899972736,
+        "ci": 0.0004667890860059305
+      },
+      "losgeraakt": {
+        "n": 8,
+        "m": 32,
+        "sd": 15.08073510902474,
+        "ci": 10.450416259652052
+      },
+      "meedoend": {
+        "n": 8,
+        "m": 108,
+        "sd": 15.08073510902474,
+        "ci": 10.450416259652052
+      },
+      "neuronenEind": {
+        "n": 8,
+        "m": 140,
+        "sd": 0,
+        "ci": 0
+      },
+      "tijdMs": {
+        "n": 8,
+        "m": 8501.25,
+        "sd": 156.6549894331033,
+        "ci": 108.55636922815721
+      },
+      "verzadigd": false
+    },
+    "s9-n120-d35-A": {
+      "neuronen": 120,
+      "dichtheid": 35,
+      "stand": "A",
+      "lr": 0.008,
+      "runs": 8,
+      "perZaad": [
+        {
+          "zaad": 1000,
+          "bench": 0.668,
+          "benchOpA": 0.668,
+          "horizon": 19,
+          "succes20": 1,
+          "verbindingen": 4343,
+          "actief": 2201,
+          "randdruk": 0.05733498552226125,
+          "losgeraakt": 8,
+          "meedoend": 132,
+          "neuronenEind": 140,
+          "tijdMs": 11728
+        },
+        {
+          "zaad": 1001,
+          "bench": 0.592,
+          "benchOpA": 0.592,
+          "horizon": 10,
+          "succes20": 0.65,
+          "verbindingen": 4323,
+          "actief": 1567,
+          "randdruk": 0.055960476721942654,
+          "losgeraakt": 24,
+          "meedoend": 116,
+          "neuronenEind": 140,
+          "tijdMs": 12511
+        },
+        {
+          "zaad": 1002,
+          "bench": 0.682,
+          "benchOpA": 0.682,
+          "horizon": 28,
+          "succes20": 0.9,
+          "verbindingen": 4496,
+          "actief": 2284,
+          "randdruk": 0.05773165501213758,
+          "losgeraakt": 16,
+          "meedoend": 124,
+          "neuronenEind": 140,
+          "tijdMs": 11791
+        },
+        {
+          "zaad": 1003,
+          "bench": 0.69,
+          "benchOpA": 0.69,
+          "horizon": 40,
+          "succes20": 0.9,
+          "verbindingen": 4294,
+          "actief": 2341,
+          "randdruk": 0.0579726434660109,
+          "losgeraakt": 11,
+          "meedoend": 129,
+          "neuronenEind": 140,
+          "tijdMs": 11474
+        },
+        {
+          "zaad": 1004,
+          "bench": 0.612,
+          "benchOpA": 0.612,
+          "horizon": 21,
+          "succes20": 0.9,
+          "verbindingen": 4169,
+          "actief": 1472,
+          "randdruk": 0.056717846366228584,
+          "losgeraakt": 30,
+          "meedoend": 110,
+          "neuronenEind": 140,
+          "tijdMs": 11822
+        },
+        {
+          "zaad": 1005,
+          "bench": 0.702,
+          "benchOpA": 0.702,
+          "horizon": 40,
+          "succes20": 0.9,
+          "verbindingen": 4346,
+          "actief": 2485,
+          "randdruk": 0.05805439632698839,
+          "losgeraakt": 11,
+          "meedoend": 129,
+          "neuronenEind": 140,
+          "tijdMs": 10855
+        },
+        {
+          "zaad": 1006,
+          "bench": 0.672,
+          "benchOpA": 0.672,
+          "horizon": 40,
+          "succes20": 0.9,
+          "verbindingen": 4322,
+          "actief": 2309,
+          "randdruk": 0.05770156550510864,
+          "losgeraakt": 10,
+          "meedoend": 130,
+          "neuronenEind": 140,
+          "tijdMs": 11657
+        },
+        {
+          "zaad": 1007,
+          "bench": 0.654,
+          "benchOpA": 0.654,
+          "horizon": 19,
+          "succes20": 0.8,
+          "verbindingen": 4355,
+          "actief": 2410,
+          "randdruk": 0.05743951858176361,
+          "losgeraakt": 7,
+          "meedoend": 133,
+          "neuronenEind": 140,
+          "tijdMs": 11722
+        }
+      ],
+      "bench": {
+        "n": 8,
+        "m": 0.659,
+        "sd": 0.03838154318344766,
+        "ci": 0.02659705246827174
+      },
+      "horizon": {
+        "n": 8,
+        "m": 27.125,
+        "sd": 11.716136613357543,
+        "ci": 8.118868455640847
+      },
+      "succes20": {
+        "n": 8,
+        "m": 0.86875,
+        "sd": 0.10329396331413979,
+        "ci": 0.07157906467676145
+      },
+      "verbindingen": {
+        "n": 8,
+        "m": 4331,
+        "sd": 89.38520171546455,
+        "ci": 61.940784625317754
+      },
+      "actief": {
+        "n": 8,
+        "m": 2133.625,
+        "sd": 389.05964930108814,
+        "ci": 269.60458198072223
+      },
+      "randdruk": {
+        "n": 8,
+        "m": 0.0573641359378052,
+        "sd": 0.0007061112310179856,
+        "ci": 0.0004893101189303024
+      },
+      "losgeraakt": {
+        "n": 8,
+        "m": 14.625,
+        "sd": 8.24512843181614,
+        "ci": 5.713582501373372
+      },
+      "meedoend": {
+        "n": 8,
+        "m": 125.375,
+        "sd": 8.24512843181614,
+        "ci": 5.713582501373372
+      },
+      "neuronenEind": {
+        "n": 8,
+        "m": 140,
+        "sd": 0,
+        "ci": 0
+      },
+      "tijdMs": {
+        "n": 8,
+        "m": 11695,
+        "sd": 454.95745483977475,
+        "ci": 315.2694314392056
+      },
+      "verzadigd": false
+    },
+    "s9-n120-d70-A": {
+      "neuronen": 120,
+      "dichtheid": 70,
+      "stand": "A",
+      "lr": 0.008,
+      "runs": 8,
+      "perZaad": [
+        {
+          "zaad": 1000,
+          "bench": 0.684,
+          "benchOpA": 0.684,
+          "horizon": 38,
+          "succes20": 0.85,
+          "verbindingen": 8179,
+          "actief": 4716,
+          "randdruk": 0.057631639391081374,
+          "losgeraakt": 3,
+          "meedoend": 137,
+          "neuronenEind": 140,
+          "tijdMs": 17272
+        },
+        {
+          "zaad": 1001,
+          "bench": 0.67,
+          "benchOpA": 0.67,
+          "horizon": 20,
+          "succes20": 0.9,
+          "verbindingen": 8196,
+          "actief": 5094,
+          "randdruk": 0.056220151855100646,
+          "losgeraakt": 1,
+          "meedoend": 139,
+          "neuronenEind": 140,
+          "tijdMs": 18106
+        },
+        {
+          "zaad": 1002,
+          "bench": 0.636,
+          "benchOpA": 0.636,
+          "horizon": 12,
+          "succes20": 1,
+          "verbindingen": 8087,
+          "actief": 4330,
+          "randdruk": 0.0557554139254434,
+          "losgeraakt": 6,
+          "meedoend": 134,
+          "neuronenEind": 140,
+          "tijdMs": 19160
+        },
+        {
+          "zaad": 1003,
+          "bench": 0.69,
+          "benchOpA": 0.69,
+          "horizon": 25,
+          "succes20": 0.75,
+          "verbindingen": 8036,
+          "actief": 4744,
+          "randdruk": 0.05518287924694796,
+          "losgeraakt": 9,
+          "meedoend": 131,
+          "neuronenEind": 140,
+          "tijdMs": 18766
+        },
+        {
+          "zaad": 1004,
+          "bench": 0.68,
+          "benchOpA": 0.68,
+          "horizon": 24,
+          "succes20": 1,
+          "verbindingen": 8048,
+          "actief": 4634,
+          "randdruk": 0.056332060276501984,
+          "losgeraakt": 8,
+          "meedoend": 132,
+          "neuronenEind": 140,
+          "tijdMs": 17583
+        },
+        {
+          "zaad": 1005,
+          "bench": 0.678,
+          "benchOpA": 0.678,
+          "horizon": 10,
+          "succes20": 1,
+          "verbindingen": 8092,
+          "actief": 4650,
+          "randdruk": 0.05822890048378654,
+          "losgeraakt": 11,
+          "meedoend": 129,
+          "neuronenEind": 140,
+          "tijdMs": 16743
+        },
+        {
+          "zaad": 1006,
+          "bench": 0.698,
+          "benchOpA": 0.698,
+          "horizon": 10,
+          "succes20": 0.85,
+          "verbindingen": 8110,
+          "actief": 4582,
+          "randdruk": 0.055698814572084296,
+          "losgeraakt": 5,
+          "meedoend": 135,
+          "neuronenEind": 140,
+          "tijdMs": 18600
+        },
+        {
+          "zaad": 1007,
+          "bench": 0.69,
+          "benchOpA": 0.69,
+          "horizon": 12,
+          "succes20": 0.9,
+          "verbindingen": 8160,
+          "actief": 4553,
+          "randdruk": 0.056918750290802275,
+          "losgeraakt": 10,
+          "meedoend": 130,
+          "neuronenEind": 140,
+          "tijdMs": 18218
+        }
+      ],
+      "bench": {
+        "n": 8,
+        "m": 0.67825,
+        "sd": 0.019106842454247323,
+        "ci": 0.013240366309132072
+      },
+      "horizon": {
+        "n": 8,
+        "m": 18.875,
+        "sd": 9.87692115127844,
+        "ci": 6.84435716484755
+      },
+      "succes20": {
+        "n": 8,
+        "m": 0.90625,
+        "sd": 0.09038607667745546,
+        "ci": 0.06263435558860649
+      },
+      "verbindingen": {
+        "n": 8,
+        "m": 8113.5,
+        "sd": 59.44024610600849,
+        "ci": 41.189989075016754
+      },
+      "actief": {
+        "n": 8,
+        "m": 4662.875,
+        "sd": 215.70180309200674,
+        "ci": 149.4737235269129
+      },
+      "randdruk": {
+        "n": 8,
+        "m": 0.05649607625521856,
+        "sd": 0.0010338945483342593,
+        "ci": 0.0007164523692357784
+      },
+      "losgeraakt": {
+        "n": 8,
+        "m": 6.625,
+        "sd": 3.50255009141299,
+        "ci": 2.427143382662013
+      },
+      "meedoend": {
+        "n": 8,
+        "m": 133.375,
+        "sd": 3.50255009141299,
+        "ci": 2.427143382662013
+      },
+      "neuronenEind": {
+        "n": 8,
+        "m": 140,
+        "sd": 0,
+        "ci": 0
+      },
+      "tijdMs": {
+        "n": 8,
+        "m": 18056,
+        "sd": 811.5197383392998,
+        "ci": 562.3544878455225
+      },
+      "verzadigd": false
+    },
+    "s9-n8-d15-B20": {
+      "neuronen": 8,
+      "dichtheid": 15,
+      "stand": "B20",
+      "lr": 0.016,
+      "runs": 8,
+      "perZaad": [
+        {
+          "zaad": 1000,
+          "bench": 0.118,
+          "benchOpA": 0.15,
+          "horizon": 1,
+          "succes20": 0.5,
+          "verbindingen": 967,
+          "actief": 502,
+          "randdruk": 0.043555449046586536,
+          "losgeraakt": 0,
+          "meedoend": 60,
+          "neuronenEind": 60,
+          "tijdMs": 3173
+        },
+        {
+          "zaad": 1001,
+          "bench": 0.018,
+          "benchOpA": 0.098,
+          "horizon": 10,
+          "succes20": 0.35,
+          "verbindingen": 886,
+          "actief": 292,
+          "randdruk": 0.04323336009228839,
+          "losgeraakt": 2,
+          "meedoend": 52,
+          "neuronenEind": 54,
+          "tijdMs": 3105
+        },
+        {
+          "zaad": 1002,
+          "bench": 0.028,
+          "benchOpA": 0.048,
+          "horizon": 0,
+          "succes20": 0.35,
+          "verbindingen": 868,
+          "actief": 310,
+          "randdruk": 0.043313259849861833,
+          "losgeraakt": 1,
+          "meedoend": 53,
+          "neuronenEind": 54,
+          "tijdMs": 3074
+        },
+        {
+          "zaad": 1003,
+          "bench": 0.094,
+          "benchOpA": 0.168,
+          "horizon": 1,
+          "succes20": 0.4,
+          "verbindingen": 783,
+          "actief": 384,
+          "randdruk": 0.04596484697515759,
+          "losgeraakt": 0,
+          "meedoend": 48,
+          "neuronenEind": 48,
+          "tijdMs": 2781
+        },
+        {
+          "zaad": 1004,
+          "bench": 0.038,
+          "benchOpA": 0.054,
+          "horizon": 0,
+          "succes20": 0.3,
+          "verbindingen": 843,
+          "actief": 476,
+          "randdruk": 0.04204563335398867,
+          "losgeraakt": 1,
+          "meedoend": 53,
+          "neuronenEind": 54,
+          "tijdMs": 2987
+        },
+        {
+          "zaad": 1005,
+          "bench": 0.056,
+          "benchOpA": 0.072,
+          "horizon": 0,
+          "succes20": 0.4,
+          "verbindingen": 899,
+          "actief": 553,
+          "randdruk": 0.04155542025830995,
+          "losgeraakt": 0,
+          "meedoend": 56,
+          "neuronenEind": 56,
+          "tijdMs": 3092
+        },
+        {
+          "zaad": 1006,
+          "bench": 0.02,
+          "benchOpA": 0.076,
+          "horizon": 1,
+          "succes20": 0.4,
+          "verbindingen": 889,
+          "actief": 412,
+          "randdruk": 0.0434052520178843,
+          "losgeraakt": 1,
+          "meedoend": 55,
+          "neuronenEind": 56,
+          "tijdMs": 3166
+        },
+        {
+          "zaad": 1007,
+          "bench": 0.058,
+          "benchOpA": 0.092,
+          "horizon": 9,
+          "succes20": 0.45,
+          "verbindingen": 836,
+          "actief": 343,
+          "randdruk": 0.04510345946382325,
+          "losgeraakt": 1,
+          "meedoend": 53,
+          "neuronenEind": 54,
+          "tijdMs": 3038
+        }
+      ],
+      "bench": {
+        "n": 8,
+        "m": 0.05375,
+        "sd": 0.03605452220496857,
+        "ci": 0.024984509200702745
+      },
+      "horizon": {
+        "n": 8,
+        "m": 2.75,
+        "sd": 4.200340122282616,
+        "ci": 2.9106872040808502
+      },
+      "succes20": {
+        "n": 8,
+        "m": 0.39375000000000004,
+        "sd": 0.06232117273791125,
+        "ci": 0.04318636937738573
+      },
+      "verbindingen": {
+        "n": 8,
+        "m": 871.375,
+        "sd": 53.86474463214055,
+        "ci": 37.3263636723429
+      },
+      "actief": {
+        "n": 8,
+        "m": 409,
+        "sd": 94.38068809727065,
+        "ci": 65.40248007529989
+      },
+      "randdruk": {
+        "n": 8,
+        "m": 0.04352208513223757,
+        "sd": 0.001447028682325182,
+        "ci": 0.0010027397179666992
+      },
+      "losgeraakt": {
+        "n": 8,
+        "m": 0.75,
+        "sd": 0.7071067811865476,
+        "ci": 0.48999999999999994
+      },
+      "meedoend": {
+        "n": 8,
+        "m": 53.75,
+        "sd": 3.453776401067595,
+        "ci": 2.393344939619026
+      },
+      "neuronenEind": {
+        "n": 8,
+        "m": 54.5,
+        "sd": 3.3380918415851206,
+        "ci": 2.3131796298601626
+      },
+      "tijdMs": {
+        "n": 8,
+        "m": 3052,
+        "sd": 125.57979819336275,
+        "ci": 87.02236034491365
+      },
+      "verzadigd": false
+    },
+    "s9-n8-d35-B20": {
+      "neuronen": 8,
+      "dichtheid": 35,
+      "stand": "B20",
+      "lr": 0.016,
+      "runs": 8,
+      "perZaad": [
+        {
+          "zaad": 1000,
+          "bench": 0.118,
+          "benchOpA": 0.15,
+          "horizon": 1,
+          "succes20": 0.5,
+          "verbindingen": 967,
+          "actief": 502,
+          "randdruk": 0.043555449046586536,
+          "losgeraakt": 0,
+          "meedoend": 60,
+          "neuronenEind": 60,
+          "tijdMs": 3142
+        },
+        {
+          "zaad": 1001,
+          "bench": 0.018,
+          "benchOpA": 0.098,
+          "horizon": 10,
+          "succes20": 0.35,
+          "verbindingen": 886,
+          "actief": 292,
+          "randdruk": 0.04323336009228839,
+          "losgeraakt": 2,
+          "meedoend": 52,
+          "neuronenEind": 54,
+          "tijdMs": 3080
+        },
+        {
+          "zaad": 1002,
+          "bench": 0.028,
+          "benchOpA": 0.048,
+          "horizon": 0,
+          "succes20": 0.35,
+          "verbindingen": 868,
+          "actief": 310,
+          "randdruk": 0.043313259849861833,
+          "losgeraakt": 1,
+          "meedoend": 53,
+          "neuronenEind": 54,
+          "tijdMs": 3080
+        },
+        {
+          "zaad": 1003,
+          "bench": 0.094,
+          "benchOpA": 0.168,
+          "horizon": 1,
+          "succes20": 0.4,
+          "verbindingen": 783,
+          "actief": 384,
+          "randdruk": 0.04596484697515759,
+          "losgeraakt": 0,
+          "meedoend": 48,
+          "neuronenEind": 48,
+          "tijdMs": 2780
+        },
+        {
+          "zaad": 1004,
+          "bench": 0.038,
+          "benchOpA": 0.054,
+          "horizon": 0,
+          "succes20": 0.3,
+          "verbindingen": 843,
+          "actief": 476,
+          "randdruk": 0.04204563335398867,
+          "losgeraakt": 1,
+          "meedoend": 53,
+          "neuronenEind": 54,
+          "tijdMs": 2965
+        },
+        {
+          "zaad": 1005,
+          "bench": 0.056,
+          "benchOpA": 0.072,
+          "horizon": 0,
+          "succes20": 0.4,
+          "verbindingen": 899,
+          "actief": 553,
+          "randdruk": 0.04155542025830995,
+          "losgeraakt": 0,
+          "meedoend": 56,
+          "neuronenEind": 56,
+          "tijdMs": 3096
+        },
+        {
+          "zaad": 1006,
+          "bench": 0.02,
+          "benchOpA": 0.076,
+          "horizon": 1,
+          "succes20": 0.4,
+          "verbindingen": 889,
+          "actief": 412,
+          "randdruk": 0.0434052520178843,
+          "losgeraakt": 1,
+          "meedoend": 55,
+          "neuronenEind": 56,
+          "tijdMs": 3150
+        },
+        {
+          "zaad": 1007,
+          "bench": 0.058,
+          "benchOpA": 0.092,
+          "horizon": 9,
+          "succes20": 0.45,
+          "verbindingen": 836,
+          "actief": 343,
+          "randdruk": 0.04510345946382325,
+          "losgeraakt": 1,
+          "meedoend": 53,
+          "neuronenEind": 54,
+          "tijdMs": 3015
+        }
+      ],
+      "bench": {
+        "n": 8,
+        "m": 0.05375,
+        "sd": 0.03605452220496857,
+        "ci": 0.024984509200702745
+      },
+      "horizon": {
+        "n": 8,
+        "m": 2.75,
+        "sd": 4.200340122282616,
+        "ci": 2.9106872040808502
+      },
+      "succes20": {
+        "n": 8,
+        "m": 0.39375000000000004,
+        "sd": 0.06232117273791125,
+        "ci": 0.04318636937738573
+      },
+      "verbindingen": {
+        "n": 8,
+        "m": 871.375,
+        "sd": 53.86474463214055,
+        "ci": 37.3263636723429
+      },
+      "actief": {
+        "n": 8,
+        "m": 409,
+        "sd": 94.38068809727065,
+        "ci": 65.40248007529989
+      },
+      "randdruk": {
+        "n": 8,
+        "m": 0.04352208513223757,
+        "sd": 0.001447028682325182,
+        "ci": 0.0010027397179666992
+      },
+      "losgeraakt": {
+        "n": 8,
+        "m": 0.75,
+        "sd": 0.7071067811865476,
+        "ci": 0.48999999999999994
+      },
+      "meedoend": {
+        "n": 8,
+        "m": 53.75,
+        "sd": 3.453776401067595,
+        "ci": 2.393344939619026
+      },
+      "neuronenEind": {
+        "n": 8,
+        "m": 54.5,
+        "sd": 3.3380918415851206,
+        "ci": 2.3131796298601626
+      },
+      "tijdMs": {
+        "n": 8,
+        "m": 3038.5,
+        "sd": 121.10915973380614,
+        "ci": 83.9243659493475
+      },
+      "verzadigd": true
+    },
+    "s9-n8-d70-B20": {
+      "neuronen": 8,
+      "dichtheid": 70,
+      "stand": "B20",
+      "lr": 0.016,
+      "runs": 8,
+      "perZaad": [
+        {
+          "zaad": 1000,
+          "bench": 0.118,
+          "benchOpA": 0.15,
+          "horizon": 1,
+          "succes20": 0.5,
+          "verbindingen": 967,
+          "actief": 502,
+          "randdruk": 0.043555449046586536,
+          "losgeraakt": 0,
+          "meedoend": 60,
+          "neuronenEind": 60,
+          "tijdMs": 3203
+        },
+        {
+          "zaad": 1001,
+          "bench": 0.018,
+          "benchOpA": 0.098,
+          "horizon": 10,
+          "succes20": 0.35,
+          "verbindingen": 886,
+          "actief": 292,
+          "randdruk": 0.04323336009228839,
+          "losgeraakt": 2,
+          "meedoend": 52,
+          "neuronenEind": 54,
+          "tijdMs": 3095
+        },
+        {
+          "zaad": 1002,
+          "bench": 0.028,
+          "benchOpA": 0.048,
+          "horizon": 0,
+          "succes20": 0.35,
+          "verbindingen": 868,
+          "actief": 310,
+          "randdruk": 0.043313259849861833,
+          "losgeraakt": 1,
+          "meedoend": 53,
+          "neuronenEind": 54,
+          "tijdMs": 3081
+        },
+        {
+          "zaad": 1003,
+          "bench": 0.094,
+          "benchOpA": 0.168,
+          "horizon": 1,
+          "succes20": 0.4,
+          "verbindingen": 783,
+          "actief": 384,
+          "randdruk": 0.04596484697515759,
+          "losgeraakt": 0,
+          "meedoend": 48,
+          "neuronenEind": 48,
+          "tijdMs": 2778
+        },
+        {
+          "zaad": 1004,
+          "bench": 0.038,
+          "benchOpA": 0.054,
+          "horizon": 0,
+          "succes20": 0.3,
+          "verbindingen": 843,
+          "actief": 476,
+          "randdruk": 0.04204563335398867,
+          "losgeraakt": 1,
+          "meedoend": 53,
+          "neuronenEind": 54,
+          "tijdMs": 2997
+        },
+        {
+          "zaad": 1005,
+          "bench": 0.056,
+          "benchOpA": 0.072,
+          "horizon": 0,
+          "succes20": 0.4,
+          "verbindingen": 899,
+          "actief": 553,
+          "randdruk": 0.04155542025830995,
+          "losgeraakt": 0,
+          "meedoend": 56,
+          "neuronenEind": 56,
+          "tijdMs": 3098
+        },
+        {
+          "zaad": 1006,
+          "bench": 0.02,
+          "benchOpA": 0.076,
+          "horizon": 1,
+          "succes20": 0.4,
+          "verbindingen": 889,
+          "actief": 412,
+          "randdruk": 0.0434052520178843,
+          "losgeraakt": 1,
+          "meedoend": 55,
+          "neuronenEind": 56,
+          "tijdMs": 3182
+        },
+        {
+          "zaad": 1007,
+          "bench": 0.058,
+          "benchOpA": 0.092,
+          "horizon": 9,
+          "succes20": 0.45,
+          "verbindingen": 836,
+          "actief": 343,
+          "randdruk": 0.04510345946382325,
+          "losgeraakt": 1,
+          "meedoend": 53,
+          "neuronenEind": 54,
+          "tijdMs": 3003
+        }
+      ],
+      "bench": {
+        "n": 8,
+        "m": 0.05375,
+        "sd": 0.03605452220496857,
+        "ci": 0.024984509200702745
+      },
+      "horizon": {
+        "n": 8,
+        "m": 2.75,
+        "sd": 4.200340122282616,
+        "ci": 2.9106872040808502
+      },
+      "succes20": {
+        "n": 8,
+        "m": 0.39375000000000004,
+        "sd": 0.06232117273791125,
+        "ci": 0.04318636937738573
+      },
+      "verbindingen": {
+        "n": 8,
+        "m": 871.375,
+        "sd": 53.86474463214055,
+        "ci": 37.3263636723429
+      },
+      "actief": {
+        "n": 8,
+        "m": 409,
+        "sd": 94.38068809727065,
+        "ci": 65.40248007529989
+      },
+      "randdruk": {
+        "n": 8,
+        "m": 0.04352208513223757,
+        "sd": 0.001447028682325182,
+        "ci": 0.0010027397179666992
+      },
+      "losgeraakt": {
+        "n": 8,
+        "m": 0.75,
+        "sd": 0.7071067811865476,
+        "ci": 0.48999999999999994
+      },
+      "meedoend": {
+        "n": 8,
+        "m": 53.75,
+        "sd": 3.453776401067595,
+        "ci": 2.393344939619026
+      },
+      "neuronenEind": {
+        "n": 8,
+        "m": 54.5,
+        "sd": 3.3380918415851206,
+        "ci": 2.3131796298601626
+      },
+      "tijdMs": {
+        "n": 8,
+        "m": 3054.625,
+        "sd": 133.60596383181618,
+        "ci": 92.58420937179298
+      },
+      "verzadigd": true
+    },
+    "s9-n16-d15-B20": {
+      "neuronen": 16,
+      "dichtheid": 15,
+      "stand": "B20",
+      "lr": 0.008,
+      "runs": 8,
+      "perZaad": [
+        {
+          "zaad": 1000,
+          "bench": 0.118,
+          "benchOpA": 0.222,
+          "horizon": 2,
+          "succes20": 0.5,
+          "verbindingen": 1033,
+          "actief": 456,
+          "randdruk": 0.04878046296087039,
+          "losgeraakt": 1,
+          "meedoend": 53,
+          "neuronenEind": 54,
+          "tijdMs": 3571
+        },
+        {
+          "zaad": 1001,
+          "bench": 0.068,
+          "benchOpA": 0.192,
+          "horizon": 2,
+          "succes20": 0.5,
+          "verbindingen": 1115,
+          "actief": 501,
+          "randdruk": 0.0482404230570738,
+          "losgeraakt": 2,
+          "meedoend": 56,
+          "neuronenEind": 58,
+          "tijdMs": 3685
+        },
+        {
+          "zaad": 1002,
+          "bench": 0.072,
+          "benchOpA": 0.214,
+          "horizon": 3,
+          "succes20": 0.5,
+          "verbindingen": 1036,
+          "actief": 409,
+          "randdruk": 0.047366187162967005,
+          "losgeraakt": 5,
+          "meedoend": 51,
+          "neuronenEind": 56,
+          "tijdMs": 3649
+        },
+        {
+          "zaad": 1003,
+          "bench": 0.116,
+          "benchOpA": 0.192,
+          "horizon": 1,
+          "succes20": 0.55,
+          "verbindingen": 1178,
+          "actief": 518,
+          "randdruk": 0.04503593749075613,
+          "losgeraakt": 3,
+          "meedoend": 63,
+          "neuronenEind": 66,
+          "tijdMs": 4003
+        },
+        {
+          "zaad": 1004,
+          "bench": 0.044,
+          "benchOpA": 0.098,
+          "horizon": 0,
+          "succes20": 0.25,
+          "verbindingen": 1182,
+          "actief": 674,
+          "randdruk": 0.04588343861474232,
+          "losgeraakt": 1,
+          "meedoend": 65,
+          "neuronenEind": 66,
+          "tijdMs": 4086
+        },
+        {
+          "zaad": 1005,
+          "bench": 0.078,
+          "benchOpA": 0.108,
+          "horizon": 0,
+          "succes20": 0.45,
+          "verbindingen": 1062,
+          "actief": 481,
+          "randdruk": 0.04582751809731507,
+          "losgeraakt": 1,
+          "meedoend": 59,
+          "neuronenEind": 60,
+          "tijdMs": 3857
+        },
+        {
+          "zaad": 1006,
+          "bench": 0.112,
+          "benchOpA": 0.308,
+          "horizon": 3,
+          "succes20": 0.5,
+          "verbindingen": 1252,
+          "actief": 521,
+          "randdruk": 0.04726123802180509,
+          "losgeraakt": 1,
+          "meedoend": 67,
+          "neuronenEind": 68,
+          "tijdMs": 4189
+        },
+        {
+          "zaad": 1007,
+          "bench": 0.096,
+          "benchOpA": 0.252,
+          "horizon": 5,
+          "succes20": 0.45,
+          "verbindingen": 1124,
+          "actief": 586,
+          "randdruk": 0.04912588424043104,
+          "losgeraakt": 0,
+          "meedoend": 60,
+          "neuronenEind": 60,
+          "tijdMs": 3815
+        }
+      ],
+      "bench": {
+        "n": 8,
+        "m": 0.088,
+        "sd": 0.02676885183513534,
+        "ci": 0.018549867924058112
+      },
+      "horizon": {
+        "n": 8,
+        "m": 2,
+        "sd": 1.6903085094570331,
+        "ci": 1.1713240371477056
+      },
+      "succes20": {
+        "n": 8,
+        "m": 0.4625,
+        "sd": 0.09161253813129044,
+        "ci": 0.06348425001525969
+      },
+      "verbindingen": {
+        "n": 8,
+        "m": 1122.75,
+        "sd": 78.01236165780762,
+        "ci": 54.05980854572092
+      },
+      "actief": {
+        "n": 8,
+        "m": 518.25,
+        "sd": 81.37347760261237,
+        "ci": 56.388943065108066
+      },
+      "randdruk": {
+        "n": 8,
+        "m": 0.0471901362057451,
+        "sd": 0.0014938048412948524,
+        "ci": 0.0010351539423879069
+      },
+      "losgeraakt": {
+        "n": 8,
+        "m": 1.75,
+        "sd": 1.5811388300841898,
+        "ci": 1.095673308974897
+      },
+      "meedoend": {
+        "n": 8,
+        "m": 59.25,
+        "sd": 5.67576300723398,
+        "ci": 3.933103100606441
+      },
+      "neuronenEind": {
+        "n": 8,
+        "m": 61,
+        "sd": 5.1269595556932455,
+        "ci": 3.552801711325865
+      },
+      "tijdMs": {
+        "n": 8,
+        "m": 3856.875,
+        "sd": 220.51526510166397,
+        "ci": 152.8092825223651
+      },
+      "verzadigd": false
+    },
+    "s9-n16-d35-B20": {
+      "neuronen": 16,
+      "dichtheid": 35,
+      "stand": "B20",
+      "lr": 0.008,
+      "runs": 8,
+      "perZaad": [
+        {
+          "zaad": 1000,
+          "bench": 0.118,
+          "benchOpA": 0.222,
+          "horizon": 2,
+          "succes20": 0.5,
+          "verbindingen": 1033,
+          "actief": 456,
+          "randdruk": 0.04878046296087039,
+          "losgeraakt": 1,
+          "meedoend": 53,
+          "neuronenEind": 54,
+          "tijdMs": 3573
+        },
+        {
+          "zaad": 1001,
+          "bench": 0.068,
+          "benchOpA": 0.192,
+          "horizon": 2,
+          "succes20": 0.5,
+          "verbindingen": 1115,
+          "actief": 501,
+          "randdruk": 0.0482404230570738,
+          "losgeraakt": 2,
+          "meedoend": 56,
+          "neuronenEind": 58,
+          "tijdMs": 3671
+        },
+        {
+          "zaad": 1002,
+          "bench": 0.072,
+          "benchOpA": 0.214,
+          "horizon": 3,
+          "succes20": 0.5,
+          "verbindingen": 1036,
+          "actief": 409,
+          "randdruk": 0.047366187162967005,
+          "losgeraakt": 5,
+          "meedoend": 51,
+          "neuronenEind": 56,
+          "tijdMs": 3650
+        },
+        {
+          "zaad": 1003,
+          "bench": 0.116,
+          "benchOpA": 0.192,
+          "horizon": 1,
+          "succes20": 0.55,
+          "verbindingen": 1178,
+          "actief": 518,
+          "randdruk": 0.04503593749075613,
+          "losgeraakt": 3,
+          "meedoend": 63,
+          "neuronenEind": 66,
+          "tijdMs": 3968
+        },
+        {
+          "zaad": 1004,
+          "bench": 0.028,
+          "benchOpA": 0.098,
+          "horizon": 1,
+          "succes20": 0.4,
+          "verbindingen": 1246,
+          "actief": 499,
+          "randdruk": 0.047266527453302114,
+          "losgeraakt": 5,
+          "meedoend": 63,
+          "neuronenEind": 68,
+          "tijdMs": 4324
+        },
+        {
+          "zaad": 1005,
+          "bench": 0.078,
+          "benchOpA": 0.108,
+          "horizon": 0,
+          "succes20": 0.45,
+          "verbindingen": 1062,
+          "actief": 481,
+          "randdruk": 0.04582751809731507,
+          "losgeraakt": 1,
+          "meedoend": 59,
+          "neuronenEind": 60,
+          "tijdMs": 3703
+        },
+        {
+          "zaad": 1006,
+          "bench": 0.088,
+          "benchOpA": 0.502,
+          "horizon": 5,
+          "succes20": 0.6,
+          "verbindingen": 1248,
+          "actief": 516,
+          "randdruk": 0.04700770559630212,
+          "losgeraakt": 2,
+          "meedoend": 66,
+          "neuronenEind": 68,
+          "tijdMs": 4117
+        },
+        {
+          "zaad": 1007,
+          "bench": 0.096,
+          "benchOpA": 0.252,
+          "horizon": 5,
+          "succes20": 0.45,
+          "verbindingen": 1124,
+          "actief": 586,
+          "randdruk": 0.04912588424043104,
+          "losgeraakt": 0,
+          "meedoend": 60,
+          "neuronenEind": 60,
+          "tijdMs": 3844
+        }
+      ],
+      "bench": {
+        "n": 8,
+        "m": 0.083,
+        "sd": 0.029041841736167,
+        "ci": 0.020124969565194377
+      },
+      "horizon": {
+        "n": 8,
+        "m": 2.375,
+        "sd": 1.8468119248354136,
+        "ci": 1.2797753709147552
+      },
+      "succes20": {
+        "n": 8,
+        "m": 0.49375,
+        "sd": 0.06232117273791123,
+        "ci": 0.04318636937738572
+      },
+      "verbindingen": {
+        "n": 8,
+        "m": 1130.25,
+        "sd": 86.86072595992803,
+        "ci": 60.191412178150465
+      },
+      "actief": {
+        "n": 8,
+        "m": 495.75,
+        "sd": 51.28561480292779,
+        "ci": 35.53911788438199
+      },
+      "randdruk": {
+        "n": 8,
+        "m": 0.04733133075737721,
+        "sd": 0.0014034287402761845,
+        "ci": 0.0009725264995781562
+      },
+      "losgeraakt": {
+        "n": 8,
+        "m": 2.375,
+        "sd": 1.8468119248354136,
+        "ci": 1.2797753709147552
+      },
+      "meedoend": {
+        "n": 8,
+        "m": 58.875,
+        "sd": 5.221863378417434,
+        "ci": 3.618566705202489
+      },
+      "neuronenEind": {
+        "n": 8,
+        "m": 61.25,
+        "sd": 5.444525428617001,
+        "ci": 3.7728636338993216
+      },
+      "tijdMs": {
+        "n": 8,
+        "m": 3856.25,
+        "sd": 261.85914970784256,
+        "ci": 181.45913286467564
+      },
+      "verzadigd": false
+    },
+    "s9-n16-d70-B20": {
+      "neuronen": 16,
+      "dichtheid": 70,
+      "stand": "B20",
+      "lr": 0.008,
+      "runs": 8,
+      "perZaad": [
+        {
+          "zaad": 1000,
+          "bench": 0.118,
+          "benchOpA": 0.222,
+          "horizon": 2,
+          "succes20": 0.5,
+          "verbindingen": 1033,
+          "actief": 456,
+          "randdruk": 0.04878046296087039,
+          "losgeraakt": 1,
+          "meedoend": 53,
+          "neuronenEind": 54,
+          "tijdMs": 3591
+        },
+        {
+          "zaad": 1001,
+          "bench": 0.068,
+          "benchOpA": 0.192,
+          "horizon": 2,
+          "succes20": 0.5,
+          "verbindingen": 1115,
+          "actief": 501,
+          "randdruk": 0.0482404230570738,
+          "losgeraakt": 2,
+          "meedoend": 56,
+          "neuronenEind": 58,
+          "tijdMs": 3693
+        },
+        {
+          "zaad": 1002,
+          "bench": 0.072,
+          "benchOpA": 0.214,
+          "horizon": 3,
+          "succes20": 0.5,
+          "verbindingen": 1036,
+          "actief": 409,
+          "randdruk": 0.047366187162967005,
+          "losgeraakt": 5,
+          "meedoend": 51,
+          "neuronenEind": 56,
+          "tijdMs": 3663
+        },
+        {
+          "zaad": 1003,
+          "bench": 0.116,
+          "benchOpA": 0.192,
+          "horizon": 1,
+          "succes20": 0.55,
+          "verbindingen": 1178,
+          "actief": 518,
+          "randdruk": 0.04503593749075613,
+          "losgeraakt": 3,
+          "meedoend": 63,
+          "neuronenEind": 66,
+          "tijdMs": 3974
+        },
+        {
+          "zaad": 1004,
+          "bench": 0.028,
+          "benchOpA": 0.098,
+          "horizon": 1,
+          "succes20": 0.4,
+          "verbindingen": 1246,
+          "actief": 499,
+          "randdruk": 0.047266527453302114,
+          "losgeraakt": 5,
+          "meedoend": 63,
+          "neuronenEind": 68,
+          "tijdMs": 4376
+        },
+        {
+          "zaad": 1005,
+          "bench": 0.078,
+          "benchOpA": 0.108,
+          "horizon": 0,
+          "succes20": 0.45,
+          "verbindingen": 1062,
+          "actief": 481,
+          "randdruk": 0.04582751809731507,
+          "losgeraakt": 1,
+          "meedoend": 59,
+          "neuronenEind": 60,
+          "tijdMs": 3704
+        },
+        {
+          "zaad": 1006,
+          "bench": 0.088,
+          "benchOpA": 0.502,
+          "horizon": 5,
+          "succes20": 0.6,
+          "verbindingen": 1248,
+          "actief": 516,
+          "randdruk": 0.04700770559630212,
+          "losgeraakt": 2,
+          "meedoend": 66,
+          "neuronenEind": 68,
+          "tijdMs": 4139
+        },
+        {
+          "zaad": 1007,
+          "bench": 0.096,
+          "benchOpA": 0.252,
+          "horizon": 5,
+          "succes20": 0.45,
+          "verbindingen": 1124,
+          "actief": 586,
+          "randdruk": 0.04912588424043104,
+          "losgeraakt": 0,
+          "meedoend": 60,
+          "neuronenEind": 60,
+          "tijdMs": 3814
+        }
+      ],
+      "bench": {
+        "n": 8,
+        "m": 0.083,
+        "sd": 0.029041841736167,
+        "ci": 0.020124969565194377
+      },
+      "horizon": {
+        "n": 8,
+        "m": 2.375,
+        "sd": 1.8468119248354136,
+        "ci": 1.2797753709147552
+      },
+      "succes20": {
+        "n": 8,
+        "m": 0.49375,
+        "sd": 0.06232117273791123,
+        "ci": 0.04318636937738572
+      },
+      "verbindingen": {
+        "n": 8,
+        "m": 1130.25,
+        "sd": 86.86072595992803,
+        "ci": 60.191412178150465
+      },
+      "actief": {
+        "n": 8,
+        "m": 495.75,
+        "sd": 51.28561480292779,
+        "ci": 35.53911788438199
+      },
+      "randdruk": {
+        "n": 8,
+        "m": 0.04733133075737721,
+        "sd": 0.0014034287402761845,
+        "ci": 0.0009725264995781562
+      },
+      "losgeraakt": {
+        "n": 8,
+        "m": 2.375,
+        "sd": 1.8468119248354136,
+        "ci": 1.2797753709147552
+      },
+      "meedoend": {
+        "n": 8,
+        "m": 58.875,
+        "sd": 5.221863378417434,
+        "ci": 3.618566705202489
+      },
+      "neuronenEind": {
+        "n": 8,
+        "m": 61.25,
+        "sd": 5.444525428617001,
+        "ci": 3.7728636338993216
+      },
+      "tijdMs": {
+        "n": 8,
+        "m": 3869.25,
+        "sd": 273.0566398596243,
+        "ci": 189.21859765889818
+      },
+      "verzadigd": true
+    },
+    "s9-n30-d15-B20": {
+      "neuronen": 30,
+      "dichtheid": 15,
+      "stand": "B20",
+      "lr": 0.008,
+      "runs": 8,
+      "perZaad": [
+        {
+          "zaad": 1000,
+          "bench": 0.048,
+          "benchOpA": 0.168,
+          "horizon": 0,
+          "succes20": 0.25,
+          "verbindingen": 1314,
+          "actief": 583,
+          "randdruk": 0.04958983213462716,
+          "losgeraakt": 3,
+          "meedoend": 71,
+          "neuronenEind": 74,
+          "tijdMs": 4687
+        },
+        {
+          "zaad": 1001,
+          "bench": 0.024,
+          "benchOpA": 0.182,
+          "horizon": 6,
+          "succes20": 0.45,
+          "verbindingen": 1243,
+          "actief": 352,
+          "randdruk": 0.0489676424016695,
+          "losgeraakt": 18,
+          "meedoend": 52,
+          "neuronenEind": 70,
+          "tijdMs": 4503
+        },
+        {
+          "zaad": 1002,
+          "bench": 0.046,
+          "benchOpA": 0.094,
+          "horizon": 0,
+          "succes20": 0.1,
+          "verbindingen": 1393,
+          "actief": 573,
+          "randdruk": 0.04666205558406302,
+          "losgeraakt": 4,
+          "meedoend": 76,
+          "neuronenEind": 80,
+          "tijdMs": 5069
+        },
+        {
+          "zaad": 1003,
+          "bench": 0.054,
+          "benchOpA": 0.146,
+          "horizon": 14,
+          "succes20": 0.45,
+          "verbindingen": 1405,
+          "actief": 593,
+          "randdruk": 0.047388589654856914,
+          "losgeraakt": 7,
+          "meedoend": 77,
+          "neuronenEind": 84,
+          "tijdMs": 5019
+        },
+        {
+          "zaad": 1004,
+          "bench": 0.042,
+          "benchOpA": 0.086,
+          "horizon": 1,
+          "succes20": 0.3,
+          "verbindingen": 1352,
+          "actief": 614,
+          "randdruk": 0.049090186780860204,
+          "losgeraakt": 3,
+          "meedoend": 75,
+          "neuronenEind": 78,
+          "tijdMs": 4753
+        },
+        {
+          "zaad": 1005,
+          "bench": 0.094,
+          "benchOpA": 0.204,
+          "horizon": 1,
+          "succes20": 0.3,
+          "verbindingen": 1374,
+          "actief": 766,
+          "randdruk": 0.04816042717184947,
+          "losgeraakt": 1,
+          "meedoend": 75,
+          "neuronenEind": 76,
+          "tijdMs": 4776
+        },
+        {
+          "zaad": 1006,
+          "bench": 0.072,
+          "benchOpA": 0.118,
+          "horizon": 2,
+          "succes20": 0.2,
+          "verbindingen": 1375,
+          "actief": 563,
+          "randdruk": 0.04732028067484498,
+          "losgeraakt": 5,
+          "meedoend": 73,
+          "neuronenEind": 78,
+          "tijdMs": 4855
+        },
+        {
+          "zaad": 1007,
+          "bench": 0.086,
+          "benchOpA": 0.154,
+          "horizon": 2,
+          "succes20": 0.4,
+          "verbindingen": 1355,
+          "actief": 659,
+          "randdruk": 0.04903953734304622,
+          "losgeraakt": 2,
+          "meedoend": 72,
+          "neuronenEind": 74,
+          "tijdMs": 4722
+        }
+      ],
+      "bench": {
+        "n": 8,
+        "m": 0.05825000000000001,
+        "sd": 0.02374718028374256,
+        "ci": 0.016455956368439967
+      },
+      "horizon": {
+        "n": 8,
+        "m": 3.25,
+        "sd": 4.743416490252569,
+        "ci": 3.2870199269246907
+      },
+      "succes20": {
+        "n": 8,
+        "m": 0.30625,
+        "sd": 0.12374368670764584,
+        "ci": 0.08575
+      },
+      "verbindingen": {
+        "n": 8,
+        "m": 1351.375,
+        "sd": 51.87054628041401,
+        "ci": 35.944454718356766
+      },
+      "actief": {
+        "n": 8,
+        "m": 587.875,
+        "sd": 115.87978684826788,
+        "ci": 80.30059542120468
+      },
+      "randdruk": {
+        "n": 8,
+        "m": 0.04827731896822718,
+        "sd": 0.0010535294264101586,
+        "ci": 0.0007300586455623129
+      },
+      "losgeraakt": {
+        "n": 8,
+        "m": 5.375,
+        "sd": 5.423164600647327,
+        "ci": 3.7580613353163885
+      },
+      "meedoend": {
+        "n": 8,
+        "m": 71.375,
+        "sd": 8.087689057185266,
+        "ci": 5.604482580934658
+      },
+      "neuronenEind": {
+        "n": 8,
+        "m": 76.75,
+        "sd": 4.267819784654187,
+        "ci": 2.9574482243988647
+      },
+      "tijdMs": {
+        "n": 8,
+        "m": 4798,
+        "sd": 182.5071427173664,
+        "ci": 126.47099746582218
+      },
+      "verzadigd": false
+    },
+    "s9-n30-d35-B20": {
+      "neuronen": 30,
+      "dichtheid": 35,
+      "stand": "B20",
+      "lr": 0.008,
+      "runs": 8,
+      "perZaad": [
+        {
+          "zaad": 1000,
+          "bench": 0.104,
+          "benchOpA": 0.3,
+          "horizon": 12,
+          "succes20": 0.5,
+          "verbindingen": 1765,
+          "actief": 1108,
+          "randdruk": 0.0501174601319275,
+          "losgeraakt": 1,
+          "meedoend": 79,
+          "neuronenEind": 80,
+          "tijdMs": 6095
+        },
+        {
+          "zaad": 1001,
+          "bench": 0.06,
+          "benchOpA": 0.196,
+          "horizon": 5,
+          "succes20": 0.6,
+          "verbindingen": 1747,
+          "actief": 903,
+          "randdruk": 0.049333542466208816,
+          "losgeraakt": 1,
+          "meedoend": 77,
+          "neuronenEind": 78,
+          "tijdMs": 5856
+        },
+        {
+          "zaad": 1002,
+          "bench": 0.098,
+          "benchOpA": 0.178,
+          "horizon": 2,
+          "succes20": 0.2,
+          "verbindingen": 1712,
+          "actief": 1077,
+          "randdruk": 0.05004361807417995,
+          "losgeraakt": 1,
+          "meedoend": 77,
+          "neuronenEind": 78,
+          "tijdMs": 5934
+        },
+        {
+          "zaad": 1003,
+          "bench": 0.096,
+          "benchOpA": 0.292,
+          "horizon": 3,
+          "succes20": 0.5,
+          "verbindingen": 1557,
+          "actief": 918,
+          "randdruk": 0.05149359446615292,
+          "losgeraakt": 1,
+          "meedoend": 71,
+          "neuronenEind": 72,
+          "tijdMs": 5332
+        },
+        {
+          "zaad": 1004,
+          "bench": 0.158,
+          "benchOpA": 0.438,
+          "horizon": 9,
+          "succes20": 0.55,
+          "verbindingen": 1859,
+          "actief": 875,
+          "randdruk": 0.05090213476917183,
+          "losgeraakt": 1,
+          "meedoend": 77,
+          "neuronenEind": 78,
+          "tijdMs": 5993
+        },
+        {
+          "zaad": 1005,
+          "bench": 0.14,
+          "benchOpA": 0.496,
+          "horizon": 14,
+          "succes20": 0.55,
+          "verbindingen": 1650,
+          "actief": 801,
+          "randdruk": 0.05059326873048011,
+          "losgeraakt": 4,
+          "meedoend": 76,
+          "neuronenEind": 80,
+          "tijdMs": 5463
+        },
+        {
+          "zaad": 1006,
+          "bench": 0.068,
+          "benchOpA": 0.242,
+          "horizon": 1,
+          "succes20": 0.55,
+          "verbindingen": 1909,
+          "actief": 982,
+          "randdruk": 0.048585270381276,
+          "losgeraakt": 0,
+          "meedoend": 80,
+          "neuronenEind": 80,
+          "tijdMs": 6235
+        },
+        {
+          "zaad": 1007,
+          "bench": 0.106,
+          "benchOpA": 0.194,
+          "horizon": 4,
+          "succes20": 0.3,
+          "verbindingen": 1845,
+          "actief": 911,
+          "randdruk": 0.049460727053279245,
+          "losgeraakt": 3,
+          "meedoend": 81,
+          "neuronenEind": 84,
+          "tijdMs": 6104
+        }
+      ],
+      "bench": {
+        "n": 8,
+        "m": 0.10375,
+        "sd": 0.0328361734328817,
+        "ci": 0.02275430728455604
+      },
+      "horizon": {
+        "n": 8,
+        "m": 6.25,
+        "sd": 4.832922806867792,
+        "ci": 3.3490446398935916
+      },
+      "succes20": {
+        "n": 8,
+        "m": 0.46875,
+        "sd": 0.1412634317254722,
+        "ci": 0.09789056389662898
+      },
+      "verbindingen": {
+        "n": 8,
+        "m": 1755.5,
+        "sd": 116.41796621287823,
+        "ci": 80.67353469385111
+      },
+      "actief": {
+        "n": 8,
+        "m": 946.875,
+        "sd": 103.24649769224274,
+        "ci": 71.54617267890714
+      },
+      "randdruk": {
+        "n": 8,
+        "m": 0.05006620200908455,
+        "sd": 0.0009345524504180481,
+        "ci": 0.0006476118075638043
+      },
+      "losgeraakt": {
+        "n": 8,
+        "m": 1.5,
+        "sd": 1.3093073414159542,
+        "ci": 0.9073036977771003
+      },
+      "meedoend": {
+        "n": 8,
+        "m": 77.25,
+        "sd": 3.058944729337694,
+        "ci": 2.119740550161741
+      },
+      "neuronenEind": {
+        "n": 8,
+        "m": 78.75,
+        "sd": 3.370036032024414,
+        "ci": 2.335315824465719
+      },
+      "tijdMs": {
+        "n": 8,
+        "m": 5876.5,
+        "sd": 319.1018646137938,
+        "ci": 221.12631051053148
+      },
+      "verzadigd": false
+    },
+    "s9-n30-d70-B20": {
+      "neuronen": 30,
+      "dichtheid": 70,
+      "stand": "B20",
+      "lr": 0.008,
+      "runs": 8,
+      "perZaad": [
+        {
+          "zaad": 1000,
+          "bench": 0.104,
+          "benchOpA": 0.3,
+          "horizon": 12,
+          "succes20": 0.5,
+          "verbindingen": 1765,
+          "actief": 1108,
+          "randdruk": 0.0501174601319275,
+          "losgeraakt": 1,
+          "meedoend": 79,
+          "neuronenEind": 80,
+          "tijdMs": 5885
+        },
+        {
+          "zaad": 1001,
+          "bench": 0.06,
+          "benchOpA": 0.196,
+          "horizon": 5,
+          "succes20": 0.6,
+          "verbindingen": 1747,
+          "actief": 903,
+          "randdruk": 0.049333542466208816,
+          "losgeraakt": 1,
+          "meedoend": 77,
+          "neuronenEind": 78,
+          "tijdMs": 5899
+        },
+        {
+          "zaad": 1002,
+          "bench": 0.098,
+          "benchOpA": 0.178,
+          "horizon": 2,
+          "succes20": 0.2,
+          "verbindingen": 1712,
+          "actief": 1077,
+          "randdruk": 0.05004361807417995,
+          "losgeraakt": 1,
+          "meedoend": 77,
+          "neuronenEind": 78,
+          "tijdMs": 5962
+        },
+        {
+          "zaad": 1003,
+          "bench": 0.096,
+          "benchOpA": 0.292,
+          "horizon": 3,
+          "succes20": 0.5,
+          "verbindingen": 1557,
+          "actief": 918,
+          "randdruk": 0.05149359446615292,
+          "losgeraakt": 1,
+          "meedoend": 71,
+          "neuronenEind": 72,
+          "tijdMs": 5333
+        },
+        {
+          "zaad": 1004,
+          "bench": 0.158,
+          "benchOpA": 0.438,
+          "horizon": 9,
+          "succes20": 0.55,
+          "verbindingen": 1859,
+          "actief": 875,
+          "randdruk": 0.05090213476917183,
+          "losgeraakt": 1,
+          "meedoend": 77,
+          "neuronenEind": 78,
+          "tijdMs": 6002
+        },
+        {
+          "zaad": 1005,
+          "bench": 0.14,
+          "benchOpA": 0.496,
+          "horizon": 14,
+          "succes20": 0.55,
+          "verbindingen": 1650,
+          "actief": 801,
+          "randdruk": 0.05059326873048011,
+          "losgeraakt": 4,
+          "meedoend": 76,
+          "neuronenEind": 80,
+          "tijdMs": 5442
+        },
+        {
+          "zaad": 1006,
+          "bench": 0.068,
+          "benchOpA": 0.242,
+          "horizon": 1,
+          "succes20": 0.55,
+          "verbindingen": 1909,
+          "actief": 982,
+          "randdruk": 0.048585270381276,
+          "losgeraakt": 0,
+          "meedoend": 80,
+          "neuronenEind": 80,
+          "tijdMs": 6236
+        },
+        {
+          "zaad": 1007,
+          "bench": 0.106,
+          "benchOpA": 0.194,
+          "horizon": 4,
+          "succes20": 0.3,
+          "verbindingen": 1845,
+          "actief": 911,
+          "randdruk": 0.049460727053279245,
+          "losgeraakt": 3,
+          "meedoend": 81,
+          "neuronenEind": 84,
+          "tijdMs": 6104
+        }
+      ],
+      "bench": {
+        "n": 8,
+        "m": 0.10375,
+        "sd": 0.0328361734328817,
+        "ci": 0.02275430728455604
+      },
+      "horizon": {
+        "n": 8,
+        "m": 6.25,
+        "sd": 4.832922806867792,
+        "ci": 3.3490446398935916
+      },
+      "succes20": {
+        "n": 8,
+        "m": 0.46875,
+        "sd": 0.1412634317254722,
+        "ci": 0.09789056389662898
+      },
+      "verbindingen": {
+        "n": 8,
+        "m": 1755.5,
+        "sd": 116.41796621287823,
+        "ci": 80.67353469385111
+      },
+      "actief": {
+        "n": 8,
+        "m": 946.875,
+        "sd": 103.24649769224274,
+        "ci": 71.54617267890714
+      },
+      "randdruk": {
+        "n": 8,
+        "m": 0.05006620200908455,
+        "sd": 0.0009345524504180481,
+        "ci": 0.0006476118075638043
+      },
+      "losgeraakt": {
+        "n": 8,
+        "m": 1.5,
+        "sd": 1.3093073414159542,
+        "ci": 0.9073036977771003
+      },
+      "meedoend": {
+        "n": 8,
+        "m": 77.25,
+        "sd": 3.058944729337694,
+        "ci": 2.119740550161741
+      },
+      "neuronenEind": {
+        "n": 8,
+        "m": 78.75,
+        "sd": 3.370036032024414,
+        "ci": 2.335315824465719
+      },
+      "tijdMs": {
+        "n": 8,
+        "m": 5857.875,
+        "sd": 313.0592994945207,
+        "ci": 216.93902651436417
+      },
+      "verzadigd": true
+    },
+    "s9-n60-d15-B20": {
+      "neuronen": 60,
+      "dichtheid": 15,
+      "stand": "B20",
+      "lr": 0.004,
+      "runs": 8,
+      "perZaad": [
+        {
+          "zaad": 1000,
+          "bench": 0.062,
+          "benchOpA": 0.11,
+          "horizon": 0,
+          "succes20": 0.05,
+          "verbindingen": 1654,
+          "actief": 844,
+          "randdruk": 0.05477746390320075,
+          "losgeraakt": 10,
+          "meedoend": 88,
+          "neuronenEind": 98,
+          "tijdMs": 6263
+        },
+        {
+          "zaad": 1001,
+          "bench": 0.078,
+          "benchOpA": 0.216,
+          "horizon": 5,
+          "succes20": 0.3,
+          "verbindingen": 1687,
+          "actief": 692,
+          "randdruk": 0.05490771897284013,
+          "losgeraakt": 12,
+          "meedoend": 88,
+          "neuronenEind": 100,
+          "tijdMs": 6364
+        },
+        {
+          "zaad": 1002,
+          "bench": 0.058,
+          "benchOpA": 0.138,
+          "horizon": 0,
+          "succes20": 0.1,
+          "verbindingen": 1787,
+          "actief": 911,
+          "randdruk": 0.053114816660552955,
+          "losgeraakt": 6,
+          "meedoend": 104,
+          "neuronenEind": 110,
+          "tijdMs": 6736
+        },
+        {
+          "zaad": 1003,
+          "bench": 0.06,
+          "benchOpA": 0.148,
+          "horizon": 1,
+          "succes20": 0.15,
+          "verbindingen": 1788,
+          "actief": 934,
+          "randdruk": 0.051908168595224846,
+          "losgeraakt": 7,
+          "meedoend": 103,
+          "neuronenEind": 110,
+          "tijdMs": 6843
+        },
+        {
+          "zaad": 1004,
+          "bench": 0.036,
+          "benchOpA": 0.068,
+          "horizon": 1,
+          "succes20": 0.1,
+          "verbindingen": 1810,
+          "actief": 978,
+          "randdruk": 0.05346540005730326,
+          "losgeraakt": 4,
+          "meedoend": 106,
+          "neuronenEind": 110,
+          "tijdMs": 6941
+        },
+        {
+          "zaad": 1005,
+          "bench": 0.042,
+          "benchOpA": 0.094,
+          "horizon": 0,
+          "succes20": 0.15,
+          "verbindingen": 1811,
+          "actief": 915,
+          "randdruk": 0.053011180646209716,
+          "losgeraakt": 7,
+          "meedoend": 103,
+          "neuronenEind": 110,
+          "tijdMs": 6785
+        },
+        {
+          "zaad": 1006,
+          "bench": 0.03,
+          "benchOpA": 0.026,
+          "horizon": 0,
+          "succes20": 0,
+          "verbindingen": 1789,
+          "actief": 923,
+          "randdruk": 0.05330761643627017,
+          "losgeraakt": 6,
+          "meedoend": 104,
+          "neuronenEind": 110,
+          "tijdMs": 6914
+        },
+        {
+          "zaad": 1007,
+          "bench": 0.062,
+          "benchOpA": 0.164,
+          "horizon": 2,
+          "succes20": 0.35,
+          "verbindingen": 1764,
+          "actief": 900,
+          "randdruk": 0.05405825212727742,
+          "losgeraakt": 5,
+          "meedoend": 97,
+          "neuronenEind": 102,
+          "tijdMs": 6584
+        }
+      ],
+      "bench": {
+        "n": 8,
+        "m": 0.0535,
+        "sd": 0.016026763330664832,
+        "ci": 0.011105980370953299
+      },
+      "horizon": {
+        "n": 8,
+        "m": 1.125,
+        "sd": 1.7268882005337975,
+        "ci": 1.196672469809513
+      },
+      "succes20": {
+        "n": 8,
+        "m": 0.15,
+        "sd": 0.11952286093343938,
+        "ci": 0.08282511696339463
+      },
+      "verbindingen": {
+        "n": 8,
+        "m": 1761.25,
+        "sd": 58.58266442752985,
+        "ci": 40.595715291148636
+      },
+      "actief": {
+        "n": 8,
+        "m": 887.125,
+        "sd": 87.16886321551816,
+        "ci": 60.40494040225517
+      },
+      "randdruk": {
+        "n": 8,
+        "m": 0.05356882717485991,
+        "sd": 0.0009889952409660979,
+        "ci": 0.0006853387366193844
+      },
+      "losgeraakt": {
+        "n": 8,
+        "m": 7.125,
+        "sd": 2.6423744732991303,
+        "ci": 1.8310720903339657
+      },
+      "meedoend": {
+        "n": 8,
+        "m": 99.125,
+        "sd": 7.3375258578274,
+        "ci": 5.084646005377365
+      },
+      "neuronenEind": {
+        "n": 8,
+        "m": 106.25,
+        "sd": 5.284748946598261,
+        "ci": 3.6621441806679313
+      },
+      "tijdMs": {
+        "n": 8,
+        "m": 6678.75,
+        "sd": 252.57403440801838,
+        "ci": 175.02487623192306
+      },
+      "verzadigd": false
+    },
+    "s9-n60-d35-B20": {
+      "neuronen": 60,
+      "dichtheid": 35,
+      "stand": "B20",
+      "lr": 0.004,
+      "runs": 8,
+      "perZaad": [
+        {
+          "zaad": 1000,
+          "bench": 0.132,
+          "benchOpA": 0.588,
+          "horizon": 23,
+          "succes20": 0.4,
+          "verbindingen": 2961,
+          "actief": 1744,
+          "randdruk": 0.05636568500195092,
+          "losgeraakt": 3,
+          "meedoend": 103,
+          "neuronenEind": 106,
+          "tijdMs": 9810
+        },
+        {
+          "zaad": 1001,
+          "bench": 0.126,
+          "benchOpA": 0.376,
+          "horizon": 12,
+          "succes20": 0.55,
+          "verbindingen": 2976,
+          "actief": 1791,
+          "randdruk": 0.05549946408259578,
+          "losgeraakt": 1,
+          "meedoend": 103,
+          "neuronenEind": 104,
+          "tijdMs": 9922
+        },
+        {
+          "zaad": 1002,
+          "bench": 0.046,
+          "benchOpA": 0.154,
+          "horizon": 0,
+          "succes20": 0.25,
+          "verbindingen": 3007,
+          "actief": 1612,
+          "randdruk": 0.05525144185365619,
+          "losgeraakt": 5,
+          "meedoend": 101,
+          "neuronenEind": 106,
+          "tijdMs": 10226
+        },
+        {
+          "zaad": 1003,
+          "bench": 0.076,
+          "benchOpA": 0.21,
+          "horizon": 4,
+          "succes20": 0.55,
+          "verbindingen": 2931,
+          "actief": 1588,
+          "randdruk": 0.05462476411955774,
+          "losgeraakt": 2,
+          "meedoend": 102,
+          "neuronenEind": 104,
+          "tijdMs": 10016
+        },
+        {
+          "zaad": 1004,
+          "bench": 0.116,
+          "benchOpA": 0.348,
+          "horizon": 4,
+          "succes20": 0.5,
+          "verbindingen": 2916,
+          "actief": 1532,
+          "randdruk": 0.055597192252346085,
+          "losgeraakt": 2,
+          "meedoend": 100,
+          "neuronenEind": 102,
+          "tijdMs": 10034
+        },
+        {
+          "zaad": 1005,
+          "bench": 0.096,
+          "benchOpA": 0.39,
+          "horizon": 10,
+          "succes20": 0.4,
+          "verbindingen": 3066,
+          "actief": 1712,
+          "randdruk": 0.054931939890773405,
+          "losgeraakt": 5,
+          "meedoend": 105,
+          "neuronenEind": 110,
+          "tijdMs": 10358
+        },
+        {
+          "zaad": 1006,
+          "bench": 0.066,
+          "benchOpA": 0.12,
+          "horizon": 0,
+          "succes20": 0.5,
+          "verbindingen": 3004,
+          "actief": 1615,
+          "randdruk": 0.05540162479421158,
+          "losgeraakt": 4,
+          "meedoend": 104,
+          "neuronenEind": 108,
+          "tijdMs": 10571
+        },
+        {
+          "zaad": 1007,
+          "bench": 0.106,
+          "benchOpA": 0.528,
+          "horizon": 31,
+          "succes20": 0.6,
+          "verbindingen": 2922,
+          "actief": 1668,
+          "randdruk": 0.05672823877845464,
+          "losgeraakt": 1,
+          "meedoend": 99,
+          "neuronenEind": 100,
+          "tijdMs": 9773
+        }
+      ],
+      "bench": {
+        "n": 8,
+        "m": 0.09549999999999999,
+        "sd": 0.030458402546986698,
+        "ci": 0.021106596125382224
+      },
+      "horizon": {
+        "n": 8,
+        "m": 10.5,
+        "sd": 11.237691679598363,
+        "ci": 7.787323031697093
+      },
+      "succes20": {
+        "n": 8,
+        "m": 0.46875,
+        "sd": 0.11319231422671772,
+        "ci": 0.07843827190855239
+      },
+      "verbindingen": {
+        "n": 8,
+        "m": 2972.875,
+        "sd": 51.45438340344359,
+        "ci": 35.656068557820554
+      },
+      "actief": {
+        "n": 8,
+        "m": 1657.75,
+        "sd": 86.88374827483972,
+        "ci": 60.20736582844328
+      },
+      "randdruk": {
+        "n": 8,
+        "m": 0.055550043846693285,
+        "sd": 0.0006977086493072509,
+        "ci": 0.00048348742687331057
+      },
+      "losgeraakt": {
+        "n": 8,
+        "m": 2.875,
+        "sd": 1.6420805617960927,
+        "ci": 1.1379037744906202
+      },
+      "meedoend": {
+        "n": 8,
+        "m": 102.125,
+        "sd": 2.03100960115899,
+        "ci": 1.407417848401817
+      },
+      "neuronenEind": {
+        "n": 8,
+        "m": 105,
+        "sd": 3.2071349029490928,
+        "ci": 2.222431101294256
+      },
+      "tijdMs": {
+        "n": 8,
+        "m": 10088.75,
+        "sd": 277.07489962102306,
+        "ci": 192.00310961023519
+      },
+      "verzadigd": false
+    },
+    "s9-n60-d70-B20": {
+      "neuronen": 60,
+      "dichtheid": 70,
+      "stand": "B20",
+      "lr": 0.004,
+      "runs": 8,
+      "perZaad": [
+        {
+          "zaad": 1000,
+          "bench": 0.15,
+          "benchOpA": 0.304,
+          "horizon": 4,
+          "succes20": 0.55,
+          "verbindingen": 3928,
+          "actief": 2075,
+          "randdruk": 0.055536988146724676,
+          "losgeraakt": 5,
+          "meedoend": 107,
+          "neuronenEind": 112,
+          "tijdMs": 13072
+        },
+        {
+          "zaad": 1001,
+          "bench": 0.16,
+          "benchOpA": 0.41,
+          "horizon": 17,
+          "succes20": 0.45,
+          "verbindingen": 3944,
+          "actief": 2069,
+          "randdruk": 0.054372402715051484,
+          "losgeraakt": 3,
+          "meedoend": 113,
+          "neuronenEind": 116,
+          "tijdMs": 12855
+        },
+        {
+          "zaad": 1002,
+          "bench": 0.172,
+          "benchOpA": 0.418,
+          "horizon": 22,
+          "succes20": 0.5,
+          "verbindingen": 3796,
+          "actief": 2453,
+          "randdruk": 0.05637924469547493,
+          "losgeraakt": 2,
+          "meedoend": 106,
+          "neuronenEind": 108,
+          "tijdMs": 12152
+        },
+        {
+          "zaad": 1003,
+          "bench": 0.212,
+          "benchOpA": 0.642,
+          "horizon": 23,
+          "succes20": 0.5,
+          "verbindingen": 3455,
+          "actief": 2033,
+          "randdruk": 0.055605873724633714,
+          "losgeraakt": 4,
+          "meedoend": 100,
+          "neuronenEind": 104,
+          "tijdMs": 10903
+        },
+        {
+          "zaad": 1004,
+          "bench": 0.094,
+          "benchOpA": 0.352,
+          "horizon": 9,
+          "succes20": 0.45,
+          "verbindingen": 4006,
+          "actief": 2169,
+          "randdruk": 0.05572033815568404,
+          "losgeraakt": 3,
+          "meedoend": 101,
+          "neuronenEind": 104,
+          "tijdMs": 13089
+        },
+        {
+          "zaad": 1005,
+          "bench": 0.132,
+          "benchOpA": 0.444,
+          "horizon": 5,
+          "succes20": 0.55,
+          "verbindingen": 3262,
+          "actief": 1935,
+          "randdruk": 0.05636310343876607,
+          "losgeraakt": 5,
+          "meedoend": 99,
+          "neuronenEind": 104,
+          "tijdMs": 10504
+        },
+        {
+          "zaad": 1006,
+          "bench": 0.118,
+          "benchOpA": 0.364,
+          "horizon": 9,
+          "succes20": 0.6,
+          "verbindingen": 4203,
+          "actief": 2220,
+          "randdruk": 0.05488349726845907,
+          "losgeraakt": 3,
+          "meedoend": 103,
+          "neuronenEind": 106,
+          "tijdMs": 13403
+        },
+        {
+          "zaad": 1007,
+          "bench": 0.086,
+          "benchOpA": 0.224,
+          "horizon": 4,
+          "succes20": 0.5,
+          "verbindingen": 3904,
+          "actief": 2179,
+          "randdruk": 0.05651732894079569,
+          "losgeraakt": 2,
+          "meedoend": 104,
+          "neuronenEind": 106,
+          "tijdMs": 12731
+        }
+      ],
+      "bench": {
+        "n": 8,
+        "m": 0.14049999999999999,
+        "sd": 0.04189442513202511,
+        "ci": 0.029031355462671736
+      },
+      "horizon": {
+        "n": 8,
+        "m": 11.625,
+        "sd": 7.927123419897391,
+        "ci": 5.493216271001898
+      },
+      "succes20": {
+        "n": 8,
+        "m": 0.5125,
+        "sd": 0.05175491695067657,
+        "ci": 0.03586432768085859
+      },
+      "verbindingen": {
+        "n": 8,
+        "m": 3812.25,
+        "sd": 307.0750257324282,
+        "ci": 212.79213636786486
+      },
+      "actief": {
+        "n": 8,
+        "m": 2141.625,
+        "sd": 155.58639079302534,
+        "ci": 107.81586815028666
+      },
+      "randdruk": {
+        "n": 8,
+        "m": 0.05567234713569871,
+        "sd": 0.0007585725503752409,
+        "ci": 0.0005256639585044606
+      },
+      "losgeraakt": {
+        "n": 8,
+        "m": 3.375,
+        "sd": 1.1877349391654208,
+        "ci": 0.8230583211413394
+      },
+      "meedoend": {
+        "n": 8,
+        "m": 104.125,
+        "sd": 4.54933276112317,
+        "ci": 3.152526764359027
+      },
+      "neuronenEind": {
+        "n": 8,
+        "m": 107.5,
+        "sd": 4.375255094603872,
+        "ci": 3.03189709587908
+      },
+      "tijdMs": {
+        "n": 8,
+        "m": 12338.625,
+        "sd": 1076.7738769782898,
+        "ci": 746.1662280115604
+      },
+      "verzadigd": false
+    },
+    "s9-n120-d15-B20": {
+      "neuronen": 120,
+      "dichtheid": 15,
+      "stand": "B20",
+      "lr": 0.008,
+      "runs": 8,
+      "perZaad": [
+        {
+          "zaad": 1000,
+          "bench": 0.042,
+          "benchOpA": 0.082,
+          "horizon": 1,
+          "succes20": 0.15,
+          "verbindingen": 2053,
+          "actief": 991,
+          "randdruk": 0.05716652629997834,
+          "losgeraakt": 21,
+          "meedoend": 119,
+          "neuronenEind": 140,
+          "tijdMs": 8697
+        },
+        {
+          "zaad": 1001,
+          "bench": 0.044,
+          "benchOpA": 0.118,
+          "horizon": 0,
+          "succes20": 0.2,
+          "verbindingen": 2115,
+          "actief": 809,
+          "randdruk": 0.05601966618428152,
+          "losgeraakt": 33,
+          "meedoend": 107,
+          "neuronenEind": 140,
+          "tijdMs": 8904
+        },
+        {
+          "zaad": 1002,
+          "bench": 0.066,
+          "benchOpA": 0.098,
+          "horizon": 0,
+          "succes20": 0.35,
+          "verbindingen": 2155,
+          "actief": 1182,
+          "randdruk": 0.05600919983211446,
+          "losgeraakt": 18,
+          "meedoend": 122,
+          "neuronenEind": 140,
+          "tijdMs": 9758
+        },
+        {
+          "zaad": 1003,
+          "bench": 0.088,
+          "benchOpA": 0.118,
+          "horizon": 0,
+          "succes20": 0.45,
+          "verbindingen": 2050,
+          "actief": 1277,
+          "randdruk": 0.05643681391925982,
+          "losgeraakt": 18,
+          "meedoend": 122,
+          "neuronenEind": 140,
+          "tijdMs": 8913
+        },
+        {
+          "zaad": 1004,
+          "bench": 0.044,
+          "benchOpA": 0.096,
+          "horizon": 0,
+          "succes20": 0.25,
+          "verbindingen": 1993,
+          "actief": 1051,
+          "randdruk": 0.05624437910278351,
+          "losgeraakt": 14,
+          "meedoend": 126,
+          "neuronenEind": 140,
+          "tijdMs": 8512
+        },
+        {
+          "zaad": 1005,
+          "bench": 0.068,
+          "benchOpA": 0.124,
+          "horizon": 0,
+          "succes20": 0,
+          "verbindingen": 2038,
+          "actief": 1109,
+          "randdruk": 0.05654403314570658,
+          "losgeraakt": 25,
+          "meedoend": 115,
+          "neuronenEind": 140,
+          "tijdMs": 8775
+        },
+        {
+          "zaad": 1006,
+          "bench": 0.072,
+          "benchOpA": 0.102,
+          "horizon": 0,
+          "succes20": 0.4,
+          "verbindingen": 2120,
+          "actief": 1128,
+          "randdruk": 0.05644737145224287,
+          "losgeraakt": 9,
+          "meedoend": 131,
+          "neuronenEind": 140,
+          "tijdMs": 8946
+        },
+        {
+          "zaad": 1007,
+          "bench": 0.074,
+          "benchOpA": 0.124,
+          "horizon": 2,
+          "succes20": 0.35,
+          "verbindingen": 2095,
+          "actief": 721,
+          "randdruk": 0.05688935953796995,
+          "losgeraakt": 37,
+          "meedoend": 103,
+          "neuronenEind": 140,
+          "tijdMs": 8820
+        }
+      ],
+      "bench": {
+        "n": 8,
+        "m": 0.06225,
+        "sd": 0.01698528775146303,
+        "ci": 0.011770203906475027
+      },
+      "horizon": {
+        "n": 8,
+        "m": 0.375,
+        "sd": 0.7440238091428449,
+        "ci": 0.5155821951929682
+      },
+      "succes20": {
+        "n": 8,
+        "m": 0.26875,
+        "sd": 0.14865468134476723,
+        "ci": 0.10301243856933005
+      },
+      "verbindingen": {
+        "n": 8,
+        "m": 2077.375,
+        "sd": 52.890554112106955,
+        "ci": 36.65128408391716
+      },
+      "actief": {
+        "n": 8,
+        "m": 1033.5,
+        "sd": 187.51914188004534,
+        "ci": 129.94413568914914
+      },
+      "randdruk": {
+        "n": 8,
+        "m": 0.05646966868429214,
+        "sd": 0.00040251829307897476,
+        "ci": 0.00027893094629602167
+      },
+      "losgeraakt": {
+        "n": 8,
+        "m": 21.875,
+        "sd": 9.417878135303544,
+        "ci": 6.526256583984419
+      },
+      "meedoend": {
+        "n": 8,
+        "m": 118.125,
+        "sd": 9.417878135303544,
+        "ci": 6.526256583984419
+      },
+      "neuronenEind": {
+        "n": 8,
+        "m": 140,
+        "sd": 0,
+        "ci": 0
+      },
+      "tijdMs": {
+        "n": 8,
+        "m": 8915.625,
+        "sd": 368.4503988715054,
+        "ci": 255.3231000614711
+      },
+      "verzadigd": false
+    },
+    "s9-n120-d35-B20": {
+      "neuronen": 120,
+      "dichtheid": 35,
+      "stand": "B20",
+      "lr": 0.008,
+      "runs": 8,
+      "perZaad": [
+        {
+          "zaad": 1000,
+          "bench": 0.12,
+          "benchOpA": 0.326,
+          "horizon": 5,
+          "succes20": 0.5,
+          "verbindingen": 4284,
+          "actief": 2336,
+          "randdruk": 0.055352425939209124,
+          "losgeraakt": 6,
+          "meedoend": 134,
+          "neuronenEind": 140,
+          "tijdMs": 14891
+        },
+        {
+          "zaad": 1001,
+          "bench": 0.068,
+          "benchOpA": 0.272,
+          "horizon": 5,
+          "succes20": 0.5,
+          "verbindingen": 4248,
+          "actief": 2660,
+          "randdruk": 0.05416807938547342,
+          "losgeraakt": 8,
+          "meedoend": 132,
+          "neuronenEind": 140,
+          "tijdMs": 14949
+        },
+        {
+          "zaad": 1002,
+          "bench": 0.106,
+          "benchOpA": 0.464,
+          "horizon": 12,
+          "succes20": 0.55,
+          "verbindingen": 4479,
+          "actief": 1490,
+          "randdruk": 0.05465188528469103,
+          "losgeraakt": 31,
+          "meedoend": 109,
+          "neuronenEind": 140,
+          "tijdMs": 15106
+        },
+        {
+          "zaad": 1003,
+          "bench": 0.138,
+          "benchOpA": 0.36,
+          "horizon": 13,
+          "succes20": 0.55,
+          "verbindingen": 4264,
+          "actief": 2455,
+          "randdruk": 0.0551166580511491,
+          "losgeraakt": 13,
+          "meedoend": 127,
+          "neuronenEind": 140,
+          "tijdMs": 14834
+        },
+        {
+          "zaad": 1004,
+          "bench": 0.036,
+          "benchOpA": 0.33,
+          "horizon": 12,
+          "succes20": 0.4,
+          "verbindingen": 4135,
+          "actief": 2178,
+          "randdruk": 0.054666166858040384,
+          "losgeraakt": 11,
+          "meedoend": 129,
+          "neuronenEind": 140,
+          "tijdMs": 14473
+        },
+        {
+          "zaad": 1005,
+          "bench": 0.062,
+          "benchOpA": 0.446,
+          "horizon": 10,
+          "succes20": 0.5,
+          "verbindingen": 4292,
+          "actief": 2428,
+          "randdruk": 0.05498911453999461,
+          "losgeraakt": 15,
+          "meedoend": 125,
+          "neuronenEind": 140,
+          "tijdMs": 14672
+        },
+        {
+          "zaad": 1006,
+          "bench": 0.086,
+          "benchOpA": 0.492,
+          "horizon": 22,
+          "succes20": 0.4,
+          "verbindingen": 4275,
+          "actief": 2217,
+          "randdruk": 0.05503434689089177,
+          "losgeraakt": 9,
+          "meedoend": 131,
+          "neuronenEind": 140,
+          "tijdMs": 14439
+        },
+        {
+          "zaad": 1007,
+          "bench": 0.148,
+          "benchOpA": 0.516,
+          "horizon": 23,
+          "succes20": 0.55,
+          "verbindingen": 4297,
+          "actief": 2403,
+          "randdruk": 0.05545506485818487,
+          "losgeraakt": 4,
+          "meedoend": 136,
+          "neuronenEind": 140,
+          "tijdMs": 14679
+        }
+      ],
+      "bench": {
+        "n": 8,
+        "m": 0.0955,
+        "sd": 0.03924647390894772,
+        "ci": 0.02719641888190428
+      },
+      "horizon": {
+        "n": 8,
+        "m": 12.75,
+        "sd": 6.7559497587576205,
+        "ci": 4.68163433001767
+      },
+      "succes20": {
+        "n": 8,
+        "m": 0.49375,
+        "sd": 0.06232117273791125,
+        "ci": 0.04318636937738573
+      },
+      "verbindingen": {
+        "n": 8,
+        "m": 4284.25,
+        "sd": 94.29096305736681,
+        "ci": 65.34030379482482
+      },
+      "actief": {
+        "n": 8,
+        "m": 2270.875,
+        "sd": 349.08060366789624,
+        "ci": 241.90051679357774
+      },
+      "randdruk": {
+        "n": 8,
+        "m": 0.054929217725954285,
+        "sd": 0.0004193250799695887,
+        "ci": 0.00029057745541672574
+      },
+      "losgeraakt": {
+        "n": 8,
+        "m": 12.125,
+        "sd": 8.425090080061036,
+        "ci": 5.838289561164298
+      },
+      "meedoend": {
+        "n": 8,
+        "m": 127.875,
+        "sd": 8.425090080061036,
+        "ci": 5.838289561164298
+      },
+      "neuronenEind": {
+        "n": 8,
+        "m": 140,
+        "sd": 0,
+        "ci": 0
+      },
+      "tijdMs": {
+        "n": 8,
+        "m": 14755.375,
+        "sd": 232.26151363126374,
+        "ci": 160.94901747137197
+      },
+      "verzadigd": false
+    },
+    "s9-n120-d70-B20": {
+      "neuronen": 120,
+      "dichtheid": 70,
+      "stand": "B20",
+      "lr": 0.008,
+      "runs": 8,
+      "perZaad": [
+        {
+          "zaad": 1000,
+          "bench": 0.274,
+          "benchOpA": 0.59,
+          "horizon": 28,
+          "succes20": 0.45,
+          "verbindingen": 8010,
+          "actief": 4208,
+          "randdruk": 0.05433889368575731,
+          "losgeraakt": 8,
+          "meedoend": 132,
+          "neuronenEind": 140,
+          "tijdMs": 24019
+        },
+        {
+          "zaad": 1001,
+          "bench": 0.18,
+          "benchOpA": 0.62,
+          "horizon": 10,
+          "succes20": 0.55,
+          "verbindingen": 8053,
+          "actief": 4770,
+          "randdruk": 0.052992402999316075,
+          "losgeraakt": 1,
+          "meedoend": 139,
+          "neuronenEind": 140,
+          "tijdMs": 23417
+        },
+        {
+          "zaad": 1002,
+          "bench": 0.122,
+          "benchOpA": 0.526,
+          "horizon": 26,
+          "succes20": 0.55,
+          "verbindingen": 8059,
+          "actief": 4074,
+          "randdruk": 0.053118777060349814,
+          "losgeraakt": 10,
+          "meedoend": 130,
+          "neuronenEind": 140,
+          "tijdMs": 23203
+        },
+        {
+          "zaad": 1003,
+          "bench": 0.056,
+          "benchOpA": 0.196,
+          "horizon": 2,
+          "succes20": 0.4,
+          "verbindingen": 8002,
+          "actief": 4434,
+          "randdruk": 0.05353569023046534,
+          "losgeraakt": 12,
+          "meedoend": 128,
+          "neuronenEind": 140,
+          "tijdMs": 25023
+        },
+        {
+          "zaad": 1004,
+          "bench": 0.172,
+          "benchOpA": 0.452,
+          "horizon": 10,
+          "succes20": 0.4,
+          "verbindingen": 8011,
+          "actief": 4363,
+          "randdruk": 0.05354786246714174,
+          "losgeraakt": 5,
+          "meedoend": 135,
+          "neuronenEind": 140,
+          "tijdMs": 23045
+        },
+        {
+          "zaad": 1005,
+          "bench": 0.39,
+          "benchOpA": 0.678,
+          "horizon": 15,
+          "succes20": 0.75,
+          "verbindingen": 7985,
+          "actief": 4323,
+          "randdruk": 0.05460634470052954,
+          "losgeraakt": 9,
+          "meedoend": 131,
+          "neuronenEind": 140,
+          "tijdMs": 21389
+        },
+        {
+          "zaad": 1006,
+          "bench": 0.176,
+          "benchOpA": 0.612,
+          "horizon": 18,
+          "succes20": 0.55,
+          "verbindingen": 8013,
+          "actief": 4229,
+          "randdruk": 0.052220811220912225,
+          "losgeraakt": 4,
+          "meedoend": 136,
+          "neuronenEind": 140,
+          "tijdMs": 24488
+        },
+        {
+          "zaad": 1007,
+          "bench": 0.108,
+          "benchOpA": 0.392,
+          "horizon": 10,
+          "succes20": 0.4,
+          "verbindingen": 8001,
+          "actief": 4069,
+          "randdruk": 0.05369251837917608,
+          "losgeraakt": 5,
+          "meedoend": 135,
+          "neuronenEind": 140,
+          "tijdMs": 23735
+        }
+      ],
+      "bench": {
+        "n": 8,
+        "m": 0.18475,
+        "sd": 0.10471696546951148,
+        "ci": 0.07256515486099371
+      },
+      "horizon": {
+        "n": 8,
+        "m": 14.875,
+        "sd": 8.806450557890587,
+        "ci": 6.102558889515119
+      },
+      "succes20": {
+        "n": 8,
+        "m": 0.5062500000000001,
+        "sd": 0.12082307017169479,
+        "ci": 0.0837261159973398
+      },
+      "verbindingen": {
+        "n": 8,
+        "m": 8016.75,
+        "sd": 25.816661286851172,
+        "ci": 17.89003353825811
+      },
+      "actief": {
+        "n": 8,
+        "m": 4308.75,
+        "sd": 226.9938639825189,
+        "ci": 157.29872249958038
+      },
+      "randdruk": {
+        "n": 8,
+        "m": 0.053506662592956014,
+        "sd": 0.0007566206450139392,
+        "ci": 0.000524311357097594
+      },
+      "losgeraakt": {
+        "n": 8,
+        "m": 6.75,
+        "sd": 3.615443067098218,
+        "ci": 2.505374223544259
+      },
+      "meedoend": {
+        "n": 8,
+        "m": 133.25,
+        "sd": 3.615443067098218,
+        "ci": 2.505374223544259
+      },
+      "neuronenEind": {
+        "n": 8,
+        "m": 140,
+        "sd": 0,
+        "ci": 0
+      },
+      "tijdMs": {
+        "n": 8,
+        "m": 23539.875,
+        "sd": 1093.2247759332413,
+        "ci": 757.5661193750681
+      },
+      "verzadigd": false
+    }
+  },
+  "perStand": {
+    "A": {
+      "perN": [
+        {
+          "neuronen": 8,
+          "besteDichtheid": 15,
+          "bench": {
+            "n": 8,
+            "m": 0.265,
+            "sd": 0.166671618974043,
+            "ci": 0.11549753936772851
+          },
+          "horizon": {
+            "n": 8,
+            "m": 7.75,
+            "sd": 11.597413504743201,
+            "ci": 8.036597538759795
+          },
+          "randdruk": {
+            "n": 8,
+            "m": 0.04659125782339687,
+            "sd": 0.0022640575197315663,
+            "ci": 0.0015689118166946142
+          },
+          "losgeraakt": {
+            "n": 8,
+            "m": 30.5,
+            "sd": 17.968225924034428,
+            "ci": 12.451345308841129
+          },
+          "meedoend": {
+            "n": 8,
+            "m": 26.25,
+            "sd": 17.95828499606797,
+            "ci": 12.444456597216288
+          },
+          "neuronenEind": {
+            "n": 8,
+            "m": 56.75,
+            "sd": 2.3754698783308417,
+            "ci": 1.6461166422826787
+          },
+          "spreidingTussenZaden": {
+            "n": 8,
+            "m": 0.166671618974043,
+            "sd": 0,
+            "ci": 0
+          },
+          "bijStandaardDichtheid": {
+            "n": 8,
+            "m": 0.265,
+            "sd": 0.166671618974043,
+            "ci": 0.11549753936772851
+          },
+          "verzadigdeCellen": 2
+        },
+        {
+          "neuronen": 16,
+          "besteDichtheid": 35,
+          "bench": {
+            "n": 8,
+            "m": 0.5415,
+            "sd": 0.058100897460489236,
+            "ci": 0.04026186781558947
+          },
+          "horizon": {
+            "n": 8,
+            "m": 7.25,
+            "sd": 4.978525312350464,
+            "ci": 3.4499420284984494
+          },
+          "randdruk": {
+            "n": 8,
+            "m": 0.04942039540797206,
+            "sd": 0.001086503525221123,
+            "ci": 0.0007529085302576061
+          },
+          "losgeraakt": {
+            "n": 8,
+            "m": 41,
+            "sd": 23.77874200685502,
+            "ci": 16.477827526709945
+          },
+          "meedoend": {
+            "n": 8,
+            "m": 25.25,
+            "sd": 23.559953917005622,
+            "ci": 16.32621511557409
+          },
+          "neuronenEind": {
+            "n": 8,
+            "m": 66.25,
+            "sd": 4.590362575159894,
+            "ci": 3.1809589749004936
+          },
+          "spreidingTussenZaden": {
+            "n": 8,
+            "m": 0.058100897460489236,
+            "sd": 0,
+            "ci": 0
+          },
+          "bijStandaardDichtheid": {
+            "n": 8,
+            "m": 0.5415,
+            "sd": 0.058100897460489236,
+            "ci": 0.04026186781558947
+          },
+          "verzadigdeCellen": 1
+        },
+        {
+          "neuronen": 30,
+          "besteDichtheid": 35,
+          "bench": {
+            "n": 8,
+            "m": 0.58325,
+            "sd": 0.0864337070493087,
+            "ci": 0.05989550317010451
+          },
+          "horizon": {
+            "n": 8,
+            "m": 13.125,
+            "sd": 8.131727983645296,
+            "ci": 5.635
+          },
+          "randdruk": {
+            "n": 8,
+            "m": 0.04969020368588948,
+            "sd": 0.00097102110815356,
+            "ci": 0.000672883298045645
+          },
+          "losgeraakt": {
+            "n": 8,
+            "m": 10,
+            "sd": 7.634508123364221,
+            "ci": 5.290444215753531
+          },
+          "meedoend": {
+            "n": 8,
+            "m": 73.25,
+            "sd": 10.278271116430872,
+            "ci": 7.122478501196054
+          },
+          "neuronenEind": {
+            "n": 8,
+            "m": 83.25,
+            "sd": 4.891683905218266,
+            "ci": 3.38976400358491
+          },
+          "spreidingTussenZaden": {
+            "n": 8,
+            "m": 0.0864337070493087,
+            "sd": 0,
+            "ci": 0
+          },
+          "bijStandaardDichtheid": {
+            "n": 8,
+            "m": 0.58325,
+            "sd": 0.0864337070493087,
+            "ci": 0.05989550317010451
+          },
+          "verzadigdeCellen": 1
+        },
+        {
+          "neuronen": 60,
+          "besteDichtheid": 70,
+          "bench": {
+            "n": 8,
+            "m": 0.6855,
+            "sd": 0.0634777801394202,
+            "ci": 0.043987857415427704
+          },
+          "horizon": {
+            "n": 8,
+            "m": 18.125,
+            "sd": 8.236460751699465,
+            "ci": 5.707576105493469
+          },
+          "randdruk": {
+            "n": 8,
+            "m": 0.057626496934160915,
+            "sd": 0.0005053734385242298,
+            "ci": 0.0003502059257038047
+          },
+          "losgeraakt": {
+            "n": 8,
+            "m": 2.625,
+            "sd": 2.8753881725529062,
+            "ci": 1.9925423458486393
+          },
+          "meedoend": {
+            "n": 8,
+            "m": 109.375,
+            "sd": 3.2486260832190936,
+            "ci": 2.25118302232404
+          },
+          "neuronenEind": {
+            "n": 8,
+            "m": 112,
+            "sd": 3.7032803990902057,
+            "ci": 2.56624238917527
+          },
+          "spreidingTussenZaden": {
+            "n": 8,
+            "m": 0.0634777801394202,
+            "sd": 0,
+            "ci": 0
+          },
+          "bijStandaardDichtheid": {
+            "n": 8,
+            "m": 0.6447499999999999,
+            "sd": 0.049867682062491266,
+            "ci": 0.03455654062547348
+          },
+          "verzadigdeCellen": 0
+        },
+        {
+          "neuronen": 120,
+          "besteDichtheid": 70,
+          "bench": {
+            "n": 8,
+            "m": 0.67825,
+            "sd": 0.019106842454247323,
+            "ci": 0.013240366309132072
+          },
+          "horizon": {
+            "n": 8,
+            "m": 18.875,
+            "sd": 9.87692115127844,
+            "ci": 6.84435716484755
+          },
+          "randdruk": {
+            "n": 8,
+            "m": 0.05649607625521856,
+            "sd": 0.0010338945483342593,
+            "ci": 0.0007164523692357784
+          },
+          "losgeraakt": {
+            "n": 8,
+            "m": 6.625,
+            "sd": 3.50255009141299,
+            "ci": 2.427143382662013
+          },
+          "meedoend": {
+            "n": 8,
+            "m": 133.375,
+            "sd": 3.50255009141299,
+            "ci": 2.427143382662013
+          },
+          "neuronenEind": {
+            "n": 8,
+            "m": 140,
+            "sd": 0,
+            "ci": 0
+          },
+          "spreidingTussenZaden": {
+            "n": 8,
+            "m": 0.019106842454247323,
+            "sd": 0,
+            "ci": 0
+          },
+          "bijStandaardDichtheid": {
+            "n": 8,
+            "m": 0.659,
+            "sd": 0.03838154318344766,
+            "ci": 0.02659705246827174
+          },
+          "verzadigdeCellen": 0
+        }
+      ],
+      "optimum": 60,
+      "optimumOpRand": false,
+      "valNaarGroot": 0.007249999999999979,
+      "valNaarKlein": 0.4205,
+      "spreidingOverDichtheid": {
+        "n": 5,
+        "m": 0.23520000000000002,
+        "sd": 0.22199362321922675,
+        "ci": 0.19458599017914932
+      },
+      "spreidingOverGrootte": {
+        "n": 3,
+        "m": 0.3786666666666667,
+        "sd": 0.051250203251629475,
+        "ci": 0.05799506454096857
+      },
+      "diagnostisch": {
+        "randdruk": {
+          "n": 120,
+          "rho": 0.870719492378284
+        },
+        "horizon": {
+          "n": 120,
+          "rho": 0.39175654955904926
+        },
+        "losgeraakt": {
+          "n": 120,
+          "rho": -0.35318387768902754
+        },
+        "meedoend": {
+          "n": 120,
+          "rho": 0.8671824150040365
+        }
+      },
+      "diagnostischTegenScore": {
+        "randdruk": {
+          "n": 15,
+          "rho": 0.5306859205776173
+        },
+        "horizon": {
+          "n": 15,
+          "rho": 0.7833935018050542
+        },
+        "losgeraakt": {
+          "n": 15,
+          "rho": -0.6209386281588448
+        },
+        "meedoend": {
+          "n": 15,
+          "rho": 0.4368231046931408
+        },
+        "verbindingen": {
+          "n": 15,
+          "rho": 0.5956678700361011
+        },
+        "actief": {
+          "n": 15,
+          "rho": 0.6137184115523465
+        }
+      },
+      "verzadiging": [
+        {
+          "neuronen": 8,
+          "verbindingen": [
+            902,
+            902,
+            902
+          ],
+          "plafondVanaf": 35
+        },
+        {
+          "neuronen": 16,
+          "verbindingen": [
+            1172,
+            1157,
+            1157
+          ],
+          "plafondVanaf": 70
+        },
+        {
+          "neuronen": 30,
+          "verbindingen": [
+            1303,
+            1757,
+            1757
+          ],
+          "plafondVanaf": 70
+        },
+        {
+          "neuronen": 60,
+          "verbindingen": [
+            1795,
+            3075,
+            3926
+          ],
+          "plafondVanaf": null
+        },
+        {
+          "neuronen": 120,
+          "verbindingen": [
+            2083,
+            4331,
+            8114
+          ],
+          "plafondVanaf": null
+        }
+      ]
+    },
+    "B20": {
+      "perN": [
+        {
+          "neuronen": 8,
+          "besteDichtheid": 15,
+          "bench": {
+            "n": 8,
+            "m": 0.05375,
+            "sd": 0.03605452220496857,
+            "ci": 0.024984509200702745
+          },
+          "horizon": {
+            "n": 8,
+            "m": 2.75,
+            "sd": 4.200340122282616,
+            "ci": 2.9106872040808502
+          },
+          "randdruk": {
+            "n": 8,
+            "m": 0.04352208513223757,
+            "sd": 0.001447028682325182,
+            "ci": 0.0010027397179666992
+          },
+          "losgeraakt": {
+            "n": 8,
+            "m": 0.75,
+            "sd": 0.7071067811865476,
+            "ci": 0.48999999999999994
+          },
+          "meedoend": {
+            "n": 8,
+            "m": 53.75,
+            "sd": 3.453776401067595,
+            "ci": 2.393344939619026
+          },
+          "neuronenEind": {
+            "n": 8,
+            "m": 54.5,
+            "sd": 3.3380918415851206,
+            "ci": 2.3131796298601626
+          },
+          "spreidingTussenZaden": {
+            "n": 8,
+            "m": 0.03605452220496857,
+            "sd": 0,
+            "ci": 0
+          },
+          "bijStandaardDichtheid": {
+            "n": 8,
+            "m": 0.05375,
+            "sd": 0.03605452220496857,
+            "ci": 0.024984509200702745
+          },
+          "verzadigdeCellen": 2
+        },
+        {
+          "neuronen": 16,
+          "besteDichtheid": 15,
+          "bench": {
+            "n": 8,
+            "m": 0.088,
+            "sd": 0.02676885183513534,
+            "ci": 0.018549867924058112
+          },
+          "horizon": {
+            "n": 8,
+            "m": 2,
+            "sd": 1.6903085094570331,
+            "ci": 1.1713240371477056
+          },
+          "randdruk": {
+            "n": 8,
+            "m": 0.0471901362057451,
+            "sd": 0.0014938048412948524,
+            "ci": 0.0010351539423879069
+          },
+          "losgeraakt": {
+            "n": 8,
+            "m": 1.75,
+            "sd": 1.5811388300841898,
+            "ci": 1.095673308974897
+          },
+          "meedoend": {
+            "n": 8,
+            "m": 59.25,
+            "sd": 5.67576300723398,
+            "ci": 3.933103100606441
+          },
+          "neuronenEind": {
+            "n": 8,
+            "m": 61,
+            "sd": 5.1269595556932455,
+            "ci": 3.552801711325865
+          },
+          "spreidingTussenZaden": {
+            "n": 8,
+            "m": 0.02676885183513534,
+            "sd": 0,
+            "ci": 0
+          },
+          "bijStandaardDichtheid": {
+            "n": 8,
+            "m": 0.083,
+            "sd": 0.029041841736167,
+            "ci": 0.020124969565194377
+          },
+          "verzadigdeCellen": 1
+        },
+        {
+          "neuronen": 30,
+          "besteDichtheid": 35,
+          "bench": {
+            "n": 8,
+            "m": 0.10375,
+            "sd": 0.0328361734328817,
+            "ci": 0.02275430728455604
+          },
+          "horizon": {
+            "n": 8,
+            "m": 6.25,
+            "sd": 4.832922806867792,
+            "ci": 3.3490446398935916
+          },
+          "randdruk": {
+            "n": 8,
+            "m": 0.05006620200908455,
+            "sd": 0.0009345524504180481,
+            "ci": 0.0006476118075638043
+          },
+          "losgeraakt": {
+            "n": 8,
+            "m": 1.5,
+            "sd": 1.3093073414159542,
+            "ci": 0.9073036977771003
+          },
+          "meedoend": {
+            "n": 8,
+            "m": 77.25,
+            "sd": 3.058944729337694,
+            "ci": 2.119740550161741
+          },
+          "neuronenEind": {
+            "n": 8,
+            "m": 78.75,
+            "sd": 3.370036032024414,
+            "ci": 2.335315824465719
+          },
+          "spreidingTussenZaden": {
+            "n": 8,
+            "m": 0.0328361734328817,
+            "sd": 0,
+            "ci": 0
+          },
+          "bijStandaardDichtheid": {
+            "n": 8,
+            "m": 0.10375,
+            "sd": 0.0328361734328817,
+            "ci": 0.02275430728455604
+          },
+          "verzadigdeCellen": 1
+        },
+        {
+          "neuronen": 60,
+          "besteDichtheid": 70,
+          "bench": {
+            "n": 8,
+            "m": 0.14049999999999999,
+            "sd": 0.04189442513202511,
+            "ci": 0.029031355462671736
+          },
+          "horizon": {
+            "n": 8,
+            "m": 11.625,
+            "sd": 7.927123419897391,
+            "ci": 5.493216271001898
+          },
+          "randdruk": {
+            "n": 8,
+            "m": 0.05567234713569871,
+            "sd": 0.0007585725503752409,
+            "ci": 0.0005256639585044606
+          },
+          "losgeraakt": {
+            "n": 8,
+            "m": 3.375,
+            "sd": 1.1877349391654208,
+            "ci": 0.8230583211413394
+          },
+          "meedoend": {
+            "n": 8,
+            "m": 104.125,
+            "sd": 4.54933276112317,
+            "ci": 3.152526764359027
+          },
+          "neuronenEind": {
+            "n": 8,
+            "m": 107.5,
+            "sd": 4.375255094603872,
+            "ci": 3.03189709587908
+          },
+          "spreidingTussenZaden": {
+            "n": 8,
+            "m": 0.04189442513202511,
+            "sd": 0,
+            "ci": 0
+          },
+          "bijStandaardDichtheid": {
+            "n": 8,
+            "m": 0.09549999999999999,
+            "sd": 0.030458402546986698,
+            "ci": 0.021106596125382224
+          },
+          "verzadigdeCellen": 0
+        },
+        {
+          "neuronen": 120,
+          "besteDichtheid": 70,
+          "bench": {
+            "n": 8,
+            "m": 0.18475,
+            "sd": 0.10471696546951148,
+            "ci": 0.07256515486099371
+          },
+          "horizon": {
+            "n": 8,
+            "m": 14.875,
+            "sd": 8.806450557890587,
+            "ci": 6.102558889515119
+          },
+          "randdruk": {
+            "n": 8,
+            "m": 0.053506662592956014,
+            "sd": 0.0007566206450139392,
+            "ci": 0.000524311357097594
+          },
+          "losgeraakt": {
+            "n": 8,
+            "m": 6.75,
+            "sd": 3.615443067098218,
+            "ci": 2.505374223544259
+          },
+          "meedoend": {
+            "n": 8,
+            "m": 133.25,
+            "sd": 3.615443067098218,
+            "ci": 2.505374223544259
+          },
+          "neuronenEind": {
+            "n": 8,
+            "m": 140,
+            "sd": 0,
+            "ci": 0
+          },
+          "spreidingTussenZaden": {
+            "n": 8,
+            "m": 0.10471696546951148,
+            "sd": 0,
+            "ci": 0
+          },
+          "bijStandaardDichtheid": {
+            "n": 8,
+            "m": 0.0955,
+            "sd": 0.03924647390894772,
+            "ci": 0.02719641888190428
+          },
+          "verzadigdeCellen": 0
+        }
+      ],
+      "optimum": 120,
+      "optimumOpRand": true,
+      "valNaarGroot": 0,
+      "valNaarKlein": 0.131,
+      "spreidingOverDichtheid": {
+        "n": 5,
+        "m": 0.05199999999999999,
+        "sd": 0.05279796397589589,
+        "ci": 0.0462794559172858
+      },
+      "spreidingOverGrootte": {
+        "n": 3,
+        "m": 0.07183333333333333,
+        "sd": 0.05182261411134462,
+        "ci": 0.05864280840629803
+      },
+      "diagnostisch": {
+        "randdruk": {
+          "n": 120,
+          "rho": 0.9146127375978224
+        },
+        "horizon": {
+          "n": 120,
+          "rho": 0.323670635968675
+        },
+        "losgeraakt": {
+          "n": 120,
+          "rho": 0.7384637810902926
+        },
+        "meedoend": {
+          "n": 120,
+          "rho": 0.9459133882406966
+        }
+      },
+      "diagnostischTegenScore": {
+        "randdruk": {
+          "n": 15,
+          "rho": 0.48014440433212996
+        },
+        "horizon": {
+          "n": 15,
+          "rho": 0.7003610108303249
+        },
+        "losgeraakt": {
+          "n": 15,
+          "rho": 0.21299638989169675
+        },
+        "meedoend": {
+          "n": 15,
+          "rho": 0.6209386281588448
+        },
+        "verbindingen": {
+          "n": 15,
+          "rho": 0.6534296028880866
+        },
+        "actief": {
+          "n": 15,
+          "rho": 0.7472924187725631
+        }
+      },
+      "verzadiging": [
+        {
+          "neuronen": 8,
+          "verbindingen": [
+            871,
+            871,
+            871
+          ],
+          "plafondVanaf": 35
+        },
+        {
+          "neuronen": 16,
+          "verbindingen": [
+            1123,
+            1130,
+            1130
+          ],
+          "plafondVanaf": 70
+        },
+        {
+          "neuronen": 30,
+          "verbindingen": [
+            1351,
+            1756,
+            1756
+          ],
+          "plafondVanaf": 70
+        },
+        {
+          "neuronen": 60,
+          "verbindingen": [
+            1761,
+            2973,
+            3812
+          ],
+          "plafondVanaf": null
+        },
+        {
+          "neuronen": 120,
+          "verbindingen": [
+            2077,
+            4284,
+            8017
+          ],
+          "plafondVanaf": null
+        }
+      ]
+    }
+  }
+}
