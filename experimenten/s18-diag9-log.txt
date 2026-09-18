@@ -1,0 +1,7 @@
+cat mlp oud                z3000    7s  ond   0.0  streng   0.0  loos   0.0  | R1 0 (0/100)  R2 0 (0/100)  R3 0 (0/0)  R4 0 (0/0)  R5 0 (0/100)  R6 0 (0/100)
+cat mlp sym bg.05          z3000    7s  ond  16.2  streng  16.7  loos   1.9  | R1 0 (0/100)  R2 97 (98/97)  R3 0 (0/99)  R4 0 (0/0)  R5 0 (0/100)  R6 0 (0/100)
+cat elman oud              z3000   15s  ond   0.0  streng   0.0  loos   0.0  | R1 0 (0/100)  R2 0 (0/100)  R3 0 (0/0)  R4 0 (0/0)  R5 0 (0/100)  R6 0 (0/100)
+cat elman sym bg.05        z3000   15s  ond   1.0  streng   0.0  loos   0.1  | R1 0 (0/100)  R2 6 (0/100)  R3 0 (0/0)  R4 0 (0/0)  R5 0 (0/100)  R6 0 (0/100)
+cat skip sym bg.05         z3000   18s  ond  15.6  streng  16.7  loos   3.2  | R1 0 (0/100)  R2 94 (95/93)  R3 0 (0/97)  R4 0 (0/0)  R5 0 (0/100)  R6 0 (0/100)
+cat ang sym bg.05          z3000   62s  ond   9.4  streng   0.0  loos   7.9  | R1 19 (4/91)  R2 12 (2/91)  R3 2 (2/2)  R4 2 (3/2)  R5 11 (1/92)  R6 10 (1/93)
+KLAAR exitcode=0 

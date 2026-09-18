@@ -1,0 +1,6 @@
+[["cat mlp sym bg0", "mlp", 0.016, [1.5,-1.5,0.5,1.5,0], 6, 3000, {"catPolicy": true}],
+ ["cat elman sym bg0", "elman", 0.008, [1.5,-1.5,0.5,1.5,0], 6, 3000, {"catPolicy": true}],
+ ["cat skip sym bg0", "skip", 0.008, [1.5,-1.5,0.5,1.5,0], 6, 3000, {"catPolicy": true}],
+ ["cat mlp R3 alleen bg0", "mlp", 0.016, [1.5,-1.5,0.5,1.5,0], 3, 2000, {"catPolicy": true}],
+ ["cat elman R1-3 bg0", "elman", 0.008, [1.5,-1.5,0.5,1.5,0], 3, 2000, {"catPolicy": true}],
+ ["cat ang sym bg0", "ang", 0.008, [1.5,-1.5,0.5,1.5,0], 6, 3000, {"catPolicy": true}]]

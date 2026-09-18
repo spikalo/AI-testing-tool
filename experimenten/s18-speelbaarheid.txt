@@ -42,5 +42,25 @@ gradiënt p(1-p) nul. Welke kant wint hangt af van de verhouding tussen de straf
 van het zaad. Directe bogen invoer -> handel (skip) helpen merkbaar; dat is precies wat
 ANG met reflexen zou moeten kunnen, maar ANG doet het hier niet beter dan een MLP.
 
+5. EEN KEUZE PER TIK (categorisch beleid: niets of precies een handel) — besluit Frank,
+   gebouwd en getest (test-stap18.js). Lost het niet op.  3000 diensten, z3000
+   stap 17-beloning        mlp 0, elman 0                        (weer stil)
+   [.,.,.,1.5,.05]         mlp 16.2 (alleen R2), elman 1.0, elman-skip 15.6 (alleen R2)
+   [.,.,.,1.5,0]           mlp 6.4, elman 15.7 (alleen R2), elman-skip 12.6   (bodem nu 20 %)
+   elman, alleen R1-R3     R3 30 (10/86) — het enige geheugenresultaat boven de bodem
+   R1 sterft vrijwel overal. Oorzaak: R1 is "lamp 0 EN wissel open", en de wissel staat op
+   ongeveer de helft van alle achtergrondtikken open. Het gewicht wissel -> handel 0 dat
+   R1 nodig heeft, wordt op honderd achtergrondtikken per dienst afgestraft voor het op
+   drie eistikken beloond wordt. R2 heeft de wissel dicht nodig en heeft dat probleem niet.
+
+6. WAAROM DE GEHEUGENREGELS NOOIT LUKKEN — EN DAT IS HET BELANGRIJKSTE.
+   Geen enkele leerregel in dit project kan krediet toekennen over meer dan een paar
+   tikken. De "Elman met BPTT" van stap 6 is in werkelijkheid afgekapt op EEN tik:
+   backpropDev loopt alleen over voorwaartse verbindingen, en een terugkoppeling krijgt
+   pre = de toestand van de vorige tik. Het spoor (lambda 0,6) rekt dat tot twee a drie
+   tikken. R3 vraagt 5-15, R4 30-70, R5 een teller over de hele dienst. Voor ANG geldt
+   hetzelfde. Op spel 1 viel dat niet op, want koers houden is continuiteit en geen
+   opgeslagen bit. Het spel vraagt dus iets wat geen van de deelnemers kan leren.
+
 BESLUIT NODIG (van Frank): hoe het spel speelbaar te maken vóór de basislijnen gedraaid
 worden. Zie claude/ang-speelbaarheid.md in het project.

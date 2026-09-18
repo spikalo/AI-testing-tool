@@ -1273,7 +1273,9 @@ function brainStep(B,inp,cfg,expl,rnd){
   propagate(B,inp,cfg,hn,tp,B.act,r);
   B.dev.fill(0);
   if(learn && !exact) for(let j=HID0;j<B.n;j++) B.dev[j]=B.act[j]-B.clean[j];
-  if(cfg.catPolicy) actCategorical(B,tp,sample,r);
+  /* stap 18b: in het seinhuis is de keuze één uit vijf — niets, of precies één handel —
+     want dat is wat de spelregel "goed" noemt. Op spel 1 blijft het de negen richtingen. */
+  if(cfg.catPolicy) actCategorical(B,tp,sample,r,(cfg.taak==="seinhuis")?SEIN_ACTIES:CAT_ACTIES);
   else for(let j=OUT0;j<HID0;j++){
     const pr=B.act[j];
     const a=sample ? (r()<pr?1:0) : (pr>0.5?1:0);
@@ -1311,26 +1313,36 @@ function brainStep(B,inp,cfg,expl,rnd){
    andere schaal dan de conditie waarmee zij vergeleken wordt, en dan meet je twee
    dingen tegelijk. */
 const CAT_ACTIES=[[0],[1],[2],[3],[0,2],[0,3],[1,2],[1,3],[]];
+/* Stap 18b: de acties van het seinhuis. Vier losse handels maken zestien combinaties, en
+   elf daarvan zijn volgens de spelregel altijd fout (meer dan één handel). In stap 18a
+   bleek dat precies daar de exploratie heen ging: elk net verzadigde naar "nooit" of
+   "altijd drukken" en leerde daarna niets meer. Hier is de keuze wat het spel vraagt:
+   niets, of precies één handel. De lege actie staat achteraan, net als bij CAT_ACTIES. */
+const SEIN_ACTIES=[[0],[1],[2],[3],[]];
 const CAT_SC=new Float64Array(9), CAT_MARG=new Float64Array(N_OUT);
-function actCategorical(B,tp,sample,rnd){
+/* De actielijst is een argument (stap 18b). Voor spel 1 is het CAT_ACTIES en doet deze
+   functie rekenkundig precies wat zij deed: dezelfde lussen, dezelfde trekking, dezelfde
+   teller — test-stap18.js controleert dat met een bit-voor-bit-vergelijking. */
+function actCategorical(B,tp,sample,rnd,acties){
+  const ACT=acties||CAT_ACTIES, nA=ACT.length;
   const net=B.onet, sc=CAT_SC;
   let mx=-Infinity;
-  for(let a=0;a<9;a++){
-    let s=0; const A=CAT_ACTIES[a];
+  for(let a=0;a<nA;a++){
+    let s=0; const A=ACT[a];
     for(let q=0;q<A.length;q++) s+=net[A[q]];
     sc[a]=s/tp; if(sc[a]>mx) mx=sc[a];
   }
   let Z=0;
-  for(let a=0;a<9;a++){ sc[a]=Math.exp(sc[a]-mx); Z+=sc[a]; }
-  let keus=8, best=-1, u=sample? rnd()*Z : 0, acc=0;
-  for(let a=0;a<9;a++){
+  for(let a=0;a<nA;a++){ sc[a]=Math.exp(sc[a]-mx); Z+=sc[a]; }
+  let keus=nA-1, best=-1, u=sample? rnd()*Z : 0, acc=0;
+  for(let a=0;a<nA;a++){
     if(sample){ acc+=sc[a]; if(acc>=u){ keus=a; break; } }
     else if(sc[a]>best){ best=sc[a]; keus=a; }
   }
   /* de randkans per knop: hoe vaak zou deze knop onder dit beleid ingedrukt worden */
   const marg=CAT_MARG; marg.fill(0);
-  for(let a=0;a<9;a++){ const p=sc[a]/Z, A=CAT_ACTIES[a]; for(let q=0;q<A.length;q++) marg[A[q]]+=p; }
-  const gekozen=CAT_ACTIES[keus];
+  for(let a=0;a<nA;a++){ const p=sc[a]/Z, A=ACT[a]; for(let q=0;q<A.length;q++) marg[A[q]]+=p; }
+  const gekozen=ACT[keus];
   for(let j=0;j<N_OUT;j++){
     const a=gekozen.indexOf(j)>=0?1:0;
     B.press[j]=a;
@@ -1339,7 +1351,7 @@ function actCategorical(B,tp,sample,rnd){
        die dit beleid werkelijk gebruikt, niet de sigmoïde die niemand meer raadpleegt */
     B.act[OUT0+j]=marg[j];
   }
-  kb(9*2);
+  kb(nA*2);
 }
 /* ---------- de exacte gradiënt als schatter (stap 6) ----------
    Node-perturbatie schát wat een verborgen knoop bijdroeg door hem te verstoren en
@@ -2508,6 +2520,10 @@ function seinOnderscheid(n0,g0,n1,g1){
   if(!n0||!n1) return null;
   return Math.sqrt((g0/n0)*(g1/n1));
 }
+/* De toevalsbodem hangt af van de beleidsvorm (stap 18b). Vier losse handels met kans
+   een half: aan elke kant 1/16, dus 6,25 %. Eén keuze uit vijf, uniform: aan elke kant
+   1/5, dus 20 %. Beide worden in test-stap18.js nagemeten. */
+function seinToeval(cfg){ return (cfg&&cfg.catPolicy)? 0.2 : 0.0625; }
 
 function seinLeegTelling(){
   return {eis:new Int32Array(SEIN_REGELS), goed:new Int32Array(SEIN_REGELS),
@@ -3065,14 +3081,15 @@ function drawSeinhuis(){
     }
     /* de toevalsbodem als streepje, zodat een balk nooit gelezen wordt als "het doet iets" */
     ctx.strokeStyle="#55606b"; ctx.lineWidth=1;
-    ctx.beginPath(); ctx.moveTo(bx+bw*0.0625,y); ctx.lineTo(bx+bw*0.0625,y+bh); ctx.stroke();
+    const tb=seinToeval(S.cfg);
+    ctx.beginPath(); ctx.moveTo(bx+bw*tb,y); ctx.lineTo(bx+bw*tb,y+bh); ctx.stroke();
     ctx.fillStyle=actief?"#9aa4b0":"#39414c"; ctx.textAlign="right";
     ctx.fillText(actief ? (e? (100*f).toFixed(0)+"%   "+g+"/"+(n0+n1) : "nog niet beide kanten") : "uit",
       W-pad, y+bh*0.78);
   }
   ctx.textAlign="left"; ctx.fillStyle="#55606b";
   ctx.font=Math.round(H*0.022)+"px system-ui,sans-serif";
-  ctx.fillText("streepje = toevalsbodem 6,25 %   ·   tik "+t+" / "+d.T+
+  ctx.fillText("streepje = toevalsbodem "+(100*seinToeval(S.cfg)).toFixed(2).replace(".",",").replace(/,?0+$/,"")+" %   ·   tik "+t+" / "+d.T+
     (tel?("   ·   loos alarm "+tel.loos+" van "+tel.stil+" stille tikken"):""), pad, H-pad*0.4);
 }
 
@@ -3670,7 +3687,8 @@ function buildResult(naamOverride){
       tikkenPerDienst:S.cfg.seinTikken, actieveRegels:S.cfg.seinRegels,
       regels:SEIN_REGELNAAM.map((n,i)=>({id:SEIN_KORT[i], regel:n})),
       dienstenset:{aantal:SEIN_BENCH_N, eersteZaad:SEIN_BENCH_SEED0, stap:SEIN_BENCH_STRIDE},
-      toevalsbodem:0.0625, bovengrens:1,
+      toevalsbodem:seinToeval(S.cfg), bovengrens:1,
+      beleidsvorm:S.cfg.catPolicy?"een uit vijf (niets of een handel)":"vier losse handels",
       /* stap 18: de score is het onderscheid per regel, en de beloning is instelbaar */
       scoremaat:"onderscheid: per regel het meetkundig gemiddelde van de trefkans aan beide kanten, gemiddeld over de regels",
       beloning:{waarden:((S.cfg.seinBeloning)||SEIN_BELONING).slice(),
@@ -4607,7 +4625,7 @@ window.__brain={S,createBrain,analyze,makeWorld,readCfg,startTraining,stopTraini
   seinDienst,seinWaarnemen,seinScoreTik,seinBench,seinBenchDiensten,
   SEIN_REGELS,SEIN_KORT,SEIN_REGELNAAM,SEIN_LAMPEN,SEIN_RUIS,SEIN_TIKKEN,
   /* stap 18 */
-  seinOnderscheid,SEIN_BELONING,SEIN_BELONING_OUD,
+  seinOnderscheid,SEIN_BELONING,SEIN_BELONING_OUD,SEIN_ACTIES,seinToeval,
   runOne,runLeven,cfgOverride,runExperiments,csvRow,CSV_COLS,meanCI,mannWhitney,
   benchmarkWorlds,benchWorldSeed,playWorlds,benchBrain,benchReactief,runBenchmark,createLayered,
   reactiefDir,reactiefTick,moveAgent,rayDist,blocked,DIRV,

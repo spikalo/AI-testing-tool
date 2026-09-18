@@ -55,6 +55,28 @@ const gelijk = (a, b) => JSON.stringify(a) === JSON.stringify(b);
     }
   }
 
+  /* 1b (stap 18b): actCategorical kreeg een actielijst als argument. Op spel 1 hoort het
+     categorische beleid van stap 7 daardoor niets te merken. */
+  {
+    const { CONDITIES: C7 } = require('./stap7-condities');
+    const veeg = JSON.parse(fs.readFileSync(path.join(OUT, 'lr-veeg-stap7.json'), 'utf8'));
+    const c = C7.find(x => x.ov && x.ov.catPolicy);
+    const pad = c && path.join(OUT, 'runs', `${c.naam}_z1000.json`);
+    if (!c || !fs.existsSync(pad)) ok('stap 7, categorisch beleid, reproduceert', false, 'referentie ontbreekt');
+    else {
+      const oud = JSON.parse(fs.readFileSync(pad, 'utf8'));
+      const nieuw = await p.evaluate(([naam, ov, lr]) => {
+        const W = window.__brain;
+        let cfg = W.readCfg();
+        cfg.nEpisodes = 500; cfg.evalOn = true; cfg.benchOn = true; cfg.benchN = 500; cfg.benchReps = 3;
+        cfg = W.cfgOverride(cfg, Object.assign({}, ov, { lr }));
+        return W.runOne(cfg, 1000, naam);
+      }, [c.naam, c.ov, veeg.keuze[c.naam].lr]);
+      const h = gelijk(oud.historie, nieuw.historie), n = gelijk(oud.netwerk, nieuw.netwerk);
+      ok(`spel 1: ${c.naam} (categorisch beleid) geeft bit voor bit hetzelfde leven`, h && n, `historie ${h}, netwerk ${n}`);
+    }
+  }
+
   /* ---------- 2. de skip-knop ---------- */
   const skip = await p.evaluate(() => {
     const W = window.__brain;
@@ -109,6 +131,9 @@ const gelijk = (a, b) => JSON.stringify(a) === JSON.stringify(b);
     let z = 987654321;
     const munt = () => { z = (z * 1103515245 + 12345) & 0x7fffffff; return (z / 0x7fffffff) < 0.5 ? 1 : 0; };
     const geloot = speel(() => [munt(), munt(), munt(), munt()]);
+    /* stap 18b: één keuze uit vijf, uniform — de toevalsbodem van het categorische beleid */
+    const uitVijf = () => { z = (z * 1103515245 + 12345) & 0x7fffffff; return Math.floor(5 * z / 0x80000000); };
+    const vijf = speel(() => { const P = [0, 0, 0, 0]; const k = uitVijf(); if (k < 4) P[k] = 1; return P; });
     const baksteen = speel(() => [1, 1, 1, 1]);
     const lui = speel(() => [0, 0, 0, 0]);
     /* de speler waar stap 17 in trapte: geheugenloos, lamp aan -> de handel van die lamp.
@@ -116,7 +141,8 @@ const gelijk = (a, b) => JSON.stringify(a) === JSON.stringify(b);
     const LAMP_HANDEL = [0, 1, -1, 0, -1, 2, 2, 3];
     const reflex = speel((d, t) => { const P = [0, 0, 0, 0]; const l = d.lamp[t];
       if (l >= 0 && LAMP_HANDEL[l] >= 0) P[LAMP_HANDEL[l]] = 1; return P; });
-    return { perfect, geloot, baksteen, lui, reflex, kort: W.SEIN_KORT };
+    return { perfect, geloot, vijf, baksteen, lui, reflex, kort: W.SEIN_KORT,
+      toeval: [W.seinToeval({}), W.seinToeval({ catPolicy: true })] };
   });
   const f = x => x === null ? '–' : (100 * x).toFixed(1);
   ok('perfecte speler: 100 % onderscheid op elke regel',
@@ -126,6 +152,10 @@ const gelijk = (a, b) => JSON.stringify(a) === JSON.stringify(b);
     'gevallen per kant ' + ijk.perfect.n.join(' '));
   ok('geloot beleid: in de buurt van de toevalsbodem 6,25 %',
     Math.abs(ijk.geloot.totaal - 0.0625) < 0.02, `${f(ijk.geloot.totaal)} %, per regel ${ijk.geloot.per.map(f).join(' ')}`);
+  ok('een uit vijf, uniform geloot: in de buurt van 20 % (de bodem van het categorische beleid)',
+    Math.abs(ijk.vijf.totaal - 0.2) < 0.03, `${f(ijk.vijf.totaal)} %, per regel ${ijk.vijf.per.map(f).join(' ')}`);
+  ok('en seinToeval geeft voor beide beleidsvormen de juiste bodem',
+    ijk.toeval[0] === 0.0625 && ijk.toeval[1] === 0.2, JSON.stringify(ijk.toeval));
   ok('alles vasthouden: 0', ijk.baksteen.totaal === 0);
   ok('niets doen: 0', ijk.lui.totaal === 0);
   ok('de reflexspeler van stap 17 haalt op de oude maat een hoge trefkans op de eisen',
