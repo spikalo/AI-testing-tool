@@ -1,0 +1,132 @@
+10.13  Een tweede taak: het seinhuis
+Alles hierboven is gemeten op één spel met één tijdschaal, één soort antwoord en een vaste hoeveelheid werk. De vorige versie van dit document noemde een tweede taak als de meest voor de hand liggende verklaring voor de reeks negatieve bevindingen: een netwerk dat zijn structuur kan verbouwen heeft op het eerste spel per constructie weinig te verbouwen. Deze sectie beschrijft die tweede taak, wat de kalibratie ervan opleverde, en waarom zij is afgesloten voordat de meting waarvoor zij gebouwd was, kon beginnen.
+De taak. Geen ruimte en geen navigatie: een stroom van acht seinlampen, een wisselstand en zeven afleiderkanalen, en vier handels. Zes regels, elk één zin: lamp 0 bij open wissel vraagt handel 0 en lamp 1 bij gesloten wissel handel 1, deze tik; lamp 3 vraagt handel 0 als er sinds de vorige lamp 3 een lamp 2 was en anders handel 1 (vijf tot vijftien tikken ertussen); lamp 5 idem met lamp 4 en handel 2 of 3 (dertig tot zeventig tikken); elke derde lamp 6 vraagt handel 2; lamp 7 twee keer binnen drie tikken vraagt handel 3. Elke handel wordt door twee regels gebruikt, zodat een handel nooit verraadt om welke regel het gaat. Een dienst duurt 240 tikken.
+De score, en twee keer dat hij niet deugde
+Elke regel is een onderscheid tussen twee soorten gevallen: lamp 0 bij open tegen gesloten wissel, lamp 3 met tegen zonder voorafgaande lamp 2, de derde lamp 6 tegen de andere. De eerste versie scoorde alleen de gevallen waarin een handel gevraagd werd, en een geheugenloos net dat bij elke lamp de bijbehorende handel indrukte haalde daarmee boven de negentig procent op een regel die over tellen gaat. De tweede versie nam het meetkundig gemiddelde van de trefkans aan beide kanten; daarmee kwamen altijd-reageren en nooit-reageren op nul, maar een geheugenloos net dat bij lamp 3 willekeurig tussen handel 0 en 1 koos, haalde 51 procent zonder iets van de vlag te weten. De score is nu Youdens J: trefkans aan de ene kant plus trefkans aan de andere kant min één. Nul betekent dat de reactie niet afhangt van wat de regel zegt dat ertoe doet — en dat geldt voor altijd, nooit én een munt. Eén is perfect. De controletest meet die schaal na met zes gescripte spelers, waaronder de twee die de eerdere versies doorlieten.
+De methodologische les is algemener dan dit spel. Beide fouten werden niet gevonden door een toevalsbodem maar door een speler die precies één stap slimmer was dan de vorige: eerst &quot;lamp aan, handel erbij&quot;, toen &quot;gooi een munt tussen de twee goede antwoorden&quot;. Een score hoort getoetst te worden tegen de beste strategie die het bedoelde vermogen níét heeft, en niet alleen tegen toeval.
+De kalibratie
+Vóór de basislijnen is per architectuur één proefleven gedraaid, op zaden buiten de meetzaden. Dat leverde vier bevindingen op die de opzet van de afsluitende meting bepaalden. Met de oorspronkelijke beloning stortte élk net — ook een backpropnet dat de eerste regel los binnen duizend diensten leert — binnen driehonderd diensten in naar &quot;nooit drukken&quot;: vier onafhankelijke handels die met REINFORCE geleerd worden verzadigen naar nooit of altijd, en daar is de gradiënt nul. Eén keuze per tik — niets, of precies één handel — hielp niet. De eerste regel stierf zolang de achtergrond werd afgestraft, omdat zijn voorwaarde (open wissel) op de helft van alle stille tikken ook waar is. En geen enkel net leerde een regel die geheugen vraagt.
+Correctie op sectie 10.8 en 10.9. Het recurrente vergelijkingsnet dat daar als &quot;backprop door de tijd&quot; stond beschreven, propageert niet terug door de tijd. De exacte gradiënt loopt alleen over voorwaartse bogen, en een terugkoppelende boog krijgt de toestand van de vorige tik als presynaptische waarde; het spoor rekt dat tot twee à drie tikken. De labels in die secties zijn aangepast. Op het eerste spel verandert dat aan geen enkele conclusie iets — koers houden is continuïteit en geen opgeslagen bit — maar het betekent wel dat de sterkste tegenstander in dit document tot hier geen echt geheugen kon leren. Voor deze sectie is daarom een Elman-net gebouwd met terugpropagatie door de hele dienst: dezelfde schatter, hetzelfde spoor, dezelfde basislijn en rem, met de gradiënt door alle 240 tikken terug en een update per dienst. Een controle met eindige differenties over alle gewichten geeft een cosinus van 1,000000.
+De afsluitende meting
+Om de negatieve uitkomst niet op één zaad te laten rusten, is de gunstigste opzet uit de kalibratie één keer volledig gemeten: een groeiende dienstregeling (1000 diensten per regel, regels die blijven), één keuze per tik, een beloning die de achtergrond niet afstraft, een leersnelheid per conditie geveegd op eigen zaden, en 12 zaden per conditie met elk een eigen brein- en wereldzaad. De voorspellingen stonden vast voordat de eerste run draaide. De tabel geeft J per regel aan het eind van het leven, op 200 vaste diensten, in procenten, met het interval over de zaden.
+conditie
+η
+R1
+R2
+R3
+R4
+R5
+R6
+totaal
+ANG, met structurele plasticiteit
+0.032
+-5 ± 0
+-5 ± 0
+-95 ± 0
+-95 ± 0
+-7 ± 0
+-7 ± 0
+-36 ± 0
+ANG, structuur bevroren
+0.032
+-3 ± 0
+-2 ± 0
+-97 ± 0
+-97 ± 0
+-3 ± 0
+-3 ± 0
+-34 ± 0
+MLP-32, backprop (geen geheugen)
+0.016
+75 ± 1
+91 ± 1
+-3 ± 0
+-3 ± 1
+-2 ± 0
+-1 ± 1
+26 ± 0
+Elman-32, backprop afgekapt op één tik
+0.032
+55 ± 19
+65 ± 23
+-18 ± 22
+-34 ± 27
+-2 ± 1
+21 ± 12
+15 ± 14
+Elman-32, backprop door de hele dienst
+0.016
+65 ± 23
+68 ± 27
+-12 ± 16
+-29 ± 25
+-1 ± 1
+0 ± 13
+15 ± 13
+Elman-64, backprop door de hele dienst
+0.004
+25 ± 22
+17 ± 32
+-18 ± 17
+-47 ± 27
+-19 ± 19
+-1 ± 28
+-7 ± 20
+Geen enkel net leert een regel die geheugen vraagt. Van de 24 combinaties van conditie en geheugenregel ligt er na Holm geen enkele boven nul; de kleinste gecorrigeerde p is 0.188. Dat geldt ook voor het Elman-net met terugpropagatie door de hele dienst, en ook voor de brede variant daarvan. Wat R3 tot en met R6 vragen — een vlag vijf tot zeventig tikken vasthouden, tellen tot drie, twee lampen binnen drie tikken herkennen — ligt met REINFORCE en deze netten in dit budget buiten bereik, voor elke architectuur in dit document.
+De regels zonder geheugen. R1 en R2 — één tik, alleen een voorwaarde op de wissel — leren MLP-32, backprop (geen geheugen) (ondergrens van het interval op het gemiddelde van beide boven 0,5). Niet: ANG, met structurele plasticiteit, ANG, structuur bevroren, Elman-32, backprop afgekapt op één tik, Elman-32, backprop door de hele dienst, Elman-64, backprop door de hele dienst. Het falen op de overige regels ligt dus aan het geheugen en niet aan de beloning of het beleid.
+ANG leert zelfs de regels zonder geheugen niet. Op het gemiddelde van R1 en R2 haalt de vrije graaf J = -5 %, het geheugenloze MLP 83 % (Holm p < 0,001) en dezelfde graaf bevroren -2 % (Holm p < 0,001). Beide varianten van ANG zijn over de hele linie stil gebleven — al in de eerste fase, waarin alleen R1 bestaat, komt het onderscheid niet van nul. Het verschil tussen vrij en bevroren is significant maar klein, en valt in de richting die de eerdere secties steeds vonden: bevroren is niet slechter. Een beperking hoort hier direct bij: voor beide ANG-varianten koos de leersnelheidsveeg de hoogste van de drie kandidaten, en een keuze op de rand van het raster is geen optimum. Dat de score met de leersnelheid steeg (van ongeveer −58 naar −35 %) maar in geen enkele variant boven nul kwam, maakt het onwaarschijnlijk maar niet uitgesloten dat een nog hogere waarde ANG over de drempel had geholpen. Hetzelfde geldt voor het Elman-net dat één tik terugleert.
+De recurrente netten leren R1 in het ene zaad wel en in het andere helemaal niet. Elman-32, backprop afgekapt op één tik: 3 van de 12 zaden boven 80 %, 3 onder 10 %; Elman-32, backprop door de hele dienst: 7 van de 12 zaden boven 80 %, 3 onder 10 %; Elman-64, backprop door de hele dienst: 1 van de 12 zaden boven 80 %, 6 onder 10 %. Het geheugenloze MLP haalt in elk zaad ongeveer hetzelfde. Het gemiddelde met zijn brede interval verbergt dus geen middelmatig net maar twee soorten netten: een dat de regel beheerst en een dat is ingestort. Terugkoppeling maakt het leren hier niet sterker maar grilliger.
+Eén aanwijzing die de correctie niet overleeft. Elman-32, backprop afgekapt op één tik haalt op R6 J = 21 ± 12 (ongecorrigeerd p = 0.008, na Holm 0.19). R6 is de geheugenregel met de kortste tijdschaal — twee lampen binnen drie tikken — en daarmee de enige die binnen het bereik van een spoor van twee à drie tikken ligt. Het is juist niet het net met terugpropagatie door de hele dienst dat hier boven komt drijven. Na correctie is het geen bevinding, en het staat hier alleen omdat het in de richting wijst die de verklaring voorspelt.
+Hoe een net faalt, niet alleen dát
+Omdat elke regel twee kanten heeft, is per regel af te lezen wélke strategie een net gekozen heeft. &quot;Stil&quot; betekent nooit reageren (de ene kant bijna nul, de andere bijna één), &quot;reflex&quot; altijd reageren en de voorwaarde negeren, &quot;munt&quot; gokken tussen de twee antwoorden, &quot;geleerd&quot; een J boven de helft. Twee categorieën zijn na de meting toegevoegd, omdat de vooraf vastgelegde indeling ze onder &quot;gemengd&quot; schoof: bij R3 en R4 vragen beide kanten een handel, zodat nooit reageren daar &quot;niets goed&quot; oplevert en steeds hetzelfde antwoord &quot;vast antwoord&quot;. Alle faalvormen halen J rond nul of lager — en ze zijn aan een gewone trefkans niet van elkaar, en de reflex en de munt niet van begrip, te onderscheiden.
+conditie
+R1
+R2
+R3
+R4
+R5
+R6
+ANG, met structurele plasticiteit
+stil
+stil
+niets goed
+niets goed
+stil
+stil
+ANG, structuur bevroren
+stil
+stil
+niets goed
+niets goed
+stil
+stil
+MLP-32, backprop (geen geheugen)
+geleerd
+geleerd
+munt
+vast antwoord
+stil
+stil
+Elman-32, backprop afgekapt op één tik
+geleerd
+geleerd
+munt
+gemengd
+stil
+gemengd
+Elman-32, backprop door de hele dienst
+geleerd
+geleerd
+munt
+gemengd
+munt
+munt
+Elman-64, backprop door de hele dienst
+gemengd
+munt
+gemengd
+gemengd
+munt
+munt
+Waarom de taak is afgesloten. Een test van de vraag of een netwerk capaciteit bijbouwt wanneer het aantal regels groeit, heeft een taak nodig waarop een vaste tegenstander de latere regels wél kan leren. Die is er niet. Doormeten zou tientallen keren nul opleveren en niets over structurele plasticiteit zeggen. Wat overblijft zijn drie bruikbare dingen: een tweede bevestiging van het patroon van sectie 10.5 op de regels die wél te leren zijn, een score die tegen de slimste domme speler bestand is, en een beschrijving van drie faalvormen die geen van alle met de grootte van het netwerk te maken hebben.
+KLAAR exitcode=0 

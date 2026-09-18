@@ -1,0 +1,2 @@
+De regels zonder geheugen. R1 en R2 — één tik, alleen een voorwaarde op de wissel — worden betrouwbaar geleerd (ondergrens van het interval op het gemiddelde van beide boven 0,5) door: MLP-32, backprop (geen geheugen). Niet betrouwbaar: ANG, met structurele plasticiteit; ANG, structuur bevroren; Elman-32, backprop afgekapt op één tik; Elman-32, backprop door de hele dienst; Elman-64, backprop door de hele dienst. Het falen op de overige regels ligt dus aan het geheugen en niet aan de beloning of het beleid.
+KLAAR exitcode=0 

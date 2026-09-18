@@ -136,12 +136,21 @@ function maten(row) {
   const v3 = res['s18-ang'] && res['s18-mlp-32-bp'] ? await mw(res['s18-ang'].tikregels, res['s18-mlp-32-bp'].tikregels) : null;
   const v4 = res['s18-ang'] && res['s18-ang-vast'] ? await mw(res['s18-ang'].tikregels, res['s18-ang-vast'].tikregels) : null;
   const v34h = holm([v3 ? v3.p : null, v4 ? v4.p : null]);
-  const vorm = (k0, k1, J) => (J !== null && J > 0.5) ? 'geleerd' : (k0 < 0.2 && k1 > 0.8) ? 'stil' :
-    (k0 > 0.8 && k1 < 0.2) ? 'reflex' : (k0 >= 0.3 && k0 <= 0.7 && k1 >= 0.3 && k1 <= 0.7) ? 'munt' : 'gemengd';
+  /* Bij R3 en R4 is kant 1 óók een handel; "één kant goed, de andere niet" is daar geen
+     stilte of reflex maar steeds hetzelfde antwoord geven. Ook dat is na de meting
+     toegevoegd; de vooraf vastgelegde indeling maakte dat onderscheid niet. */
+  const vorm = (k0, k1, J, r) => (J !== null && J > 0.5) ? 'geleerd' :
+    ((r === 'R3' || r === 'R4') && ((k0 < 0.2 && k1 > 0.8) || (k0 > 0.8 && k1 < 0.2))) ? 'vast antwoord' :
+    (k0 < 0.2 && k1 > 0.8) ? 'stil' :
+    (k0 > 0.8 && k1 < 0.2) ? 'reflex' :
+    /* toegevoegd na de meting, en daarom hier gemeld: bij R3 en R4 vragen béide kanten een
+       handel, dus nooit drukken zet daar béide trefkansen op nul. De vooraf vastgelegde
+       indeling kende dat geval niet en noemde het "gemengd". */
+    (k0 < 0.2 && k1 < 0.2) ? 'niets goed' : (k0 >= 0.3 && k0 <= 0.7 && k1 >= 0.3 && k1 <= 0.7) ? 'munt' : 'gemengd';
   const v5 = {};
   for (const c of conds) { v5[c.naam] = {};
     for (const r of ['R1', 'R2', 'R3', 'R4', 'R5', 'R6']) { const x = res[c.naam].perRegel[r];
-      v5[c.naam][r] = x.k0 && x.k1 ? vorm(x.k0.m, x.k1.m, x.J ? x.J.m : null) : null; } }
+      v5[c.naam][r] = x.k0 && x.k1 ? vorm(x.k0.m, x.k1.m, x.J ? x.J.m : null, r) : null; } }
 
   console.log('\nV1 (geheugenregels boven nul?), Holm over ' + v1.length + ':');
   for (const x of v1) console.log(`  ${x.c.padEnd(20)} ${x.r}  J ${pct(x.m)}  p ${x.p.toFixed(4)}  Holm ${x.pHolm.toFixed(4)}`);

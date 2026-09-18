@@ -1,0 +1,58 @@
+--- leersnelheidsveeg (veegzaden 2000..), keuze op totaal-J aan het eind ---
+s18-ang             0.002:  -58±0     0.008:  -54±0     0.032:  -36±0     -> 0.032
+s18-ang-vast        0.002:  -58±1     0.008:  -48±7     0.032:  -34±0     -> 0.032
+s18-mlp-32-bp       0.004:   -6±8     0.016:   19±15    0.064:   14±2     -> 0.016
+s18-elman-32-bp1    0.002:  -15±8     0.008:   17±13    0.032:   30±8     -> 0.032
+s18-elman-32-bptt   0.001:  -23±2     0.004:   16±3     0.016:   23±16    -> 0.016
+s18-elman-64-bptt   0.001:  -16±2     0.004:   -6±53    0.016:  -33±0     -> 0.004
+
+--- meting, zaden 1000..1011 ---
+s18-ang             lr 0.032  totaal  -36±0   | R1   -5±0   R2   -5±0   R3  -95±0   R4  -95±0   R5   -7±0   R6   -7±0  
+s18-ang-vast        lr 0.032  totaal  -34±0   | R1   -3±0   R2   -2±0   R3  -97±0   R4  -97±0   R5   -3±0   R6   -3±0  
+s18-mlp-32-bp       lr 0.016  totaal   26±0   | R1   75±1   R2   91±1   R3   -3±0   R4   -3±1   R5   -2±0   R6   -1±1  
+s18-elman-32-bp1    lr 0.032  totaal   15±14  | R1   55±19  R2   65±23  R3  -18±22  R4  -34±27  R5   -2±1   R6   21±12 
+s18-elman-32-bptt   lr 0.016  totaal   15±13  | R1   65±23  R2   68±27  R3  -12±16  R4  -29±25  R5   -1±1   R6    0±13 
+s18-elman-64-bptt   lr 0.004  totaal   -7±20  | R1   25±22  R2   17±32  R3  -18±17  R4  -47±27  R5  -19±19  R6   -1±28 
+
+V1 (geheugenregels boven nul?), Holm over 24:
+  s18-ang              R3  J  -95±0    p 1.0000  Holm 1.0000
+  s18-ang              R4  J  -95±0    p 1.0000  Holm 1.0000
+  s18-ang              R5  J   -7±0    p 1.0000  Holm 1.0000
+  s18-ang              R6  J   -7±0    p 1.0000  Holm 1.0000
+  s18-ang-vast         R3  J  -97±0    p 1.0000  Holm 1.0000
+  s18-ang-vast         R4  J  -97±0    p 1.0000  Holm 1.0000
+  s18-ang-vast         R5  J   -3±0    p 1.0000  Holm 1.0000
+  s18-ang-vast         R6  J   -3±0    p 1.0000  Holm 1.0000
+  s18-mlp-32-bp        R3  J   -3±0    p 1.0000  Holm 1.0000
+  s18-mlp-32-bp        R4  J   -3±1    p 1.0000  Holm 1.0000
+  s18-mlp-32-bp        R5  J   -2±0    p 1.0000  Holm 1.0000
+  s18-mlp-32-bp        R6  J   -1±1    p 0.9907  Holm 1.0000
+  s18-elman-32-bp1     R3  J  -18±22   p 1.0000  Holm 1.0000
+  s18-elman-32-bp1     R4  J  -34±27   p 1.0000  Holm 1.0000
+  s18-elman-32-bp1     R5  J   -2±1    p 1.0000  Holm 1.0000
+  s18-elman-32-bp1     R6  J   21±12   p 0.0078  Holm 0.1875
+  s18-elman-32-bptt    R3  J  -12±16   p 1.0000  Holm 1.0000
+  s18-elman-32-bptt    R4  J  -29±25   p 1.0000  Holm 1.0000
+  s18-elman-32-bptt    R5  J   -1±1    p 1.0000  Holm 1.0000
+  s18-elman-32-bptt    R6  J    0±13   p 0.4883  Holm 1.0000
+  s18-elman-64-bptt    R3  J  -18±17   p 0.9998  Holm 1.0000
+  s18-elman-64-bptt    R4  J  -47±27   p 0.9995  Holm 1.0000
+  s18-elman-64-bptt    R5  J  -19±19   p 1.0000  Holm 1.0000
+  s18-elman-64-bptt    R6  J   -1±28   p 0.5186  Holm 1.0000
+V2 (tikregels geleerd, ondergrens > 0,5):
+  s18-ang                -5±0    nee
+  s18-ang-vast           -2±0    nee
+  s18-mlp-32-bp          83±1    ja
+  s18-elman-32-bp1       60±21   nee
+  s18-elman-32-bptt      66±25   nee
+  s18-elman-64-bptt      21±25   nee
+V3 ang tegen mlp op de tikregels: p 0.0000, Holm 0.0001
+V4 ang tegen ang-vast op de tikregels: p 0.0000, Holm 0.0001
+V5 faalvormen:
+  s18-ang             R1 stil  R2 stil  R3 gemengd  R4 gemengd  R5 stil  R6 stil
+  s18-ang-vast        R1 stil  R2 stil  R3 gemengd  R4 gemengd  R5 stil  R6 stil
+  s18-mlp-32-bp       R1 geleerd  R2 geleerd  R3 munt  R4 stil  R5 stil  R6 stil
+  s18-elman-32-bp1    R1 geleerd  R2 geleerd  R3 munt  R4 gemengd  R5 stil  R6 gemengd
+  s18-elman-32-bptt   R1 geleerd  R2 geleerd  R3 munt  R4 gemengd  R5 munt  R6 munt
+  s18-elman-64-bptt   R1 gemengd  R2 munt  R3 gemengd  R4 gemengd  R5 munt  R6 munt
+KLAAR exitcode=0 

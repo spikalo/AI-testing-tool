@@ -270,14 +270,16 @@ const gelijk = (a, b) => JSON.stringify(a) === JSON.stringify(b);
         historie: row.historie.length, struct: row.structuur.verbindingen };
     });
     ok('een echte agent speelt het spel en levert een benchmark op',
-      leven.bench && isFinite(leven.bench.pct) && leven.bench.pct >= 0 && leven.bench.pct <= 1,
+      /* sinds stap 18 is de score Youdens J per regel, en die loopt van -1 tot 1 */
+      leven.bench && isFinite(leven.bench.pct) && leven.bench.pct >= -1 && leven.bench.pct <= 1,
       `score ${(100 * leven.bench.pct).toFixed(1)} %`);
     ok('met een score per regel erin',
       leven.bench.perRegel && Object.keys(leven.bench.perRegel).length === 6,
       Object.entries(leven.bench.perRegel || {})
         .map(([k, v]) => `${k} ${v.pct === null ? '–' : (100 * v.pct).toFixed(0) + '%'}`).join('  '));
     ok('en het seinhuisblok staat in het resultaat',
-      leven.seinhuis && leven.seinhuis.toevalsbodem === 0.0625);
+      /* sinds stap 18: de bodem van een geloot beleid met vier losse handels, in J */
+      leven.seinhuis && leven.seinhuis.toevalsbodem === -0.875);
     ok('de agent doet het niet beter dan de perfecte speler',
       leven.bench.pct <= 1);
   }

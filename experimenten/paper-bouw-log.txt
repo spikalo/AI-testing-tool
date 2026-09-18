@@ -1,2 +1,2 @@
-geschreven: 1088109 bytes — XML gekeurd, alle onderdelen welgevormd
+geschreven: 1094072 bytes — XML gekeurd, alle onderdelen welgevormd
 KLAAR exitcode=0 

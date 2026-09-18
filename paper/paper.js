@@ -52,6 +52,8 @@ const OMSLAG = lees(path.join(EXPDIR, 'omslag.json'));
 const SGEDRAG = lees(path.join(EXPDIR, 'structuurgedrag.json'));
 const SIGNAAL = lees(path.join(EXPDIR, 'signaalsturing.json'));
 const RASTER = lees(path.join(EXPDIR, 'capaciteitsraster.json'));
+/* stap 18: de afsluitende meting op het seinhuis */
+const SEINHUIS = lees(path.join(EXPDIR, 'seinhuis-slot.json'));
 function stat(xs) {
   const v = xs.filter(x => typeof x === 'number' && isFinite(x));
   const n = v.length; if (!n) return null;
@@ -66,7 +68,7 @@ const num = (x, d = 0) => x === null ? '–' : x.m.toFixed(d) + ' ± ' + x.ci.to
 const kol = k => RUNS ? RUNS.map(r => r[k]) : [];
 /* een gemiddelde-met-interval uit benchmark.json in dezelfde vorm als stat() */
 const bm = o => o ? { n: o.n, m: o.m, sd: o.sd, ci: o.ci, min: o.m, max: o.m } : null;
-const VERSIE = RASTER ? '2.2' : SIGNAAL ? '2.1' : SGEDRAG ? '2.0' : OMSLAG ? '1.9' : TAAKAS ? '1.8' : ABLATIE ? '1.7' : LEERREGEL ? '1.6' : '1.5';
+const VERSIE = SEINHUIS ? '3.0' : RASTER ? '2.2' : SIGNAAL ? '2.1' : SGEDRAG ? '2.0' : OMSLAG ? '1.9' : TAAKAS ? '1.8' : ABLATIE ? '1.7' : LEERREGEL ? '1.6' : '1.5';
 /* De laatste secties schuiven mee met wat er gemeten is, zodat een verwijzing in de
    tekst nooit naar een verkeerd nummer wijst. */
 const SEC_OMSLAG = '10.9', SEC_SG = OMSLAG ? '10.10' : '10.9';
@@ -76,9 +78,11 @@ const SEC_SIG = SIGNAAL ? '10.' + NA_SG : null;
 const NA_SIG = NA_SG + (SIGNAAL ? 1 : 0);
 const SEC_RASTER = RASTER ? '10.' + NA_SIG : null;
 const NA_RASTER = NA_SIG + (RASTER ? 1 : 0);
-const SEC_HIERNA = '10.' + NA_RASTER;
-const SEC_VRAAG = '10.' + (NA_RASTER + 1);
-const DATUM = '17 september 2026';
+const SEC_SEIN = SEINHUIS ? '10.' + NA_RASTER : null;
+const NA_SEIN = NA_RASTER + (SEINHUIS ? 1 : 0);
+const SEC_HIERNA = '10.' + NA_SEIN;
+const SEC_VRAAG = '10.' + (NA_SEIN + 1);
+const DATUM = SEINHUIS ? '18 september 2026' : '17 september 2026';
 const SERIF = 'Cambria';
 const TEXTW_PT = 448;              // bruikbare tekstbreedte in punten
 const INK = '1A1D21', DIM = '55606B', ACC = '1F5C73';
@@ -348,7 +352,14 @@ C.push(new Paragraph({
             'van op een aangewezen correlatie.'
           : 'Een mechanisme dat de omslag niet waarneemt kan er niet op reageren, en daarmee gaat de ' +
             'negatieve bevinding niet over structurele plasticiteit als idee maar over deze aansturing ' +
-            'ervan — een uitspraak die te repareren en opnieuw te toetsen valt.') : '')
+            'ervan — een uitspraak die te repareren en opnieuw te toetsen valt.') : '') +
+      (SEINHUIS ? ' Een tweede taak, gebouwd om de ene druk te toetsen waaronder capaciteit bijbouwen iets ' +
+        'kán opleveren — een groeiend aantal regels met tijdschalen van één tot zeventig tikken — bleek ' +
+        'voor geen enkele architectuur te leren: ook een recurrent net met terugpropagatie door de tijd, ' +
+        'dat hiervoor gebouwd en numeriek gecontroleerd is, leert geen enkele regel die geheugen vraagt. ' +
+        'Onderweg bleek de score van die taak twee keer te misleiden, telkens door een speler die precies ' +
+        'één stap slimmer was dan de vorige; de uiteindelijke maat (Youdens J per regel) zet elke ' +
+        'strategie die niet op de voorwaarde let op nul.' : '')
   })]
 }));
 C.push(new Paragraph({
@@ -2231,7 +2242,7 @@ if (TAAKAS && TAAKAS.tabel) {
     'ang': 'ANG, met structurele plasticiteit',
     'ang-vast': 'ANG, structuur bevroren',
     'mlp-16-bp': 'vast net zonder terugkoppeling, backprop',
-    'elman-16-bp': 'vast recurrent net, backprop door de tijd',
+    'elman-16-bp': 'vast recurrent net, backprop afgekapt op één tik',
     'ang-typeloos': 'ANG zonder neuronsoorten'
   };
   const cel = (a, b) => T[`s12-${a}-b${b}`];
@@ -2454,7 +2465,7 @@ if (OMSLAG && OMSLAG.tabel) {
     'ang-vast': 'ANG, structuur bevroren',
     'ang-geensnoei': 'ANG, wel plasticiteit maar niet snoeien',
     'mlp-16-bp': 'vast net zonder terugkoppeling, backprop',
-    'elman-16-bp': 'vast recurrent net, backprop door de tijd'
+    'elman-16-bp': 'vast recurrent net, backprop afgekapt op één tik'
   };
   const r = c => T['s13-' + c];
   const ts = (conditie, tegen, maat) => TT.find(x => x.conditie === conditie && x.tegen === tegen && x.maat === maat);
@@ -3261,6 +3272,216 @@ if (RASTER) {
   C.push(gap(60));
 }
 
+/* --- het seinhuis: een tweede taak, en waarom zij is afgesloten -------------------------
+   Uit experimenten/seinhuis-slot.json (stap 18, slot). De kalibratie die eraan voorafging
+   (18a-c) was een verkenning op één zaad per variant en staat hier als verantwoording van
+   de opzet, niet als resultaat; alleen de afsluitende meting draagt uitspraken. Elke zin
+   die van de data afhangt, heeft een tak voor de andere uitkomst. */
+if (SEINHUIS) {
+  const CD = SEINHUIS.condities, U = SEINHUIS.uitslag;
+  const NAAM = {
+    's18-ang': 'ANG, met structurele plasticiteit', 's18-ang-vast': 'ANG, structuur bevroren',
+    's18-mlp-32-bp': 'MLP-32, backprop (geen geheugen)',
+    's18-elman-32-bp1': 'Elman-32, backprop afgekapt op één tik',
+    's18-elman-32-bptt': 'Elman-32, backprop door de hele dienst',
+    's18-elman-64-bptt': 'Elman-64, backprop door de hele dienst' };
+  const RG = ['R1', 'R2', 'R3', 'R4', 'R5', 'R6'];
+  const jj = o => (o === null || o === undefined) ? '–' : (100 * o.m).toFixed(0) + ' ± ' + (100 * o.ci).toFixed(0);
+  const namen = Object.keys(CD);
+  const v1 = U.V1 || [];
+  const v1boven = v1.filter(x => x.pHolm !== null && x.pHolm < 0.05 && x.m && x.m.m > 0);
+
+  C.push(h2(SEC_SEIN, 'Een tweede taak: het seinhuis'));
+  C.push(body(
+    'Alles hierboven is gemeten op één spel met één tijdschaal, één soort antwoord en een vaste ' +
+    'hoeveelheid werk. De vorige versie van dit document noemde een tweede taak als de ' +
+    'meest voor de hand liggende verklaring voor de reeks negatieve bevindingen: een netwerk dat zijn ' +
+    'structuur kan verbouwen heeft op het eerste spel per constructie weinig te verbouwen. Deze sectie ' +
+    'beschrijft die tweede taak, wat de kalibratie ervan opleverde, en waarom zij is afgesloten voordat ' +
+    'de meting waarvoor zij gebouwd was, kon beginnen.'
+  ));
+  C.push(body([
+    bd('De taak. '),
+    t('Geen ruimte en geen navigatie: een stroom van acht seinlampen, een wisselstand en zeven ' +
+      'afleiderkanalen, en vier handels. Zes regels, elk één zin: lamp 0 bij open wissel vraagt handel 0 ' +
+      'en lamp 1 bij gesloten wissel handel 1, deze tik; lamp 3 vraagt handel 0 als er sinds de vorige ' +
+      'lamp 3 een lamp 2 was en anders handel 1 (vijf tot vijftien tikken ertussen); lamp 5 idem met ' +
+      'lamp 4 en handel 2 of 3 (dertig tot zeventig tikken); elke derde lamp 6 vraagt handel 2; lamp 7 ' +
+      'twee keer binnen drie tikken vraagt handel 3. Elke handel wordt door twee regels gebruikt, zodat ' +
+      'een handel nooit verraadt om welke regel het gaat. Een dienst duurt 240 tikken.')
+  ]));
+
+  C.push(h3('De score, en twee keer dat hij niet deugde'));
+  C.push(body(
+    'Elke regel is een onderscheid tussen twee soorten gevallen: lamp 0 bij open tegen gesloten ' +
+    'wissel, lamp 3 met tegen zonder voorafgaande lamp 2, de derde lamp 6 tegen de andere. De eerste ' +
+    'versie scoorde alleen de gevallen waarin een handel gevraagd werd, en een geheugenloos net dat bij ' +
+    'elke lamp de bijbehorende handel indrukte haalde daarmee boven de negentig procent op een regel die ' +
+    'over tellen gaat. De tweede versie nam het meetkundig gemiddelde van de trefkans aan beide kanten; ' +
+    'daarmee kwamen altijd-reageren en nooit-reageren op nul, maar een geheugenloos net dat bij lamp 3 ' +
+    'willekeurig tussen handel 0 en 1 koos, haalde 51 procent zonder iets van de vlag te weten. De score ' +
+    'is nu Youdens J: trefkans aan de ene kant plus trefkans aan de andere kant min één. Nul betekent ' +
+    'dat de reactie niet afhangt van wat de regel zegt dat ertoe doet — en dat geldt voor altijd, nooit ' +
+    'én een munt. Eén is perfect. De controletest meet die schaal na met zes gescripte spelers, ' +
+    'waaronder de twee die de eerdere versies doorlieten.'
+  ));
+  C.push(body([
+    bd('De methodologische les is algemener dan dit spel. '),
+    t('Beide fouten werden niet gevonden door een toevalsbodem maar door een speler die precies één stap ' +
+      'slimmer was dan de vorige: eerst "lamp aan, handel erbij", toen "gooi een munt tussen de twee goede ' +
+      'antwoorden". Een score hoort getoetst te worden tegen de beste strategie die het bedoelde vermogen ' +
+      'níét heeft, en niet alleen tegen toeval.')
+  ]));
+
+  C.push(h3('De kalibratie'));
+  C.push(body(
+    'Vóór de basislijnen is per architectuur één proefleven gedraaid, op zaden buiten de meetzaden. ' +
+    'Dat leverde vier bevindingen op die de opzet van de afsluitende meting bepaalden. Met de oorspronkelijke ' +
+    'beloning stortte élk net — ook een backpropnet dat de eerste regel los binnen duizend diensten leert ' +
+    '— binnen driehonderd diensten in naar "nooit drukken": vier onafhankelijke handels die met REINFORCE ' +
+    'geleerd worden verzadigen naar nooit of altijd, en daar is de gradiënt nul. Eén keuze per tik — niets, ' +
+    'of precies één handel — hielp niet. De eerste regel stierf zolang de achtergrond werd afgestraft, ' +
+    'omdat zijn voorwaarde (open wissel) op de helft van alle stille tikken ook waar is. En geen enkel net ' +
+    'leerde een regel die geheugen vraagt.'
+  ));
+  C.push(body([
+    bd('Correctie op sectie 10.8 en ' + SEC_OMSLAG + '. '),
+    t('Het recurrente vergelijkingsnet dat daar als "backprop door de tijd" stond beschreven, propageert ' +
+      'niet terug door de tijd. De exacte gradiënt loopt alleen over voorwaartse bogen, en een ' +
+      'terugkoppelende boog krijgt de toestand van de vorige tik als presynaptische waarde; het spoor rekt ' +
+      'dat tot twee à drie tikken. De labels in die secties zijn aangepast. Op het eerste spel verandert ' +
+      'dat aan geen enkele conclusie iets — koers houden is continuïteit en geen opgeslagen bit — maar het ' +
+      'betekent wel dat de sterkste tegenstander in dit document tot hier geen echt geheugen kon leren. ' +
+      'Voor deze sectie is daarom een Elman-net gebouwd met terugpropagatie door de hele dienst: dezelfde ' +
+      'schatter, hetzelfde spoor, dezelfde basislijn en rem, met de gradiënt door alle 240 tikken terug ' +
+      'en een update per dienst. Een controle met eindige differenties over alle gewichten geeft een ' +
+      'cosinus van 1,000000.')
+  ]));
+
+  C.push(h3('De afsluitende meting'));
+  C.push(body(
+    'Om de negatieve uitkomst niet op één zaad te laten rusten, is de gunstigste opzet uit de kalibratie ' +
+    'één keer volledig gemeten: een groeiende dienstregeling (' + SEINHUIS.fasen[0].pogingen + ' diensten ' +
+    'per regel, regels die blijven), één keuze per tik, een beloning die de achtergrond niet afstraft, een ' +
+    'leersnelheid per conditie geveegd op eigen zaden, en ' + SEINHUIS.zaden + ' zaden per conditie met ' +
+    'elk een eigen brein- en wereldzaad. De voorspellingen stonden vast voordat de eerste run draaide. ' +
+    'De tabel geeft J per regel aan het eind van het leven, op ' + SEINHUIS.benchmark.diensten +
+    ' vaste diensten, in procenten, met het interval over de zaden.'
+  ));
+  C.push(tbl(['conditie', 'η'].concat(RG).concat(['totaal']),
+    namen.map(n => [NAAM[n] || n, String(CD[n].lr)].concat(RG.map(r => jj(CD[n].perRegel[r].J))).concat([jj(CD[n].totaal)])),
+    [2700, 700, 820, 820, 820, 820, 820, 820, 852]));
+  C.push(body([
+    bd(v1boven.length
+      ? 'Er is wél een net dat een geheugenregel leert. '
+      : 'Geen enkel net leert een regel die geheugen vraagt. '),
+    t(v1boven.length
+      ? 'Na Holm over ' + v1.length + ' toetsen ligt J boven nul voor ' +
+        v1boven.map(x => (NAAM[x.c] || x.c) + ' op ' + x.r + ' (' + jj(x.m) + ')').join(', ') + '. ' +
+        'Daarmee is de voorgeregistreerde verwachting onderuitgegaan, en is de afsluiting van deze taak ' +
+        'voorbarig: er bestaat een tegenstander die geheugen leert, en de meting waarvoor het spel gebouwd ' +
+        'was, kan in principe door.'
+      : 'Van de ' + v1.length + ' combinaties van conditie en geheugenregel ligt er na Holm geen enkele ' +
+        'boven nul; de kleinste gecorrigeerde p is ' +
+        Math.min(...v1.map(x => x.pHolm)).toFixed(3) + '. Dat geldt ook voor het Elman-net met ' +
+        'terugpropagatie door de hele dienst, en ook voor de brede variant daarvan. Wat R3 tot en met R6 ' +
+        'vragen — een vlag vijf tot zeventig tikken vasthouden, tellen tot drie, twee lampen binnen drie ' +
+        'tikken herkennen — ligt met REINFORCE en deze netten in dit budget buiten bereik, voor elke ' +
+        'architectuur in dit document.')
+  ]));
+  {
+    const tik = namen.map(n => ({ n, x: CD[n].tikregelsMci }));
+    const geleerd = tik.filter(o => o.x && o.x.m - o.x.ci > 0.5).map(o => NAAM[o.n] || o.n);
+    const nietGeleerd = tik.filter(o => !(o.x && o.x.m - o.x.ci > 0.5)).map(o => NAAM[o.n] || o.n);
+    C.push(body([
+      bd('De regels zonder geheugen. '),
+      t((geleerd.length
+        ? 'R1 en R2 — één tik, alleen een voorwaarde op de wissel — worden betrouwbaar geleerd ' +
+          '(ondergrens van het interval op het gemiddelde van beide boven 0,5) door: ' + geleerd.join('; ') + '. '
+        : 'Ook R1 en R2 — één tik, alleen een voorwaarde op de wissel — haalt geen enkele conditie ' +
+          'betrouwbaar boven 0,5. ') +
+        (nietGeleerd.length && geleerd.length ? 'Niet betrouwbaar: ' + nietGeleerd.join('; ') + '. ' : '') +
+        (geleerd.length
+          ? 'Het falen op de overige regels ligt dus aan het geheugen en niet aan de beloning of het beleid.'
+          : 'Dan faalt de opzet al op de eenvoudigste regels, en zegt deze meting niets over geheugen.') +
+        '')
+    ]));
+    /* V3 en V4 met richting: een p zonder richting zegt niet wie er wint. */
+    const tm = n => CD[n] && CD[n].tikregelsMci ? CD[n].tikregelsMci.m : null;
+    const pz = o => o.pHolm < 0.001 ? 'Holm p < 0,001' : 'Holm p = ' + o.pHolm.toFixed(3);
+    const a = tm('s18-ang'), m = tm('s18-mlp-32-bp'), v = tm('s18-ang-vast');
+    if (U.V3 && U.V4 && a !== null && m !== null && v !== null) C.push(body([
+      bd(a < 0.1 ? 'ANG leert zelfs de regels zonder geheugen niet. ' : 'ANG en de tikregels. '),
+      t('Op het gemiddelde van R1 en R2 haalt de vrije graaf J = ' + (100 * a).toFixed(0) + ' %, het ' +
+        'geheugenloze MLP ' + (100 * m).toFixed(0) + ' % (' + pz(U.V3) + ') en dezelfde graaf bevroren ' +
+        (100 * v).toFixed(0) + ' % (' + pz(U.V4) + '). ' +
+        (a < 0.1
+          ? 'Beide varianten van ANG zijn over de hele linie stil gebleven — al in de eerste fase, waarin ' +
+            'alleen R1 bestaat, komt het onderscheid niet van nul. ' + (v > a
+              ? 'Het verschil tussen vrij en bevroren is significant maar klein, en valt in de richting ' +
+                'die de eerdere secties steeds vonden: bevroren is niet slechter. '
+              : 'Vrij en bevroren verschillen significant, en hier in het voordeel van de vrije graaf. ')
+          : '') +
+        'Een beperking hoort hier direct bij: voor beide ANG-varianten koos de leersnelheidsveeg de ' +
+        'hoogste van de drie kandidaten, en een keuze op de rand van het raster is geen optimum. Dat de ' +
+        'score met de leersnelheid steeg (van ongeveer −58 naar −35 %) maar in geen enkele variant boven ' +
+        'nul kwam, maakt het onwaarschijnlijk maar niet uitgesloten dat een nog hogere waarde ANG over ' +
+        'de drempel had geholpen. Hetzelfde geldt voor het Elman-net dat één tik terugleert.')
+    ]));
+    /* de spreiding tussen zaden van de recurrente netten is zelf een bevinding */
+    const rec = ['s18-elman-32-bp1', 's18-elman-32-bptt', 's18-elman-64-bptt'].filter(n => CD[n]);
+    const dood = rec.map(n => ({ n, k: CD[n].perRegel.R1.perZaad.filter(x => x !== null && x < 0.1).length,
+      g: CD[n].perRegel.R1.perZaad.filter(x => x !== null && x > 0.8).length }));
+    if (dood.some(d => d.k > 0 && d.g > 0)) C.push(body([
+      bd('De recurrente netten leren R1 in het ene zaad wel en in het andere helemaal niet. '),
+      t(dood.map(d => (NAAM[d.n] || d.n) + ': ' + d.g + ' van de ' + SEINHUIS.zaden + ' zaden boven 80 %, ' +
+          d.k + ' onder 10 %').join('; ') + '. Het geheugenloze MLP haalt in elk zaad ongeveer hetzelfde. ' +
+        'Het gemiddelde met zijn brede interval verbergt dus geen middelmatig net maar twee soorten ' +
+        'netten: een dat de regel beheerst en een dat is ingestort. Terugkoppeling maakt het leren hier ' +
+        'niet sterker maar grilliger.')
+    ]));
+    const r6 = v1.filter(x => x.r === 'R6' && x.p !== null && x.p < 0.05 && x.pHolm >= 0.05);
+    if (!v1boven.length && r6.length) C.push(body([
+      bd('Eén aanwijzing die de correctie niet overleeft. '),
+      t(r6.map(x => (NAAM[x.c] || x.c) + ' haalt op R6 J = ' + jj(x.m) + ' (ongecorrigeerd p = ' +
+          x.p.toFixed(3) + ', na Holm ' + x.pHolm.toFixed(2) + ')').join('; ') + '. R6 is de geheugenregel ' +
+        'met de kortste tijdschaal — twee lampen binnen drie tikken — en daarmee de enige die binnen het ' +
+        'bereik van een spoor van twee à drie tikken ligt. Het is juist niet het net met ' +
+        'terugpropagatie door de hele dienst dat hier boven komt drijven. Na correctie is het geen ' +
+        'bevinding, en het staat hier alleen omdat het in de richting wijst die de verklaring voorspelt.')
+    ]));
+  }
+
+  C.push(h3('Hoe een net faalt, niet alleen dát'));
+  C.push(body(
+    'Omdat elke regel twee kanten heeft, is per regel af te lezen wélke strategie een net gekozen heeft. ' +
+    '"Stil" betekent nooit reageren (de ene kant bijna nul, de andere bijna één), "reflex" altijd ' +
+    'reageren en de voorwaarde negeren, "munt" gokken tussen de twee antwoorden, "geleerd" een J boven ' +
+    'de helft. Twee categorieën zijn na de meting toegevoegd, omdat de vooraf vastgelegde indeling ze ' +
+    'onder "gemengd" schoof: bij R3 en R4 vragen beide kanten een handel, zodat nooit reageren daar ' +
+    '"niets goed" oplevert en steeds hetzelfde antwoord "vast antwoord". Alle faalvormen halen J rond ' +
+    'nul of lager — en ze zijn aan een gewone trefkans niet van elkaar, en de reflex en de munt niet van ' +
+    'begrip, te onderscheiden.'
+  ));
+  C.push(tbl(['conditie'].concat(RG),
+    namen.map(n => [NAAM[n] || n].concat(RG.map(r => (U.V5 && U.V5[n] && U.V5[n][r]) || '–'))),
+    [3300, 1030, 1030, 1030, 1030, 1030, 1022]));
+  C.push(body([
+    bd('Waarom de taak is afgesloten. '),
+    t(v1boven.length
+      ? 'Zij is, anders dan vooraf gedacht, niet afgesloten op grond van deze meting; zie hierboven.'
+      : 'Een test van de vraag of een netwerk capaciteit bijbouwt wanneer het aantal regels groeit, heeft ' +
+        'een taak nodig waarop een vaste tegenstander de latere regels wél kan leren. Die is er niet. ' +
+        'Doormeten zou tientallen keren nul opleveren en niets over structurele plasticiteit zeggen. Wat ' +
+        'overblijft zijn drie bruikbare dingen: een tweede bevestiging van het patroon van sectie 10.5 op ' +
+        'de regels die wél te leren zijn, een score die tegen de slimste domme speler bestand is, en een ' +
+        'beschrijving van de manieren waarop een net hier faalt — stilvallen, gokken, steeds hetzelfde ' +
+        'antwoord geven, en in de kalibratie ook een reflex die de voorwaarde negeert. Geen daarvan ' +
+        'verdwijnt met een groter net: de brede Elman-variant doet het slechter dan de smalle.')
+  ]));
+  C.push(gap(60));
+}
+
 C.push(h2(SEC_HIERNA, 'Wat hierna gemeten wordt'));
 C.push(body(
   'Sectie 10.4 laat zien dat de structurele plasticiteit als geheel niets oplevert, sectie 10.5 wat de ' +
@@ -3277,11 +3498,18 @@ if (ABLATIE) C.push(bullet([bd('Elke ablatie met haar eigen leersnelheid. '), t(
   'grootst is, is een leersnelheidsveeg zoals in sectie 10.5 en 10.6 de manier om uit te sluiten dat de tabel ' +
   'het afstellen meet.')]));
 
-C.push(bullet([bd('Een recurrente basislijn met terugpropagatie door de tijd. '), t('De Elman-basislijn van ' +
+if (!SEINHUIS) C.push(bullet([bd('Een recurrente basislijn met terugpropagatie door de tijd. '), t('De Elman-basislijn van ' +
   'sectie 10.5 deelt bewust het skelet van ANG en propageert dus niet terug door de tijd; daarmee wordt zij ' +
   'gemeten in precies de vorm waarin een gepoort geheugennet zijn kracht niet kan tonen. Een GRU met echte BPTT ' +
   'hoort bij de tweede taak hieronder, waar geheugen over tientallen tikken werkelijk nodig is — op de huidige ' +
   'taak is het doel altijd zichtbaar en zou zo’n basislijn niets extra’s laten zien.')]));
+if (SEINHUIS) C.push(bullet([bd('Gepoort geheugen, en een andere leerregel. '), t('Sectie ' + SEC_SEIN + ' laat zien ' +
+  'dat een Elman-net met terugpropagatie door de hele dienst de geheugenregels van het seinhuis niet leert. ' +
+  'Twee dingen zijn daar niet getoetst en liggen voor de hand: een net met poorten (GRU of LSTM), dat voor ' +
+  'afhankelijkheden over tientallen stappen de gangbare oplossing is, en een schatter met minder variantie ' +
+  'dan REINFORCE met een lopende basislijn — een criticus die op de toestand van het recurrente net zelf ' +
+  'leert in plaats van op de zintuigen. Pas als een van beide de geheugenregels leert, heeft de vraag of ANG ' +
+  'daar capaciteit voor bijbouwt een tegenstander.')]));
 if (!LEERREGEL) C.push(bullet([bd('De schaal van het wolkdeel van de update. '), t('Sectie 3.11 laat zien dat het ' +
   'node-perturbatiedeel twee ordes te klein is ten opzichte van het score-functiedeel. De ontbrekende factor ' +
   'toevoegen is één regel code, maar vraagt om de leersnelheid en de stapbegrenzing samen opnieuw af te stellen; ' +
@@ -3308,7 +3536,7 @@ if (TAAKAS && !OMSLAG) C.push(bullet([bd('Waarom de vrije graaf onder knipperen 
   'die de informatie over de donkere periode heen dragen. Dat is te toetsen door de herstructurering ' +
   'gefaseerd uit te zetten en door de gesnoeide verbindingen te vergelijken met de verbindingen die de ' +
   'geheugenhorizon dragen.')]));
-if (RASTER) C.push(bullet([bd('Een tweede taak, en wel een die vraagt wat dit model aanbiedt. '),
+if (RASTER && !SEINHUIS) C.push(bullet([bd('Een tweede taak, en wel een die vraagt wat dit model aanbiedt. '),
   t('Alles in dit document is gemeten op één spel, en dat spel heeft één tijdschaal, één soort antwoord ' +
     'en een vaste hoeveelheid werk. Een netwerk dat zijn rekenstructuur kan verbouwen heeft daar per ' +
     'constructie weinig te verbouwen, en dat is de meest waarschijnlijke verklaring voor de reeks ' +
@@ -3531,6 +3759,30 @@ if (OMSLAG && OMSLAG.tabel && OMSLAG.tabel['s13-ang']) {
           'en geen eigenschap van het idee. Wat overblijft als bijdrage is dan ook niet het model maar het ' +
           'gereedschap eromheen — de blinderingsproef, de omslagproef, en een meetopzet waarin een ' +
           'voorspelling eerder vastligt dan de data die haar moet weerleggen.'))
+  ]));
+}
+if (SEINHUIS) {
+  const v1 = (SEINHUIS.uitslag && SEINHUIS.uitslag.V1) || [];
+  const boven = v1.filter(x => x.pHolm !== null && x.pHolm < 0.05 && x.m && x.m.m > 0).length;
+  C.push(body([
+    bd('De tweede taak die hierboven steeds werd aangekondigd, is gebouwd — en ' +
+      (boven ? 'zij levert een tegenstander op. ' : 'zij kon de vraag niet dragen. ')),
+    t(boven
+      ? 'Sectie ' + SEC_SEIN + ' laat zien dat ten minste één vast net een regel met geheugen leert. ' +
+        'Daarmee is de meting waarvoor het seinhuis gebouwd is — groeit ANG mee wanneer het aantal regels ' +
+        'groeit — voor het eerst uitvoerbaar, en die meting is het eerstvolgende wat dit document moet ' +
+        'rapporteren.'
+      : 'Sectie ' + SEC_SEIN + ' laat zien dat geen enkele architectuur in dit document — ook niet een ' +
+        'recurrent net met terugpropagatie door de hele dienst — een regel leert die geheugen over meer ' +
+        'dan een paar tikken vraagt. De afbakening van deze conclusie verschuift daardoor niet van "op ' +
+        'deze taak" naar "op deze twee taken", maar krijgt er een grens bij: onder de leerregels die hier ' +
+        'gemeten zijn, is een taak met geheugen over tientallen tikken voor geen enkele deelnemer ' +
+        'bereikbaar, en is het vermogen van ANG om voor zo’n taak capaciteit bij te bouwen daarmee niet ' +
+        'te toetsen. Wat de taak wél opleverde, is voor de oorspronkelijke vraag misschien het ' +
+        'bruikbaarste van dit hele document: een netwerk dat faalt, faalt hier niet door zijn grootte ' +
+        'maar door een beleid dat instort, door een kortere weg die de voorwaarde negeert, of door gokken ' +
+        'dat op begrip lijkt — en de laatste twee zijn alleen zichtbaar voor een maat die per voorwaarde ' +
+        'beide kanten weegt.')
   ]));
 }
 
