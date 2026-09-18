@@ -5,16 +5,23 @@ OK    skip uit geeft bit voor bit hetzelfde net als zonder de sleutel
 OK    skip aan legt precies 16 x 4 = 64 bogen aan   64 extra
 OK    en dat zijn allemaal directe bogen invoer -> handel, voorwaarts gemarkeerd   64 direct, 64 voorwaarts
 OK    de rest van het net blijft hetzelfde (de bogen komen achteraan)
-OK    perfecte speler: 100 % onderscheid op elke regel   100.0 100.0 100.0 100.0 100.0 100.0
+OK    perfecte speler: onderscheid 1 op elke regel   100.0 100.0 100.0 100.0 100.0 100.0
 OK    elke regel heeft beide kanten in de dienstenset   gevallen per kant 300 300 300 300 284 316 141 259 500 1000 305 595
-OK    geloot beleid: in de buurt van de toevalsbodem 6,25 %   5.4 %, per regel 5.9 7.3 5.1 3.5 5.6 5.0
-OK    een uit vijf, uniform geloot: in de buurt van 20 % (de bodem van het categorische beleid)   20.5 %, per regel 21.9 20.8 18.7 17.7 21.8 21.7
-OK    en seinToeval geeft voor beide beleidsvormen de juiste bodem   [0.0625,0.2]
-OK    alles vasthouden: 0
-OK    niets doen: 0
+OK    vier losse handels, geloot: in de buurt van de bodem -87,5 %   -89.1 %, per regel -88.0 -85.3 -89.7 -92.9 -88.7 -89.7
+OK    een uit vijf, uniform geloot: in de buurt van de bodem -60 %   -58.9 %, per regel -56.0 -58.3 -62.0 -64.3 -56.4 -56.4
+OK    en seinToeval geeft voor beide beleidsvormen de juiste bodem   [-0.875,-0.6]
+OK    alles vasthouden: nooit boven nul   -100.0 -100.0 -100.0 -100.0 -100.0 -100.0
+OK    niets doen: nooit boven nul   0.0 0.0 -100.0 -100.0 0.0 0.0
+OK    de muntspeler (geheugenloos, gokt bij elke lamp) zit op elke regel rond nul — het meetkundig gemiddelde gaf hem 50 %   4.0 -7.0 3.1 -3.7 -1.2 -4.4
 OK    de reflexspeler van stap 17 haalt op de oude maat een hoge trefkans op de eisen   76.1 % van de eisen goed
 OK    maar op het onderscheid haalt hij nul op R1, R2, R5 en R6   0.0 0.0 0.0 0.0 0.0 0.0
 OK    en ook nul op R3 en R4, waar hij altijd hetzelfde antwoord geeft
+OK    BPTT (één uit vijf): cosinus met eindige differenties over alle 224 gewichten > 0,999   cos 1.000000, grootste relatieve fout op de 20 zwaarste 0.00 %, 60 tikken
+OK    BPTT (één uit vijf): de terugkoppeling draagt werkelijk gradiënt   5.0 % van de gradiëntmassa zit in terugkoppelende gewichten
+OK    BPTT (één uit vijf): met leersnelheid 0 verandert er niets
+OK    BPTT (vier losse handels): cosinus met eindige differenties over alle 224 gewichten > 0,999   cos 1.000000, grootste relatieve fout op de 20 zwaarste 0.00 %, 60 tikken
+OK    BPTT (vier losse handels): de terugkoppeling draagt werkelijk gradiënt   7.3 % van de gradiëntmassa zit in terugkoppelende gewichten
+OK    BPTT (vier losse handels): met leersnelheid 0 verandert er niets
 OK    de standaardbeloning is nog die van stap 17   [1.5,-1.5,0.5,0.5,0.5]
 OK    en geeft op afleider en achtergrond dezelfde straf als in stap 17
 OK    cfg.seinBeloning wordt werkelijk gebruikt   [-1.25,-0.05]

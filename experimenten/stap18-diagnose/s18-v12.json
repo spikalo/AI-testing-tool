@@ -1,0 +1,4 @@
+[["bptt cat groeiend 500", "bptt", 0.004, [1.5,-1.5,0.5,1.5,0], 6, 0, {"catPolicy": true, "__fase": 500}],
+ ["bptt cat groeiend 1500", "bptt", 0.004, [1.5,-1.5,0.5,1.5,0], 6, 0, {"catPolicy": true, "__fase": 1500}],
+ ["bptt cat alle 12000", "bptt", 0.004, [1.5,-1.5,0.5,1.5,0], 6, 12000, {"catPolicy": true}],
+ ["mlp cat groeiend 1500", "mlp", 0.016, [1.5,-1.5,0.5,1.5,0], 6, 0, {"catPolicy": true, "__fase": 1500}]]

@@ -9,6 +9,7 @@ const ARCH = {
   mlp: { layered: true, layerSizes: [32], prop: 2, gradExact: true, ...VAST },
   elman: { layered: true, layerSizes: [32], prop: 2, gradExact: true, recurrent: true, ...VAST },
   skip: { layered: true, layerSizes: [32], prop: 2, gradExact: true, recurrent: true, skip: true, ...VAST },
+  bptt: { layered: true, layerSizes: [32], prop: 2, gradExact: true, recurrent: true, bptt: true, ...VAST },
   ang: {}, angvast: VAST
 };
 const VARIANTEN = JSON.parse(process.env.VARIANTEN);

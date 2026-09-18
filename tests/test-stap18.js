@@ -141,29 +141,106 @@ const gelijk = (a, b) => JSON.stringify(a) === JSON.stringify(b);
     const LAMP_HANDEL = [0, 1, -1, 0, -1, 2, 2, 3];
     const reflex = speel((d, t) => { const P = [0, 0, 0, 0]; const l = d.lamp[t];
       if (l >= 0 && LAMP_HANDEL[l] >= 0) P[LAMP_HANDEL[l]] = 1; return P; });
-    return { perfect, geloot, vijf, baksteen, lui, reflex, kort: W.SEIN_KORT,
+    /* stap 18c: de speler die het meetkundig gemiddelde doorliet. Geheugenloos, en bij elke
+       lamp een munt: bij R1/R2/R5/R6 wel of niet de handel, bij lamp 3 handel 0 of 1, bij
+       lamp 5 handel 2 of 3. Hij weet niets van enige voorwaarde. */
+    const MUNT_KEUZE = { 0: [0, -1], 1: [1, -1], 3: [0, 1], 5: [2, 3], 6: [2, -1], 7: [3, -1] };
+    const muntSpeler = speel((d, t) => { const P = [0, 0, 0, 0]; const k = MUNT_KEUZE[d.lamp[t]];
+      if (k) { const h = k[munt()]; if (h >= 0) P[h] = 1; } return P; });
+    return { perfect, geloot, vijf, baksteen, lui, reflex, muntSpeler, kort: W.SEIN_KORT,
       toeval: [W.seinToeval({}), W.seinToeval({ catPolicy: true })] };
   });
   const f = x => x === null ? '–' : (100 * x).toFixed(1);
-  ok('perfecte speler: 100 % onderscheid op elke regel',
-    ijk.perfect.per.every(x => x === 1), ijk.perfect.per.map(f).join(' '));
+  ok('perfecte speler: onderscheid 1 op elke regel',
+    ijk.perfect.per.every(x => Math.abs(x - 1) < 1e-12), ijk.perfect.per.map(f).join(' '));
   ok('elke regel heeft beide kanten in de dienstenset',
     ijk.perfect.per.every(x => x !== null) && ijk.perfect.n.every(x => x > 0),
     'gevallen per kant ' + ijk.perfect.n.join(' '));
-  ok('geloot beleid: in de buurt van de toevalsbodem 6,25 %',
-    Math.abs(ijk.geloot.totaal - 0.0625) < 0.02, `${f(ijk.geloot.totaal)} %, per regel ${ijk.geloot.per.map(f).join(' ')}`);
-  ok('een uit vijf, uniform geloot: in de buurt van 20 % (de bodem van het categorische beleid)',
-    Math.abs(ijk.vijf.totaal - 0.2) < 0.03, `${f(ijk.vijf.totaal)} %, per regel ${ijk.vijf.per.map(f).join(' ')}`);
+  ok('vier losse handels, geloot: in de buurt van de bodem -87,5 %',
+    Math.abs(ijk.geloot.totaal + 0.875) < 0.03, `${f(ijk.geloot.totaal)} %, per regel ${ijk.geloot.per.map(f).join(' ')}`);
+  ok('een uit vijf, uniform geloot: in de buurt van de bodem -60 %',
+    Math.abs(ijk.vijf.totaal + 0.6) < 0.04, `${f(ijk.vijf.totaal)} %, per regel ${ijk.vijf.per.map(f).join(' ')}`);
   ok('en seinToeval geeft voor beide beleidsvormen de juiste bodem',
-    ijk.toeval[0] === 0.0625 && ijk.toeval[1] === 0.2, JSON.stringify(ijk.toeval));
-  ok('alles vasthouden: 0', ijk.baksteen.totaal === 0);
-  ok('niets doen: 0', ijk.lui.totaal === 0);
+    ijk.toeval[0] === -0.875 && ijk.toeval[1] === -0.6, JSON.stringify(ijk.toeval));
+  ok('alles vasthouden: nooit boven nul', ijk.baksteen.per.every(x => x <= 0), ijk.baksteen.per.map(f).join(' '));
+  ok('niets doen: nooit boven nul', ijk.lui.per.every(x => x <= 0), ijk.lui.per.map(f).join(' '));
+  ok('de muntspeler (geheugenloos, gokt bij elke lamp) zit op elke regel rond nul — het meetkundig gemiddelde gaf hem 50 %',
+    ijk.muntSpeler.per.every(x => Math.abs(x) < 0.1), ijk.muntSpeler.per.map(f).join(' '));
   ok('de reflexspeler van stap 17 haalt op de oude maat een hoge trefkans op de eisen',
     ijk.reflex.trefkansEisen > 0.6, `${f(ijk.reflex.trefkansEisen)} % van de eisen goed`);
   ok('maar op het onderscheid haalt hij nul op R1, R2, R5 en R6',
     [0, 1, 4, 5].every(r => ijk.reflex.per[r] === 0), ijk.reflex.per.map(f).join(' '));
   ok('en ook nul op R3 en R4, waar hij altijd hetzelfde antwoord geeft',
     ijk.reflex.per[2] === 0 && ijk.reflex.per[3] === 0);
+
+  /* ---------- 6 (stap 18c). terugpropagatie door de tijd is de echte gradiënt ----------
+     L(w) = Σ_t Ã_t · log π_t(a_t; w), met de acties en Ã uit een gespeelde dienst vast.
+     bpttLeer hoort precies ∂L/∂w te geven, óók over de terugkoppeling en over de hele
+     dienst. Nagemeten met centrale differenties op élk gewicht, voor beide beleidsvormen. */
+  for (const cat of [true, false]) {
+    const gc = await p.evaluate(([cat]) => {
+      const W = window.__brain, S = W.S;
+      const cfg = W.cfgOverride(W.readCfg(), { taak: 'seinhuis', layered: true, layerSizes: [8], recurrent: true,
+        prop: 2, gradExact: true, bptt: true, catPolicy: cat, lr: 0, seinTikken: 60,
+        structOn: false, growOn: false, retypeOn: false });
+      S.cfg = cfg;
+      const B = W.createLayered(cfg, 77); S.B = B;
+      S.rnd = W.mulberry32(4242);
+      S.world = W.seinDienst(31337, cfg);
+      W.seinStart();
+      let klaar = false;
+      while (!klaar) klaar = W.seinTick(true, 0.3);
+      const L0 = S.bpttLaatsteG;
+      const { At, acties, tp } = L0;
+      const G = Array.from(L0.G);
+      /* de doelfunctie, opnieuw afgespeeld met vaste acties */
+      const d = S.world, inp = new Float32Array(16);
+      const L = () => {
+        W.resetBrainState(B);
+        let som = 0;
+        for (let t = 0; t < d.T; t++) {
+          W.seinWaarnemen(d, t, inp);
+          B.prev.set(B.act);
+          W.propagate(B, inp, cfg, 0, tp, B.act, null);
+          const net = B.onet, a = acties[t];
+          let lp;
+          if (cat) {
+            const sc = W.SEIN_ACTIES.map(A => A.reduce((s, j) => s + net[j], 0) / tp);
+            const mx = Math.max(...sc), Z = sc.reduce((s, v) => s + Math.exp(v - mx), 0);
+            let k = W.SEIN_ACTIES.findIndex(A => A.length === a.reduce((s, x) => s + x, 0) && A.every(j => a[j]));
+            lp = sc[k] - mx - Math.log(Z);
+          } else {
+            lp = 0;
+            for (let j = 0; j < 4; j++) { const q = 1 / (1 + Math.exp(-net[j] / tp));
+              lp += a[j] ? Math.log(q) : Math.log(1 - q); }
+          }
+          som += At[t] * lp;
+        }
+        return som;
+      };
+      const w0 = Float32Array.from(B.cW);
+      const eps = 1e-2, num = new Array(B.nc);
+      for (let q = 0; q < B.nc; q++) {
+        B.cW.set(w0); B.cW[q] = w0[q] + eps; const lp = L();
+        B.cW.set(w0); B.cW[q] = w0[q] - eps; const lm = L();
+        num[q] = (lp - lm) / (2 * eps);
+      }
+      B.cW.set(w0);
+      const dot = (x, y) => x.reduce((s, v, i) => s + v * y[i], 0);
+      const cos = dot(G, num) / Math.sqrt(dot(G, G) * dot(num, num));
+      let rec = 0, tot = 0;
+      for (let q = 0; q < B.nc; q++) { tot += G[q] * G[q]; if (B.cRec[q]) rec += G[q] * G[q]; }
+      const zwaarst = G.map((v, q) => [Math.abs(v), q]).sort((a, b) => b[0] - a[0]).slice(0, 20).map(x => x[1]);
+      const relMax = Math.max(...zwaarst.map(q => Math.abs(G[q] - num[q]) / Math.max(1e-9, Math.abs(num[q]))));
+      return { cos, recAandeel: rec / tot, relMax, nc: B.nc, T: d.T, lr0gelijk: B.cW.every((v, q) => v === L0.gewichtenVoor[q]) };
+    }, [cat]);
+    const vorm = cat ? 'één uit vijf' : 'vier losse handels';
+    ok(`BPTT (${vorm}): cosinus met eindige differenties over alle ${gc.nc} gewichten > 0,999`,
+      gc.cos > 0.999, `cos ${gc.cos.toFixed(6)}, grootste relatieve fout op de 20 zwaarste ${(100 * gc.relMax).toFixed(2)} %, ${gc.T} tikken`);
+    ok(`BPTT (${vorm}): de terugkoppeling draagt werkelijk gradiënt`,
+      gc.recAandeel > 0.01, `${(100 * gc.recAandeel).toFixed(1)} % van de gradiëntmassa zit in terugkoppelende gewichten`);
+    ok(`BPTT (${vorm}): met leersnelheid 0 verandert er niets`, gc.lr0gelijk);
+  }
 
   /* ---------- 5. de beloning ---------- */
   const bel = await p.evaluate(() => {

@@ -1,0 +1,6 @@
+[["bptt cat bg0 lr.001", "bptt", 0.001, [1.5,-1.5,0.5,1.5,0], 6, 3000, {"catPolicy": true}],
+ ["bptt cat bg0 lr.004", "bptt", 0.004, [1.5,-1.5,0.5,1.5,0], 6, 3000, {"catPolicy": true}],
+ ["bptt cat bg0 lr.016", "bptt", 0.016, [1.5,-1.5,0.5,1.5,0], 6, 3000, {"catPolicy": true}],
+ ["bptt cat bg.05 lr.004", "bptt", 0.004, [1.5,-1.5,0.5,1.5,0.05], 6, 3000, {"catPolicy": true}],
+ ["bptt cat R1-3 lr.004", "bptt", 0.004, [1.5,-1.5,0.5,1.5,0], 3, 3000, {"catPolicy": true}],
+ ["bptt bern bg0 lr.004", "bptt", 0.004, [1.5,-1.5,0.5,1.5,0], 6, 3000]]

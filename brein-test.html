@@ -1217,6 +1217,10 @@ function propagate(B,inp,cfg,hn,tp,state,rnd){
        berekend, pas daarna geschreven. De momentopname wordt genomen nadat de
        sensorwaarden zijn ingezet, dus de invoerknopen staan er goed in. */
     if(s===cfg.prop-1 && state===B.act && B.pre) B.pre.set(state);
+    /* stap 18c: terugpropagatie door de tijd heeft de toestand aan het begin van élke
+       propagatiestap nodig, niet alleen van de laatste. Alleen als er opgenomen wordt;
+       anders is dit één vergelijking en verandert er niets. */
+    if(B.bpttRec && state===B.act) B.bpttRec.push(Float32Array.from(state));
     sum.fill(0);
     kb(B.nc);
     for(let c=0;c<B.nc;c++) sum[B.cTo[c]]+=B.cW[c]*state[B.cFrom[c]];
@@ -2474,12 +2478,11 @@ function seinWaarnemen(d,t,out){
       voorwaarde (de wissel, de derde keer, de tweede lamp) werd nooit getoetst. De
       afleiders stonden wel in de dienst, maar alleen in het loos-alarmcijfer ernaast, en
       dat leest niemand als score. Omgekeerd scoort "niets doen" op de afleiders perfect.
-      Daarom is elke regel nu een ONDERSCHEID tussen twee soorten gevallen (d.kant), en
-      is zijn score het meetkundig gemiddelde van de trefkans aan beide kanten. Beide
-      eenzijdige strategieën — altijd reageren, nooit reageren — halen dan precies nul;
-      een geloot beleid haalt aan elke kant 1/16 en dus nog steeds 6,25 %; een perfecte
-      speler 100 %. Bij R3 en R4 zijn beide kanten eisen, en "altijd hetzelfde antwoord"
-      haalt er om dezelfde reden ook nul in plaats van 52 of 64 %.
+      Daarom is elke regel nu een ONDERSCHEID tussen twee soorten gevallen (d.kant). In
+      stap 18a was de score het meetkundig gemiddelde van de trefkans aan beide kanten;
+      sinds stap 18c is het trefkans(kant 0) + trefkans(kant 1) − 1 — zie seinOnderscheid
+      voor waarom het eerste nog een domme speler doorliet. Altijd reageren, nooit
+      reageren en een munt opgooien halen nu allemaal nul; een perfecte speler één.
 
    2. NIETS DOEN WAS DE BESTE LEERSTRATEGIE. Met een straf van 0,5 per handel op élke
       stille tik — en een dienst is voor negen tiende stil — trok de beloning ieder
@@ -2513,17 +2516,29 @@ function seinScoreTik(d,t,P){
     aflGoed:(ingedrukt===0), r:-bel[3]*ingedrukt};
   return {regel:0, handel:-1, goed:null, ingedrukt, kant:-1, afleider:0, r:-bel[4]*ingedrukt};
 }
-/* De score van één regel uit de tellingen per kant: het meetkundig gemiddelde van de
-   trefkans aan beide kanten. Null zolang een van beide kanten nog niet is voorgekomen —
-   dat is "niet gemeten", geen nul. */
+/* De score van één regel uit de tellingen per kant. Null zolang een van beide kanten nog
+   niet is voorgekomen — dat is "niet gemeten", geen nul.
+
+   STAP 18c: HET ONDERSCHEID IS NU trefkans(kant 0) + trefkans(kant 1) − 1 (Youdens J,
+   "informedness"), en niet meer het meetkundig gemiddelde van die twee. Het meetkundig
+   gemiddelde zette altijd-reageren en nooit-reageren netjes op nul, maar liet de volgende
+   domme speler door: een geheugenloos net dat bij lamp 3 willekeurig handel 0 of 1 kiest,
+   haalt aan beide kanten 50 % en dus een meetkundig gemiddelde van 50 % — terwijl het
+   niets van de vlag weet. Dat gebeurde echt: een MLP zonder enig geheugen haalde zo 51 %
+   op R3. J is nul voor élke strategie waarin de reactie niet van de voorwaarde afhangt —
+   altijd, nooit, of een munt — en één voor een perfecte speler. Het is precies de vraag
+   die een regel stelt: hangt wat je doet af van wat de regel zegt dat ertoe doet? */
 function seinOnderscheid(n0,g0,n1,g1){
   if(!n0||!n1) return null;
-  return Math.sqrt((g0/n0)*(g1/n1));
+  return g0/n0 + g1/n1 - 1;
 }
-/* De toevalsbodem hangt af van de beleidsvorm (stap 18b). Vier losse handels met kans
-   een half: aan elke kant 1/16, dus 6,25 %. Eén keuze uit vijf, uniform: aan elke kant
-   1/5, dus 20 %. Beide worden in test-stap18.js nagemeten. */
-function seinToeval(cfg){ return (cfg&&cfg.catPolicy)? 0.2 : 0.0625; }
+/* De toevalsbodem hangt af van de beleidsvorm. Vier losse handels met kans een half:
+   aan elke kant 1/16, dus J = 2/16 − 1 = −0,875. Eén keuze uit vijf, uniform: aan elke
+   kant 1/5, dus J = −0,6. Negatief, omdat een geloot beleid aan béide kanten vaker fout
+   zit dan een speler die consequent één kant kiest. De betekenisvolle nul is dus niet de
+   toevalsbodem maar "de reactie hangt niet van de voorwaarde af". Beide nagemeten in
+   test-stap18.js. */
+function seinToeval(cfg){ return (cfg&&cfg.catPolicy)? -0.6 : -0.875; }
 
 function seinLeegTelling(){
   return {eis:new Int32Array(SEIN_REGELS), goed:new Int32Array(SEIN_REGELS),
@@ -2551,10 +2566,19 @@ function seinTick(learn,noise){
   const criticOn=learn && !!c.criticOn;
   let v0=0;
   if(criticOn){ if(!S.inpNext) S.inpNext=new Float32Array(N_IN); v0=criticValue(B,S.inp); kb(3*N_IN); }
+  /* stap 18c: terugpropagatie door de tijd. Alleen voor een gelaagd net met de exacte
+     gradiënt; de hele dienst wordt opgenomen en pas aan het eind in één keer geleerd. */
+  const bptt=learn && !!c.bptt && !!c.gradExact && !!B.lagenIdx;
+  if(bptt){ if(t===0 || !S.bptt) S.bptt={rec:[], delta:[], adv:[], tp:tempOf(noise)}; B.bpttRec=S.bptt.rec; }
+  else B.bpttRec=null;
   brainStep(B,S.inp,c,noise,S.rnd);
   const P=B.press;
   S.outPressed=[!!P[0],!!P[1],!!P[2],!!P[3]];
-  if(learn){
+  if(bptt){ B.bpttRec=null;
+    /* B.dev op de knoppen is hier al (a − p)/τ: backpropDev heeft door τ gedeeld */
+    S.bptt.delta.push(Float32Array.from(B.dev.subarray(OUT0,HID0)));
+    S.bptt.acties=S.bptt.acties||[]; S.bptt.acties.push([P[0],P[1],P[2],P[3]]); }
+  else if(learn){
     if(c.gradExact) updateTracesExact(B,c.lam);
     else updateTraces(B,c.lam,c.traceOud,c.perturbGain);
   }
@@ -2577,8 +2601,13 @@ function seinTick(learn,noise){
     adv=s.r+c.criticGamma*v1-v0;
     criticUpdate(B,S.inp,adv,c.criticLr);
   }
-  if(learn) applyReward(B,s.r,c,S.lrScale,adv);
+  if(bptt){
+    /* dezelfde lopende basislijn als applyReward, per tik bijgewerkt */
+    B.rbar+=0.02*(s.r-B.rbar);
+    S.bptt.adv.push(clamp(s.r-B.rbar,-10,10));
+  } else if(learn) applyReward(B,s.r,c,S.lrScale,adv);
   S.step++;
+  if(bptt && S.step>=d.T) bpttLeer(B,c,S.lrScale);
   if(S.step>=d.T){
     /* "Geslaagd" is een foutloze dienst: elke eis goed en geen enkel loos alarm. Dat is
        streng, en het is de enige drempelvrije definitie die er is — elke andere vraagt
@@ -2589,6 +2618,77 @@ function seinTick(learn,noise){
     return true;
   }
   return false;
+}
+/* ---------- stap 18c: terugpropagatie door de tijd (BPTT) ----------
+   WAAROM. In stap 18a/b bleek dat geen enkele leerregel in dit project krediet kan
+   toekennen over meer dan twee à drie tikken. De "Elman met BPTT" uit stap 6 was in
+   werkelijkheid afgekapt op één tik: backpropDev loopt alleen over voorwaartse bogen, en
+   een terugkoppeling krijgt de toestand van de vorige tik als presynaptische waarde. Het
+   spoor (λ) rekt dat tot een paar tikken. Het seinhuis vraagt tot zeventig. Zonder één
+   deelnemer die zo ver terug kán leren, meet het spel niet wat ANG mist maar wat niemand
+   kan.
+
+   WAT HET IS. Dezelfde REINFORCE-schatter, met hetzelfde spoor, dezelfde lopende
+   basislijn en dezelfde rem op de stap. Het enige verschil is dat ∇log π_t nu door de hele
+   dienst terug wordt uitgerekend in plaats van één tik. Dat kan in één keer per dienst,
+   want de som van de updates per tik is exact te herschrijven:
+
+       Σ_t A_t e_t  met  e_t = Σ_{k≤t} (1−λ) λ^{t−k} ∇log π_k
+     = Σ_k ∇log π_k · Ã_k,   Ã_k = (1−λ) Σ_{t≥k} λ^{t−k} A_t
+
+   Dus: Ã van achteren naar voren, en één terugpropagatie door alle propagatiestappen van
+   de dienst waarin elke tik zijn eigen (a − p)/τ meekrijgt, gewogen met Ã. Kosten: één
+   extra doorrekening per dienst, niet één per tik.
+
+   WAT ER ANDERS IS, EN DAT HOORT ERBIJ. De gewichten veranderen per dienst in plaats van
+   per tik. Binnen een dienst speelt het net dus met vaste gewichten — gewone REINFORCE
+   per episode. De begrensde stap en de demping richting het plafond werken daardoor op
+   de som van 240 tikken en niet op elke tik apart; de leersnelheid wordt voor deze
+   conditie daarom apart geveegd, zoals elke conditie.
+
+   Alleen voor een gelaagd net met uitsluitend workers (tanh), en alleen op het seinhuis:
+   spel 1 raakt dit niet. tests/test-stap18.js controleert de gradiënt met eindige
+   differenties. */
+function bpttLeer(B,c,scale){
+  const R=S.bptt.rec, D=S.bptt.delta, A=S.bptt.adv, T=A.length, P=c.prop, lam=c.lam;
+  const nS=R.length, n=B.n, nc=B.nc;
+  const At=new Float64Array(T);
+  let acc=0;
+  for(let t=T-1;t>=0;t--){ acc=A[t]+lam*acc; At[t]=(1-lam)*acc; }
+  const G=new Float64Array(nc), Gb=new Float64Array(n);
+  let g=new Float64Array(n), gN=new Float64Array(n);
+  for(let s=nS-1;s>=0;s--){
+    const na=(s+1<nS)? R[s+1] : B.act;               /* toestand ná propagatiestap s */
+    g.fill(0);
+    if(s+1<nS){
+      for(let q=0;q<nc;q++){ const a=B.cFrom[q]; if(a>=HID0) g[a]+=B.cW[q]*gN[B.cTo[q]]; }
+      for(let j=HID0;j<n;j++){ const h=na[j]; g[j]*=(1-h*h); }
+    }
+    if(s%P===P-1){ const t=(s/P)|0, dt=D[t], w=At[t];
+      for(let j=0;j<N_OUT;j++) g[OUT0+j]=w*dt[j]; }
+    const x=R[s];
+    for(let q=0;q<nc;q++) G[q]+=g[B.cTo[q]]*x[B.cFrom[q]];
+    for(let j=N_IN;j<n;j++) Gb[j]+=g[j];
+    const h=g; g=gN; gN=h;
+  }
+  kb(2*nc*nS);
+  S.bpttLaatsteG={G, Gb, At:Array.from(At), acties:S.bptt.acties, tp:S.bptt.tp,
+    gewichtenVoor:Float32Array.from(B.cW), biasVoor:Float32Array.from(B.bias)};   /* voor de gradiëntcontrole */
+  const eta=c.lr*(scale===undefined?1:scale), wmax=c.wmax, smax=c.stepMax;
+  if(eta>0){
+    for(let q=0;q<nc;q++){
+      const w=B.cW[q]; let d=eta*G[q];
+      if((d>0)===(w>=0)) d*=(1-Math.abs(w)/wmax);
+      if(d>smax) d=smax; else if(d<-smax) d=-smax;
+      B.cW[q]=clamp(w+d,-wmax,wmax);
+    }
+    for(let j=N_IN;j<n;j++){
+      let d=eta*0.5*Gb[j];
+      if(d>smax) d=smax; else if(d<-smax) d=-smax;
+      B.bias[j]=clamp(B.bias[j]+d,-wmax,wmax);
+    }
+  }
+  S.bptt=null;
 }
 /* De laatste dertig tikken, voor het tekenen. Alleen bijhouden als er iemand kijkt: in de
    experimentloper kost dit anders geheugen zonder dat het iets oplevert. */
@@ -2649,9 +2749,9 @@ function seinBench(mode,n){
   /* STAP 18: de score. Per regel het onderscheid (seinOnderscheid) over de hele set,
      en de totaalscore is het gemiddelde over de regels die in de set voorkomen — elke
      regel even zwaar, want de vraag is hoeveel regels het netwerk beheerst en niet hoeveel
-     tikken. Een meetkundig gemiddelde is niet per dienst uit te rekenen (drie gevallen per
-     kant geven te vaak een nul), dus het interval komt uit een bootstrap over de diensten
-     met een vaste generator: hetzelfde brein geeft hetzelfde interval. */
+     tikken. Per dienst is het onderscheid te grof (drie gevallen per kant), dus het
+     interval komt uit een bootstrap over de diensten met een vaste generator: hetzelfde
+     brein geeft hetzelfde interval. */
   const scoreVan=idx=>{
     const N=new Float64Array(2*SEIN_REGELS), G=new Float64Array(2*SEIN_REGELS);
     for(const k of idx){ const x=kantPerDienst[k]; for(let i=0;i<N.length;i++){ N[i]+=x.n[i]; G[i]+=x.g[i]; } }
@@ -3058,7 +3158,7 @@ function drawSeinhuis(){
   /* ---- scorebalken per regel, over de lopende dienst ---- */
   const by=sy+sh+H*0.055;
   ctx.textAlign="left"; ctx.fillStyle="#7c8794";
-  ctx.fillText("onderscheid per regel, deze dienst (beide kanten goed)", pad, by-H*0.012);
+  ctx.fillText("onderscheid per regel, deze dienst (trefkans kant 0 + kant 1 − 1)", pad, by-H*0.012);
   /* Drie kolommen die samen precies het canvas vullen: naam, balk, getal. De eerste
      versie rekende de balk tot aan de rechterrand en zette het getal dáár nog achter,
      zodat het buiten beeld viel. */
@@ -3069,7 +3169,7 @@ function drawSeinhuis(){
     /* stap 18: de balk is het onderscheid, niet de trefkans op de eisen — zie seinScoreTik */
     const n0=tel?tel.kantN[2*r]:0, n1=tel?tel.kantN[2*r+1]:0;
     const o=tel? seinOnderscheid(n0,tel.kantG[2*r],n1,tel.kantG[2*r+1]) : null;
-    const e=(o===null)?0:1, f=(o===null)?0:o;
+    const e=(o===null)?0:1, f=(o===null)?0:Math.max(0,o);
     const g=tel?(tel.kantG[2*r]+tel.kantG[2*r+1]):0;
     ctx.fillStyle=actief?"#9aa4b0":"#39414c"; ctx.textAlign="left";
     ctx.font=Math.round(H*0.024)+"px system-ui,sans-serif";
@@ -3079,17 +3179,16 @@ function drawSeinhuis(){
       ctx.fillStyle = f>0.75?"#3fa66b" : f>0.4?"#ffb454" : "#c0392b";
       ctx.fillRect(bx,y,bw*f,bh);
     }
-    /* de toevalsbodem als streepje, zodat een balk nooit gelezen wordt als "het doet iets" */
-    ctx.strokeStyle="#55606b"; ctx.lineWidth=1;
-    const tb=seinToeval(S.cfg);
-    ctx.beginPath(); ctx.moveTo(bx+bw*tb,y); ctx.lineTo(bx+bw*tb,y+bh); ctx.stroke();
+    /* stap 18c: de balk begint bij nul = "de reactie hangt niet van de voorwaarde af".
+       Een negatieve waarde (vaker fout dan een consequente gok) tekent als lege balk;
+       het getal ernaast laat hem wel zien. */
     ctx.fillStyle=actief?"#9aa4b0":"#39414c"; ctx.textAlign="right";
-    ctx.fillText(actief ? (e? (100*f).toFixed(0)+"%   "+g+"/"+(n0+n1) : "nog niet beide kanten") : "uit",
+    ctx.fillText(actief ? (e? (100*o).toFixed(0)+"%   "+g+"/"+(n0+n1) : "nog niet beide kanten") : "uit",
       W-pad, y+bh*0.78);
   }
   ctx.textAlign="left"; ctx.fillStyle="#55606b";
   ctx.font=Math.round(H*0.022)+"px system-ui,sans-serif";
-  ctx.fillText("streepje = toevalsbodem "+(100*seinToeval(S.cfg)).toFixed(2).replace(".",",").replace(/,?0+$/,"")+" %   ·   tik "+t+" / "+d.T+
+  ctx.fillText("0 % = reageert niet op de voorwaarde   ·   tik "+t+" / "+d.T+
     (tel?("   ·   loos alarm "+tel.loos+" van "+tel.stil+" stille tikken"):""), pad, H-pad*0.4);
 }
 
@@ -3583,7 +3682,9 @@ function buildResult(naamOverride){
         terugkoppeling:!!S.cfg.recurrent, voorwaartseVerbindingen:S.B.ffCount||S.B.nc,
         /* stap 18: directe bogen invoer -> handel. Alleen aanwezig als hij aanstond,
            zodat een oudere run er geen veld bij krijgt. */
-        ...(S.cfg.skip?{skip:true}:{})}:null,
+        ...(S.cfg.skip?{skip:true}:{}),
+        /* stap 18c: terugpropagatie door de hele dienst in plaats van één tik */
+        ...(S.cfg.bptt?{terugpropagatieDoorDeTijd:"hele dienst, update per dienst"}:{})}:null,
       samenstelling:S.B.comp, samenstellingStart:S.B.compStart,
       neuronenNu:S.B.n-HID0,
       types:{
@@ -3690,7 +3791,7 @@ function buildResult(naamOverride){
       toevalsbodem:seinToeval(S.cfg), bovengrens:1,
       beleidsvorm:S.cfg.catPolicy?"een uit vijf (niets of een handel)":"vier losse handels",
       /* stap 18: de score is het onderscheid per regel, en de beloning is instelbaar */
-      scoremaat:"onderscheid: per regel het meetkundig gemiddelde van de trefkans aan beide kanten, gemiddeld over de regels",
+      scoremaat:"onderscheid: per regel trefkans(kant 0) + trefkans(kant 1) - 1 (Youdens J), gemiddeld over de regels; 0 = de reactie hangt niet van de voorwaarde af, 1 = perfect",
       beloning:{waarden:((S.cfg.seinBeloning)||SEIN_BELONING).slice(),
         volgorde:["goed","fout of gemist","per extra handel","per handel op een afleider","per handel op een achtergrondtik"]},
       laatsteDienst: S.seinTel ? {
@@ -4625,7 +4726,7 @@ window.__brain={S,createBrain,analyze,makeWorld,readCfg,startTraining,stopTraini
   seinDienst,seinWaarnemen,seinScoreTik,seinBench,seinBenchDiensten,
   SEIN_REGELS,SEIN_KORT,SEIN_REGELNAAM,SEIN_LAMPEN,SEIN_RUIS,SEIN_TIKKEN,
   /* stap 18 */
-  seinOnderscheid,SEIN_BELONING,SEIN_BELONING_OUD,SEIN_ACTIES,seinToeval,
+  seinOnderscheid,SEIN_BELONING,SEIN_BELONING_OUD,SEIN_ACTIES,seinToeval,seinTick,seinStart,bpttLeer,
   runOne,runLeven,cfgOverride,runExperiments,csvRow,CSV_COLS,meanCI,mannWhitney,
   benchmarkWorlds,benchWorldSeed,playWorlds,benchBrain,benchReactief,runBenchmark,createLayered,
   reactiefDir,reactiefTick,moveAgent,rayDist,blocked,DIRV,

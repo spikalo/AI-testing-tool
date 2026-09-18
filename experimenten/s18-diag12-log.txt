@@ -1,0 +1,5 @@
+bptt cat groeiend 500      z3000   20s  ond  37.8  streng  37.0  loos  59.8  | R1 59 (85/41)  R2 57 (95/35)  R3 0 (0/97)  R4 35 (23/51)  R5 29 (85/10)  R6 47 (63/35)
+bptt cat groeiend 1500     z3000   58s  ond  31.4  streng  33.3  loos  18.2  | R1 94 (96/92)  R2 95 (97/92)  R3 0 (0/99)  R4 0 (0/0)  R5 0 (0/98)  R6 0 (0/97)
+bptt cat alle 12000        z3000   78s  ond   0.0  streng   0.0  loos   0.5  | R1 0 (0/100)  R2 0 (0/100)  R3 0 (0/0)  R4 0 (0/0)  R5 0 (0/100)  R6 0 (0/99)
+mlp cat groeiend 1500      z3000   19s  ond  39.2  streng  41.9  loos  39.4  | R1 85 (92/78)  R2 95 (99/91)  R3 51 (49/53)  R4 0 (0/1)  R5 4 (0/99)  R6 0 (0/98)
+KLAAR exitcode=0 
