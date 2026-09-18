@@ -1,0 +1,6 @@
+mlp criticus g0            z3000    7s  ond   0.0  streng   0.0  loos   0.1  | R1 0 (0/100)  R2 0 (0/99)  R3 0 (0/0)  R4 0 (0/0)  R5 0 (0/100)  R6 0 (0/100)
+elman criticus g0          z3000   15s  ond   0.0  streng   0.0  loos   0.1  | R1 0 (0/100)  R2 0 (0/99)  R3 0 (0/0)  R4 0 (0/0)  R5 0 (0/100)  R6 0 (0/100)
+mlp criticus g0 bg0        z3000    8s  ond  17.7  streng  16.7  loos  37.9  | R1 6 (0/98)  R2 89 (87/92)  R3 0 (0/1)  R4 0 (1/0)  R5 0 (0/100)  R6 11 (1/99)
+elman criticus g0 bg0      z3000   15s  ond   0.0  streng   0.0  loos   0.2  | R1 0 (0/100)  R2 0 (0/99)  R3 0 (0/0)  R4 0 (0/0)  R5 0 (0/100)  R6 0 (0/100)
+mlp oud+criticus g0        z3000    7s  ond   0.0  streng   0.0  loos   0.0  | R1 0 (0/100)  R2 0 (0/99)  R3 0 (0/0)  R4 0 (0/0)  R5 0 (0/100)  R6 0 (0/100)
+KLAAR exitcode=0 

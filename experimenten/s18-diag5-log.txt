@@ -1,0 +1,10 @@
+mlp R1+R2                  z3000    2s  ond  49.2  streng  50.0  loos   0.7  | R1 0 (0/100)  R2 98 (98/99)
+mlp R1+R2                  z3001    2s  ond  49.2  streng  50.0  loos   0.7  | R1 0 (0/100)  R2 98 (98/99)
+mlp R1+R2                  z3002    2s  ond  92.8  streng  99.9  loos   6.3  | R1 88 (96/81)  R2 97 (97/98)
+mlp R1+R2 lam 0            z3000    2s  ond  49.8  streng  50.0  loos   0.1  | R1 0 (0/100)  R2 100 (100/100)
+mlp R1+R2 lam 0            z3001    2s  ond  49.8  streng  50.0  loos   0.1  | R1 0 (0/100)  R2 100 (100/100)
+mlp R1+R2 lam 0            z3002    2s  ond  99.2  streng 100.0  loos   0.3  | R1 99 (99/99)  R2 99 (99/100)
+mlp R1+R2 bg 0             z3000    2s  ond  94.5  streng 100.0  loos  60.1  | R1 93 (96/90)  R2 96 (97/95)
+mlp R1+R2 bg 0             z3001    2s  ond  92.8  streng 100.0  loos  56.4  | R1 91 (96/86)  R2 94 (96/93)
+mlp R1+R2 bg 0             z3002    2s  ond  94.6  streng 100.0  loos  63.3  | R1 94 (97/91)  R2 95 (97/94)
+KLAAR exitcode=0 

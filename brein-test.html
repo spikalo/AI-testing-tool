@@ -1131,6 +1131,15 @@ function createLayered(cfg,seed){
     const laatste=lagen[lagen.length-1];
     for(const a of laatste) for(const b of laatste) add(a,b);
   }
+  /* Stap 18: de skip-knop. Elke invoer krijgt een directe boog naar elke handel, naast
+     de weg door de verborgen lagen. Bestaat omdat ANG zulke korte bogen zelf kan
+     aanleggen (reflexen) en een gelaagd net niet: als dát het verschil maakt op het
+     seinhuis, moet het meetbaar zijn en niet verstopt. markLayers ziet de boog als
+     voorwaarts (laag 0 -> laatste laag), dus de exacte gradiënt loopt er vanzelf over.
+     Staat hij uit, dan wordt er niets geloot en is het net bit voor bit het oude. */
+  if(cfg.skip){
+    for(let i=0;i<N_IN;i++) for(let o=OUT0;o<HID0;o++) add(i,o);
+  }
   finalizeConns(B);
   markLayers(B,lagen);
   B.comp=countKinds(B); B.compStart={...B.comp};
@@ -2402,25 +2411,33 @@ function seinDienst(seed,cfg){
   if(nR>=5) for(let k=0;k<SEIN_PER_REGEL*3;k++){ const t=kiesTik(); if(t<0) break; zet(t,6); }
 
   /* ---- de eisen, afgeleid uit de gevallen lampen ---- */
+  /* Stap 18: naast de eisen ook de AFLEIDERS per regel, en per geval de KANT. Elke regel
+     is een onderscheid tussen twee soorten gevallen: R1 lamp 0 met de wissel open (eis)
+     tegen lamp 0 met de wissel dicht (niets doen); R3 met vlag (handel 0) tegen zonder
+     (handel 1); R5 de derde lamp 6 (eis) tegen de andere (niets); enzovoort. Kant 0 is
+     steeds het geval waar de regel over gaat, kant 1 het andere. Zie seinScoreTik voor
+     waarom dat nodig bleek. Er wordt hier niets geloot: dit is afgeleid, niet gepland. */
+  const aflRegel=new Int8Array(T), kant=new Int8Array(T).fill(-1);
+  const afl=(t,regel)=>{ aflRegel[t]=regel; kant[t]=1; };
   let vlag3=false, vlag4=false, tel6=0;
   for(let t=0;t<T;t++){
     const l=lamp[t];
     if(l===2) vlag3=true;
     if(l===4) vlag4=true;
-    if(nR>=1 && l===0 && wissel[t]===1) eis(t,1,0);
-    if(nR>=2 && l===1 && wissel[t]===0) eis(t,2,1);
+    if(nR>=1 && l===0){ if(wissel[t]===1){ eis(t,1,0); kant[t]=0; } else afl(t,1); }
+    if(nR>=2 && l===1){ if(wissel[t]===0){ eis(t,2,1); kant[t]=0; } else afl(t,2); }
     /* De vlag geldt tot de eerstvolgende vraag en wordt daar opgebruikt. */
-    if(nR>=3 && l===3){ eis(t,3,vlag3?0:1); vlag3=false; }
-    if(nR>=4 && l===5){ eis(t,4,vlag4?2:3); vlag4=false; }
-    if(nR>=5 && l===6){ tel6++; if(tel6%3===0) eis(t,5,2); }
+    if(nR>=3 && l===3){ eis(t,3,vlag3?0:1); kant[t]=vlag3?0:1; vlag3=false; }
+    if(nR>=4 && l===5){ eis(t,4,vlag4?2:3); kant[t]=vlag4?0:1; vlag4=false; }
+    if(nR>=5 && l===6){ tel6++; if(tel6%3===0){ eis(t,5,2); kant[t]=0; } else afl(t,5); }
     if(nR>=6 && l===7){
       let paar=false;
       for(let k=1;k<=3 && t-k>=0;k++) if(lamp[t-k]===7) paar=true;
-      if(paar) eis(t,6,3);
+      if(paar){ eis(t,6,3); kant[t]=0; } else afl(t,6);
     }
   }
 
-  return {T, nR, lamp, wissel, eisRegel, eisHandel, ruis, zaad:seed};
+  return {T, nR, lamp, wissel, eisRegel, eisHandel, aflRegel, kant, ruis, zaad:seed};
 }
 
 /* De zestien invoerkanalen op tik t. */
@@ -2436,21 +2453,66 @@ function seinWaarnemen(d,t,out){
    de trainingslus en de controletest gebruiken alle drie deze functie; zou elk van hen
    het zelf uitrekenen, dan is de bovengrens die de test meet niet de bovengrens die de
    benchmark rapporteert. */
+/* STAP 18: TWEE CORRECTIES OP STAP 17, gevonden bij de eerste proefruns en vóór er iets
+   gemeten was. Beide staan hier omdat dit de plaats is waar "goed" gedefinieerd wordt.
+
+   1. DE SCORE TELDE ALLEEN DE EISEN. Een geheugenloos net dat bij lamp 6 altijd handel 2
+      indrukt, haalde op R5 97 % — terwijl R5 over tellen gaat en dat net niet kan tellen.
+      Hetzelfde op R1, R2 en R6: "lamp aan, handel erbij" scoorde bijna perfect, en de
+      voorwaarde (de wissel, de derde keer, de tweede lamp) werd nooit getoetst. De
+      afleiders stonden wel in de dienst, maar alleen in het loos-alarmcijfer ernaast, en
+      dat leest niemand als score. Omgekeerd scoort "niets doen" op de afleiders perfect.
+      Daarom is elke regel nu een ONDERSCHEID tussen twee soorten gevallen (d.kant), en
+      is zijn score het meetkundig gemiddelde van de trefkans aan beide kanten. Beide
+      eenzijdige strategieën — altijd reageren, nooit reageren — halen dan precies nul;
+      een geloot beleid haalt aan elke kant 1/16 en dus nog steeds 6,25 %; een perfecte
+      speler 100 %. Bij R3 en R4 zijn beide kanten eisen, en "altijd hetzelfde antwoord"
+      haalt er om dezelfde reden ook nul in plaats van 52 of 64 %.
+
+   2. NIETS DOEN WAS DE BESTE LEERSTRATEGIE. Met een straf van 0,5 per handel op élke
+      stille tik — en een dienst is voor negen tiende stil — trok de beloning ieder
+      netwerk naar "nooit drukken", ook een backpropnet dat R1 in een paar honderd tikken
+      zou moeten leren: in de proefruns zakten alle vier de architecturen binnen
+      driehonderd diensten naar exact −36 per dienst, het bedrag van alle eisen gemist.
+      De beloning is nu per soort tik instelbaar (cfg.seinBeloning), met een aparte
+      straf voor drukken op een afleider en een kleine straf op een achtergrondtik. De
+      oude beloning is [1.5, −1.5, 0.5, 0.5, 0.5] en blijft daarmee reproduceerbaar. De
+      beloning is een leersignaal en geen score: aan wat "goed" is verandert zij niets. */
+const SEIN_BELONING_OUD=[1.5,-1.5,0.5,0.5,0.5];
+/* goed, fout of gemist, per extra handel, per handel op een afleider, per handel op een
+   achtergrondtik. De standaard blijft voorlopig de beloning van stap 17: welke beloning
+   het spel speelbaar maakt is een ontwerpbesluit dat in stap 18 genomen en opgeschreven
+   wordt, en tot dan verandert de standaard niet stilletjes. */
+const SEIN_BELONING=SEIN_BELONING_OUD;
 function seinScoreTik(d,t,P){
   const regel=d.eisRegel[t], handel=d.eisHandel[t];
+  const bel=(S.cfg&&S.cfg.seinBeloning)||SEIN_BELONING;
   let ingedrukt=0; for(let i=0;i<N_OUT;i++) if(P[i]) ingedrukt++;
+  const kant=d.kant? d.kant[t] : -1;
   if(regel>0){
     const juist=P[handel]?1:0;
     /* Vloeiend genoeg om een gradiënt te geven: de juiste handel telt, elke extra handel
        kost. Zonder die tweede term is alles vasthouden de beste zet. */
-    return {regel, handel, goed:(juist===1 && ingedrukt===1), ingedrukt,
-      r:(juist?1.5:-1.5)-0.5*(ingedrukt-juist)};
+    return {regel, handel, goed:(juist===1 && ingedrukt===1), ingedrukt, kant, afleider:0,
+      r:(juist?bel[0]:bel[1])-bel[2]*(ingedrukt-juist)};
   }
-  return {regel:0, handel:-1, goed:null, ingedrukt, r:-0.5*ingedrukt};
+  const af=d.aflRegel? d.aflRegel[t] : 0;
+  if(af>0) return {regel:0, handel:-1, goed:null, ingedrukt, kant, afleider:af,
+    aflGoed:(ingedrukt===0), r:-bel[3]*ingedrukt};
+  return {regel:0, handel:-1, goed:null, ingedrukt, kant:-1, afleider:0, r:-bel[4]*ingedrukt};
+}
+/* De score van één regel uit de tellingen per kant: het meetkundig gemiddelde van de
+   trefkans aan beide kanten. Null zolang een van beide kanten nog niet is voorgekomen —
+   dat is "niet gemeten", geen nul. */
+function seinOnderscheid(n0,g0,n1,g1){
+  if(!n0||!n1) return null;
+  return Math.sqrt((g0/n0)*(g1/n1));
 }
 
 function seinLeegTelling(){
   return {eis:new Int32Array(SEIN_REGELS), goed:new Int32Array(SEIN_REGELS),
+    /* stap 18: per regel en per kant (index 2·regel + kant) */
+    kantN:new Int32Array(2*SEIN_REGELS), kantG:new Int32Array(2*SEIN_REGELS),
     stil:0, loos:0, eisTot:0, goedTot:0};
 }
 function seinStart(){
@@ -2485,6 +2547,10 @@ function seinTick(learn,noise){
   if(s.regel>0){ tel.eis[s.regel-1]++; tel.eisTot++;
     if(s.goed){ tel.goed[s.regel-1]++; tel.goedTot++; } }
   else { tel.stil++; if(s.ingedrukt>0) tel.loos++; }
+  /* stap 18: de telling per kant, waar de score per regel uit komt */
+  const rg=s.regel>0? s.regel : s.afleider;
+  if(rg>0 && s.kant>=0){ const k=2*(rg-1)+s.kant; tel.kantN[k]++;
+    if(s.regel>0? s.goed : s.aflGoed) tel.kantG[k]++; }
   S.epReward+=s.r;
   seinStrook(d,t,P,s);
   let adv=null;
@@ -2545,7 +2611,7 @@ function seinBench(mode,n){
   const diensten=seinBenchDiensten(n,c);
   const eis=new Int32Array(SEIN_REGELS), goed=new Int32Array(SEIN_REGELS);
   let stil=0, loos=0, eisTot=0, goedTot=0, foutloos=0;
-  const perDienst=[];
+  const perDienst=[], kantPerDienst=[];
   for(let k=0;k<diensten.length;k++){
     S.evalRnd=mulberry32(SEIN_BENCH_RNG+k*131);
     S.world=diensten[k];
@@ -2556,24 +2622,58 @@ function seinBench(mode,n){
     for(let r=0;r<SEIN_REGELS;r++){ eis[r]+=tel.eis[r]; goed[r]+=tel.goed[r]; }
     stil+=tel.stil; loos+=tel.loos; eisTot+=tel.eisTot; goedTot+=tel.goedTot;
     if(S.reached) foutloos++;
-    perDienst.push(tel.eisTot? tel.goedTot/tel.eisTot : null);
+    kantPerDienst.push({n:Int32Array.from(tel.kantN), g:Int32Array.from(tel.kantG)});
+    let nG=0, gG=0; for(let i=0;i<tel.kantN.length;i++){ nG+=tel.kantN[i]; gG+=tel.kantG[i]; }
+    perDienst.push(nG? gG/nG : null);
   }
   B.cW.set(saveW); B.cE.set(saveE); B.bias.set(saveB);
   S.world=saveWorld; S.step=saveStep; S.epReward=saveR; S.reached=saveReach; S.seinTel=saveTel;
   S.evalSample=wasSample; S.evalTemp=wasTemp; S.evalRnd=wasRnd;
   resetBrainState(S.B);
+  /* STAP 18: de score. Per regel het onderscheid (seinOnderscheid) over de hele set,
+     en de totaalscore is het gemiddelde over de regels die in de set voorkomen — elke
+     regel even zwaar, want de vraag is hoeveel regels het netwerk beheerst en niet hoeveel
+     tikken. Een meetkundig gemiddelde is niet per dienst uit te rekenen (drie gevallen per
+     kant geven te vaak een nul), dus het interval komt uit een bootstrap over de diensten
+     met een vaste generator: hetzelfde brein geeft hetzelfde interval. */
+  const scoreVan=idx=>{
+    const N=new Float64Array(2*SEIN_REGELS), G=new Float64Array(2*SEIN_REGELS);
+    for(const k of idx){ const x=kantPerDienst[k]; for(let i=0;i<N.length;i++){ N[i]+=x.n[i]; G[i]+=x.g[i]; } }
+    const per=[]; let som=0, aantal=0;
+    for(let r=0;r<SEIN_REGELS;r++){ const o=seinOnderscheid(N[2*r],G[2*r],N[2*r+1],G[2*r+1]);
+      per.push(o); if(o!==null){ som+=o; aantal++; } }
+    return {totaal: aantal? som/aantal : null, per, N, G};
+  };
+  const alle=kantPerDienst.map((_,k)=>k);
+  const hier=scoreVan(alle);
+  const bs=[], brnd=mulberry32(SEIN_BENCH_RNG+7);
+  for(let b=0;b<SEIN_BOOTSTRAP && alle.length>1;b++){
+    const idx=alle.map(()=>Math.floor(brnd()*alle.length));
+    const x=scoreVan(idx).totaal; if(x!==null) bs.push(x);
+  }
+  const m=hier.totaal===null? 0 : hier.totaal;
+  const bm=bs.length? bs.reduce((a,b)=>a+b,0)/bs.length : m;
+  const sd=bs.length>1? Math.sqrt(bs.reduce((a,b)=>a+(b-bm)*(b-bm),0)/(bs.length-1)) : 0;
   const v=perDienst.filter(x=>x!==null);
-  const m=v.length? v.reduce((a,b)=>a+b,0)/v.length : 0;
-  const sd=v.length>1? Math.sqrt(v.reduce((a,b)=>a+(b-m)*(b-m),0)/(v.length-1)) : 0;
   const perRegel={};
-  for(let r=0;r<SEIN_REGELS;r++) perRegel[SEIN_KORT[r]]=
-    {naam:SEIN_REGELNAAM[r], eisen:eis[r], goed:goed[r], pct: eis[r]? goed[r]/eis[r] : null};
-  return {pct:m, ci:v.length?1.96*sd/Math.sqrt(v.length):0, sd,
+  for(let r=0;r<SEIN_REGELS;r++){
+    const n0=hier.N[2*r], g0=hier.G[2*r], n1=hier.N[2*r+1], g1=hier.G[2*r+1];
+    perRegel[SEIN_KORT[r]]={naam:SEIN_REGELNAAM[r],
+      pct: hier.per[r],                                  /* het onderscheid: de score van de regel */
+      kant0:{gevallen:n0, goed:g0, pct:n0? g0/n0 : null},  /* het geval waar de regel over gaat */
+      kant1:{gevallen:n1, goed:g1, pct:n1? g1/n1 : null},  /* het andere geval */
+      /* de oude maat van stap 17, alleen de eisen — bewaard omdat het verschil met pct
+         precies laat zien hoeveel een regel met "lamp aan, handel erbij" te winnen was */
+      eisen:eis[r], goed:goed[r], trefkansEisen: eis[r]? goed[r]/eis[r] : null};
+  }
+  return {pct:m, ci:1.96*sd, sd, maat:"onderscheid",
     werelden:v.length, herhalingen:1, pogingen:v.length, diensten:v.length,
-    eisen:eisTot, goed:goedTot, stilleTikken:stil, loosAlarm: stil? loos/stil : null,
+    eisen:eisTot, goed:goedTot, trefkansEisen: eisTot? goedTot/eisTot : null,
+    stilleTikken:stil, loosAlarm: stil? loos/stil : null,
     foutlozeDiensten: v.length? foutloos/v.length : null,
     perRegel, perWereld:perDienst, modus:mode, gemStappen:null};
 }
+const SEIN_BOOTSTRAP=400;
 
 /* toets op onbekende werelden — zonder leren, zonder ruis */
 /* Toets op werelden die het brein nooit gezien heeft. Zonder leren, zonder ruis in
@@ -2942,7 +3042,7 @@ function drawSeinhuis(){
   /* ---- scorebalken per regel, over de lopende dienst ---- */
   const by=sy+sh+H*0.055;
   ctx.textAlign="left"; ctx.fillStyle="#7c8794";
-  ctx.fillText("score per regel, deze dienst", pad, by-H*0.012);
+  ctx.fillText("onderscheid per regel, deze dienst (beide kanten goed)", pad, by-H*0.012);
   /* Drie kolommen die samen precies het canvas vullen: naam, balk, getal. De eerste
      versie rekende de balk tot aan de rechterrand en zette het getal dáár nog achter,
      zodat het buiten beeld viel. */
@@ -2950,8 +3050,11 @@ function drawSeinhuis(){
   for(let r=0;r<SEIN_REGELS;r++){
     const y=by+r*(bh+H*0.012);
     const actief=(r<(d.nR||SEIN_REGELS));
-    const e=tel?tel.eis[r]:0, g=tel?tel.goed[r]:0;
-    const f=e? g/e : 0;
+    /* stap 18: de balk is het onderscheid, niet de trefkans op de eisen — zie seinScoreTik */
+    const n0=tel?tel.kantN[2*r]:0, n1=tel?tel.kantN[2*r+1]:0;
+    const o=tel? seinOnderscheid(n0,tel.kantG[2*r],n1,tel.kantG[2*r+1]) : null;
+    const e=(o===null)?0:1, f=(o===null)?0:o;
+    const g=tel?(tel.kantG[2*r]+tel.kantG[2*r+1]):0;
     ctx.fillStyle=actief?"#9aa4b0":"#39414c"; ctx.textAlign="left";
     ctx.font=Math.round(H*0.024)+"px system-ui,sans-serif";
     ctx.fillText(SEIN_KORT[r]+"  "+SEIN_TEKENNAAM[r], pad, y+bh*0.75);
@@ -2964,7 +3067,7 @@ function drawSeinhuis(){
     ctx.strokeStyle="#55606b"; ctx.lineWidth=1;
     ctx.beginPath(); ctx.moveTo(bx+bw*0.0625,y); ctx.lineTo(bx+bw*0.0625,y+bh); ctx.stroke();
     ctx.fillStyle=actief?"#9aa4b0":"#39414c"; ctx.textAlign="right";
-    ctx.fillText(actief ? (e? (100*f).toFixed(0)+"%   "+g+"/"+e : "nog geen eis") : "uit",
+    ctx.fillText(actief ? (e? (100*f).toFixed(0)+"%   "+g+"/"+(n0+n1) : "nog niet beide kanten") : "uit",
       W-pad, y+bh*0.78);
   }
   ctx.textAlign="left"; ctx.fillStyle="#55606b";
@@ -3460,7 +3563,10 @@ function buildResult(naamOverride){
       startNeuronen:S.cfg.layered?(S.B.n-HID0):S.cfg.nNeurons,
       /* basislijn: geen wolk maar een vaste stapel lagen */
       gelaagd:S.cfg.layered?{lagen:S.B.lagen.slice(), verbindingen:S.B.nc,
-        terugkoppeling:!!S.cfg.recurrent, voorwaartseVerbindingen:S.B.ffCount||S.B.nc}:null,
+        terugkoppeling:!!S.cfg.recurrent, voorwaartseVerbindingen:S.B.ffCount||S.B.nc,
+        /* stap 18: directe bogen invoer -> handel. Alleen aanwezig als hij aanstond,
+           zodat een oudere run er geen veld bij krijgt. */
+        ...(S.cfg.skip?{skip:true}:{})}:null,
       samenstelling:S.B.comp, samenstellingStart:S.B.compStart,
       neuronenNu:S.B.n-HID0,
       types:{
@@ -3533,11 +3639,15 @@ function buildResult(naamOverride){
       beleid:{pct:S.lastBench.beleid.pct, ci:S.lastBench.beleid.ci, sd:S.lastBench.beleid.sd,
         perRegel:S.lastBench.beleid.perRegel||null,
         eisen:S.lastBench.beleid.eisen, goed:S.lastBench.beleid.goed,
+        /* stap 18: welke maat pct is, en de oude maat ernaast */
+        ...(S.lastBench.beleid.maat?{maat:S.lastBench.beleid.maat,
+          trefkansEisen:S.lastBench.beleid.trefkansEisen}:{}),
         loosAlarm:(S.lastBench.beleid.loosAlarm===undefined?null:S.lastBench.beleid.loosAlarm),
         foutlozeDiensten:(S.lastBench.beleid.foutlozeDiensten===undefined?null:S.lastBench.beleid.foutlozeDiensten),
         gemStappen:S.lastBench.beleid.gemStappen, pogingen:S.lastBench.beleid.pogingen,
         perWereld:S.lastBench.beleid.perWereld},
       streng:{pct:S.lastBench.streng.pct, ci:S.lastBench.streng.ci, sd:S.lastBench.streng.sd,
+        ...(S.lastBench.streng.perRegel?{perRegel:S.lastBench.streng.perRegel}:{}),
         gemStappen:S.lastBench.streng.gemStappen, pogingen:S.lastBench.streng.pogingen,
         perWereld:S.lastBench.streng.perWereld}
     }:null,
@@ -3561,6 +3671,10 @@ function buildResult(naamOverride){
       regels:SEIN_REGELNAAM.map((n,i)=>({id:SEIN_KORT[i], regel:n})),
       dienstenset:{aantal:SEIN_BENCH_N, eersteZaad:SEIN_BENCH_SEED0, stap:SEIN_BENCH_STRIDE},
       toevalsbodem:0.0625, bovengrens:1,
+      /* stap 18: de score is het onderscheid per regel, en de beloning is instelbaar */
+      scoremaat:"onderscheid: per regel het meetkundig gemiddelde van de trefkans aan beide kanten, gemiddeld over de regels",
+      beloning:{waarden:((S.cfg.seinBeloning)||SEIN_BELONING).slice(),
+        volgorde:["goed","fout of gemist","per extra handel","per handel op een afleider","per handel op een achtergrondtik"]},
       laatsteDienst: S.seinTel ? {
         eisen:S.seinTel.eisTot, goed:S.seinTel.goedTot,
         stilleTikken:S.seinTel.stil, loosAlarm:S.seinTel.loos,
@@ -4492,6 +4606,8 @@ window.__brain={S,createBrain,analyze,makeWorld,readCfg,startTraining,stopTraini
      met dezelfde scorefunctie kan nameten die de benchmark gebruikt. */
   seinDienst,seinWaarnemen,seinScoreTik,seinBench,seinBenchDiensten,
   SEIN_REGELS,SEIN_KORT,SEIN_REGELNAAM,SEIN_LAMPEN,SEIN_RUIS,SEIN_TIKKEN,
+  /* stap 18 */
+  seinOnderscheid,SEIN_BELONING,SEIN_BELONING_OUD,
   runOne,runLeven,cfgOverride,runExperiments,csvRow,CSV_COLS,meanCI,mannWhitney,
   benchmarkWorlds,benchWorldSeed,playWorlds,benchBrain,benchReactief,runBenchmark,createLayered,
   reactiefDir,reactiefTick,moveAgent,rayDist,blocked,DIRV,

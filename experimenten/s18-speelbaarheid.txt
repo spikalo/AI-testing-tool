@@ -1,0 +1,46 @@
+STAP 18 — SPEELBAARHEID VAN HET SEINHUIS (verkenning, geen meting)
+18 september 2026. Veegzaden 3000.. (nooit de meetzaden), benchmark op 100 diensten,
+score = onderscheid (zie brein-test.html, seinScoreTik). Tussen haakjes per regel:
+trefkans op kant 0 / kant 1. Ruwe logs: s18-proef-log.txt, s18-diagnose*-log.txt,
+s18-diag3..8-log.txt; varianten: stap18-diagnose/*.json.
+
+1. MET DE BELONING VAN STAP 17 LEERT NIETS IETS.
+   Alle vier (ang, mlp-32-bp, elman-32-bp, elman-32-skip-bp) zakken binnen 300 diensten
+   naar exact -36 beloning per dienst = alle eisen gemist, nooit drukken. Ook na 3000
+   diensten. Ook een backpropnet dat R1 los in 1000 diensten naar 94 % leert.
+
+2. DE SCORE VAN STAP 17 WAS TE MISLEIDEN.
+   Met een lagere achtergrondstraf leerde een geheugenloos MLP "lamp aan, handel erbij" en
+   haalde op de oude maat R1 94, R2 92, R5 97, R6 92 % — R5 is tellen, en dat kan een
+   geheugenloos net niet. De afleiders werden niet gescoord. Gecorrigeerd: elke regel is
+   nu een onderscheid tussen twee kanten (meetkundig gemiddelde van beide trefkansen).
+   Diezelfde reflexspeler haalt nu 0 op elke regel (test-stap18.js). Let op: de log van
+   die eerste run (oude maat, beloning [1.5,-1.5,.5,.05,.05], 55.8 % totaal) is door een
+   latere run in hetzelfde bestand overschreven; de getallen hierboven zijn uit de
+   sessie overgenomen. Dezelfde run op de nieuwe maat gaf 8.2 %.
+
+3. MET ANDERE BELONINGEN: EEN MESSCHERP EVENWICHT, EN DE GEHEUGENREGELS NOOIT.
+   beloning [goed, gemist, extra, afleider, achtergrond]     3000 diensten, z3000
+   [1.5,-1.5,.5,.5,.05]  mlp 10.8  elman 0.0  elman-skip 17.3  ang 11.4  ang-vast 10.9
+                         (allemaal "drukken bij de lamp", aan beide kanten)
+   [1.5,-1.5,.5,1.0,.05] mlp 23.6 (alleen R2 85)
+   [1.5,-1.5,.5,1.5,.05] mlp 0, elman 0, elman-skip 0 (weer stil)
+   [1.5,-1.5,.5,1.5,0]   mlp 17.1/17.5 (alleen R2)  elman 1.0/0.0
+                         elman-skip 37.8/23.2 (R1 72, R2 84, R6 58)  ang 9.0
+   + criticus (gamma 0)  geen verschil;  + meer exploratie (noise0 .6/1.0)  geen verschil
+   R3, R4 en R5 komen in geen enkele variant boven 4 %.
+
+4. WAAR HET WEL LUKT.
+   R1 alleen: mlp 94.5.  R1+R2, symmetrisch: in 2 van 3 zaden sterft R1 (0/100).
+   R1+R2 zonder achtergrondstraf: 3 van 3 zaden beide regels ~93 %.
+   Groeiend (500 diensten per regel): mlp houdt R1 op 90 en leert daarna niets meer bij;
+   elman leert niets.
+
+DIAGNOSE. Het is geen capaciteitsprobleem (mlp-64 faalt net zo) maar leerdynamiek: vier
+onafhankelijke handels met REINFORCE verzadigen naar "nooit" of "altijd", en daar is de
+gradiënt p(1-p) nul. Welke kant wint hangt af van de verhouding tussen de straffen en
+van het zaad. Directe bogen invoer -> handel (skip) helpen merkbaar; dat is precies wat
+ANG met reflexen zou moeten kunnen, maar ANG doet het hier niet beter dan een MLP.
+
+BESLUIT NODIG (van Frank): hoe het spel speelbaar te maken vóór de basislijnen gedraaid
+worden. Zie claude/ang-speelbaarheid.md in het project.

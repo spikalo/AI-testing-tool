@@ -1,0 +1,7 @@
+S mlp-32                  6s  onderscheid 0.0±0.0  streng 0.0  eisen 0  loos 0.3  | R1 0 (0/100)  R2 0 (0/99)  R3 0 (0/0)  R4 0 (0/0)  R5 0 (0/100)  R6 0 (0/100)
+S mlp-32 achtergrond .15    6s  onderscheid 0.0±0.0  streng 0.0  eisen 0  loos 0.0  | R1 0 (0/100)  R2 0 (0/99)  R3 0 (0/0)  R4 0 (0/0)  R5 0 (0/100)  R6 0 (0/100)
+S elman-32               14s  onderscheid 0.0±0.0  streng 0.0  eisen 0  loos 0.1  | R1 0 (0/100)  R2 0 (0/99)  R3 0 (0/0)  R4 0 (0/0)  R5 0 (0/100)  R6 0 (0/100)
+S elman-32 lr .016       15s  onderscheid 0.0±0.0  streng 0.0  eisen 0  loos 0.1  | R1 0 (0/100)  R2 0 (0/99)  R3 0 (0/0)  R4 0 (0/0)  R5 0 (0/100)  R6 0 (0/100)
+S elman-32-skip          16s  onderscheid 0.0±0.0  streng 0.0  eisen 0  loos 0.1  | R1 0 (0/100)  R2 0 (0/99)  R3 0 (0/0)  R4 0 (0/0)  R5 0 (0/100)  R6 0 (0/100)
+S ang                    63s  onderscheid 6.7±1.8  streng 0.0  eisen 1  loos 4.8  | R1 11 (1/97)  R2 14 (2/94)  R3 1 (1/1)  R4 0 (0/2)  R5 0 (0/97)  R6 14 (2/95)
+KLAAR exitcode=0 

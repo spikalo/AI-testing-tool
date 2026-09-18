@@ -1,0 +1,9 @@
+mlp-32 oude beloning      3s  onderscheid 0.0±0.0  streng 0.0  eisen 0  loos 0.0  | R1 0 (0/100)  R2 0 (0/99)  R3 0 (0/0)  R4 0 (0/0)  R5 0 (0/100)  R6 0 (0/100)
+mlp-32 nieuw              4s  onderscheid 10.8±1.5  streng 0.0  eisen 57  loos 18.9  | R1 13 (96/2)  R2 28 (93/8)  R3 0 (1/0)  R4 3 (2/4)  R5 10 (98/1)  R6 11 (97/1)
+elman-32 nieuw            8s  onderscheid 0.0±0.0  streng 0.0  eisen 0  loos 0.2  | R1 0 (0/100)  R2 0 (0/99)  R3 0 (0/0)  R4 0 (0/0)  R5 0 (0/100)  R6 0 (0/100)
+elman-32-skip nieuw      11s  onderscheid 17.3±1.6  streng 1.5  eisen 56  loos 24.9  | R1 15 (93/2)  R2 33 (92/12)  R3 1 (1/1)  R4 3 (1/10)  R5 11 (98/1)  R6 41 (88/19)
+ang nieuw                33s  onderscheid 11.4±1.7  streng 0.0  eisen 3  loos 11.8  | R1 14 (2/89)  R2 19 (4/85)  R3 2 (2/3)  R4 3 (2/3)  R5 8 (1/88)  R6 21 (5/87)
+ang-vast nieuw           25s  onderscheid 10.9±1.6  streng 0.0  eisen 3  loos 11.8  | R1 16 (3/90)  R2 18 (4/84)  R3 2 (2/3)  R4 2 (2/3)  R5 7 (1/88)  R6 19 (4/87)
+mlp-32 achtergrond 0      6s  onderscheid 9.2±1.5  streng 0.0  eisen 55  loos 54.6  | R1 12 (90/2)  R2 15 (91/2)  R3 1 (1/1)  R4 4 (2/6)  R5 10 (95/1)  R6 13 (91/2)
+mlp-32 afleider 1.0       5s  onderscheid 23.6±1.4  streng 16.7  eisen 20  loos 10.3  | R1 6 (0/99)  R2 85 (84/85)  R3 0 (0/2)  R4 4 (1/13)  R5 0 (0/100)  R6 47 (57/38)
+KLAAR exitcode=0 

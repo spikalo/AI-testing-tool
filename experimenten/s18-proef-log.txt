@@ -1,0 +1,5 @@
+ang                43s  bench 0.4%  streng 0.0%  loos 1.9%  | R1 0  R2 1  R3 0  R4 1  R5 0  R6 1  | beloning per zesde: -47.1 -40.2 -41.3 -40.5 -39.7 -38.6  | verb 3087
+mlp-32-bp          10s  bench 0.0%  streng 0.0%  loos 0.0%  | R1 0  R2 0  R3 0  R4 0  R5 0  R6 0  | beloning per zesde: -37.8 -36.2 -36.1 -36.1 -36.1 -36.1  | verb 640
+elman-32-bp        23s  bench 0.0%  streng 0.0%  loos 0.0%  | R1 0  R2 0  R3 0  R4 0  R5 0  R6 0  | beloning per zesde: -38.0 -36.2 -36.2 -36.2 -36.1 -36.1  | verb 1664
+elman-32-skip-bp   24s  bench 0.0%  streng 0.0%  loos 0.0%  | R1 0  R2 0  R3 0  R4 0  R5 0  R6 0  | beloning per zesde: -37.9 -36.2 -36.2 -36.1 -36.1 -36.1  | verb 1728
+KLAAR exitcode=0 

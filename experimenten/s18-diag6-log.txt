@@ -1,0 +1,11 @@
+mlp alle bg0               z3000    7s  ond  17.1  streng  16.7  loos  35.7  | R1 6 (0/98)  R2 91 (89/94)  R3 0 (0/1)  R4 1 (1/0)  R5 4 (0/100)  R6 0 (0/99)
+mlp alle bg0               z3001    6s  ond  17.5  streng  16.7  loos  41.9  | R1 6 (0/98)  R2 89 (87/92)  R3 0 (0/0)  R4 0 (1/0)  R5 4 (0/100)  R6 6 (0/99)
+elman alle bg0             z3000   14s  ond   1.0  streng   0.0  loos   0.2  | R1 6 (0/100)  R2 0 (0/99)  R3 0 (0/0)  R4 0 (0/0)  R5 0 (0/100)  R6 0 (0/100)
+elman alle bg0             z3001   14s  ond   0.0  streng   0.0  loos   0.3  | R1 0 (0/100)  R2 0 (0/99)  R3 0 (0/0)  R4 0 (0/0)  R5 0 (0/100)  R6 0 (0/100)
+skip alle bg0              z3000   19s  ond  37.8  streng  44.6  loos  56.4  | R1 72 (80/65)  R2 84 (92/77)  R3 2 (2/2)  R4 3 (1/5)  R5 8 (1/97)  R6 58 (53/65)
+skip alle bg0              z3001   19s  ond  23.2  streng  16.7  loos  42.8  | R1 6 (0/97)  R2 87 (86/88)  R3 0 (0/1)  R4 2 (2/3)  R5 0 (0/99)  R6 44 (25/77)
+ang alle bg0               z3000   65s  ond   9.0  streng   0.0  loos   7.2  | R1 14 (2/94)  R2 16 (3/89)  R3 1 (2/1)  R4 1 (1/2)  R5 4 (0/94)  R6 17 (3/93)
+ang alle bg0               z3001   64s  ond   9.1  streng   0.0  loos   7.3  | R1 11 (1/94)  R2 18 (4/89)  R3 1 (2/1)  R4 1 (1/2)  R5 6 (0/94)  R6 16 (3/92)
+angvast alle bg0           z3000   52s  ond   7.5  streng   0.0  loos   5.7  | R1 11 (1/96)  R2 17 (3/91)  R3 1 (2/1)  R4 1 (1/2)  R5 0 (0/95)  R6 14 (2/94)
+angvast alle bg0           z3001   52s  ond   7.4  streng   0.0  loos   5.4  | R1 11 (1/96)  R2 17 (3/91)  R3 1 (1/1)  R4 1 (1/2)  R5 0 (0/96)  R6 14 (2/94)
+KLAAR exitcode=0 

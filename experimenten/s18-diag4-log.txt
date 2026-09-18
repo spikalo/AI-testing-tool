@@ -1,0 +1,6 @@
+mlp groeiend 500/regel     z3000    7s  ond  15.1  streng  16.7  loos   1.6  | R1 90 (87/94)  R2 0 (0/99)  R3 0 (1/0)  R4 0 (0/0)  R5 0 (0/100)  R6 0 (0/100)
+elman groeiend 500/regel   z3000   15s  ond   1.0  streng   0.0  loos   0.2  | R1 6 (0/100)  R2 0 (0/99)  R3 0 (0/0)  R4 0 (0/0)  R5 0 (0/100)  R6 0 (0/100)
+mlp categorisch            z3000    7s  ond  16.2  streng  16.7  loos   1.9  | R1 0 (0/100)  R2 97 (97/97)  R3 0 (0/99)  R4 0 (1/0)  R5 0 (0/100)  R6 0 (0/100)
+mlp R1+R2 lr .004          z3000    5s  ond  46.1  streng  50.0  loos   3.4  | R1 0 (0/98)  R2 92 (92/93)
+mlp-64 R1+R2               z3000    5s  ond  49.4  streng  50.0  loos   0.5  | R1 0 (0/100)  R2 99 (99/99)
+KLAAR exitcode=0 
