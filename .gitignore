@@ -40,7 +40,6 @@ __pycache__/
 # Papers en interne documenten (niet in de repo)
 # ---------------------------------------------------------------------------
 ANG-paper*.docx
-ANG-paper*.pdf
 ~$*.docx
 kritiek chatGPT.docx
 

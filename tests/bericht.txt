@@ -1,0 +1,35 @@
+stap18-slot-afsluitende-meting-seinhuis-en-paper-3.0
+
+De afsluitende meting op het seinhuis, zoals vooraf vastgelegd in e274151: zes
+condities, leersnelheidsveeg op eigen zaden, twaalf meetzaden met eigen brein- en
+wereldzaad, groeiende dienstregeling (1000 diensten per regel), score Youdens J.
+
+V1 waar: geen enkele conditie leert een regel die geheugen vraagt. Van de 24
+combinaties ligt er na Holm geen boven nul; de kleinste gecorrigeerde p is 0,19
+(Elman afgekapt op een tik, R6, J 21 +- 12, ongecorrigeerd p 0,008). Ook de Elman-netten
+met echte BPTT niet.
+
+V2 deels onwaar: R1 en R2 leert alleen het geheugenloze MLP betrouwbaar (J 83 +- 1). De
+recurrente netten leren ze in sommige zaden perfect en in andere helemaal niet
+(Elman-32 BPTT: 7 van 12 zaden boven 80 %, 3 onder 10 %).
+
+V3 waar: ANG haalt op R1 en R2 J = -5 %, tegen 83 % voor het MLP (Holm p < 0,001).
+Beide ANG-varianten zijn overal stil gebleven, al in de fase met alleen R1.
+
+V4 waar: bevroren is niet slechter (-2 tegen -5 %, Holm p < 0,001, klein).
+
+V5: de faalvormen per regel. Twee categorieen zijn na de meting toegevoegd en zo gemeld
+in script en paper ("niets goed" en "vast antwoord" bij R3/R4, waar beide kanten een
+handel vragen).
+
+Beperking, in de paper: de veeg koos voor ang, ang-vast en elman-32-bp1 de hoogste
+kandidaat; een keuze op de rand van het raster is geen optimum.
+
+Paper naar 3.0: nieuwe sectie 10.13 over de tweede taak, een zin in de samenvatting,
+een alinea in de conclusie, en de correctie op "backprop door de tijd" in 10.8 en 10.9.
+Elke nieuwe alinea heeft een tak voor de andere uitkomst en is teruggelezen met
+lees-sectie.js. test-stap18.js groen (27), test-stap17.js groen na aanpassing aan de
+nieuwe scoredefinitie (J van -1 tot 1, bodem -0,875).
+
+Co-Authored-By: Claude Opus 5 <noreply@anthropic.com>
+Claude-Session: https://claude.ai/code/session_01T2TqCbfdkJVxct3noGguYN
