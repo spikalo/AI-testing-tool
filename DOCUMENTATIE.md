@@ -39,13 +39,25 @@ AI-testing-tool/
 ├── resultaten.html            resultaten van test 01 vergelijken
 ├── ollama-test.html           test 02 — lokale LLM's via de Ollama-API
 ├── ollama-resultaten.html     resultaten van test 02 + modelkeuze-advies
+├── stat-modellen-test.html    test 03 — acht klassieke modellen zonder AI
+├── brein-test.html            test 04 — Adaptive Neural Graph, drie spellen
+├── brein-resultaten.html      getrainde breinen vergelijken en opnieuw tekenen
 ├── start-server.cmd           lokale webserver op poort 8080 (nodig voor de LLM-test)
 ├── resultaten/                JSON-runs van test 01
 ├── resultaten-llm/            JSON-runs van test 02 (één bestand per model)
+├── resultaten-brein/          JSON-runs van test 04
+├── experimenten/              meetreeksen van test 04 (runs.csv en de losse runs)
+├── tests/                     Playwright-tests, meetscripts en prereregistraties
+├── paper/                     generator van het ANG-paper
+├── docs/                      figuren
 ├── datasets/                  MNIST / EMNIST (niet in git)
 ├── README.md
 └── DOCUMENTATIE.md            dit bestand
 ```
+
+Test 01 en 02 worden hieronder volledig beschreven. **Test 03 en 04 staan in `README.md`**;
+test 04 is inmiddels een eigen onderzoekslijn met een paper, een werkplan en negentien
+meetstappen, en die documentatie hoort daar en in de projectdocumenten thuis.
 
 Alle pagina's zijn losse, zelfstandige HTML-bestanden zonder build-stap en zonder
 dependencies. Ze bewaren gekozen mappen via de File System Access API (Chrome/Edge),

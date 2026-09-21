@@ -54,6 +54,17 @@ const SIGNAAL = lees(path.join(EXPDIR, 'signaalsturing.json'));
 const RASTER = lees(path.join(EXPDIR, 'capaciteitsraster.json'));
 /* stap 18: de afsluitende meting op het seinhuis */
 const SEINHUIS = lees(path.join(EXPDIR, 'seinhuis-slot.json'));
+/* stap 19-20: de derde taak, de proeftuin — gebouwd en gekalibreerd, niet gemeten */
+const TUIN = lees(path.join(EXPDIR, 's20-opzet.json'));
+const KAL = TUIN ? lees(path.join(EXPDIR, 's20-kalibratie.json')) : null;
+/* gemiddelde J op fase i over de veegzaden van een kalibratiekandidaat */
+function kalJ(ronde, naam, i) {
+  const R = KAL && KAL.rondes[ronde]; if (!R) return null;
+  const xs = Object.values(R).filter(v => v.naam === naam).map(v => v.fasen[i] && v.fasen[i].J)
+    .filter(x => typeof x === 'number' && isFinite(x));
+  return xs.length ? xs.reduce((a, b) => a + b, 0) / xs.length : null;
+}
+const kp = x => (x === null || x === undefined) ? '–' : (100 * x).toFixed(1) + '%';
 function stat(xs) {
   const v = xs.filter(x => typeof x === 'number' && isFinite(x));
   const n = v.length; if (!n) return null;
@@ -68,7 +79,7 @@ const num = (x, d = 0) => x === null ? '–' : x.m.toFixed(d) + ' ± ' + x.ci.to
 const kol = k => RUNS ? RUNS.map(r => r[k]) : [];
 /* een gemiddelde-met-interval uit benchmark.json in dezelfde vorm als stat() */
 const bm = o => o ? { n: o.n, m: o.m, sd: o.sd, ci: o.ci, min: o.m, max: o.m } : null;
-const VERSIE = SEINHUIS ? '3.0' : RASTER ? '2.2' : SIGNAAL ? '2.1' : SGEDRAG ? '2.0' : OMSLAG ? '1.9' : TAAKAS ? '1.8' : ABLATIE ? '1.7' : LEERREGEL ? '1.6' : '1.5';
+const VERSIE = TUIN ? '4.0' : SEINHUIS ? '3.0' : RASTER ? '2.2' : SIGNAAL ? '2.1' : SGEDRAG ? '2.0' : OMSLAG ? '1.9' : TAAKAS ? '1.8' : ABLATIE ? '1.7' : LEERREGEL ? '1.6' : '1.5';
 /* De laatste secties schuiven mee met wat er gemeten is, zodat een verwijzing in de
    tekst nooit naar een verkeerd nummer wijst. */
 const SEC_OMSLAG = '10.9', SEC_SG = OMSLAG ? '10.10' : '10.9';
@@ -80,9 +91,11 @@ const SEC_RASTER = RASTER ? '10.' + NA_SIG : null;
 const NA_RASTER = NA_SIG + (RASTER ? 1 : 0);
 const SEC_SEIN = SEINHUIS ? '10.' + NA_RASTER : null;
 const NA_SEIN = NA_RASTER + (SEINHUIS ? 1 : 0);
-const SEC_HIERNA = '10.' + NA_SEIN;
-const SEC_VRAAG = '10.' + (NA_SEIN + 1);
-const DATUM = SEINHUIS ? '18 september 2026' : '17 september 2026';
+const SEC_TUIN = TUIN ? '10.' + NA_SEIN : null;
+const NA_TUIN = NA_SEIN + (TUIN ? 1 : 0);
+const SEC_HIERNA = '10.' + NA_TUIN;
+const SEC_VRAAG = '10.' + (NA_TUIN + 1);
+const DATUM = TUIN ? '21 september 2026' : SEINHUIS ? '18 september 2026' : '17 september 2026';
 const SERIF = 'Cambria';
 const TEXTW_PT = 448;              // bruikbare tekstbreedte in punten
 const INK = '1A1D21', DIM = '55606B', ACC = '1F5C73';
@@ -113,6 +126,11 @@ const h3 = (text) => new Paragraph({
   spacing: { before: 160, after: 70 }, keepNext: true
 });
 
+/* Het manifest van mkeq.py bewaart het absolute pad van de machine waarop de formules
+   gerenderd zijn (bij Frank een Windows-pad). Dan bouwt de paper alleen daar. Het pad wordt
+   daarom opgelost vanaf de eigen eq-map, op de bestandsnaam — dezelfde soort fout als
+   nummer 8 in het foutenregister, en gevonden bij de bouw van versie 4.0. */
+const eqPad = p => path.join(__dirname, 'eq', path.win32.basename(p));
 /* vergelijking: gecentreerde afbeelding met nummer rechts */
 function eq(num, scale = 1) {
   const m = MAN[String(num)];
@@ -129,7 +147,7 @@ function eq(num, scale = 1) {
     ],
     children: [
       new TextRun({ children: [new Tab()] }),
-      new ImageRun({ type: 'png', data: fs.readFileSync(m.path), transformation: { width: w, height: h } }),
+      new ImageRun({ type: 'png', data: fs.readFileSync(eqPad(m.path)), transformation: { width: w, height: h } }),
       new TextRun({ children: [new Tab()] }),
       t(`(${num})`)
     ]
@@ -359,7 +377,14 @@ C.push(new Paragraph({
         'dat hiervoor gebouwd en numeriek gecontroleerd is, leert geen enkele regel die geheugen vraagt. ' +
         'Onderweg bleek de score van die taak twee keer te misleiden, telkens door een speler die precies ' +
         'één stap slimmer was dan de vorige; de uiteindelijke maat (Youdens J per regel) zet elke ' +
-        'strategie die niet op de voorwaarde let op nul.' : '')
+        'strategie die niet op de voorwaarde let op nul.' : '') +
+      (TUIN ? ' Een derde taak maakt ten slotte de situatie die de eerste twee misten: dezelfde zintuigen, ' +
+        'maar een betekenis die per fase verschuift, zodat de optimale interne organisatie zelf verandert en ' +
+        'een hard verbindingsbudget capaciteit alleen laat verplaatsen. De kalibratie van die taak liet zien ' +
+        'dat de premisse niet houdt: de graaf verliest na de eerste fase haar leervermogen, ook met bevroren ' +
+        'structuur, terwijl dezelfde leerregel in een gelaagd net met hetzelfde budget gewoon herleert — en ' +
+        'waar de graaf gedeeltelijk herleert, doet de vrije variant het slechter dan de bevroren. Daarmee ' +
+        'wordt het werk afgesloten.' : '')
   })]
 }));
 C.push(new Paragraph({
@@ -370,7 +395,8 @@ C.push(new Paragraph({
     new TextRun({
       text: 'zelfstructurerende netwerken · reward-gemoduleerde plasticiteit · node-perturbatie · ' +
         'beleidsgradiënt · structurele plasticiteit · interpreteerbaarheid' +
-        (TAAKAS ? ' · deels waarneembare omgevingen · negatieve resultaten' : ''),
+        (TAAKAS ? ' · deels waarneembare omgevingen · negatieve resultaten' : '') +
+        (TUIN ? ' · verlies van plasticiteit' : ''),
       font: SERIF, size: 18, color: DIM
     })
   ]
@@ -393,6 +419,15 @@ C.push(body(
   'Dat verschil is niet alleen anatomisch interessant. Het bepaalt welke oplossingen een netwerk überhaupt kán ' +
   'vinden: in een gelaagd netwerk bestaat "sneller reageren dan nadenken" niet als optie.'
 ));
+if (TUIN) C.push(body([
+  bd('Geïnspireerd, niet plausibel. '),
+  t('Die vergelijking is een aanleiding en geen aanspraak. ANG gebruikt tanh-knopen, vier discrete ' +
+    'uitvoerknoppen, met de hand ontworpen neuronsoorten en bedradingsregels, node-perturbatie en periodieke ' +
+    'herstructureringsrondes; niets daarvan is een model van een echt zenuwstelsel. Dit document positioneert ' +
+    'ANG daarom als een model uit het kunstmatige-levenonderzoek voor zichzelf organiserende netwerken — ' +
+    'biologisch geïnspireerd, niet biologisch plausibel — en de soorttoewijzing als een dynamische ' +
+    'classificatie op grond van ontstane bedrading, niet als het vanzelf ontdekken van een neurale organisatie.')
+]));
 C.push(body([
   t('ANG laat de laagstructuur los. Wat overblijft is een gerichte graaf met getypeerde knopen, waarin de enige ' +
     'harde eis is dat elke invoer ergens naartoe gaat en elke uitvoer ergens vandaan komt. Alles daarbinnen — hoeveel ' +
@@ -3482,8 +3517,175 @@ if (SEINHUIS) {
   C.push(gap(60));
 }
 
-C.push(h2(SEC_HIERNA, 'Wat hierna gemeten wordt'));
-C.push(body(
+if (TUIN) {
+  const O = TUIN;
+  C.push(h2(SEC_TUIN, 'Een derde taak: de proeftuin, en waarom het werk hier stopt'));
+  C.push(body(
+    'Spel 1 en spel 2 hebben één ding gemeen dat pas na achttien meetstappen in het oog sprong: in geen van ' +
+    'beide verandert de optimale interne organisatie. Welke zintuigen ertoe doen, welke knoppen erbij horen en ' +
+    'hoe diep de rekenweg moet zijn, ligt van de eerste tot de laatste poging vast. Een netwerk dat zijn ' +
+    'bedrading mag verbouwen, heeft daar per constructie niets te verbouwen, en dat een vast net even ver komt ' +
+    'zegt dan net zoveel over de taken als over het model. Een externe kritiek op versie 3.0 formuleerde het ' +
+    'zo: er is aangetoond dat ANG kán veranderen, niet dat het weet wánneer veranderen nuttig is. Deze sectie ' +
+    'beschrijft de taak die daarvoor gebouwd is, de kalibratie ervan, en waarom de afsluitende meting niet meer ' +
+    'gedraaid is.'
+  ));
+  C.push(body([
+    bd('De taak. '),
+    t('Elke tik komt er één voorwerp langs met vier eigenschappen op vaste kanalen — kleur (vier kanalen), ' +
+      'beweging, grootte en geur (elk twee) — plus zes afleiderkanalen met ruis. Het voorwerp moet in één ' +
+      'van vier bakken; de vier knoppen zijn de bakken. De zintuigen blijven in elke fase dezelfde; alleen ' +
+      'de regel verschuift. Er is in geen enkele fase geheugen nodig: elk voorwerp begint met een schone ' +
+      'toestand, zodat de as waarop spel 2 vastliep hier niet in de weg staat.')
+  ]));
+  C.push(tbl(['fase', 'regel', 'welke kanalen ertoe doen'], [
+    ['A', 'bak = kleur', 'kleur'],
+    ['B', 'bak = kleur, antwoorden paarsgewijs omgewisseld', 'kleur — dezelfde draden, ander teken'],
+    ['C', 'bak = kleurgroep × beweging', 'kleur (grof) en beweging, voor het eerst'],
+    ['D', 'bak = geur × grootte', 'geur en grootte; kleur en beweging niet meer'],
+    ['A′', 'bak = kleur', 'kleur opnieuw — behoud en herleren']
+  ], [900, 4700, 4072]));
+  C.push(body([
+    bd('De meetlat. '),
+    t('De score is informedness over vier bakken, (gemiddelde trefkans per bak − ¼)/¾: de maat van sectie ' +
+      SEC_SEIN + ' doorgetrokken naar vier klassen. Een perfecte speler haalt 100%, altijd dezelfde bak en een ' +
+      'munt van vier kanten halen 0%, niets doen −33,3%; alle vier nagemeten. Omdat de fase-regel alleen ' +
+      'bepaalt wat goed heet en niet wat de agent ziet, levert één doorloop van de vaste toetsverzameling de ' +
+      'score op alle vijf de regels. Daaruit volgen de startwaarden waartegen een herstel afgemeten moet ' +
+      'worden: wie fase A beheerst begint fase B op −33,3% (stelselmatig het verkeerde antwoord), fase C op ' +
+      '34,6% (de kleur wijst daar nog steeds het goede páár bakken aan) en fase D op −1,5%. Naast de score ' +
+      'staat een architectuurvrije maat voor waar het antwoord van de agent van afhangt: per eigenschap de ' +
+      'afstand tussen het antwoordprofiel binnen één niveau en het profiel over alles heen, met de zes ' +
+      'afleiders als gemeten ruisbodem.')
+  ]));
+  C.push(body([
+    bd('De metabole kost. '),
+    t('Structurele verandering mag niet gratis zijn, anders meet de proef of méér plasticiteit beter is en ' +
+      'niet of zelforganisatie nuttig is. Die kost is een hard plafond op het aantal verbindingen: erbij bouwen ' +
+      'kan alleen wat het snoeien heeft vrijgemaakt. Bewust geen strafterm in de beloning, want die loopt door ' +
+      'de lopende basislijn en wordt daardoor opgeslokt. Het plafond haalt geen trekking uit de ' +
+      'toevalsgenerator, en in zijn uitstand reproduceren spel 1 en 2 bit voor bit.')
+  ]));
+
+  C.push(h3('De kalibratie'));
+  C.push(body(
+    'Alles hieronder is kalibratie: twee veegzaden per kandidaat, de meetzaden van de geplande afsluitende ' +
+    'meting onaangeroerd, en elke kandidaat bewaard in plaats van alleen de winnaar. Het budget werd gekozen ' +
+    'op een criterium dat vastlag voordat de tussenliggende waarden gemeten waren: het krapste budget waarop ' +
+    'de vrije en de bevroren graaf fase A allebei gemiddeld op ten minste 90% halen.'
+  ));
+  const BUD = [0, 2400, 2000, 1600, 1200, 800];
+  C.push(tbl(['verbindingsbudget', 'graaf, vrij', 'graaf, bevroren'],
+    BUD.map(b => {
+      const r = [2, '2b'].map(x => [kalJ(x, 'ang-b' + b, 0), kalJ(x, 'ang-vast-b' + b, 0)]).find(p => p[0] !== null) || [null, null];
+      return [b === 0 ? 'geen' : String(b), kp(r[0]), kp(r[1])];
+    }), [3200, 3236, 3236]));
+  C.push(body(
+    'Het budget werd ' + O.gemeen.connBudget + ' verbindingen. De tabel bevat ook de eerste les van deze ' +
+    'kalibratie: een voorlopig budget van 1200 dat nergens op gebaseerd was, hield twee rondes lang de graaf ' +
+    'op de helft, wat past bij sectie 10.5 — node-perturbatie betaalt in capaciteit. Verder: geen ' +
+    'eligibility trace (de voorwerpen zijn onafhankelijk), een perturbatiefractie van ' +
+    O.gemeen.perturbFrac + ', propagatiediepte 3 voor de graaf en 2 voor het gelaagde net, ' +
+    O.pogingenPerFase + ' pogingen per fase, en vaste in plaats van afbouwende exploratie — een keuze die ' +
+    'op principe is gemaakt voordat de hele levens draaiden, omdat afbouwen een stilstaande wereld ' +
+    'veronderstelt. Het gemeten effect ervan: de graaf merkt er vrijwel niets van, terwijl het gelaagde net ' +
+    'met de exacte gradiënt met afbouwende exploratie op fase D en A′ instort. De keuze houdt de ' +
+    'tegenstanders overeind, niet de graaf.', { spacing: { after: 120 } }
+  ));
+
+  const R3 = KAL.rondes[3] || {};
+  const levens = Object.values(R3).filter(v => /^leven-P\d+-mlp120/.test(v.naam) && !/ruisaf/.test(v.naam));
+  const valJ = levens.map(v => v.fasen[1].J);
+  const exact = valJ.filter(x => Math.abs(x - 1 / 3) < 0.005).length;
+  C.push(h3('Bevinding 1: de omkering is een val, geen herweging'));
+  C.push(body(
+    'Fase B was bedoeld als controlefase: alleen het antwoord hoeft om, en dat zou een vast net door te ' +
+    'herwegen moeten kunnen. Voor een leerder die alleen van beloning leert, klopt dat niet. Na fase A kiest ' +
+    'hij bij elke kleur stelselmatig het antwoord dat onder regel B fout is, zodat er nooit een beloning voor ' +
+    'het goede antwoord binnenkomt — alleen straf voor het foute, en bij een beleid dat vrijwel zeker is van ' +
+    'zijn keuze is die straf verwaarloosbaar, omdat de gradiënt van log π naar de gekozen actie evenredig is ' +
+    'met 1 − π. Elk net komt daardoor in dezelfde tussentoestand terecht: twee kleuren in één bak, precies de ' +
+    'helft goed, informedness exact een derde. Dat gebeurde in ' + exact + ' van de ' + levens.length +
+    ' levens van de twee gelaagde netten, bij ' + O.pogingenPerFase + ' en bij het dubbele aantal pogingen ' +
+    'per fase, en de bevroren graaf blijft op dezelfde tussenoplossing hangen. De val kan pas open in fase ' +
+    'C, waar de oude antwoorden voor een deel weer goed zijn en er dus weer een positief signaal is — en ook ' +
+    'dan niet altijd: het gelaagde net met de exacte gradiënt kwam in een van de twee levens ook in fase C ' +
+    'niet los.'
+  ));
+
+  const L = ['leven-P400-mlp120-bp', 'leven-P400-mlp120-pert', 'leven-P400-ang-vast', 'leven-P400-ang'];
+  const LN = ['gelaagd net 120, exacte gradiënt', 'gelaagd net 120, leerregel van de graaf',
+    'graaf, structuur bevroren', 'graaf, vrij'];
+  C.push(h3('Bevinding 2: de graaf verliest na de eerste fase haar leervermogen'));
+  C.push(tbl(['één leven, ' + O.pogingenPerFase + ' pogingen per fase', 'A', 'B', 'C', 'D', 'A′'],
+    L.map((n, i) => [LN[i]].concat([0, 1, 2, 3, 4].map(f => kp(kalJ(3, n, f))))),
+    [3572, 1220, 1220, 1220, 1220, 1220]));
+  C.push(body(
+    'De graaf leert fase A even goed als de andere deelnemers en daarna nauwelijks nog iets — ook fase D niet, ' +
+    'waar de oude oplossing niets over zegt, en zelfs A′ niet, de regel die zij eerder beheerste. Dat geldt ' +
+    'ook met bevroren structuur. Een gelaagd net met dezelfde leerregel en hetzelfde budget herleert C, D en ' +
+    'A′ wél, en bij dat net laat de kanaalafhankelijkheid precies de verschuiving zien die de taak vraagt: in ' +
+    'C van kleur naar kleur én beweging, in D naar geur en grootte, in A′ terug naar kleur. De meters werken ' +
+    'dus; het is de graaf die niet meer beweegt. Verzadiging is het niet (de entropie van het beleid van de ' +
+    'graaf blijft ruim boven die van het gelaagde net). In de literatuur heet dit verschijnsel verlies van ' +
+    'plasticiteit: een netwerk dat na een eerste taak slechter leert dan een vers netwerk (Dohare e.a., 2024). ' +
+    'Een verse graaf haalt fase A in dezelfde ' + O.pogingenPerFase + ' pogingen tot boven de 90%.'
+  ));
+
+  const VAR = [['basis', 'basis'], ['alleenWorkers', 'alleen workers (soorten uit)'], ['diepte2', 'diepte 2'],
+    ['vervaging10x', 'tien keer meer vervaging'], ['meerRuis', 'meer exploratieruis'],
+    ['lr016', 'hogere leersnelheid'], ['alleenWorkersDiepte2', 'alleen workers, diepte 2']];
+  const vrijD = VAR.map(v => kalJ('3b', 'AD-' + v[0], 1)), vastD = VAR.map(v => kalJ('3b', 'AD-' + v[0] + '-vast', 1));
+  const slechter = vrijD.filter((x, i) => x !== null && vastD[i] !== null && x < vastD[i]).length;
+  C.push(h3('Bevinding 3: waar de graaf herleert, doet de vrije variant het slechter'));
+  C.push(tbl(['ingreep, kort leven A → D', 'vrij: A', 'vrij: D', 'bevroren: A', 'bevroren: D'],
+    VAR.map((v, i) => [v[1], kp(kalJ('3b', 'AD-' + v[0], 0)), kp(vrijD[i]), kp(kalJ('3b', 'AD-' + v[0] + '-vast', 0)), kp(vastD[i])]),
+    [3672, 1500, 1500, 1500, 1500]));
+  C.push(body(
+    'Op een kort leven van fase A direct naar fase D, de schone herstart, zijn zes voor de hand liggende ' +
+    'oorzaken van het verlies van plasticiteit elk met één ingreep getoetst. Geen enkele ingreep helpt; de ' +
+    'basisopzet blijft de beste, en de neuronsoorten weglaten — sinds deze versie uitdrukkelijk toegestaan — ' +
+    'maakt het slechter. En in ' + slechter + ' van de ' + VAR.length + ' varianten herleert de vrije graaf ' +
+    'fase D slechter dan dezelfde graaf met bevroren structuur. Wat het snoeien onder het budget vrijmaakt, ' +
+    'gaat vrijwel geheel naar nieuwe neuronen, en die raken grotendeels weer los.'
+  ));
+
+  C.push(h3('Waarom de afsluitende meting niet gedraaid is'));
+  C.push(body(
+    'De meting waarvoor deze taak gebouwd is, vergelijkt de hersteltijd van de vrije en de bevroren graaf na ' +
+    'elke omslag. Die vergelijking heeft pas betekenis als de graaf na een omslag überhaupt herleert. De ' +
+    'kalibratie laat zien dat zij dat nauwelijks doet, met en zonder structurele plasticiteit, en dat waar zij ' +
+    'het gedeeltelijk doet, verbouwen kost in plaats van oplevert. Twee veegzaden zijn geen bewijs, en dit ' +
+    'document presenteert deze getallen dan ook niet als meting. Maar zij wijzen dezelfde kant op als elke ' +
+    'meetreeks ervoor — sectie 10.4, 10.7, 10.8, ' + SEC_OMSLAG + ', ' + SEC_SIG + ' en ' + SEC_SEIN + ' — ' +
+    'en de enige opzet die het idee nog een kans gaf, levert een vergelijking op tussen twee condities die ' +
+    'beide dicht bij de vloer blijven. Het werk wordt daarom hier afgesloten.'
+  ));
+  C.push(body([
+    bd('Wat de taak wél oplevert, '),
+    t('is voor de vraag waar dit project uit voortkomt misschien het bruikbaarste van het hele document. Een ' +
+      'goed getraind, zelfverzekerd netwerk kan een omgekeerde regel met alleen beloning niet afleren en blijft ' +
+      'hangen op een half-goede tussenoplossing die er stabiel uitziet — te herkennen aan een score die precies ' +
+      'op een rond getal stilstaat en aan een verwarringsmatrix waarin twee klassen samenvallen. En een ' +
+      'netwerk dat één taak goed geleerd heeft, kan slechter leren dan een vers netwerk — te herkennen door na ' +
+      'een omslag te vergelijken met een model dat opnieuw begint. Geen van beide faalvormen heeft met de ' +
+      'grootte van het netwerk te maken.')
+  ]));
+  C.push(gap(60));
+}
+
+C.push(h2(SEC_HIERNA, TUIN ? 'Wat open blijft' : 'Wat hierna gemeten wordt'));
+if (TUIN) C.push(body(
+  'Dit document is met versie 4.0 afgesloten; wat hieronder staat, wordt niet meer gemeten. Het belangrijkste ' +
+  'openstaande punt komt uit sectie ' + SEC_TUIN + ': het verlies van plasticiteit. Het mechanisme dat daar in ' +
+  'de literatuur tegen werkt — voortdurend de minst bruikbare eenheden opnieuw initialiseren (Dohare e.a., ' +
+  '2024) — is zelf een vorm van structurele plasticiteit, en precies het soort dat ANG niet heeft: ANG snoeit ' +
+  'zwakke verbindingen en laat nieuwe neuronen willekeurig aangroeien, maar zet geen bestaande eenheid gericht ' +
+  'terug in een leerbare toestand. Of een graaf met die ene vorm van verbouwen wél na een omslag herleert, is ' +
+  'de enige vraag die na dit werk nog een reële kans op een positief antwoord heeft. De punten hieronder ' +
+  'stonden al in versie 3.0 open.'
+));
+if (!TUIN) C.push(body(
   'Sectie 10.4 laat zien dat de structurele plasticiteit als geheel niets oplevert, sectie 10.5 wat de ' +
   'schatter kost en opbrengt, sectie 10.6 dat de leerregel eromheen op één punt zuiniger kan' +
   (ABLATIE ? ', en sectie 10.7 wat elk onderdeel afzonderlijk bijdraagt' : '') +
@@ -3514,7 +3716,8 @@ if (!LEERREGEL) C.push(bullet([bd('De schaal van het wolkdeel van de update. '),
   'node-perturbatiedeel twee ordes te klein is ten opzichte van het score-functiedeel. De ontbrekende factor ' +
   'toevoegen is één regel code, maar vraagt om de leersnelheid en de stapbegrenzing samen opnieuw af te stellen; ' +
   'dat wordt als volwaardige conditie gemeten, niet als aanname doorgevoerd.')]));
-if (LEERREGEL) C.push(bullet([bd('Een raster van dichtheid tegen aantal neuronen. '), t('De vraag waar dit werk ' +
+/* sinds versie 2.2 gemeten (sectie 10.12); in 3.0 stond hij hier ten onrechte nog als open punt */
+if (LEERREGEL && !RASTER) C.push(bullet([bd('Een raster van dichtheid tegen aantal neuronen. '), t('De vraag waar dit werk ' +
   'uit voortkomt is wanneer een netwerk te klein is om het patroon te leren en wanneer het groot genoeg is om ' +
   'de trainingswerelden uit het hoofd te leren. Met de benchmarkset als toets en de structuurmaten ernaast is ' +
   'dat een kromme die op dit systeem te tekenen valt, en niet alleen te vermoeden.')]));
@@ -3643,6 +3846,14 @@ if (!TAAKAS) C.push(body(
   'gedrag vindt dan een vaste architectuur. Bij propagatiediepte één kost elke boog letterlijk één tijdstap, ' +
   'zodat padlengte in dit model samenvalt met reactietijd — en dat is de eigenschap die een vaste architectuur ' +
   'niet vanzelf heeft.'
+));
+
+if (TUIN) C.push(body(
+  'Sectie ' + SEC_TUIN + ' is de laatste poging om die grensvraag positief te beantwoorden: een taak waarin de ' +
+  'optimale organisatie zelf verschuift en capaciteit alleen verplaatst kan worden. Het antwoord van de ' +
+  'kalibratie is dat de graaf na de eerste verschuiving nauwelijks meer leert, en dat verbouwen daar niets aan ' +
+  'verbetert. De grens ligt dus niet bij een omgevingsdruk die nog niet gevonden is, maar eerder: bij het ' +
+  'vermogen van deze leerregel in deze graaf om na een eerste taak nog te leren.'
 ));
 
 /* ===== 11 ===== */
@@ -3786,6 +3997,33 @@ if (SEINHUIS) {
   ]));
 }
 
+if (TUIN) {
+  C.push(body([
+    bd('De derde taak en het einde van dit werk. '),
+    t('Sectie ' + SEC_TUIN + ' bouwde de situatie waarin zelfstructurering de oplossing had kunnen zijn: dezelfde ' +
+      'zintuigen, een verschuivende betekenis, en capaciteit die alleen verplaatst kan worden. De graaf verliest ' +
+      'daar na de eerste fase haar leervermogen, ook met bevroren structuur, terwijl dezelfde leerregel in een ' +
+      'gelaagd net met hetzelfde budget gewoon herleert; en waar de graaf gedeeltelijk herleert, doet verbouwen ' +
+      'het slechter. Het idee waarmee dit werk begon — dat een netwerk dat zijn eigen structuur verbouwt, ' +
+      'daarmee iets wint wat een vast netwerk niet kan — is op drie taken en in meer dan tien meetreeksen nergens ' +
+      'bevestigd, en het werk wordt hier afgesloten.')
+  ]));
+  C.push(body([
+    bd('Wat blijft. '),
+    t('ANG is een artificial-life-model: een individueel lerend, zichzelf herstructurerend graafsysteem dat ' +
+      'gedrag leert, naar onbekende werelden generaliseert en meetbare structuur ontwikkelt — biologisch ' +
+      'geïnspireerd, niet biologisch plausibel, en geen goedkoper alternatief voor backpropagation. Wat buiten ' +
+      'dit model bruikbaar blijft, is het gereedschap: een score die tegen de slimste domme speler bestand is, ' +
+      'een kruistabel die de startwaarden van een herstel vóór de meting vastlegt, twee architectuurvrije maten ' +
+      '— de blinderingsproef voor geheugen en de kanaalafhankelijkheid voor waar een antwoord van afhangt — en ' +
+      'een werkwijze waarin elke voorspelling eerder vastligt dan de data die haar moet weerleggen. En voor de ' +
+      'vraag waar dit project uit voortkomt: een netwerk dat te klein is, kost veel meer dan een netwerk dat te ' +
+      'groot is (' + SEC_RASTER + '); maar de meeste manieren waarop een netwerk hier faalde — stilvallen, gokken, steeds ' +
+      'hetzelfde antwoord, een reflex die de voorwaarde negeert, een omgekeerde regel die niet af te leren is, ' +
+      'en een leervermogen dat na de eerste taak verdwijnt — hebben met grootte niets te maken.')
+  ]));
+}
+
 /* ===== referenties ===== */
 /* =====================================================================
    Nawerk. Voor een preprint is dit geen bijzaak: uitgevers en preprintservers
@@ -3866,6 +4104,7 @@ C.push(h1('', 'Referenties'));
 const REFS = [
   'Bogdan, P. A., Rowley, A. G. D., Rhodes, O., & Furber, S. B. (2018). Structural plasticity on the SpiNNaker many-core neuromorphic system. Frontiers in Neuroscience, 12, 434.',
   'Chklovskii, D. B., Mel, B. W., & Svoboda, K. (2004). Cortical rewiring and information storage. Nature, 431(7010), 782–788.',
+  'Dohare, S., Hernandez-Garcia, J. F., Lan, Q., Rahman, P., Mahmood, A. R., & Sutton, R. S. (2024). Loss of plasticity in deep continual learning. Nature, 632(8026), 768–774. doi:10.1038/s41586-024-07711-7',
   'Fiete, I. R., & Seung, H. S. (2006). Gradient learning in spiking neural networks by dynamic perturbation of conductances. Physical Review Letters, 97(4), 048104.',
   'Frémaux, N., & Gerstner, W. (2016). Neuromodulated spike-timing-dependent plasticity, and theory of three-factor learning rules. Frontiers in Neural Circuits, 9, 85. doi:10.3389/fncir.2015.00085',
   'Holtmaat, A., & Svoboda, K. (2009). Experience-dependent structural synaptic plasticity in the mammalian brain. Nature Reviews Neuroscience, 10(9), 647–658.',

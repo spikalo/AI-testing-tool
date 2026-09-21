@@ -1,0 +1,38 @@
+{
+  "stap": 20,
+  "datum": "2026-09-21",
+  "doel": "De opzet voor de prereregistratie van stap 21. Alles hieronder is gekozen op veegzaden 2000 en 2001, nooit op de meetzaden 1000-1015.",
+  "gemeen": {
+    "taak": "proeftuin", "worldEvery": 1, "catPolicy": true, "tuinTikken": 120, "tuinReset": true,
+    "ruisVast": true, "lam": 0, "perturbFrac": 0.1, "connBudget": 2400
+  },
+  "pogingenPerFase": 400,
+  "keuzes": {
+    "connBudget": {
+      "waarde": 2400,
+      "criterium": "het krapste budget waarop ANG en ANG-bevroren fase A gemiddeld op ten minste 90 % halen - vastgelegd voordat 1600 en 2000 gemeten waren",
+      "gemeten": {"0": [96.3, 97.4], "2400": [94.1, 96.3], "2000": [86.8, 91.3], "1600": [72.2, 80.7], "1200": [50.0, 62.5], "800": [33.8, 38.4]},
+      "gemetenUitleg": "J op fase A na 600 rondes, [vrij, bevroren], gemiddelde van twee veegzaden"
+    },
+    "lam": {"waarde": 0, "reden": "de voorwerpen zijn onafhankelijk; een spoor smeert krediet uit over voorwerpen die niets met elkaar te maken hebben. Onder budget 2400: 94,1 % tegen 78,2 % bij lam 0,6"},
+    "perturbFrac": {"waarde": 0.1, "reden": "vlak tussen 0,05 en 0,25 (binnen de ruis van twee zaden); 1 is duidelijk slechter: 76,5 % tegen 94,1 %. 0,1 ligt in het midden van het vlakke stuk, niet op de rand"},
+    "prop": {"wolk": 3, "gelaagd": 2, "reden": "de wolk: 3, 4 en 5 zijn gelijk, 2 is iets lager (90,6 %); gelaagd net met een verborgen laag: diepte 2 is precies genoeg. Minimaal 2, anders kan het signaal de knoppen niet bereiken (fout 12)"},
+    "ruisVast": {"waarde": true, "reden": "op principe besloten voordat ronde 3 draaide: afbouwen veronderstelt een stilstaande wereld. Gemeten effect: de wolk merkt er vrijwel niets van, het gelaagde net met exacte gradiënt stort met afbouwende ruis in (D 0 %, A' 33,3 % tegen 100 % en 100 %). De keuze houdt de tegenstanders overeind, niet de wolk"},
+    "pogingenPerFase": {"waarde": 400, "reden": "de gelaagde netten herleren C, D en A' binnen 400; de wolk wint niets bij 800 (D: 4,9/11,8 bij 400, -0,1/4,6 bij 800)"},
+    "leersnelheidsveeg": {"raster": [0.004, 0.008, 0.016, 0.032], "reden": "per conditie op eigen zaden, zoals elke stap; 0,016 lag in ronde 2b op de rand van het kleine raster"}
+  },
+  "tegenstandersOpHetzelfdeBudget": {
+    "mlp120": "16*120 + 120*4 = 2400 gewichten",
+    "elman": "met een schone wolk per voorwerp heeft een terugkoppeling niets om op terug te koppelen: een Elman-net valt samen met het gelaagde net. Voorstel: vervangen door mlp120 met dezelfde leerregel als de wolk"
+  },
+  "bevindingen": {
+    "faseBIsEenVal": "elke leerder (gelaagd net met exacte gradiënt, gelaagd net met perturbatie, bevroren wolk) eindigt fase B in dezelfde tussentoestand: twee kleuren samengevoegd in een bak, precies de helft goed, informedness exact 33,3 %. Na fase A is het oude antwoord bij elke kleur stelselmatig fout, dus er komt nooit een positief signaal voor het goede antwoord binnen",
+    "wolkVerliestLeervermogen": "na fase A herleert de wolk, vrij of bevroren, nauwelijks nog iets; een gelaagd net met dezelfde leerregel en hetzelfde budget herleert C, D en A' tot 90-100 %. Geen verzadiging (entropie beleid 0,43). Zes ingrepen geprobeerd (alleen workers, diepte 2, tien keer meer vervaging, meer ruis, hogere leersnelheid, workers + diepte 2): geen enkele helpt",
+    "vrijSlechterDanBevrorenOpD": "op een kort leven A -> D herleert de vrije wolk fase D in 7 van de 7 varianten slechter dan de bevroren wolk (basis: 35,6 % tegen 55,0 %). Twee veegzaden: een richting, geen meting - maar hij is er, en de prereregistratie hoort dat te melden"
+  },
+  "besluitenVoorStap21": [
+    "fase B: behouden, verplaatsen naar het eind van het leven (A -> C -> D -> A' -> B), of eruit - zij bederft alles wat na haar komt",
+    "de herstartconditie uit de kritiek (bij elke fasegrens een vers brein) wordt de scherpste controle: een verse wolk haalt in 400 rondes 94 %, een ervaren wolk op D minder dan 40 %",
+    "Elman vervangen door mlp120 met dezelfde leerregel als de wolk"
+  ]
+}

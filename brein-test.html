@@ -511,12 +511,23 @@
           <select id="taak" style="width:100%;padding:6px;background:#181c22;color:#e6e9ee;border:1px solid #39414c;border-radius:6px;">
             <option value="doel" selected>1 — doel bereiken (2D-wereld)</option>
             <option value="seinhuis">2 — seinhuis (seinen en handels)</option>
+            <option value="proeftuin">3 — proeftuin (de betekenis verandert)</option>
           </select>
           <div class="hint">Spel 2 is een heel andere taak: geen ruimte en geen navigatie, maar acht
             seinlampen, een wissel en vier handels, met zes regels die door elkaar heen lopen — van
             "reageer deze tik" tot "onthoud dit tachtig tikken". Elke regel wordt apart gescoord.
             De instellingen hieronder over obstakels, stappen en het knipperende doel doen in spel 2
-            niets; die over het brein, de leerregel en de structurele plasticiteit wél.</div>
+            niets; die over het brein, de leerregel en de structurele plasticiteit wél.
+            <br><br><b>Spel 3</b> is de proeftuin: elke tik komt er één voorwerp langs met een kleur, een
+            beweging, een grootte en een geur, en het moet in één van vier bakken. De zestien kanalen
+            blijven in elke fase precies dezelfde &mdash; alleen de <b>betekenis</b> verandert. Fase A
+            gaat op kleur, fase B op kleur met omgewisselde antwoorden, fase C op kleurgroep maal
+            beweging, fase D op geur maal grootte, en fase A&prime; weer op kleur. Zes van de zestien
+            kanalen zijn afleiders die nooit ergens over gaan; zij zijn de ruisbodem van de maat
+            onderin de tekening. Elk voorwerp begint met een schone wolk, dus
+            <b>propagatiestappen</b> moet minstens <b>2</b> zijn &mdash; anders kan het signaal de
+            knoppen binnen één voorwerp niet bereiken en scoort elk net nul. Het kiezen van spel 3
+            zet die schuif daarom omhoog.</div>
         </div>
         <div class="field">
           <label>Seinhuis: tikken per dienst <span class="val" id="seintikkenval">240</span></label>
@@ -526,7 +537,28 @@
           <label>Seinhuis: actieve regels <span class="val" id="seinregelsval">6</span></label>
           <input type="range" id="seinregels" min="1" max="6" step="1" value="6">
           <div class="hint">Op <b>1</b> geldt alleen de eerste regel, op <b>6</b> alle zes. De
-            groeiende dienstregeling van stap 19 zet deze knop tijdens één leven omhoog.</div>
+            groeiende dienstregeling van stap 18 zet deze knop tijdens één leven omhoog.</div>
+        </div>
+        <!-- stap 19: spel 3. De fase is een knop omdat je hem met de hand wilt kunnen omzetten
+             om te zien wat er gebeurt; een leven zet hem via dezelfde overrides als elke
+             andere conditie. -->
+        <div class="field">
+          <label>Proeftuin: voorwerpen per ronde <span class="val" id="tuintikkenval">120</span></label>
+          <input type="range" id="tuintikken" min="20" max="400" step="10" value="120">
+        </div>
+        <div class="field">
+          <label>Proeftuin: fase <span class="val" id="tuinfaseval">A &mdash; kleur</span></label>
+          <input type="range" id="tuinfase" min="0" max="4" step="1" value="0">
+          <div class="hint">Welke regel er nu geldt. De zintuigen veranderen niet mee: dezelfde
+            zestien kanalen, een andere betekenis.</div>
+        </div>
+        <div class="field">
+          <label>Verbindingsbudget <span class="val" id="connbudgetval">geen</span></label>
+          <input type="range" id="connbudget" min="0" max="6000" step="100" value="0">
+          <div class="hint">Het plafond op het aantal verbindingen &mdash; de metabole kost. Erbij
+            bouwen kan dan alleen wat het snoeien heeft vrijgemaakt, zodat de proef meet of een
+            net zijn capaciteit kan <i>verplaatsen</i> en niet of méér plasticiteit altijd beter
+            is. Op <b>0</b> is er geen plafond en verandert er niets aan spel 1 en 2.</div>
         </div>
         <div class="field">
           <label>Stappen per poging <span class="val" id="maxstepsval">320</span></label>
@@ -1071,6 +1103,11 @@ function createBrain(cfg,seed){
     if(indeg[i]===0){ const L=legalTo(i); if(L.length){ const q=L[Math.floor(rnd()*L.length)]; if(add(q[0],q[1],(rnd()-0.5)*0.5)){indeg[i]++;outdeg[q[0]]++;} } }
     if(outdeg[i]===0){ const L=legalFrom(i); if(L.length){ const q=L[Math.floor(rnd()*L.length)]; if(add(q[0],q[1],(rnd()-0.5)*0.5)){outdeg[i]++;indeg[q[1]]++;} } }
   }
+  /* stap 19: het budget geldt vanaf de geboorte. Zou het pas bij de eerste
+     herstructureringsronde bijten, dan beginnen een vrije en een bevroren conditie met
+     verschillende netten en is de vergelijking meteen scheef. Dit telt niet mee als
+     "gesnoeid": er is nog niets geleerd om te snoeien. */
+  if((cfg.connBudget|0)>0) budgetAfdwingen(B,cfg.connBudget|0,false);
   finalizeConns(B);
   B.comp=countKinds(B); B.compStart={...B.comp};
   layoutBrain(B,300,false);
@@ -1279,7 +1316,7 @@ function brainStep(B,inp,cfg,expl,rnd){
   if(learn && !exact) for(let j=HID0;j<B.n;j++) B.dev[j]=B.act[j]-B.clean[j];
   /* stap 18b: in het seinhuis is de keuze één uit vijf — niets, of precies één handel —
      want dat is wat de spelregel "goed" noemt. Op spel 1 blijft het de negen richtingen. */
-  if(cfg.catPolicy) actCategorical(B,tp,sample,r,(cfg.taak==="seinhuis")?SEIN_ACTIES:CAT_ACTIES);
+  if(cfg.catPolicy) actCategorical(B,tp,sample,r,actiesVoor(cfg));
   else for(let j=OUT0;j<HID0;j++){
     const pr=B.act[j];
     const a=sample ? (r()<pr?1:0) : (pr>0.5?1:0);
@@ -1323,6 +1360,16 @@ const CAT_ACTIES=[[0],[1],[2],[3],[0,2],[0,3],[1,2],[1,3],[]];
    "altijd drukken" en leerde daarna niets meer. Hier is de keuze wat het spel vraagt:
    niets, of precies één handel. De lege actie staat achteraan, net als bij CAT_ACTIES. */
 const SEIN_ACTIES=[[0],[1],[2],[3],[]];
+/* Stap 19: welke elkaar uitsluitende acties het categorische beleid heeft, hangt van het
+   spel af — spel 1 acht richtingen plus stilstaan, spel 2 niets of precies een handel,
+   spel 3 precies een bak (een voorwerp moet ergens heen, dus de lege actie bestaat daar
+   niet). Een functie in plaats van een ternair, zodat er een vierde spel bij kan zonder
+   dat deze regel opnieuw verbouwd wordt. */
+function actiesVoor(cfg){
+  if(cfg.taak==="seinhuis")  return SEIN_ACTIES;
+  if(cfg.taak==="proeftuin") return TUIN_ACTIES;
+  return CAT_ACTIES;
+}
 const CAT_SC=new Float64Array(9), CAT_MARG=new Float64Array(N_OUT);
 /* De actielijst is een argument (stap 18b). Voor spel 1 is het CAT_ACTIES en doet deze
    functie rekenkundig precies wat zij deed: dezelfde lussen, dezelfde trekking, dezelfde
@@ -1594,6 +1641,54 @@ function addConn(B,a,b,w,have,age){
 }
 function haveSet(B){ const h=new Set(); for(let c=0;c<B.from.length;c++) h.add(B.from[c]+"|"+B.to[c]); return h; }
 
+/* ---------- stap 19: het verbindingsbudget ----------
+   DE KRITIEK VRAAGT EEN METABOLE KOST: "structurele verandering moet niet gratis zijn,
+   anders test je niet of zelforganisatie nuttig is maar of meer plasticiteit altijd
+   nuttig is." Dat is hier een HARD PLAFOND op het aantal verbindingen, en met opzet geen
+   strafterm in de beloning. Reden: de beloning loopt door een lopende basislijn, en een
+   vaste aftrek per poging wordt door die basislijn opgeslokt — die zou wel in de
+   rapportage staan maar de leerregel zou er niets mee doen. Een plafond bindt wel.
+
+   WAT HET DOET. Erbij bouwen kan alleen wat het snoeien heeft vrijgemaakt. Daarmee is de
+   vraag van spel 3 zuiver: kan een systeem zijn capaciteit VERPLAATSEN naar de kanalen
+   die er nu toe doen? Een bevroren net heeft hetzelfde plafond en dezelfde startbedrading
+   en kan alleen herwegen. Als de wolk nooit iets vrijmaakt, kan zij ook nooit verplaatsen
+   — dat is geen tekortkoming van de proef maar een uitkomst ervan.
+
+   GEEN ENKELE TREKKING. De volgorde is volledig bepaald door de gewichten, met het
+   verbindingsnummer als tiebreak. Een nieuwe knop mag in zijn uitstand de toevalsreeks
+   niet verschuiven (vaste regel uit stap 7), en deze haalt er ook in zijn AANSTAND niets
+   uit. Bij budget 0 draait hij helemaal niet.
+
+   WAT ER BESCHERMD BLIJFT: de zelflus van een geheugenneuron, de laatste uitgang van een
+   invoer-node en de laatste ingang van een knop — dezelfde harde eis die restructure zelf
+   aan het eind herstelt. Blijft het net daardoor boven budget, dan is dat een vloer die
+   de bedradingsgrammatica oplegt, en het resultaatbestand meldt beide getallen. */
+function budgetAfdwingen(B,budget,telMee){
+  if(budget<=0 || B.from.length<=budget) return 0;
+  const n=B.n;
+  const outdeg=new Int32Array(n), indeg=new Int32Array(n);
+  for(let c=0;c<B.from.length;c++) if(B.from[c]!==B.to[c]){ outdeg[B.from[c]]++; indeg[B.to[c]]++; }
+  const idx=[]; for(let c=0;c<B.from.length;c++) idx.push(c);
+  idx.sort((a,b)=>{ const d=Math.abs(B.w[a])-Math.abs(B.w[b]); return d!==0? d : b-a; });
+  const weg=new Uint8Array(B.from.length);
+  let over=B.from.length-budget;
+  for(let k=0;k<idx.length && over>0;k++){
+    const c=idx[k], a=B.from[c], b=B.to[c];
+    if(a===b) continue;
+    if(B.kinds[a]===K_IN  && outdeg[a]<=1) continue;
+    if(B.kinds[b]===K_OUT && indeg[b]<=1)  continue;
+    weg[c]=1; outdeg[a]--; indeg[b]--; over--;
+  }
+  const kF=[],kT=[],kW=[],kE=[],kR=[],kA=[]; let weggehaald=0;
+  for(let c=0;c<B.from.length;c++){
+    if(weg[c]){ weggehaald++; continue; }
+    kF.push(B.from[c]);kT.push(B.to[c]);kW.push(B.w[c]);kE.push(B.e[c]);kR.push(B.rms[c]);kA.push(B.weakAge[c]);
+  }
+  B.from=kF;B.to=kT;B.w=kW;B.e=kE;B.rms=kR;B.weakAge=kA;
+  if(telMee) B.pruned+=weggehaald;
+  return weggehaald;
+}
 function restructure(B,cfg,rnd,stagnating){
   const before={n:B.n,nc:B.from.length};
   syncBack(B);
@@ -1685,8 +1780,13 @@ function restructure(B,cfg,rnd,stagnating){
   const have=haveSet(B);
   const deg=new Int32Array(n);
   for(let c=0;c<B.from.length;c++){ deg[B.from[c]]++; deg[B.to[c]]++; }
+  /* stap 19: met een verbindingsbudget kan er alleen bijgebouwd worden wat het snoeien
+     heeft vrijgemaakt. Zonder budget staat er letterlijk cfg.sprout en wordt er even vaak
+     geloot als altijd, zodat elke eerdere run bit voor bit blijft reproduceren. */
+  const budget=(cfg.connBudget|0)||0;
+  const wilSprout = budget>0 ? Math.min(cfg.sprout,Math.max(0,budget-B.from.length)) : cfg.sprout;
   let sprouted=0, guard=0;
-  while(sprouted<cfg.sprout && guard++<4000){
+  while(sprouted<wilSprout && guard++<4000){
     let a=Math.floor(rnd()*n), b=Math.floor(rnd()*n);
     if(rnd()<0.6){ let bestA=a; for(let k=0;k<3;k++){ const c2=Math.floor(rnd()*n); if(deg[c2]<deg[bestA]) bestA=c2; } a=bestA; }
     if(a===b) continue;
@@ -1705,11 +1805,19 @@ function restructure(B,cfg,rnd,stagnating){
     while(id2[i]===0 && g++<300){ const a=HID0+Math.floor(rnd()*(B.n-HID0)); if(addConn(B,a,i,(rnd()-0.5)*0.3,have)){ id2[i]++; od[a]++; } }
   }
 
+  /* 7. het budget afdwingen: de herstelstap hierboven mag er een paar bijleggen, en
+        nieuwe neuronen brengen hun eigen verbindingen mee. */
+  const budgetWeg=budgetAfdwingen(B,budget,true);
   B.pruned+=pruned; B.sprouted+=sprouted;
+  /* De rekenkosten van het verbouwen, apart geteld van die van het leren en het toetsen:
+     twee doorlopen van de verbindingenlijst plus de draden die werkelijk zijn weggehaald
+     of bijgelegd. Het gaat in een eigen teller en niet in kbLeer, zodat de rekenkosten van
+     alle eerdere meetreeksen onveranderd blijven. */
+  S.kbStruct += 2*before.nc + sprouted + pruned + budgetWeg;
   finalizeConns(B);
   B.comp=countKinds(B);
   if(B.n!==before.n || retyped>0) layoutBrain(B,90,true);
-  return {pruned,sprouted,retyped,grown};
+  return {pruned:pruned+budgetWeg,sprouted,retyped,grown,budgetWeg};
 }
 
 /* ---- structuuranalyse ---- */
@@ -1914,6 +2022,19 @@ function readCfg(){
     taak: $("taak") ? $("taak").value : "doel",
     seinTikken: $("seintikken") ? +$("seintikken").value : SEIN_TIKKEN,
     seinRegels: $("seinregels") ? +$("seinregels").value : SEIN_REGELS,
+    /* stap 19 — spel 3, de proeftuin. Net als bij spel 2 komen de waarden uit cfg en niet
+       uit een globale, zodat een conditie uit de experimentloper ze werkelijk bereikt
+       (fout 12). `tuinFase` is welke regel er geldt; een leven zet hem per fase om via
+       dezelfde overrides als elke andere conditie. */
+    tuinTikken: $("tuintikken") ? +$("tuintikken").value : TUIN_TIKKEN,
+    tuinFase:   $("tuinfase")   ? +$("tuinfase").value   : 0,
+    /* elk voorwerp op zichzelf — zie tuinWisActivatie() */
+    tuinReset: true,
+    /* stap 19 — het verbindingsbudget, de metabole kost die de kritiek vraagt. 0 betekent
+       geen plafond, en dan verandert er niets aan spel 1 en spel 2. */
+    connBudget: $("connbudget") ? +$("connbudget").value : 0,
+    /* stap 20 — vaste exploratie over het hele leven; zie noiseNow() */
+    ruisVast: false,
     nEpisodes:+$("nep").value, evalOn:$("evalon").checked,
     evalMode: ($("evalstrict")&&$("evalstrict").checked) ? "streng" : "beleid",
     /* de vaste benchmarkset aan het eind van een run; alleen de experimentloper
@@ -1955,13 +2076,18 @@ const S={
   /* stap 17: het seinhuis. seinTel telt de lopende dienst, seinStrook is alleen voor het
      tekenen, seinBench houdt de vaste dienstenset vast. */
   seinTel:null, seinStrook:null, seinBench:null, seinFractie:null,
+  /* stap 19: de proeftuin. tuinTel telt de lopende ronde per fase en per bak, tuinStrook
+     is alleen voor het tekenen, tuinBench houdt de vaste rondeset vast. */
+  tuinTel:null, tuinStrook:null, tuinBench:null, tuinScoreNu:null, tuinGewaarschuwd:false,
   resultsDirHandle:null, lastResult:null, dirty:false,
   gradAccum:null, gradAccumBias:null,
   expDirHandle:null, expCsvLines:null, expCsvName:"runs.csv", expAbort:false, expRunning:false,
   benchWorlds:null, lastBench:null, evalStreng:null,
   /* rekenkosten (stap 6): kanten-bezoeken en spelstappen, gescheiden naar leren
      en inferentie omdat dat twee verschillende kostenposten zijn */
-  kbLeer:0, kbInf:0, stapLeer:0, stapInf:0
+  kbLeer:0, kbInf:0, stapLeer:0, stapInf:0,
+  /* stap 19: wat het verbouwen zelf kost, apart van leren en toetsen */
+  kbStruct:0
 };
 
 /* ======================= spel ======================= */
@@ -1969,10 +2095,12 @@ function newWorld(seedOffset){
   /* stap 17: welk spel er gespeeld wordt, bepaalt wat een "wereld" is. Bij spel 1 een
      doolhof, bij spel 2 een dienst. De rest van de lus merkt het verschil niet. */
   if(S.cfg && S.cfg.taak==="seinhuis"){ S.world=seinDienst(S.cfg.seed*1000+seedOffset, S.cfg); return; }
+  if(S.cfg && S.cfg.taak==="proeftuin"){ S.world=tuinRonde(S.cfg.seed*1000+seedOffset, S.cfg); return; }
   S.world=makeWorld(S.cfg.seed*1000+seedOffset, S.cfg.nObs);
 }
 function startEpisode(){
   if(S.cfg && S.cfg.taak==="seinhuis"){ seinStart(); return; }
+  if(S.cfg && S.cfg.taak==="proeftuin"){ tuinStart(); return; }
   S.ag.x=S.world.start.x; S.ag.y=S.world.start.y;
   S.trail=[[S.ag.x,S.ag.y]];
   S.step=0; S.epReward=0; S.epCollisions=0; S.epIdle=0; S.reached=false;
@@ -1986,6 +2114,13 @@ function startEpisode(){
 function noiseEnd(v){ return Math.max(0.3*v,0.03); }
 function noiseNow(){
   const c=S.cfg;
+  /* STAP 20: vaste exploratie. Afbouwen over het leven veronderstelt dat de wereld
+     stilstaat, en spel 3 zegt precies het tegenovergestelde: na elke omslag moet er
+     opnieuw geleerd worden. Bij de wolk is de ruis bovendien zelf het leersignaal, en met
+     lrAnneal zakt ook de leersnelheid mee — aan het eind van een leven leert zij met
+     ongeveer een tiende van haar beginstap, terwijl een net met de exacte gradiënt alleen
+     de leersnelheid verliest. Uit, zoals altijd, is letterlijk de oude regel. */
+  if(c.ruisVast) return c.noise0;
   const f=c.nEpisodes>1 ? S.ep/(c.nEpisodes-1) : 1;
   const end=noiseEnd(c.noise0);
   return c.noise0+(end-c.noise0)*Math.min(1,f);
@@ -2010,7 +2145,8 @@ function moveAgent(dx,dy,mag,w){
 function gameTick(learn,noise){
   /* stap 17: de enige plek waar de twee spellen uit elkaar gaan. Alles vóór deze regel —
      het brein, de leerregel, de herstructurering, de poort uit stap 16 — is gedeeld. */
-  if(S.cfg.taak==="seinhuis") return seinTick(learn,noise);
+  if(S.cfg.taak==="seinhuis")  return seinTick(learn,noise);
+  if(S.cfg.taak==="proeftuin") return tuinTick(learn,noise);
   const c=S.cfg, B=S.B, w=S.world;
   /* Rekenkosten worden apart geteld voor leren en voor inferentie: dat zijn twee
      verschillende getallen die allebei "efficiëntie" heten. */
@@ -2824,9 +2960,424 @@ function evalWorlds(nWorlds,mode){
   return {pct:ok/nWorlds, gemStappen: ok? steps/ok : null};
 }
 function runEval(){
+  /* stap 19: de goedkope toets van twintig werelden hoort bij spel 1. Zonder deze regel
+     bouwt hij een 2D-wereld en geeft die aan de tik van spel 2 of 3 — en dan valt de
+     pagina om zodra iemand "toets tijdens training" aan laat staan en een ander spel
+     kiest. Dezelfde soort fout als die van stap 17, nu voordat hij iemand overkomt. */
+  if(S.cfg && S.cfg.taak!=="doel") return;
   const mode=(S.cfg&&S.cfg.evalMode)||(($("evalstrict")&&$("evalstrict").checked)?"streng":"beleid");
   const r=evalWorlds(EVAL_WORLDS,mode);
   S.evalHist.push({ep:S.ep,pct:r.pct});
+}
+
+/* ======================= spel 3: de proeftuin =======================
+   WAAROM ER EEN DERDE SPEL IS. Achttien meetstappen op twee spellen hebben hetzelfde
+   antwoord gegeven: structurele plasticiteit levert niets op. Die uitkomst is inmiddels
+   goed onderbouwd, maar zij zegt net zoveel over de taken als over het model. In spel 1
+   en spel 2 verandert de OPTIMALE INTERNE ORGANISATIE namelijk nooit. Welke zintuigen
+   ertoe doen, welke knoppen erbij horen en hoe diep de rekenweg moet zijn, staat van de
+   eerste tot de laatste poging vast. Wie zijn bedrading mag verbouwen, heeft er dan per
+   constructie niets te verbouwen — en dat een vast net dan even ver komt, is geen
+   verrassing meer maar een gevolg van de opzet.
+
+   HET IDEE, IN EEN ZIN. De zintuigen blijven identiek; alleen de BETEKENIS van de invoer
+   verandert. Er komt elke tik een voorwerp langs met vier eigenschappen op vaste kanalen,
+   en het moet in een van vier bakken. Welke eigenschap de bak bepaalt, verschuift per
+   fase: eerst de kleur, dan dezelfde kleur met omgewisselde antwoorden, dan kleur maal
+   beweging, dan geur maal grootte, en tot slot weer de eerste regel. Een net dat zijn
+   capaciteit op de kleurkanalen heeft gezet, moet die in fase C naar beweging verplaatsen
+   en in fase D naar geur en grootte. Dat is de situatie waarin herbedraden iets kan
+   betekenen wat herwegen niet kan.
+
+   GEEN GEHEUGEN. In geen enkele fase hoeft er iets onthouden te worden: elk voorwerp is
+   op zichzelf te beoordelen. Dat is met opzet. Spel 2 liep vast op geheugen — geen enkele
+   architectuur, ook niet met exacte terugpropagatie door de tijd, leerde daar een regel
+   die over meer dan een paar tikken liep. Die as hoort hier niet nog eens in de weg te
+   staan, want de vraag is nu een andere.
+
+   DE VIJF FASEN, en waarom juist deze vijf:
+
+     A   bak = kleur                     vier kanalen bepalen vier bakken
+     B   bak = kleur, paarsgewijs om     DEZELFDE draden, ander gewicht
+     C   bak = kleurgroep x beweging     beweging doet voor het eerst mee
+     D   bak = geur x grootte            kleur en beweging doen niets meer
+     A'  bak = kleur                     behoud en herleren van de eerste regel
+
+   Fase B is de controlefase en de belangrijkste van de vijf. Daar hoeft alleen het
+   antwoord om, en dat kan een vast net door te herwegen; als ANG daar wint, klopt er iets
+   niet aan de meting. Het verschil moet in C en D zitten, waar een kanaal dat er nooit toe
+   deed ineens beslissend wordt.
+
+   DE ZES AFLEIDERS. Zes van de zestien kanalen dragen ruis en doen in geen enkele fase
+   iets. Zij zijn de meetlat onder de maat "welke kanalen doen ertoe voor de agent": wat
+   die zes scoren is de ruisbodem van die maat, empirisch en niet beredeneerd.
+
+   DE SCORE is informedness over vier bakken: (gemiddelde trefkans per bak - 1/4) / (3/4).
+   Nul voor elke strategie waarin het antwoord niet van het voorwerp afhangt — altijd
+   dezelfde bak, een munt van vier kanten — en een voor perfect. Dat is de maat van stap 18
+   (Youdens J) doorgetrokken naar vier klassen, zodat spel 2 en spel 3 in dezelfde taal
+   gerapporteerd worden. tests/test-stap19.js meet bodem, plafond en drie domme spelers na.
+
+   EEN METING GEEFT VIJF SCORES. De vaste toetsverzameling wordt in een doorloop gespeeld
+   en de fase-regel bepaalt alleen wat "goed" heet. Daardoor levert een benchmark meteen de
+   score op alle vijf de regels: hoe goed op de regel van nu, hoeveel er van de vorige nog
+   over is, en of er al iets van een latere regel in zit. Dat is precies de tabel die de
+   kritiek vraagt — prestatie voor en na elke omslag — en zij kost niets extra.          */
+const TUIN_BAKKEN=4, TUIN_AFL=6, TUIN_FASEN=5, TUIN_TIKKEN=120;
+const TUIN_CH_KLEUR=0, TUIN_CH_BEW=4, TUIN_CH_GROOT=6, TUIN_CH_GEUR=8, TUIN_CH_AFL=10;
+const TUIN_KLEURNAAM=["rood","blauw","geel","groen"];
+const TUIN_KLEURCOL=["#e0544a","#4a8fe0","#e0c04a","#4fbf7a"];
+const TUIN_FASELETTER=["A","B","C","D","A2"];
+const TUIN_FASENAAM=["A - kleur","B - kleur omgekeerd","C - kleurgroep x beweging",
+                     "D - geur x grootte","A' - kleur opnieuw"];
+const TUIN_FASEREGEL=[
+  "de bak is de kleur: rood 0, blauw 1, geel 2, groen 3",
+  "dezelfde kanalen, antwoorden paarsgewijs omgewisseld: rood 1, blauw 0, geel 3, groen 2",
+  "kleurgroep maal beweging: rood/blauw bak 0-1, geel/groen bak 2-3; bewegend de eerste, stil de tweede",
+  "geur maal grootte: zoet bak 0-1, zuur bak 2-3; groot de eerste, klein de tweede",
+  "weer de regel van fase A"
+];
+/* Welke eigenschapsgroepen de regel van die fase gebruikt. Alleen voor de rapportage en
+   de tekening; de code leest de regel uit tuinBak() en niet hieruit. */
+const TUIN_FASEGROEP=[["kleur"],["kleur"],["kleur","beweging"],["geur","grootte"],["kleur"]];
+const TUIN_OMKEER=[1,0,3,2];
+/* Een ronde heet geslaagd bij informedness >= deze drempel. Dat is uitsluitend een
+   RAPPORTAGEDREMPEL: hij voedt de leercurve, succes20 en de maat "stappen tot 80 %", en
+   hij zit niet in de score. Een foutloze ronde zoals bij het seinhuis kan hier niet: met
+   honderdtwintig voorwerpen per ronde komt die drempelvrije definitie praktisch nooit uit. */
+const TUIN_GESLAAGD=0.8;
+/* goed, fout, per extra handel. Een voorwerp moet ergens heen, dus niets doen is geen
+   geldig antwoord en krijgt de foutstraf; meer dan een handel kost daarbovenop. */
+const TUIN_BELONING=[1,-1,0.5];
+/* Vier elkaar uitsluitende antwoorden, zonder lege actie: elk voorwerp gaat ergens heen.
+   Daardoor ligt de toevalsbodem van een geloot beleid op precies nul in plaats van eronder
+   — zie tuinToeval(). */
+const TUIN_ACTIES=[[0],[1],[2],[3]];
+
+/* De regel van een fase. Dit is de enige plaats waar staat wat goed is, en zowel het spel,
+   de score als de tekening lezen hem hier; stond hij twee keer, dan is de meetlat geen
+   meetlat meer (dezelfde reden als bij doelZichtbaar in spel 1). */
+function tuinBak(fase,kleur,bew,gro,geur){
+  switch(fase|0){
+    case 1: return TUIN_OMKEER[kleur];
+    case 2: return 2*(kleur>=2?1:0)+bew;
+    case 3: return 2*geur+gro;
+    default: return kleur;
+  }
+}
+function tuinFaseVan(c){ return c? clamp(c.tuinFase|0,0,TUIN_FASEN-1) : 0; }
+
+/* Een ronde: de hele stroom voorwerpen ligt vast bij het zaad, net als een dienst in het
+   seinhuis. De eigenschappen worden onafhankelijk en uniform geloot, zodat geen enkele
+   fase-regel uit een andere af te leiden is en elke bak in elke fase even vaak voorkomt. */
+function tuinRonde(seed,cfg){
+  const rnd=mulberry32((seed|0)*7919+13);
+  const T=Math.max(20,(cfg&&cfg.tuinTikken|0)||TUIN_TIKKEN);
+  const kleur=new Int8Array(T), bew=new Int8Array(T), gro=new Int8Array(T), geur=new Int8Array(T);
+  for(let t=0;t<T;t++){
+    kleur[t]=Math.floor(rnd()*4); bew[t]=Math.floor(rnd()*2);
+    gro[t]=Math.floor(rnd()*2);   geur[t]=Math.floor(rnd()*2);
+  }
+  const afl=new Float32Array(T*TUIN_AFL);
+  for(let i=0;i<afl.length;i++) afl[i]=rnd();
+  return {seed,T,kleur,bew,gro,geur,afl,spel:"proeftuin"};
+}
+/* De zestien kanalen. Vier eigenschappen als een-uit-n, zes afleiders met ruis. De
+   indeling verandert nooit en is in elke fase dezelfde — dat is het hele punt. */
+function tuinWaarnemen(d,t,out){
+  for(let i=0;i<N_IN;i++) out[i]=0;
+  out[TUIN_CH_KLEUR+d.kleur[t]]=1;
+  out[TUIN_CH_BEW  +d.bew[t]]=1;
+  out[TUIN_CH_GROOT+d.gro[t]]=1;
+  out[TUIN_CH_GEUR +d.geur[t]]=1;
+  for(let i=0;i<TUIN_AFL;i++) out[TUIN_CH_AFL+i]=d.afl[t*TUIN_AFL+i];
+  return out;
+}
+function tuinScoreTik(d,t,P,fase){
+  const moet=tuinBak(fase,d.kleur[t],d.bew[t],d.gro[t],d.geur[t]);
+  const bel=(S.cfg&&S.cfg.tuinBeloning)||TUIN_BELONING;
+  let ingedrukt=0, gekozen=-1;
+  for(let i=0;i<N_OUT;i++) if(P[i]){ ingedrukt++; if(gekozen<0) gekozen=i; }
+  const raak=!!P[moet];
+  /* STAP 20: "per extra handel" betekent per handel boven de eerste. In stap 19 stond hier
+     ingedrukt − raak, en dan telde één druk op de verkeerde bak óók als extra handel: fout
+     kostte −1,5 in plaats van −1. Gevonden doordat de leercurve die uit de beloning werd
+     afgeleid onder de toevalsbodem van 25 % begon — wat bij vier bakken onmogelijk is. */
+  return {moet, gekozen, ingedrukt, goed:(ingedrukt===1&&raak),
+    r:(raak?bel[0]:bel[1])-bel[2]*Math.max(0,ingedrukt-1)};
+}
+
+/* ---------- de assen waarlangs het gedrag wordt uitgesplitst ----------
+   Vier eigenschappen plus zes afleiders, elk met zijn eigen niveaus. Hieruit komt de maat
+   "waar hangt het antwoord van de agent van af", en die maat is ARCHITECTUURVRIJ: zij
+   kijkt alleen naar wat de agent doet, niet naar wat er in hem zit. Dezelfde eis als bij
+   de geheugenhorizon van stap 12 — een maat die alleen op ANG te meten is, is een
+   beschrijving en geen meting. */
+const TUIN_ASSEN=[{naam:"kleur",niveaus:4},{naam:"beweging",niveaus:2},
+                  {naam:"grootte",niveaus:2},{naam:"geur",niveaus:2}]
+  .concat(Array.from({length:TUIN_AFL},(_,i)=>({naam:"afleider "+(i+1),niveaus:2})));
+const TUIN_AS_OFF=(()=>{ const o=[]; let s=0; for(const a of TUIN_ASSEN){ o.push(s); s+=a.niveaus; } o.push(s); return o; })();
+const TUIN_NIV=TUIN_AS_OFF[TUIN_AS_OFF.length-1];
+function tuinNiveau(d,t,ai){
+  if(ai===0) return d.kleur[t];
+  if(ai===1) return d.bew[t];
+  if(ai===2) return d.gro[t];
+  if(ai===3) return d.geur[t];
+  return d.afl[t*TUIN_AFL+(ai-4)]>=0.5?1:0;
+}
+function tuinLeegTelling(){
+  return {n:new Int32Array(TUIN_FASEN*TUIN_BAKKEN), g:new Int32Array(TUIN_FASEN*TUIN_BAKKEN),
+    prof:new Int32Array(TUIN_NIV*TUIN_BAKKEN), profN:new Int32Array(TUIN_NIV),
+    tikken:0, meer:0, geen:0};
+}
+function tuinTel(tel,d,t,P){
+  let ingedrukt=0, gekozen=-1;
+  for(let i=0;i<N_OUT;i++) if(P[i]){ ingedrukt++; if(gekozen<0) gekozen=i; }
+  tel.tikken++;
+  if(ingedrukt===0) tel.geen++; else if(ingedrukt>1) tel.meer++;
+  for(let f=0;f<TUIN_FASEN;f++){
+    const m=tuinBak(f,d.kleur[t],d.bew[t],d.gro[t],d.geur[t]);
+    const k=f*TUIN_BAKKEN+m;
+    tel.n[k]++;
+    if(ingedrukt===1 && gekozen===m) tel.g[k]++;
+  }
+  /* het antwoordprofiel per niveau van elke as; alleen een eenduidig antwoord telt mee */
+  if(ingedrukt===1){
+    for(let ai=0;ai<TUIN_ASSEN.length;ai++){
+      const l=TUIN_AS_OFF[ai]+tuinNiveau(d,t,ai);
+      tel.profN[l]++; tel.prof[l*TUIN_BAKKEN+gekozen]++;
+    }
+  }
+}
+/* Informedness over vier bakken. Null zolang niet elke bak is voorgekomen — dat is
+   "niet gemeten" en geen nul, dezelfde afspraak als bij seinOnderscheid. */
+function tuinScore(n,g,off){
+  let som=0, m=0;
+  for(let b=0;b<TUIN_BAKKEN;b++){ const N=n[off+b]; if(!N) return null; som+=g[off+b]/N; m++; }
+  if(m<TUIN_BAKKEN) return null;
+  const kans=1/TUIN_BAKKEN;
+  return (som/m-kans)/(1-kans);
+}
+/* De toevalsbodem. Bij het categorische beleid wordt er precies een handel gekozen, dus
+   elke bak heeft trefkans 1/4 en de score is exact nul. Bij vier losse Bernoulli-knoppen
+   is "precies de goede en verder niets" 1/16, en dat is (1/16 - 1/4)/(3/4) = -0,25.
+   Beide nagemeten in test-stap19.js. */
+function tuinToeval(cfg){ return (cfg&&cfg.catPolicy)? 0 : -0.25; }
+/* Waar hangt het antwoord van af? Per as de gemiddelde afstand tussen het antwoordprofiel
+   binnen een niveau en het profiel over alles heen (halve L1, dus 0 tot 1). Nul betekent:
+   het antwoord van de agent verandert niet met deze eigenschap. Een, dat het er volledig
+   door bepaald wordt. Let op: met eindig veel monsters staat deze maat door ruis altijd
+   iets boven nul, en dat is precies waarvoor de zes afleiders er zijn — hun gemiddelde is
+   de ruisbodem, gemeten in plaats van beredeneerd. */
+function tuinAfhankelijkheid(tel){
+  const P=new Float64Array(TUIN_BAKKEN); let N=0;
+  for(let l=TUIN_AS_OFF[0];l<TUIN_AS_OFF[1];l++){
+    N+=tel.profN[l];
+    for(let k=0;k<TUIN_BAKKEN;k++) P[k]+=tel.prof[l*TUIN_BAKKEN+k];
+  }
+  if(!N) return TUIN_ASSEN.map(()=>null);
+  for(let k=0;k<TUIN_BAKKEN;k++) P[k]/=N;
+  return TUIN_ASSEN.map((as,ai)=>{
+    let som=0, m=0;
+    for(let l=TUIN_AS_OFF[ai];l<TUIN_AS_OFF[ai+1];l++){
+      const n=tel.profN[l]; if(!n) continue;
+      let tv=0;
+      for(let k=0;k<TUIN_BAKKEN;k++) tv+=Math.abs(tel.prof[l*TUIN_BAKKEN+k]/n-P[k]);
+      som+=0.5*tv; m++;
+    }
+    return m? som/m : null;
+  });
+}
+
+/* Elk voorwerp staat op zichzelf, dus begint de wolk er schoon aan. Zonder dit draagt de
+   activatie van het vorige voorwerp over naar het volgende, en die is hier per constructie
+   ruis: de stroom is onafhankelijk geloot. Het maakt bovendien alle condities gelijk —
+   wolk, gelaagd net en recurrent net worden alledrie een zuivere functie van het voorwerp
+   dat er nu ligt, zodat "welke kanalen bereiken de knoppen" het hele verhaal is.
+   De sporen (B.cE, B.ebias) blijven staan: resetBrainState() wist die wél, en dat zou het
+   leren volledig stilleggen. Daarom hier een eigen, lichtere wis.
+   Wie de andere kant wil meten zet cfg.tuinReset op false. */
+function tuinWisActivatie(B){
+  B.act.fill(0); B.next.fill(0); B.clean.fill(0); B.prev.fill(0);
+  if(B.pre) B.pre.fill(0);
+}
+function tuinStart(){
+  S.step=0; S.epReward=0; S.epCollisions=0; S.epIdle=0; S.reached=false;
+  S.tuinTel=tuinLeegTelling(); S.tuinStrook=null; S.tuinScoreNu=null;
+  if(S.B) resetBrainState(S.B);
+  invoerReset();
+}
+/* De laatste dertig tikken, voor het tekenen. Alleen bijhouden als er iemand kijkt. */
+function tuinStrookTel(d,t,P,s){
+  if(!S.watching && !S.running) return;
+  if(!S.tuinStrook) S.tuinStrook=[];
+  S.tuinStrook.push({t, kleur:d.kleur[t], bew:d.bew[t], gro:d.gro[t], geur:d.geur[t],
+    moet:s.moet, gekozen:s.gekozen, ingedrukt:s.ingedrukt, goed:s.goed});
+  if(S.tuinStrook.length>30) S.tuinStrook.shift();
+}
+/* Een tik in de proeftuin. Zelfde volgorde als gameTick en seinTick — waarnemen, criticus
+   lezen, stap door het brein, sporen bijwerken, belonen — zodat de leerregel op alle drie
+   de spellen aantoonbaar hetzelfde doet. */
+function tuinTick(learn,noise){
+  const c=S.cfg, B=S.B, d=S.world;
+  MEET = learn ? "leer" : "inf";
+  if(learn) S.stapLeer++; else S.stapInf++;
+  S.lrScale=c.lrAnneal? (c.noise0>0? noise/c.noise0 : 1) : 1;
+  const t=S.step;
+  /* SPEL 3 VRAAGT DAT HET BREIN BINNEN EEN VOORWERP VAN ZINTUIG NAAR KNOP KAN REKENEN.
+     Een invoer-node mag niet rechtstreeks aan een knop hangen (canConnect), dus het
+     kortste pad is twee. Begint elk voorwerp met een schone wolk en is cfg.prop maar 1,
+     dan zien de knoppen per constructie nooit iets anders dan nul, en scoort elk net
+     precies nul — ook een net dat prima kan leren. Dat is het soort stille nul waar de
+     vaste regel over gaat: een meting moet eerst bewijzen dat er gemeten is. Daarom staat
+     hij hier in beeld en in het resultaatbestand, in plaats van dat cfg stilzwijgend wordt
+     overschreven — dat laatste zou een conditie uit de experimentloper iets anders laten
+     draaien dan er staat. */
+  if(t===0 && c.tuinReset!==false && (c.prop|0)<2 && !S.tuinGewaarschuwd){
+    S.tuinGewaarschuwd=true;
+    console.warn("proeftuin: prop = "+c.prop+" met een schone start per voorwerp — de knoppen "+
+      "kunnen de invoer niet bereiken (kortste pad is 2). Elke score wordt nul.");
+  }
+  if(c.tuinReset!==false) tuinWisActivatie(B);
+  tuinWaarnemen(d,t,S.inp);
+  if(learn) invoerTel(S.inp);
+  const criticOn=learn && !!c.criticOn;
+  let v0=0;
+  if(criticOn){ if(!S.inpNext) S.inpNext=new Float32Array(N_IN); v0=criticValue(B,S.inp); kb(3*N_IN); }
+  /* Terugpropagatie door de tijd heeft hier niets te doen: elk voorwerp is een eigen
+     beslissing en er loopt geen krediet over tikken heen. De opname blijft dus uit. */
+  B.bpttRec=null;
+  brainStep(B,S.inp,c,noise,S.rnd);
+  const P=B.press;
+  S.outPressed=[!!P[0],!!P[1],!!P[2],!!P[3]];
+  if(learn){
+    if(c.gradExact) updateTracesExact(B,c.lam);
+    else updateTraces(B,c.lam,c.traceOud,c.perturbGain);
+  }
+  const fase=tuinFaseVan(c);
+  const s=tuinScoreTik(d,t,P,fase);
+  tuinTel(S.tuinTel,d,t,P);
+  S.epReward+=s.r;
+  tuinStrookTel(d,t,P,s);
+  let adv=null;
+  if(criticOn){
+    const terminaal=(t+1>=d.T);
+    tuinWaarnemen(d,Math.min(t+1,d.T-1),S.inpNext);
+    const v1=terminaal?0:criticValue(B,S.inpNext);
+    adv=s.r+c.criticGamma*v1-v0;
+    criticUpdate(B,S.inp,adv,c.criticLr);
+  }
+  if(learn) applyReward(B,s.r,c,S.lrScale,adv);
+  S.step++;
+  if(S.step>=d.T){
+    const sc=tuinScore(S.tuinTel.n,S.tuinTel.g,fase*TUIN_BAKKEN);
+    S.tuinScoreNu=sc;
+    /* "Geslaagd" is een rapportagedrempel en geen onderdeel van de score — zie
+       TUIN_GESLAAGD. De vloeiende maat staat ernaast in de historie. */
+    S.reached=(sc!==null && sc>=TUIN_GESLAAGD);
+    return true;
+  }
+  return false;
+}
+
+/* De vaste toetsverzameling: het ijkpunt van spel 3. Eigen zaadreeks, gescheiden van de
+   trainingsrondes, nooit gebruikt om instellingen te kiezen. */
+const TUIN_BENCH_N=40, TUIN_BENCH_SEED0=8000000, TUIN_BENCH_STRIDE=89,
+      TUIN_BENCH_RNG=20260920, TUIN_BOOTSTRAP=400;
+function tuinBenchRondes(n,cfg){
+  const N=n||TUIN_BENCH_N;
+  const sleutel=String((cfg.tuinTikken|0)||TUIN_TIKKEN);
+  if(!S.tuinBench || S.tuinBench.sleutel!==sleutel || S.tuinBench.lijst.length<N){
+    const lijst=[];
+    for(let k=0;k<Math.max(N,TUIN_BENCH_N);k++)
+      lijst.push(tuinRonde(TUIN_BENCH_SEED0+k*TUIN_BENCH_STRIDE,cfg));
+    S.tuinBench={sleutel,lijst};
+  }
+  return S.tuinBench.lijst.slice(0,N);
+}
+/* Speel de vaste verzameling zonder leren en scoor haar tegen ALLE VIJF de fase-regels.
+   Dat kan in een doorloop omdat de regel alleen bepaalt wat goed heet en niet wat de agent
+   ziet: de antwoorden liggen na een doorloop vast, en daarna is elke regel een telling.
+   Alles wat de lopende run aangaat wordt bewaard en teruggezet — dit is een meting, geen
+   voortzetting van het spel. */
+function tuinBench(mode,n){
+  const c=S.cfg, B=S.B;
+  const saveW=Float32Array.from(B.cW), saveE=Float32Array.from(B.cE), saveB=Float32Array.from(B.bias);
+  const saveWorld=S.world, saveStep=S.step, saveR=S.epReward, saveReach=S.reached,
+        saveTel=S.tuinTel, saveStrook=S.tuinStrook, saveScore=S.tuinScoreNu;
+  const wasSample=S.evalSample, wasTemp=S.evalTemp, wasRnd=S.evalRnd, wasWatch=S.watching;
+  S.evalSample=(mode!=="streng");
+  S.evalTemp=tempOf(noiseEnd(c.noise0));
+  S.watching=false;
+  const rondes=tuinBenchRondes(n,c);
+  const fase=tuinFaseVan(c);
+  const tot=tuinLeegTelling();
+  const perRonde=[], perScore=[];
+  for(let k=0;k<rondes.length;k++){
+    S.evalRnd=mulberry32(TUIN_BENCH_RNG+k*131);
+    S.world=rondes[k];
+    tuinStart();
+    let done=false;
+    while(!done) done=tuinTick(false,0);
+    const tel=S.tuinTel;
+    for(let i=0;i<tel.n.length;i++){ tot.n[i]+=tel.n[i]; tot.g[i]+=tel.g[i]; }
+    for(let i=0;i<tel.prof.length;i++) tot.prof[i]+=tel.prof[i];
+    for(let i=0;i<tel.profN.length;i++) tot.profN[i]+=tel.profN[i];
+    tot.tikken+=tel.tikken; tot.meer+=tel.meer; tot.geen+=tel.geen;
+    perRonde.push({n:Int32Array.from(tel.n), g:Int32Array.from(tel.g)});
+    perScore.push(tuinScore(tel.n,tel.g,fase*TUIN_BAKKEN));
+  }
+  B.cW.set(saveW); B.cE.set(saveE); B.bias.set(saveB);
+  S.world=saveWorld; S.step=saveStep; S.epReward=saveR; S.reached=saveReach;
+  S.tuinTel=saveTel; S.tuinStrook=saveStrook; S.tuinScoreNu=saveScore;
+  S.evalSample=wasSample; S.evalTemp=wasTemp; S.evalRnd=wasRnd; S.watching=wasWatch;
+  resetBrainState(S.B);
+
+  const perFase={};
+  for(let f=0;f<TUIN_FASEN;f++){
+    const off=f*TUIN_BAKKEN;
+    perFase[TUIN_FASELETTER[f]]={naam:TUIN_FASENAAM[f], regel:TUIN_FASEREGEL[f],
+      groepen:TUIN_FASEGROEP[f], pct:tuinScore(tot.n,tot.g,off),
+      perBak:Array.from({length:TUIN_BAKKEN},(_,b)=>({bak:b, gevallen:tot.n[off+b], goed:tot.g[off+b],
+        pct: tot.n[off+b]? tot.g[off+b]/tot.n[off+b] : null}))};
+  }
+  /* Het interval komt uit een bootstrap over de rondes, met een vaste generator: hetzelfde
+     brein geeft hetzelfde interval. Per ronde is de score te grof om er direct een
+     spreiding uit te nemen (dertig voorwerpen per bak), dezelfde reden als bij spel 2. */
+  const alle=perRonde.map((_,k)=>k);
+  const scoreVan=idx=>{
+    const N=new Float64Array(TUIN_BAKKEN), G=new Float64Array(TUIN_BAKKEN);
+    const off=fase*TUIN_BAKKEN;
+    for(const k of idx){ const x=perRonde[k];
+      for(let b=0;b<TUIN_BAKKEN;b++){ N[b]+=x.n[off+b]; G[b]+=x.g[off+b]; } }
+    let som=0; for(let b=0;b<TUIN_BAKKEN;b++){ if(!N[b]) return null; som+=G[b]/N[b]; }
+    const kans=1/TUIN_BAKKEN;
+    return (som/TUIN_BAKKEN-kans)/(1-kans);
+  };
+  const hier=scoreVan(alle);
+  const bs=[], brnd=mulberry32(TUIN_BENCH_RNG+7);
+  for(let b=0;b<TUIN_BOOTSTRAP && alle.length>1;b++){
+    const idx=alle.map(()=>Math.floor(brnd()*alle.length));
+    const x=scoreVan(idx); if(x!==null) bs.push(x);
+  }
+  const m=(hier===null)?0:hier;
+  const bm=bs.length? bs.reduce((a,b)=>a+b,0)/bs.length : m;
+  const sd=bs.length>1? Math.sqrt(bs.reduce((a,b)=>a+(b-bm)*(b-bm),0)/(bs.length-1)) : 0;
+
+  const afh=tuinAfhankelijkheid(tot);
+  const kanaal={};
+  for(let ai=0;ai<4;ai++) kanaal[TUIN_ASSEN[ai].naam]=afh[ai];
+  const aflWaarden=afh.slice(4).filter(x=>x!==null);
+  const bodem=aflWaarden.length? aflWaarden.reduce((a,b)=>a+b,0)/aflWaarden.length : null;
+
+  return {pct:m, ci:1.96*sd, sd, maat:"informedness",
+    werelden:rondes.length, herhalingen:1, pogingen:rondes.length, rondes:rondes.length,
+    fase, faseLetter:TUIN_FASELETTER[fase], faseNaam:TUIN_FASENAAM[fase],
+    perFase, kanaalafhankelijkheid:kanaal, afleiderbodem:bodem,
+    afleiders:afh.slice(4), voorwerpen:tot.tikken,
+    meerDanEen: tot.tikken? tot.meer/tot.tikken : null,
+    geenHandel: tot.tikken? tot.geen/tot.tikken : null,
+    perWereld:perScore, modus:mode, gemStappen:null};
 }
 
 /* ======================= de vaste benchmarkset ======================= */
@@ -2878,7 +3429,8 @@ function benchBrain(mode,n,reps){
   /* stap 17: spel 2 heeft een eigen ijkpunt met een eigen vaste set. De aanroepers —
      runLeven, runBenchmark, de experimentloper — merken daar niets van en krijgen een
      object met dezelfde velden terug. */
-  if(S.cfg.taak==="seinhuis") return seinBench(mode,n);
+  if(S.cfg.taak==="seinhuis")  return seinBench(mode,n);
+  if(S.cfg.taak==="proeftuin") return tuinBench(mode,n);
   const c=S.cfg, B=S.B;
   const saveW=Float32Array.from(B.cW), saveE=Float32Array.from(B.cE), saveB=Float32Array.from(B.bias);
   const saveWorld=S.world, saveAg={x:S.ag.x,y:S.ag.y}, saveTrail=S.trail, saveStep=S.step,
@@ -2972,7 +3524,10 @@ function geheugenProef(n,blindAt,H){
      in het seinhuis is er geen koers en geen doel. Null teruggeven is hier eerlijker dan
      een getal: de proef hoort bij spel 1. Spel 2 meet geheugen op zijn eigen manier,
      namelijk aan de score op R3 en R4 afzonderlijk. */
-  if(S.cfg.taak==="seinhuis") return null;
+  /* stap 19: de blinderingsproef hoort bij spel 1 en gaat over het doel; spel 2 en 3
+     hebben geen doel om te verbergen. Op taak in plaats van op "seinhuis" getoetst, zodat
+     er een spel bij kan zonder dat deze regel het stilzwijgend verkeerd doet. */
+  if(S.cfg.taak!=="doel") return null;
   const N=n||MEM_N, BA=blindAt||MEM_BLIND, HH=H||MEM_H, B=S.B;
   const saveW=Float32Array.from(B.cW), saveE=Float32Array.from(B.cE), saveB=Float32Array.from(B.bias);
   const saveWorld=S.world, saveAg={x:S.ag.x,y:S.ag.y}, saveTrail=S.trail, saveStep=S.step,
@@ -3192,9 +3747,158 @@ function drawSeinhuis(){
     (tel?("   ·   loos alarm "+tel.loos+" van "+tel.stil+" stille tikken"):""), pad, H-pad*0.4);
 }
 
+/* ======================= tekenen: de proeftuin =======================
+   Op hetzelfde canvas als spel 1 en 2. Wat je ziet, van boven naar beneden: welke fase er
+   loopt en wat de regel van die fase is; het voorwerp dat er nu ligt; de zestien kanalen
+   als balkjes, gegroepeerd per eigenschap; de vier bakken met de gekozen bak gevuld en de
+   juiste bak omrand; een strook van de laatste dertig voorwerpen; de trefkans per bak; en
+   onderaan de maat waar het deze proef om draait — waar hangt het antwoord van de agent
+   eigenlijk van af, met de zes afleiders als ruisbodem erin getekend.
+
+   Die onderste balken zijn de reden dat dit spel een eigen tekening heeft. Bij een omslag
+   hoor je de aandacht van de agent te zien verschuiven van de ene eigenschap naar de
+   andere, en dat is iets wat je aan een score niet ziet.                                */
+function drawProeftuin(){
+  const cvs=$("worldcvs"), ctx=cvs.getContext("2d");
+  const W=cvs.width, H=cvs.height;
+  ctx.clearRect(0,0,W,H);
+  ctx.fillStyle="#0f1114"; ctx.fillRect(0,0,W,H);
+  const d=S.world, tel=S.tuinTel;
+  if(!d || !d.kleur){ return; }
+  const t=Math.min(S.step,d.T-1);
+  const pad=Math.round(W*0.035);
+  const fase=tuinFaseVan(S.cfg);
+  const groot=(H*0.028)|0, klein=(H*0.022)|0;
+  const zet=(px)=>{ ctx.font="600 "+px+"px system-ui,sans-serif"; };
+
+  /* ---- fase en regel ---- */
+  zet(groot); ctx.textAlign="left"; ctx.fillStyle="#ffb454";
+  ctx.fillText("fase "+TUIN_FASENAAM[fase], pad, pad+H*0.025);
+  zet(klein); ctx.fillStyle="#7c8794";
+  ctx.fillText(TUIN_FASEREGEL[fase], pad, pad+H*0.055);
+
+  /* ---- het voorwerp ---- */
+  /* De regel van de fase is een hele zin en die moet zijn eigen regel houden; in de
+     eerste opzet begon de kanalenkop op dezelfde hoogte en liep de tekst door elkaar. */
+  const oy=pad+H*0.175, ox=pad+W*0.085;
+  const r=(d.gro[t]===0? W*0.055 : W*0.030);
+  if(d.bew[t]===0){
+    ctx.strokeStyle="#55606b"; ctx.lineWidth=2;
+    for(let i=1;i<=3;i++){ const y=oy-r*0.4+i*r*0.4;
+      ctx.beginPath(); ctx.moveTo(ox-r-W*0.055,y); ctx.lineTo(ox-r-W*0.012,y); ctx.stroke(); }
+  }
+  ctx.beginPath(); ctx.arc(ox,oy,r,0,Math.PI*2);
+  ctx.fillStyle=TUIN_KLEURCOL[d.kleur[t]]; ctx.fill();
+  if(d.bew[t]===1){ ctx.setLineDash([5,4]); ctx.strokeStyle="#e6e9ee"; ctx.lineWidth=2; ctx.stroke(); ctx.setLineDash([]); }
+  zet(klein); ctx.textAlign="center"; ctx.fillStyle="#9aa4b0";
+  ctx.fillText(TUIN_KLEURNAAM[d.kleur[t]]+", "+(d.gro[t]===0?"groot":"klein"), ox, oy+r+H*0.032);
+  ctx.fillText((d.bew[t]===0?"bewegend":"stil")+", "+(d.geur[t]===0?"zoet":"zuur"), ox, oy+r+H*0.058);
+
+  /* ---- de zestien kanalen ---- */
+  const cx0=pad+W*0.22, cw=(W-pad-cx0)/(N_IN+4), ch=H*0.085, cy=oy-H*0.045;
+  zet(klein); ctx.textAlign="left"; ctx.fillStyle="#7c8794";
+  ctx.fillText("de zestien kanalen — in elke fase dezelfde", cx0, cy-H*0.012);
+  const grenzen=[0,4,6,8,10,16], gnaam=["kleur","bew.","grootte","geur","afleiders"];
+  let gi=0;
+  for(let i=0;i<N_IN;i++){
+    while(gi<4 && i>=grenzen[gi+1]) gi++;
+    const x=cx0+(i+gi)*cw;
+    const v=clamp(S.inp[i],0,1);
+    ctx.fillStyle="#181c22"; ctx.fillRect(x,cy,cw*0.8,ch);
+    const hoort=TUIN_FASEGROEP[fase].indexOf(gnaam[gi]==="bew."?"beweging":gnaam[gi])>=0;
+    ctx.fillStyle = hoort? "#4fd1c5" : "#3b434e";
+    ctx.fillRect(x,cy+ch*(1-v),cw*0.8,ch*v);
+  }
+  gi=0;
+  ctx.fillStyle="#55606b"; ctx.font=Math.round(H*0.019)+"px system-ui,sans-serif"; ctx.textAlign="center";
+  for(let g=0;g<5;g++){
+    const van=cx0+(grenzen[g]+g)*cw, tot=cx0+(grenzen[g+1]-1+g)*cw+cw*0.8;
+    ctx.fillText(gnaam[g],(van+tot)/2,cy+ch+H*0.022);
+  }
+
+  /* ---- de vier bakken ---- */
+  const by=oy+H*0.150;
+  zet(klein); ctx.textAlign="left"; ctx.fillStyle="#7c8794";
+  ctx.fillText("bakken", pad, by+H*0.022);
+  const moet=tuinBak(fase,d.kleur[t],d.bew[t],d.gro[t],d.geur[t]);
+  for(let i=0;i<TUIN_BAKKEN;i++){
+    const bx=pad+W*0.13+i*(W*0.095), bwd=W*0.075, bhh=H*0.042;
+    const ge=S.outPressed&&S.outPressed[i];
+    ctx.fillStyle=ge?"#59c2ff":"#20252c"; ctx.fillRect(bx,by,bwd,bhh);
+    ctx.strokeStyle=(i===moet)?"#ff6b57":"#39414c"; ctx.lineWidth=(i===moet)?3:1;
+    ctx.strokeRect(bx,by,bwd,bhh);
+    ctx.fillStyle=ge?"#0f1114":"#55606b"; ctx.textAlign="center"; zet(klein);
+    ctx.fillText(String(i),bx+bwd/2,by+bhh*0.68);
+  }
+  ctx.textAlign="left"; ctx.fillStyle="#55606b"; ctx.font=Math.round(H*0.019)+"px system-ui,sans-serif";
+  ctx.fillText("omrand = de juiste bak   ·   gevuld = wat de agent koos", pad+W*0.13+4*(W*0.095)+W*0.01, by+H*0.028);
+
+  /* ---- de laatste dertig voorwerpen ---- */
+  const st=S.tuinStrook||[];
+  const sy=by+H*0.085, sh=H*0.075, sw=(W-2*pad)/30;
+  zet(klein); ctx.textAlign="left"; ctx.fillStyle="#7c8794";
+  ctx.fillText("laatste 30 voorwerpen", pad, sy-H*0.012);
+  for(let i=0;i<st.length;i++){
+    const rr=st[i], x=pad+i*sw;
+    ctx.fillStyle="#181c22"; ctx.fillRect(x,sy,sw-1,sh);
+    ctx.fillStyle=TUIN_KLEURCOL[rr.kleur]; ctx.fillRect(x,sy,sw-1,sh*0.26);
+    ctx.fillStyle=rr.goed?"#3fa66b":"#c0392b"; ctx.fillRect(x,sy+sh*0.30,sw-1,sh*0.70);
+    ctx.fillStyle="#0f1114"; ctx.textAlign="center";
+    ctx.font=Math.round(sh*0.42)+"px system-ui,sans-serif";
+    ctx.fillText(String(rr.moet), x+sw/2, sy+sh*0.88);
+  }
+
+  /* ---- trefkans per bak, deze ronde ---- */
+  const ry=sy+sh+H*0.05, rh=H*0.028, rx=pad+W*0.22, rw=W*0.40;
+  zet(klein); ctx.textAlign="left"; ctx.fillStyle="#7c8794";
+  const sc=tel? tuinScore(tel.n,tel.g,fase*TUIN_BAKKEN) : null;
+  ctx.fillText("trefkans per bak, deze ronde   ·   informedness "+
+    (sc===null? "nog niet elke bak gezien" : (100*sc).toFixed(0)+"%"), pad, ry-H*0.012);
+  for(let b=0;b<TUIN_BAKKEN;b++){
+    const y=ry+b*(rh+H*0.008), off=fase*TUIN_BAKKEN+b;
+    const n=tel?tel.n[off]:0, g=tel?tel.g[off]:0, f=n? g/n : 0;
+    ctx.fillStyle="#9aa4b0"; ctx.textAlign="left"; ctx.font=Math.round(H*0.020)+"px system-ui,sans-serif";
+    ctx.fillText("bak "+b, pad, y+rh*0.78);
+    ctx.fillStyle="#181c22"; ctx.fillRect(rx,y,rw,rh);
+    if(n){ ctx.fillStyle = f>0.75?"#3fa66b" : f>0.4?"#ffb454" : "#c0392b"; ctx.fillRect(rx,y,rw*f,rh); }
+    /* de toevalslijn: een kwart, want er zijn vier bakken */
+    ctx.fillStyle="#7c8794"; ctx.fillRect(rx+rw*0.25-1,y,2,rh);
+    ctx.textAlign="right"; ctx.fillStyle="#9aa4b0";
+    ctx.fillText(n? (100*f).toFixed(0)+"%   "+g+"/"+n : "–", W-pad, y+rh*0.78);
+  }
+
+  /* ---- waar hangt het antwoord van af ---- */
+  const ay=ry+TUIN_BAKKEN*(rh+H*0.008)+H*0.045, ah=H*0.028;
+  const afh=tel? tuinAfhankelijkheid(tel) : null;
+  const aflW=afh? afh.slice(4).filter(x=>x!==null) : [];
+  const bodem=aflW.length? aflW.reduce((a,b)=>a+b,0)/aflW.length : null;
+  zet(klein); ctx.textAlign="left"; ctx.fillStyle="#7c8794";
+  ctx.fillText("waar hangt het antwoord van de agent van af?   ·   streep = ruisbodem van de zes afleiders", pad, ay-H*0.012);
+  for(let g=0;g<4;g++){
+    const y=ay+g*(ah+H*0.008);
+    const v=afh&&afh[g]!==null? afh[g] : 0;
+    const hoort=TUIN_FASEGROEP[fase].indexOf(TUIN_ASSEN[g].naam)>=0;
+    ctx.fillStyle=hoort?"#e6e9ee":"#7c8794"; ctx.textAlign="left"; ctx.font=Math.round(H*0.020)+"px system-ui,sans-serif";
+    ctx.fillText(TUIN_ASSEN[g].naam+(hoort?"  (telt in deze fase)":""), pad, y+ah*0.78);
+    ctx.fillStyle="#181c22"; ctx.fillRect(rx,y,rw,ah);
+    ctx.fillStyle=hoort?"#4fd1c5":"#8b7cf0"; ctx.fillRect(rx,y,rw*clamp(v,0,1),ah);
+    if(bodem!==null){ ctx.fillStyle="#ff6b57"; ctx.fillRect(rx+rw*clamp(bodem,0,1)-1,y,2,ah); }
+    ctx.textAlign="right"; ctx.fillStyle="#9aa4b0";
+    ctx.fillText((100*v).toFixed(0)+"%", W-pad, y+ah*0.78);
+  }
+
+  /* ---- voet: budget en teller ---- */
+  ctx.textAlign="left"; ctx.fillStyle="#55606b"; ctx.font=Math.round(H*0.020)+"px system-ui,sans-serif";
+  const bud=(S.cfg&&S.cfg.connBudget|0)||0;
+  ctx.fillText("voorwerp "+(t+1)+" / "+d.T+
+    "   ·   verbindingen "+(S.B?S.B.nc:0)+(bud? " van "+bud+" (budget)":" (geen budget)")+
+    (bodem!==null? "   ·   ruisbodem "+(100*bodem).toFixed(0)+"%":""), pad, H-pad*0.35);
+}
+
 /* ======================= tekenen: wereld ======================= */
 function drawWorld(){
-  if(S.cfg && S.cfg.taak==="seinhuis") return drawSeinhuis();
+  if(S.cfg && S.cfg.taak==="seinhuis")  return drawSeinhuis();
+  if(S.cfg && S.cfg.taak==="proeftuin") return drawProeftuin();
   const cvs=$("worldcvs"), ctx=cvs.getContext("2d");
   const W=cvs.width, H=cvs.height, sx=W/WW, sy=H/WH;
   ctx.clearRect(0,0,W,H);
@@ -3467,6 +4171,15 @@ function updateStatus(){
     const tel=S.seinTel;
     $("s-dist").textContent = tel ? (tel.goedTot+"/"+tel.eisTot) : "–";
     $("s-col").textContent = tel ? tel.loos : 0;
+  } else if(S.cfg && S.cfg.taak==="proeftuin"){
+    /* stap 19: geen doel, dus ook geen afstand ertoe. Op dezelfde plek: hoeveel
+       voorwerpen van deze ronde in de goede bak gingen, en hoe vaak er geen of meer
+       dan een handel werd ingedrukt. */
+    const tel=S.tuinTel, off=tuinFaseVan(S.cfg)*TUIN_BAKKEN;
+    let n=0, g=0;
+    if(tel) for(let b=0;b<TUIN_BAKKEN;b++){ n+=tel.n[off+b]; g+=tel.g[off+b]; }
+    $("s-dist").textContent = tel ? (g+"/"+n) : "–";
+    $("s-col").textContent = tel ? (tel.meer+tel.geen) : 0;
   } else {
     $("s-dist").textContent=S.world?fmt(Math.hypot(S.world.goal.x-S.ag.x,S.world.goal.y-S.ag.y),1):"–";
     $("s-col").textContent=S.epCollisions;
@@ -3760,12 +4473,26 @@ function buildResult(naamOverride){
         /* stap 18: welke maat pct is, en de oude maat ernaast */
         ...(S.lastBench.beleid.maat?{maat:S.lastBench.beleid.maat,
           trefkansEisen:S.lastBench.beleid.trefkansEisen}:{}),
+        /* stap 19: en nu voor spel 3. Precies dezelfde fout als hierboven, opnieuw
+           gemaakt en opnieuw door de test gevangen: tuinBench rekende de score op alle
+           vijf de regels uit en dit blok kopieerde alleen de velden die spel 1 en 2
+           kennen, zodat het hele punt van spel 3 onderweg verdween. */
+        ...(S.lastBench.beleid.perFase?{perFase:S.lastBench.beleid.perFase,
+          fase:S.lastBench.beleid.fase, faseLetter:S.lastBench.beleid.faseLetter,
+          faseNaam:S.lastBench.beleid.faseNaam,
+          kanaalafhankelijkheid:S.lastBench.beleid.kanaalafhankelijkheid,
+          afleiders:S.lastBench.beleid.afleiders, afleiderbodem:S.lastBench.beleid.afleiderbodem,
+          meerDanEen:S.lastBench.beleid.meerDanEen, geenHandel:S.lastBench.beleid.geenHandel,
+          voorwerpen:S.lastBench.beleid.voorwerpen}:{}),
         loosAlarm:(S.lastBench.beleid.loosAlarm===undefined?null:S.lastBench.beleid.loosAlarm),
         foutlozeDiensten:(S.lastBench.beleid.foutlozeDiensten===undefined?null:S.lastBench.beleid.foutlozeDiensten),
         gemStappen:S.lastBench.beleid.gemStappen, pogingen:S.lastBench.beleid.pogingen,
         perWereld:S.lastBench.beleid.perWereld},
       streng:{pct:S.lastBench.streng.pct, ci:S.lastBench.streng.ci, sd:S.lastBench.streng.sd,
         ...(S.lastBench.streng.perRegel?{perRegel:S.lastBench.streng.perRegel}:{}),
+        ...(S.lastBench.streng.perFase?{perFase:S.lastBench.streng.perFase,
+          kanaalafhankelijkheid:S.lastBench.streng.kanaalafhankelijkheid,
+          afleiderbodem:S.lastBench.streng.afleiderbodem}:{}),
         gemStappen:S.lastBench.streng.gemStappen, pogingen:S.lastBench.streng.pogingen,
         perWereld:S.lastBench.streng.perWereld}
     }:null,
@@ -3800,6 +4527,41 @@ function buildResult(naamOverride){
         perRegel:Array.from(S.seinTel.eis).map((e,i)=>({id:SEIN_KORT[i], eisen:e, goed:S.seinTel.goed[i]}))
       } : null
     } : null,
+    /* stap 19: alles wat spel 3 aangaat in een blok, zodat een run van spel 1 of 2 er geen
+       veld bij krijgt en elke oudere run leesbaar blijft. */
+    proeftuin: (S.cfg.taak==="proeftuin") ? {
+      tikkenPerRonde:S.cfg.tuinTikken, fase:tuinFaseVan(S.cfg),
+      faseLetter:TUIN_FASELETTER[tuinFaseVan(S.cfg)],
+      fasen:TUIN_FASENAAM.map((n,i)=>({id:TUIN_FASELETTER[i], naam:n, regel:TUIN_FASEREGEL[i],
+        groepen:TUIN_FASEGROEP[i]})),
+      kanalen:{kleur:"0-3", beweging:"4-5", grootte:"6-7", geur:"8-9", afleiders:"10-15"},
+      toetsset:{aantal:TUIN_BENCH_N, eersteZaad:TUIN_BENCH_SEED0, stap:TUIN_BENCH_STRIDE},
+      toevalsbodem:tuinToeval(S.cfg), bovengrens:1, geslaagdDrempel:TUIN_GESLAAGD,
+      beleidsvorm:S.cfg.catPolicy?"een uit vier (altijd precies een bak)":"vier losse handels",
+      scoremaat:"informedness over vier bakken: (gemiddelde trefkans per bak - 1/4) / (3/4); 0 = het antwoord hangt niet van het voorwerp af, 1 = perfect",
+      toestandPerVoorwerp:(S.cfg.tuinReset!==false),
+      propagatiestappen:S.cfg.prop,
+      /* false betekent: deze opzet kan per constructie niet reageren — zie tuinTick */
+      kanReageren: !((S.cfg.tuinReset!==false) && (S.cfg.prop|0)<2),
+      beloning:{waarden:((S.cfg.tuinBeloning)||TUIN_BELONING).slice(),
+        volgorde:["goed","fout","per extra handel"]},
+      laatsteRonde: S.tuinTel ? {
+        voorwerpen:S.tuinTel.tikken, geenHandel:S.tuinTel.geen, meerDanEen:S.tuinTel.meer,
+        informedness:S.tuinScoreNu,
+        perBak:Array.from({length:TUIN_BAKKEN},(_,b)=>({bak:b,
+          gevallen:S.tuinTel.n[tuinFaseVan(S.cfg)*TUIN_BAKKEN+b],
+          goed:S.tuinTel.g[tuinFaseVan(S.cfg)*TUIN_BAKKEN+b]}))
+      } : null
+    } : null,
+    /* stap 19: de metabole boekhouding. Het budget is de bindende beperking; de tellingen
+       ernaast zijn wat het verbouwen werkelijk gekost heeft. */
+    metabool:{
+      verbindingsbudget:(S.cfg.connBudget|0)||0, verbindingenNu:S.B.nc,
+      herstructureringen:S.structLog.length,
+      gesnoeidTotaal:S.B.pruned, bijgegroeidTotaal:S.B.sprouted,
+      nieuweNeuronenTotaal:S.B.born, typeVeranderingenTotaal:S.B.retyped,
+      kantenBezoekenVerbouwen:S.kbStruct
+    },
     /* stap 16: de hele d-reeks, niet alleen het afgeleide getal. Drie keer eerder heeft
        dat het verschil gemaakt tussen een migratie van dertig seconden en een dag
        opnieuw meten (vaste regel). */
@@ -4090,6 +4852,8 @@ function clearRunState(){
   S.drift=null; S.driftLog=[]; S.epInSom=null; S.epInN=0;   /* stap 16 */
   S.lastMem=null;
   S.kbLeer=0; S.kbInf=0; S.stapLeer=0; S.stapInf=0;
+  S.kbStruct=0; S.tuinTel=null; S.tuinStrook=null; S.tuinScoreNu=null;   /* stap 19 */
+  S.tuinGewaarschuwd=false;
 }
 
 function applyResult(R,mode){
@@ -4280,8 +5044,21 @@ function runLeven(cfg,brainSeed,fasen,naam,meet){
     const opA=M.benchN? benchBrain("beleid",M.benchN,M.benchReps||1) : null;
     const geheugen=M.memN? geheugenProef(M.memN,M.memBlind,M.memH) : null;
     S.cfg.goalBlink=bewaardBlink; S.cfg.goalHide=bewaardHide;
+    /* stap 19: op elke fasegrens ook een momentopname van de structuur. De kritiek vraagt
+       er letterlijk naar — hoeveel verbindingen veranderen, welke neuronen van type
+       wisselen, hoeveel er bijkomen, welke zintuigen ineens belangrijk worden — en dat is
+       alleen per fase af te lezen als het per fase wordt opgeschreven. De tellers zijn
+       cumulatief over het leven; het verschil tussen twee grenzen is wat die fase deed. */
+    const As=analyze(S.B,S.cfg);
     grenzen.push({fase:f.naam, vanPoging:van, totPoging:tot, ov:f.ov||{},
-      opEigenTaak: hier? {pct:hier.pct, ci:hier.ci} : null,
+      structuur:{neuronen:S.B.n-HID0, verbindingen:S.B.nc, actieveVerbindingen:As.activeConns,
+        lussen:As.loops, kortstePad:As.shortest, meedoendeNeuronen:As.useful, losgeraakt:As.dead,
+        gesnoeidTot:S.B.pruned, bijgegroeidTot:S.B.sprouted, nieuweNeuronenTot:S.B.born,
+        typeVeranderingenTot:S.B.retyped, herstructureringenTot:S.structLog.length,
+        sensorGebruik:As.sensorUse},
+      opEigenTaak: hier? {pct:hier.pct, ci:hier.ci,
+        ...(hier.perFase?{perFase:hier.perFase, kanaalafhankelijkheid:hier.kanaalafhankelijkheid,
+          afleiderbodem:hier.afleiderbodem}:{})} : null,
       opTaakA: opA? {pct:opA.pct, ci:opA.ci} : null,
       geheugenhorizon: geheugen? geheugen.horizon : null,
       geheugenVoorsprong: geheugen? geheugen.voorsprong : null});
@@ -4523,7 +5300,19 @@ function initUI(){
   /* stap 17 */
   bindSlider("seintikken","seintikkenval",v=>v);
   bindSlider("seinregels","seinregelsval",v=>v);
-  if($("taak")) $("taak").addEventListener("change",()=>{ genBrain(); drawWorld(); });
+  /* stap 19 */
+  bindSlider("tuintikken","tuintikkenval",v=>v);
+  bindSlider("tuinfase","tuinfaseval",v=>TUIN_FASENAAM[clamp(+v,0,TUIN_FASEN-1)]);
+  bindSlider("connbudget","connbudgetval",v=>+v===0?"geen":v+" verbindingen");
+  if($("taak")) $("taak").addEventListener("change",()=>{
+    /* stap 19: spel 3 heeft minstens twee propagatiestappen nodig — zie tuinTick. De
+       schuif wordt zichtbaar omhoog gezet in plaats van dat cfg stilletjes wordt
+       overschreven, zodat wat er staat ook is wat er draait. */
+    if($("taak").value==="proeftuin" && $("prop") && +$("prop").value<2){
+      $("prop").value=2; $("prop").dispatchEvent(new Event("input"));
+    }
+    genBrain(); drawWorld();
+  });
   bindSlider("goalhide","goalhideval",v=>+v===0?"nooit":v+" stappen");
   bindSlider("goalblink","goalblinkval",v=>v);
   bindSlider("worldevery","worldeveryval",v=>v);
@@ -4727,6 +5516,16 @@ window.__brain={S,createBrain,analyze,makeWorld,readCfg,startTraining,stopTraini
   SEIN_REGELS,SEIN_KORT,SEIN_REGELNAAM,SEIN_LAMPEN,SEIN_RUIS,SEIN_TIKKEN,
   /* stap 18 */
   seinOnderscheid,SEIN_BELONING,SEIN_BELONING_OUD,SEIN_ACTIES,seinToeval,seinTick,seinStart,bpttLeer,
+  /* stap 19: de proeftuin, zodat tests/test-stap19.js de schaal met dezelfde scorefunctie
+     kan nameten die de benchmark gebruikt, en het budget los kan toetsen. */
+  tuinRonde,tuinWaarnemen,tuinScoreTik,tuinBak,tuinScore,tuinTel,tuinLeegTelling,
+  tuinAfhankelijkheid,tuinBench,tuinBenchRondes,tuinTick,tuinStart,tuinToeval,tuinFaseVan,
+  actiesVoor,budgetAfdwingen,drawProeftuin,
+  TUIN:{BAKKEN:TUIN_BAKKEN,AFL:TUIN_AFL,FASEN:TUIN_FASEN,TIKKEN:TUIN_TIKKEN,
+    ACTIES:TUIN_ACTIES,BELONING:TUIN_BELONING,GESLAAGD:TUIN_GESLAAGD,
+    FASELETTER:TUIN_FASELETTER,FASENAAM:TUIN_FASENAAM,FASEREGEL:TUIN_FASEREGEL,
+    FASEGROEP:TUIN_FASEGROEP,ASSEN:TUIN_ASSEN,BENCH_N:TUIN_BENCH_N,
+    BENCH_SEED0:TUIN_BENCH_SEED0,BENCH_STRIDE:TUIN_BENCH_STRIDE},
   runOne,runLeven,cfgOverride,runExperiments,csvRow,CSV_COLS,meanCI,mannWhitney,
   benchmarkWorlds,benchWorldSeed,playWorlds,benchBrain,benchReactief,runBenchmark,createLayered,
   reactiefDir,reactiefTick,moveAgent,rayDist,blocked,DIRV,

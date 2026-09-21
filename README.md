@@ -51,7 +51,7 @@ niet bereikbaar.
 | 01 | **NN Layer Test** | Bouw zelf een klein neuraal netwerk (tot 5 verborgen lagen) op koffiereviews, spam, MNIST-cijfers of EMNIST-letters, en zoek de omslag tussen "te klein" en "goed genoeg". | dataset voor taak C/D |
 | 02 | **Ollama LLM-test** | 18 vaste opdrachten voor een lokaal draaiend taalmodel: 6 vaardigheden × 3 moeilijkheidsgraden, met faalpatronen en remedies. | Ollama + webserver |
 | 03 | **Statistische modellen** | Acht klassieke modellen zonder AI — van rechte lijn tot random forest, kernel-SVM en k-means — live op echte datasets. Laat zien hoe ver je komt met een gewoon script. | niets |
-| 04 | **Basic Brain Test** | Een neuraal netwerk zónder lagen dat al spelend leert een doel te bereiken. Zie hieronder. | niets |
+| 04 | **Basic Brain Test** | Een neuraal netwerk zónder lagen dat al spelend leert een doel te bereiken, plus twee andere spellen op hetzelfde brein: het Seinhuis (geheugen op vier tijdschalen) en de Proeftuin (dezelfde zintuigen, wisselende betekenis). Zie hieronder. | niets |
 
 Bij elke test hoort een resultatenpagina waarmee je runs naast elkaar legt.
 
@@ -94,7 +94,26 @@ testset instort; en polynomiaal graad 8 gaat van LOOCV 0,36 naar 0,96 door ridge
 
 De nieuwste en eigenzinnigste test. Een brein dat **geen lagen** heeft maar een gerichte
 graaf is die zichzelf tijdens het leren herbouwt, en dat een klein 2D-spel speelt: een
-karakter moet een doel bereiken zonder tegen obstakels te botsen.
+karakter moet een doel bereiken zonder tegen obstakels te botsen. Op hetzelfde brein staan
+inmiddels twee andere spellen: het *Seinhuis* (stap 17) en de *Proeftuin* (stap 19) — zie
+verderop.
+
+> **Stand op 20 september 2026 (paper 3.0).** Het doel van ANG is niet een beter neuraal
+> netwerk te zijn, maar te onderzoeken onder welke omgevingsdruk een lerend systeem zijn
+> eigen rekenstructuur verbouwt, en of dat verbouwen zich terugbetaalt. Op beide spelen is
+> het antwoord tot nu toe **nee**: niet in eindprestatie, niet in geheugen, niet in
+> monsterefficiëntie, niet in aanpassingssnelheid, en ook niet als de herstructurering op
+> een signaal uit de omgeving wordt aangestuurd. Wat wél iets oplevert staat per sectie
+> hieronder, met de meting erbij.
+>
+> **Afgesloten op 21 september 2026 (paper 4.0).** Een derde spel, de proeftuin, maakte de
+> situatie die de eerste twee misten: dezelfde zintuigen, een verschuivende betekenis, en
+> capaciteit die alleen verplaatst kan worden. De kalibratie liet zien dat de wolk daar na
+> de eerste fase haar leervermogen verliest — ook met bevroren structuur, terwijl dezelfde
+> leerregel in een gelaagd net gewoon herleert — en dat verbouwen het herleren slechter
+> maakt. Daarmee is het idee op drie taken nergens bevestigd, en is het werk afgesloten.
+> Wat blijft is het gereedschap en een lijst faalvormen; zie **Wat dit project oplevert**
+> onderaan dit deel.
 
 ![Het netwerk en de wereld](docs/ang-brein.png)
 
@@ -366,6 +385,245 @@ runs per conditie. Dat is geen formaliteit: bij het schrijven van deze reeks ble
 strenge-invoerconditie tot dan toe alleen vanuit het vinkje in de pagina werkte en niet
 vanuit de experimentloper. Ruwe meting: `experimenten/ablatie.json`.
 
+### Hoe groot moet het netwerk zijn? — de oorspronkelijke vraag
+
+Vijf groottes (8, 16, 30, 60, 120 neuronen) × drie startdichtheden × twee taakstanden
+(**A**: doel altijd zichtbaar, **B-20**: doel tien stappen aan en twintig uit), 8 zaden per
+cel, de leersnelheid per cel geveegd op eigen zaden. Beste dichtheid per grootte:
+
+| neuronen | benchmark taak A | benchmark taak B-20 |
+|---|---|---|
+| 8 | 26,5% ± 11,5 | 5,4% ± 2,5 |
+| 16 | 54,1% ± 4,0 | 8,8% ± 1,9 |
+| 30 | 58,3% ± 6,0 | 10,4% ± 2,3 |
+| **60** | **68,5% ± 4,4** | 14,0% ± 2,9 |
+| 120 | 67,8% ± 1,3 | **18,5% ± 7,3** |
+
+**Te klein is veel duurder dan te groot** — het omgekeerde van wat er vooraf was
+opgeschreven. Van 60 terug naar 8 neuronen kost 42,0 procentpunt op taak A, doorschalen
+naar 120 slechts 0,7. De vuistregel "neem hem ruim" klopt hier dus. Zonder geheugendruk ligt
+het optimum bij 60 neuronen; mét geheugendruk ligt het op de rand van het raster, en dat is
+geen optimum: alleen "tot 120 blijft meer beter".
+
+**Waaraan herken je een verkeerd gedimensioneerd netwerk?** De rangcorrelatie met de score,
+bepaald op de zwakste van de twee taken: de **geheugenhorizon** wint (0,78 op A, 0,70 op
+B-20), omdat hij meet wat het netwerk kán en niet wat erin zit. Het aantal **losgeraakte
+neuronen** wisselt van teken tussen de taken (−0,62 op A, +0,21 op B-20) en is als losse
+diagnose onbruikbaar. Bijvangst: onder ongeveer dertig neuronen is *dichtheid* geen knop
+meer maar een gevolg van de grootte, omdat het aantal legale verbindingen dan het plafond
+vormt. Ruwe meting: `experimenten/capaciteitsraster.json`.
+
+### Verbouwen midden in het leven — omslagproef, structuur tegen gedrag, en een signaal
+
+**De omslagproef (stap 13).** Eén doorlopend leven van 900 pogingen zonder reset: 300 keer
+het doel altijd zichtbaar, 300 keer knipperend, 300 keer weer zichtbaar. Vijf condities ×
+twaalf zaden.
+
+| conditie | hersteltijd (pogingen) | behoud van taak A (pp) |
+|---|---|---|
+| ANG | 26,8 | −13,8 |
+| ANG, structuur bevroren | 32,4 | −12,7 |
+| ANG, zonder snoeien | 21,3 | −11,6 |
+| Elman-16, backprop | 1,5 | −2,2 |
+| MLP 16-16-4, backprop | 12,3 | +0,7 |
+
+ANG herstelt niet aantoonbaar sneller dan de bevroren variant (p = 0,30, na Holm 0,60), en
+vergeet niet meer (p = 0,84): het vergeten zit in de leerregel en de graaf, niet in het
+verbouwen. De herstructurering loopt op een **klok** en piekt niet na een omslag. Let op:
+de snelle hersteltijd van de vaste netten meet vooral dat zij **niets hadden om van te
+herstellen** — bij hen meet die maat de afwezigheid van een verstoring, niet de snelheid
+van aanpassen. Data: `experimenten/omslag.json`.
+
+**Structuur tegen gedrag (stap 14).** Geen nieuwe metingen, wel vier nieuwe vragen aan de
+bestaande runs. De gepoolde correlatie tussen aantal verbindingen en score is 0,68, maar
+binnen elke taakstand apart loopt hij van −0,05 tot 0,63: de pool meet vooral welke *taak*
+een run had. Binnen één leven stabiliseert de structuur gemiddeld zo'n **honderd pogingen
+vóór** het gedrag (12 van 12 levens, p = 0,0005). Twaalf verschillende beginwolken
+eindigen op een smalle band van vergelijkbare organisaties (rho tussen
+organisatieverschil en scoreverschil: 0,145). En de klok is niet blind: de hoeveelheid
+verbouwing volgt lokale stagnatie (rho = −0,32, 24 van 24 levens), alleen kijkt zij naar
+het verkeerde signaal om een omslag te herkennen. Data: `experimenten/structuurgedrag.json`.
+
+**Herstructureren op een signaal uit de omgeving (stap 16).** De klok is vervangen door
+een detector die de statistiek van de zestien invoerkanalen bewaakt. Hij ziet de terugslag
+naar de zichtbare taak in **12 van de 12 levens**, gemiddeld 3,2 pogingen na de omslag, en
+de herstructurering wordt daar 17 keer zo dicht. **Het herstel verandert er niet van**:
+30,3 ± 8,4 pogingen tegen 26,8 ± 8,4 voor de klok (Holm 1,00), en ook niet tegenover een
+klok met per zaad precies evenveel verbouwrondes (29,4 ± 7,6). Daarmee is de negatieve
+bevinding niet meer aan de aansturing toe te schrijven. Twee voorbehouden: de detector
+ziet alleen de terugslag en niet het donker worden, en alle hersteltijden liggen tussen 27
+en 32 pogingen, dus er is weinig ruimte voor een voordeel. Data:
+`experimenten/signaalsturing.json`.
+
+### Een tweede spel: het Seinhuis (stap 17–18)
+
+Een taak zonder ruimte en zonder navigatie, gebouwd om de aanspraak op meerdere
+tijdschalen tegelijk te toetsen. De agent is een seinhuiswachter: zestien invoerkanalen
+(acht seinlampen, de wisselstand en **zeven afleiders** die nergens over gaan), vier
+handels, en zes regels met tijdschalen van één tik tot zeventig tikken. Goed is: de
+gevraagde handel ingedrukt én de andere drie niet. Elke handel wordt door twee regels
+gebruikt, zodat hij geen verklikker van de regel kan zijn.
+
+![Het seinhuis](docs/seinhuis.png)
+
+De score is **Youdens J per regel**: 0 betekent dat de reactie niet van de voorwaarde
+afhangt, 100 dat zij perfect is. De eerste twee scoredefinities deugden niet — een
+reflexspeler haalde 97% op een telregel en een muntspeler 51% — en beide staan nu als
+controle op nul in `tests/test-stap18.js`. Bij het bouwen bleek bovendien dat de
+"Elman met backprop door de tijd" uit stap 6 in werkelijkheid was afgekapt op één tik;
+echte BPTT is gebouwd (gradiënt-cosinus 1,000000) en de correctie staat in de paper.
+
+Afsluitende meting, zes condities × twaalf zaden, met de voorspellingen vooraf in git:
+
+| conditie | R1 | R2 | R3 | R4 | R5 | R6 | totaal |
+|---|---|---|---|---|---|---|---|
+| ANG | −5 | −5 | −95 | −95 | −7 | −7 | −36 |
+| ANG, bevroren | −3 | −2 | −97 | −97 | −3 | −3 | −34 |
+| MLP-32, geen geheugen | **75** | **91** | −3 | −3 | −2 | −1 | 26 |
+| Elman-32, afgekapt op 1 tik | 55 | 65 | −18 | −34 | −2 | 21 | 15 |
+| Elman-32, echte BPTT | 65 | 68 | −12 | −29 | −1 | 0 | 15 |
+| Elman-64, echte BPTT | 25 | 17 | −18 | −47 | −19 | −1 | −7 |
+
+**Geen enkele architectuur leert een regel die geheugen vraagt** (24 toetsen, na Holm geen
+enkele boven nul), ook niet een recurrent net met echte BPTT. De recurrente netten zijn
+bovendien bimodaal over de zaden — perfect of ingestort — en ANG bleef overal stil. Daarom
+is spel 2 afgesloten: er is geen tegenstander die de latere regels leert, dus stap 19 en
+20 (groeiende dienstregeling, ablaties) zijn vervallen.
+
+**Wat dit voor de oorspronkelijke vraag betekent:** een slecht getraind netwerk faalde hier
+op manieren die niets met grootte te maken hebben — **stilvallen**, **gokken**, **steeds
+hetzelfde antwoord**, en een **reflex die de voorwaarde negeert** — en een groter net deed
+het zelfs slechter (Elman-64 onder Elman-32). Een gewone trefkans houdt die vormen niet uit
+elkaar; een maat die per voorwaarde beide kanten weegt wél. Dat is direct over te zetten
+naar lokale taalmodellen: verandert het antwoord wanneer de informatie verandert die ertoe
+doet? Ruwe meting: `experimenten/seinhuis-slot.json`.
+
+**De paper** (`ANG-paper.docx`, versie 3.0) beschrijft dit alles, elke tabel opgebouwd
+uit `experimenten/runs.csv` en de JSON-bestanden. Hij noemt zijn eigen correcties en
+kwalificaties, en de generator (`paper/paper.js`) bouwt hem met `tests\bouw-paper.cmd`.
+
+### Een derde spel: de proeftuin (stap 19)
+
+De taak waarin zelfstructurering iets te doen zou moeten hebben. Spel 1 en spel 2 hebben
+samen achttien meetstappen opgeleverd waarin structurele plasticiteit nergens iets
+opleverde — maar in beide spellen verandert de **optimale interne organisatie** nooit.
+Welke zintuigen ertoe doen ligt van de eerste tot de laatste poging vast, en wie zijn
+bedrading mag verbouwen heeft er dan per constructie niets te verbouwen.
+
+In de proeftuin komt elke tik één voorwerp langs met vier eigenschappen op vaste kanalen —
+kleur, beweging, grootte, geur — plus **zes afleiders** die nooit ergens over gaan. Het
+voorwerp moet in één van vier bakken. **De zestien kanalen blijven in elke fase precies
+dezelfde; alleen de betekenis verandert:**
+
+| fase | de regel | welke kanalen ertoe doen |
+|---|---|---|
+| **A** | bak = kleur | kleur |
+| **B** | bak = kleur, antwoorden paarsgewijs omgewisseld | kleur — dezelfde draden, ander gewicht |
+| **C** | bak = kleurgroep × beweging | kleur (grof) + **beweging, voor het eerst** |
+| **D** | bak = geur × grootte | **geur en grootte** — kleur en beweging doen niets meer |
+| **A′** | bak = kleur | kleur opnieuw — behoud en herleren |
+
+![De proeftuin](docs/proeftuin.png)
+
+Op de afdruk staat het lastigste moment van het spel: een net dat fase A volledig beheerst,
+op het ogenblik dat fase C is ingegaan. Onderin is te zien dat het antwoord nog volledig van
+de kleur afhangt (75%) en nog niet van de beweging (11%, vlak boven de ruisbodem van 7%).
+Dat is precies het gat dat dit spel meet.
+
+**Geen geheugen, nergens.** Elk voorwerp is op zichzelf te beoordelen. Dat is met opzet:
+spel 2 liep vast op geheugen, en die as hoort hier niet nog eens in de weg te staan.
+
+**De score** is informedness over vier bakken: (gemiddelde trefkans per bak − ¼) / ¾. Nul
+voor elke strategie waarin het antwoord niet van het voorwerp afhangt, één voor perfect —
+de maat van stap 18 doorgetrokken naar vier klassen. `tests/test-stap19.js` meet de schaal
+na: perfect 100%, altijd dezelfde bak 0,0%, een munt van vier kanten 0,0%, niets doen
+−33,3%, vier losse Bernoulli-knoppen −25,0%.
+
+**Eén meting geeft vijf scores.** De vaste toetsverzameling wordt in één doorloop gespeeld
+en de fase-regel bepaalt alleen wat "goed" heet. Daaruit volgt deze kruistabel — de
+oplossing van elke fase, gescoord op alle vijf de regels:
+
+| oplossing van | A | B | C | D | A′ |
+|---|---|---|---|---|---|
+| fase A | 100,0% | −33,3% | 34,6% | −1,5% | 100,0% |
+| fase B | −33,3% | 100,0% | 32,0% | −0,5% | −33,3% |
+| fase C | 34,6% | 32,0% | 100,0% | 0,2% | 34,6% |
+| fase D | −1,5% | −0,5% | 0,2% | 100,0% | −1,5% |
+
+Die tabel is geen formaliteit. **Fase B begint onder nul**: wie fase A kent geeft daar
+stelselmatig het maximaal verkeerde antwoord. **Fase C ligt voor een derde al in de
+oplossing van fase A**, want de kleur bepaalt daar nog steeds welk páár bakken in aanmerking
+komt. Wie "hersteltijd" meet zonder die startwaarden, meet iets anders dan hij denkt.
+
+**Waar hangt het antwoord van af?** Naast de score staat een architectuurvrije maat: per
+eigenschap de afstand tussen het antwoordprofiel binnen één niveau en het profiel over alles
+heen. Nul betekent dat het antwoord van de agent niet met die eigenschap meebeweegt, één dat
+het er volledig door bepaald wordt. Hij is op de wolk, op een gelaagd net en op een recurrent
+net precies hetzelfde te meten. De zes afleiders leveren de **ruisbodem**: wat zij scoren is
+wat ruis oplevert, gemeten in plaats van beredeneerd (rond 1–2% bij de volle toetsset).
+
+**Het verbindingsbudget — de metabole kost.** Een hard plafond op het aantal verbindingen.
+Erbij bouwen kan dan alleen wat het snoeien heeft vrijgemaakt, zodat de proef meet of een net
+zijn capaciteit kan *verplaatsen* en niet of méér plasticiteit altijd beter is. Bewust geen
+strafterm in de beloning: die loopt door een lopende basislijn en wordt daardoor opgeslokt —
+dan staat de kost wel in de rapportage terwijl de leerregel er niets mee doet. Op 0 is er
+geen plafond en verandert er niets aan spel 1 en 2.
+
+> **Let op bij het instellen.** Elk voorwerp begint met een schone wolk, en een invoer-node
+> mag niet rechtstreeks aan een knop hangen. Daarom moet **propagatiestappen minstens 2**
+> zijn; op 1 kan het signaal de knoppen binnen één voorwerp per constructie niet bereiken en
+> scoort élk net nul. Het kiezen van spel 3 in de pagina zet die schuif daarom omhoog, en het
+> resultaatbestand draagt een veld `kanReageren` dat het zegt wanneer het toch misgaat.
+
+**De kalibratie (stap 20)** — op aparte veegzaden, niet op de meetzaden — leverde een opzet
+op (budget 2400, geen spoor, schaarse perturbatie, vaste exploratie, 400 pogingen per fase;
+`experimenten/s20-opzet.json`) en haalde twee aannames onderuit:
+
+- **Fase B is geen controlefase maar een val.** Na fase A is het oude antwoord bij elke kleur
+  fout, dus er komt nooit een beloning voor het goede antwoord binnen. Elke leerder — ook een
+  gelaagd net met de exacte gradiënt — eindigt daardoor in dezelfde tussentoestand: twee
+  kleuren in één bak, precies de helft goed, **informedness exact 33,3 %**. Een zelfverzekerd
+  netwerk kan een omgekeerde regel niet afleren met alleen beloning.
+- **De wolk verliest na de eerste fase haar leervermogen.** Zij leert fase A tot 94–97 % en
+  daarna nauwelijks nog iets, ook bevroren, ook op fase D waar de oude oplossing niets zegt.
+  Een gelaagd net met **dezelfde leerregel en hetzelfde budget** herleert C, D en A′ tot
+  90–100 %. Geen verzadiging; zes ingrepen geprobeerd, geen enkele helpt.
+
+| leven, 400 pogingen per fase | A | B | C | D | A′ |
+|---|---|---|---|---|---|
+| gelaagd net 120, exacte gradiënt | 100,0 | 33,3 | 33,3 | 100,0 | 100,0 |
+| gelaagd net 120, leerregel van de wolk | 100,0 | 33,3 | 90,0 | 99,8 | 99,8 |
+| wolk, bevroren | 95,0 | 29,8 | 28,6 | 10,3 | 21,4 |
+| wolk, vrij | 94,1 | 28,5 | 23,7 | 4,9 | 11,2 |
+
+*Eén veegzaad; dit is kalibratie en geen meting.* De paper (sectie 10.14) geeft dezelfde
+tabel als gemiddelde over beide veegzaden. De voorgeregistreerde afsluitende meting is niet
+meer gedraaid: zij zou twee condities vergelijken die allebei dicht bij de vloer blijven.
+
+### Wat dit project oplevert
+
+Het idee — een netwerk dat zijn eigen structuur verbouwt, wint daarmee iets wat een vast
+netwerk niet kan — is op drie spellen en in meer dan tien meetreeksen nergens bevestigd.
+Wat overblijft, is bruikbaar buiten dit model, en voor de oorspronkelijke vraag over te
+kleine of slecht getrainde netwerken:
+
+| faalvorm | waar gezien | hoe je hem herkent |
+|---|---|---|
+| **te klein** kost veel meer dan te groot | capaciteitsraster (stap 9): 60 → 8 neuronen kost 42 pp, 60 → 120 kost 0,7 | de geheugenhorizon, niet het aantal verbindingen |
+| **stilvallen, gokken, steeds hetzelfde antwoord** | seinhuis (stap 18) | een score die per voorwaarde beide kanten weegt (Youdens J); een trefkans alleen ziet het niet |
+| **een reflex die de voorwaarde negeert** | seinhuis-kalibratie | idem — "lamp aan, handel erbij" scoort op trefkans bijna perfect |
+| **een omgekeerde regel niet kunnen afleren** | proeftuin, fase B | een score die op een exact rond getal blijft staan; twee klassen die in de verwarringsmatrix samenvallen |
+| **verlies van leervermogen na de eerste taak** | proeftuin, fase C–A′ | na een omslag vergelijken met een model dat opnieuw begint |
+| **een beperking die alles verbergt** | proeftuin-kalibratie: budget 1200 hield de wolk op de helft | kalibreer de beperking vóór de instellingen eronder |
+
+Geen van de middelste vier heeft met de grootte van het netwerk te maken. En het
+gereedschap: de slimste domme speler als ijkpunt, een kruistabel die de startwaarden van
+een herstel vóór de meting vastlegt, twee architectuurvrije maten (de blinderingsproef en
+de kanaalafhankelijkheid), en een werkwijze waarin de voorspelling in git staat vóór de
+data die haar moet weerleggen.
+
+Het volledige verhaal staat in `ANG-paper.docx` / `ANG-paper.pdf`, versie 4.0.
+
 ### Herhaalbaar, laadbaar, en in reeksen te draaien
 
 Een run ligt volledig vast door twee zaden: het **breinzaad** (de startwolk) en het
@@ -382,7 +640,7 @@ Daaruit volgen drie dingen die de pagina nu kan:
   of opnieuw te toetsen, of alleen de instellingen terugzetten en met een vers brein
   vanaf hetzelfde punt verder experimenteren.
 - **Experimentloper** — een lijst condities × zaden achter elkaar, zonder tekenen, met
-  per run een JSON en één regel in `experimenten/runs.csv` (74 kolommen: beide zaden,
+  per run een JSON en één regel in `experimenten/runs.csv` (79 kolommen: beide zaden,
   alle parameters die tussen condities verschillen, alle uitkomst- en structuurmaten,
   sinds stap 6 de rekenkosten en sinds stap 7 welke variant van de leerregel gedraaid
   heeft).
@@ -410,7 +668,10 @@ Daaruit volgen drie dingen die de pagina nu kan:
 | `resultaten-brein/` | Opgeslagen runs van test 04 (JSON, één bestand per brein) |
 | `experimenten/` | Meetreeksen van test 04: `runs.csv` met één regel per run, en de volledige runs in `runs/` (niet in git — ze zijn uit de zaden te reproduceren) |
 | `paper/` | Generator van het ANG-paper (`paper.js`) plus de scripts voor de formules en figuren |
-| `tests/` | Playwright-tests die de eigenschappen bewijzen waarop de paper zich beroept, plus de numerieke gradiëntcontrole (`gradcheck-*`) |
+| `tests/` | Playwright-tests (`test-stap*.js`) die de eigenschappen bewijzen waarop de paper zich beroept, de meetscripts (`exp-stap*.js`), de vooraf vastgelegde voorspellingen (`stap*-condities.js`) en de numerieke gradiëntcontrole (`gradcheck-*`). Een script draaien: `tests\draai.cmd <script.js> <log.txt>` |
+| `docs/` | Figuren voor deze README: het netwerk, de gradiëntcontrole, het seinhuis en de proeftuin |
+| `ANG-paper.docx` / `.pdf` | Het ANG-paper, **versie 4.0 (slotversie)** — de PDF staat in git, de docx niet (`.gitignore`); de docx is te bouwen met `tests\bouw-paper.cmd` of `node paper/paper.js`, de PDF met LibreOffice (`soffice --headless --convert-to pdf ANG-paper.docx`) |
+| `PLAN-week.md` | Het oorspronkelijke weekplan |
 | `datasets/` | MNIST/EMNIST — **niet in git**, zie `datasets/README.md` |
 | `DOCUMENTATIE.md` | Volledige documentatie van test 01 en 02: opdrachten, scoring, faalpatronen, remedies en het logboek |
 
